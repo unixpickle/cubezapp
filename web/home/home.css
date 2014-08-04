@@ -1,0 +1,37 @@
+body, html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background-color: #3498d8;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 10px;
+}
+
+#timer-content {
+  position: absolute;
+  top: 5em;
+  
+  width: 100%;
+  height: calc(100% - 5em);
+  
+  text-align: center;
+}
+
+#time-input:focus {
+  outline: 0;
+}
+
+#time-input {
+  font-size: 7em;
+  width: 7em;
+  height: 1.3em;
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  color: #FFF;
+  
+  position: relative;
+  top: calc(50% - 0.65em);
+}

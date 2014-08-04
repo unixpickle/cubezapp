@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html style="margin: 0">
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cubezapp - Home</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="status-bar.css">
+  </head>
+ 
+  <body style="margin: 0">
+    <div id="status-bar">
+      <div id="solve-statuses">
+        <a id="solve-status-plus-two" class="solve-status">+2</a>
+        <a id="solve-status-dnf" class="solve-status">DNF</a>
+        <a id="solve-status-ok" class="solve-status solve-status-sel">OK</a>
+      </div>
+    </div>
+    <div id="timer-content">
+      <input id="time-input" value="0:00:00.00" />
+    </div>
+    <br />
+    <script type="application/dart" src="home.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>
