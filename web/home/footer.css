@@ -1,0 +1,14 @@
+#footer {
+  position: absolute;
+  bottom: 0px;
+  height: 30em;
+  width: 100%;
+  background-color: #FFF;
+}
+
+#tab-bar {
+  height: 5em;
+  width: 100%;
+  background-color: #EEE;
+  border-bottom: 2px solid #DCDCDC;
+}
