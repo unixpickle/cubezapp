@@ -54,6 +54,7 @@ class PentagonView {
       };
       gen();
     }
+    // don't animate
     new Timer.periodic(new Duration(milliseconds: 10), (_) => draw());
   }
   

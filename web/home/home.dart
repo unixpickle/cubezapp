@@ -27,4 +27,5 @@ void main() {
   });
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  pents.draw();
 }

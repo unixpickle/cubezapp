@@ -9,7 +9,7 @@ class Pentagon {
   
   static double randomRadius(Random r) {
     double first = pow(r.nextDouble(), 15) + 1.0;
-    return 0.05 + first * 0.1;
+    return 0.05 + first * 0.075;
   }
   
   double get angle => _angle;
@@ -84,9 +84,9 @@ class Pentagon {
     double newOpacity = opacity + (r.nextDouble() - 0.5) / 2;
     anim.startOpacity = opacity;
     anim.endOpacity = max(min(newOpacity, 0.2), 0.0);
-   
-    anim.startOpacity = radius;
-    anim.endOpacity = randomRadius(r);
+    
+    anim.startRadius = radius;
+    anim.endRadius = Pentagon.randomRadius(r);
     
     return anim;
   }

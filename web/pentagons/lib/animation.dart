@@ -58,7 +58,7 @@ class SimpleAnimation extends Animation {
     pentagon.x = startX + (endX - startX) * percentage;
     pentagon.y = startY + (endY - startY) * percentage;
     pentagon.angle = startAngle + (endAngle - startAngle) * percentage;
-    //pentagon.opacity = startOpacity + (endOpacity - startOpacity) * percentage;
+    pentagon.opacity = startOpacity + (endOpacity - startOpacity) * percentage;
     pentagon.radius = startRadius + (endRadius - startRadius) * percentage;
   }
 }
