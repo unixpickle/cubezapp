@@ -1,14 +1,102 @@
 #footer {
-  position: absolute;
-  bottom: 0px;
+  transition: bottom 0.5s ease;
+  -webkit-transition: bottom 0.5s ease;
+  
+  position: fixed;
   height: 30em;
   width: 100%;
   background-color: #FFF;
 }
 
-#tab-bar {
-  height: 5em;
+.footer-down {
+  bottom: -25.6em;
+}
+
+.footer-up {
+  bottom: 0em;
+}
+
+.tab-bar {
+  height: 4.4em;
   width: 100%;
   background-color: #EEE;
   border-bottom: 2px solid #DCDCDC;
+}
+
+.tab-bar .filler {
+  text-align: center;
+}
+
+.close-button {
+  position: absolute;
+  right: 1em;
+  top: calc(50% - 1em);
+  
+  height: 2em;
+  width: 2em;
+  
+  border: none;
+  background-color: #000;
+}
+
+.close-button:focus {
+  outline: 0;
+}
+
+.tabs {
+  transition: opacity 0.5s ease;
+  -webkit-transition: opacity 0.5s ease;
+  padding-top: 0.775em;
+  display: inline-block;
+}
+
+.footer-up .tabs {
+  opacity: 1.0;
+}
+
+.footer-down .tabs {
+  opacity: 0.0;
+  
+}
+
+.tab-button {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.9em;
+  text-decoration: none;
+  font-weight: 100;
+  
+  height: 1.5em;
+  
+  transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-transition: background-color 0.25s ease, color 0.25s ease;
+  
+  padding-left: 10px;
+  padding-right: 10px;
+  
+  -webkit-border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  border-radius: 0.75em;
+  background-color: transparent;
+  
+  cursor: pointer;
+  
+  border: none;
+}
+
+.tab-button:focus {
+  outline: 0;
+}
+
+.tab-selected {
+  color: #FFFFFF;
+  background-color: #278cd9;
+}
+
+.tab-unselected {
+  color: #278cd9;
+  background-color: transparent;
+}
+
+.tab-unselected:hover {
+  color: #7e8284;
 }

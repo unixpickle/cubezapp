@@ -6,12 +6,13 @@
   	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cubezapp - Home</title>
     <link rel="stylesheet" href="home.css">
-    <link rel="stylesheet" href="status-bar.css">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="content.css">
     <link rel="stylesheet" href="footer.css">
   </head>
  
   <body style="margin: 0">
-    <div id="status-bar">
+    <div id="header">
       <div id="solve-statuses">
         <a id="solve-status-plus-two" class="solve-status">+2</a>
         <a id="solve-status-dnf" class="solve-status">DNF</a>
@@ -21,9 +22,16 @@
     <div id="timer-content">
       <input id="time-input" value="00:00.00" />
     </div>
-    <div id="footer">
-      <div id="tab-bar">
-        
+    <div id="footer" class="footer-up">
+      <div class="tab-bar noselect">
+        <div class="filler">
+          <button class="close-button"></button>
+          <div class="tabs">
+            <button class="tab-button tab1 tab-selected">Session Stats</a>
+            <button class="tab-button tab2 tab-unselected">Puzzle Stats</a>
+            <button class="tab-button tab3 tab-unselected">Settings</a>
+          </div>
+        </div>
       </div>
     </div>
     <script type="application/dart" src="home.dart"></script>
