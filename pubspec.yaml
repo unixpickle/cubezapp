@@ -2,3 +2,4 @@ name: cubezapp
 description: A sample web application
 dependencies:
   browser: any
+  static: any

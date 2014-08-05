@@ -19,6 +19,14 @@ class NetStack {
     handlers.add(new _PathHandler('POST', path, handler, caseSensitive));
   }
   
+  void redirect(String path, Uri place, {bool caseSensitive: true,
+      String method: 'GET'}) {
+    _PathHandlerMethod handler = (Map<String, Object> map, HttpRequest req) {
+      return req.response.redirect(place);
+    };
+    handlers.add(new _PathHandler(method, path, handler, caseSensitive));
+  }
+  
   Future handleRequest(HttpRequest request) {
     Map<String, Object> map = <String, Object>{};
     Completer completer = new Completer();

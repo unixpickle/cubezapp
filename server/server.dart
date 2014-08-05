@@ -1,14 +1,16 @@
 import 'dart:io';
 import 'dart:async';
 
-import 'static/static.dart';
+import 'package:static/static.dart';
 import 'netstack/netstack.dart';
 
 void main() {
   // create static file server
-  ForwardTable aliases = new ForwardTable();
-  aliases.rules.add(new ForwardRule('/login', '/login.html'));
-  aliases.rules.add(new ForwardRule('/home/', '/home/home.html'));
+  PathAliasTable aliases = new PathAliasTable();
+  aliases.add('/login', '/login.html');
+  aliases.add('/', '/login.html');
+  aliases.add('', '/login.html');
+  aliases.add('/home/', '/home/home.html');
   ProjectStatic fileServer = new ProjectStatic('../', '../web',
       aliases: aliases);
   
@@ -18,6 +20,7 @@ void main() {
   stack.post('/', handleLogin);
   stack.post('/login', handleLogin);
   stack.post('/login.html', handleLogin);
+  stack.redirect('/home', Uri.parse('/home/'));
   
   // add raw file server
   stack.next((_, HttpRequest req) {
