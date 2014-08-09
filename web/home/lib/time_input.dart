@@ -62,6 +62,9 @@ class TimeInput {
     if (event.keyCode < 0x30 || event.keyCode > 0x39) {
       return;
     }
+    if (numbers.length == 0 && event.keyCode == 0x30) {
+      return;
+    }
     numbers.add(event.keyCode - 0x30);
     _updateInputValue();
   }
@@ -77,9 +80,9 @@ class TimeInput {
   }
   
   void _updateInputValue() {
-    String str = '${_digitAt(5)}${_digitAt(4)}:${_digitAt(3)}${_digitAt(2)}.' +
+    String str = '${_digitAt(4)}:${_digitAt(3)}${_digitAt(2)}.' +
         '${_digitAt(1)}${_digitAt(0)}';
-    for (int i = 6; i < numbers.length; i++) {
+    for (int i = 5; i < numbers.length; i++) {
       if (i == 6) str = ':' + str;
       str = '${_digitAt(i)}$str';
     }

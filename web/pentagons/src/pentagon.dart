@@ -81,7 +81,7 @@ class Pentagon {
     anim.startAngle = angle;
     anim.endAngle = newAngle;
     
-    double newOpacity = opacity + (r.nextDouble() - 0.5) / 2;
+    double newOpacity = (r.nextDouble() - 0.1) * 0.22;
     anim.startOpacity = opacity;
     anim.endOpacity = max(min(newOpacity, 0.2), 0.0);
     

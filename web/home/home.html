@@ -14,6 +14,16 @@
   <body style="margin: 0">
     <canvas id="pentagons"></canvas>
     <div id="header">
+      <div id="puzzles-dropdown-info" class="noselect">
+        <div id="puzzle-name-header">
+            <label class="puzzle-name">Curvy Copter</label>
+            <div src="image/arrow.png" class="down-arrow"></div>
+        </div>
+        <div id="puzzle-button-header" class="button-header-hidden">
+          <div id="minus-button" class="header-circle minus-deselected"></div>
+          <div id="plus-button" class="header-circle plus-deselected"></div>
+        </div>
+      </div>
       <div id="solve-statuses">
         <a id="solve-status-plus-two" class="solve-status">+2</a>
         <a id="solve-status-dnf" class="solve-status">DNF</a>
@@ -21,16 +31,26 @@
       </div>
     </div>
     <div id="timer-content">
-      <input id="time-input" value="00:00.00" />
+      <input id="time-input" value="0:00.00" />
     </div>
-    <div id="footer" class="footer-up">
+    <div id="footer" class="footer-up noselect">
       <div class="tab-bar noselect">
         <div class="filler">
-          <button class="close-button"></button>
+          <canvas width="40" height="40" class="close-button"></canvas>
           <div class="tabs">
             <button class="tab-button tab1 tab-selected">Session Stats</button>
             <button class="tab-button tab2 tab-unselected">Puzzle Stats</button>
             <button class="tab-button tab3 tab-unselected">Settings</button>
+          </div>
+        </div>
+      </div>
+      <div class="filler">
+        <div id="footer-content">
+          <div class="footer-view footer-view-visible" id="session-view">
+          </div>
+          <div class="footer-view footer-view-hidden" id="puzzle-view">
+          </div>
+          <div class="footer-view footer-view-hidden" id="settings-view">
           </div>
         </div>
       </div>
