@@ -1,19 +1,18 @@
-#footer {
+.page-footer {
   transition: bottom 0.5s ease;
   -webkit-transition: bottom 0.5s ease;
   
   position: fixed;
   height: 300px;
   width: 100%;
-  background-color: #FFF;
-}
-
-.footer-down {
-  bottom: -260px;
 }
 
 .footer-up {
   bottom: 0;
+}
+
+.footer-down {
+  bottom: -260px;
 }
 
 .tab-bar {
@@ -27,23 +26,11 @@
   text-align: center;
 }
 
-.close-button {
-  position: absolute;
-  right: 10px;
-  top: calc(50% - 10px);
-  
-  height: 20px;
-  width: 20px;
-  
-  cursor: pointer;
-}
-
 .tabs {
+  display: inline-block;
   transition: opacity 0.5s ease;
   -webkit-transition: opacity 0.5s ease;
-  
-  padding-top: 6px;
-  display: inline-block;
+  margin-top: 7px;
 }
 
 .footer-up .tabs {
@@ -54,63 +41,47 @@
   opacity: 0.0;
 }
 
-.tab-button {
-  font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Open Sans', sans-serif;
+.tab {
+  font-family: inherit;
+  
   font-size: 18px;
   text-decoration: none;
   font-weight: 100;
   
   height: 26px;
   
-  margin-top: 1px;
-  padding-top: 2px;
-  padding-left: 15px;
-  padding-right: 15px;
+  padding: 0px 15px 0 15px;
   
   -webkit-border-radius: 13px;
   -moz-border-radius: 13px;
   border-radius: 13px;
-  background-color: transparent;
   
+  background-color: transparent;
   cursor: pointer;
   border: none;
 }
 
-.tab-button:focus {
+.tab:focus {
   outline: 0;
 }
 
 .tab-selected {
-  color: #FFFFFF;
-  background-color: #278cd9;
+  color: #FFF;
 }
 
-.tab-unselected {
-  color: #278cd9;
-  background-color: transparent;
+.page-footer .content {
+  height: 260px;
+  width: 100%;
 }
 
-#footer-content {
-  position: absolute;
-  top: 0;
-  left: 0;
+.page-footer .footer-view {
+  background-color: #FF0;
   width: 100%;
   height: 100%;
 }
 
-.footer-view {
-  width: 100%;
-  height: 100%;
-}
-
-.footer-view-hidden {
-  display: none;
-}
-
-.footer-view-visible {
+.close-button {
   display: block;
-}
-
-#session-view {
-  background-color: #DDD;
+  position: absolute;
+  right: 0;
 }

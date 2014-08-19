@@ -5,62 +5,83 @@
   	<meta charset="utf-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cubezapp - Home</title>
+    <link rel="stylesheet" href="style/general.css">
     <link rel="stylesheet" href="style/home.css">
     <link rel="stylesheet" href="style/header.css">
-    <link rel="stylesheet" href="style/content.css">
     <link rel="stylesheet" href="style/footer.css">
-    <link rel="stylesheet" href="style/dropdown.css">
+    <link rel="stylesheet" href="style/pentagons.css">
+    <style id="theme-style">
+    <!--
+    .theme-background {
+      background-color: #3498d8;
+    }
+    .theme-color {
+      color: #3498d8;
+    }
+    -->
+    </style>
   </head>
  
-  <body style="margin: 0">
-    <canvas id="pentagons"></canvas>
-    <div id="header">
-      <div id="puzzles-dropdown-info" class="noselect">
-        <div id="puzzle-name-header">
-            <label class="puzzle-name">Curvy Copter</label>
-            <div src="image/arrow.png" class="down-arrow"></div>
+  <body style="margin: 0" class="theme-background">
+    <!-- begin page header -->
+    <div class="page-header">
+    
+      <!-- begin solve statuses -->
+      <div class="solve-statuses">
+        <a class="solve-status solve-status-plus-two">+2</a>
+        <a class="solve-status solve-status-dnf">DNF</a>
+        <a class="solve-status solve-status-ok solve-status-selected">OK</a>
+      </div>
+      <!-- end solve statuses -->
+    
+      <!-- begin left dropdown stub -->
+      <div class="noselect dropdown-stub left-dropdown-stub">
+        <div class="name-field theme-color">
+          <label class="theme-color">Curvy Copter</label>
+          <div class="theme-color arrow-down"></div>
         </div>
-        <div id="puzzle-button-header" class="button-header-hidden">
-          <div id="minus-button" class="header-circle minus-deselected"></div>
-          <div id="plus-button" class="header-circle plus-deselected"></div>
+        <div class="buttons buttons-hidden">
+          <button class="minus-button minus-deselected"></button>
+          <button class="plus-button plus-deselected"></button>
         </div>
       </div>
-      <div id="solve-statuses">
-        <a id="solve-status-plus-two" class="solve-status">+2</a>
-        <a id="solve-status-dnf" class="solve-status">DNF</a>
-        <a id="solve-status-ok" class="solve-status solve-status-sel">OK</a>
-      </div>
+      <!-- end left dropdown stub -->
+      
     </div>
-    <!-- end header -->
-    <div id="puzzles-dropdown">
-      <div class="dropdown-container">
-      </div>
-    </div>
-    <div id="timer-content">
-      <input id="time-input" value="0:00.00" />
-    </div>
-    <div id="footer" class="footer-up noselect">
-      <div class="tab-bar noselect">
+    <!-- end page header -->
+    
+    <!-- begin footer -->
+    <div class="noselect page-footer footer-up">
+
+      <!-- begin tab bar -->
+      <div class="noselect tab-bar">
         <div class="filler">
-          <canvas width="40" height="40" class="close-button"></canvas>
           <div class="tabs">
-            <button class="tab-button tab1 tab-selected">Session Stats</button>
-            <button class="tab-button tab2 tab-unselected">Puzzle Stats</button>
-            <button class="tab-button tab3 tab-unselected">Settings</button>
+            <button class="tab tab1 tab-selected">Session Stats</button>
+            <button class="tab tab2 tab-unselected">Puzzle Stats</button>
+            <button class="tab tab3 tab-unselected">Settings</button>
           </div>
+          <canvas width="40" height="40" class="close-button"></canvas>
         </div>
       </div>
-      <div class="filler">
-        <div id="footer-content">
-          <div class="footer-view footer-view-visible" id="session-view">
-          </div>
-          <div class="footer-view footer-view-hidden" id="puzzle-view">
-          </div>
-          <div class="footer-view footer-view-hidden" id="settings-view">
-          </div>
+      <!-- end tab bar -->
+      
+      <!-- begin footer -->
+      <div class="content">
+        <div class="footer-view session-view footer-view-visible">
+        </div>
+        <div class="footer-view puzzle-view footer-view-hidden">
+        </div>
+        <div class="footer-view settings-view footer-view-hidden">
         </div>
       </div>
+      <!-- end footer -->
+      
     </div>
+    <!-- end footer -->
+    
+    <canvas id="pentagons"></canvas>
+    
     <script type="application/dart" src="home.dart"></script>
     <script src="packages/browser/dart.js"></script>
   </body>

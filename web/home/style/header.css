@@ -1,14 +1,114 @@
-#header {
+.page-header {
   font-size: 20px;
   
   width: 100%;
   height: 40px;
+  
   position: absolute;
+  top: 0;
+  left: 0;
   
   background-color: rgba(255, 255, 255, 0.5);
-  text-align: center;
+}
+
+.dropdown-stub {
+  display: inline-block;
+  height: 100%;
+  font-size: 25px;
+  position: absolute;
+  top: 0;
+}
+
+.dropdown-stub .name-field {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.dropdown-stub label {
+  cursor: pointer;
+  display: block;
+  float: left;
+  height: 100%;
   
-  min-width: 700px;
+  margin-top: 3px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.dropdown-stub .arrow-down {
+  display: block;
+  float: right;
+  
+  background-size: 100% 100%;
+  background-image: url('../image/arrow.png');
+  
+  margin-top: 10px;
+  
+  width: 20px;
+  height: 20px;  
+}
+
+.dropdown-stub .buttons {
+  display: inline-block;
+  overflow: hidden;
+  -webkit-transition: opacity 0.5s linear;
+  transition: opacity 0.5s linear;
+}
+
+.dropdown-stub .buttons-visible {
+  opacity: 1.0;
+}
+
+.dropdown-stub .buttons-hidden {
+  opacity: 0.0;
+}
+
+.dropdown-stub .buttons button {
+  float: right;
+  background-size: 100% 100%;
+  width: 26px;
+  height: 26px;
+  margin-top: 7px;
+  margin-left: 10px;
+  
+  border: none;
+  background-color: transparent;
+  background-size: 100% 100%;
+  cursor: pointer;
+  
+  -webkit-transition: -webkit-transform 0.7s ease;
+  transition: transform 0.7s ease;
+}
+
+.dropdown-stub .buttons button:focus {
+  outline: 0;
+}
+
+.dropdown-stub .buttons-visible button {
+  transform: translate(0px, 0px) rotate(0deg);
+  -webkit-transform: translate(0px, 0px) rotate(0deg);
+}
+
+.dropdown-stub .buttons-hidden button {
+  transform: translate(-72px, 0px) rotate(-401deg);
+  -webkit-transform: translate(-72px, 0px) rotate(-401deg);
+}
+
+.dropdown-stub .buttons .minus-deselected {
+  background-image: url('../image/minus.png');
+}
+
+.dropdown-stub .buttons .plus-deselected {
+  background-image: url('../image/plus.png');
+}
+
+.solve-statuses {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
 }
 
 .solve-status {
@@ -24,96 +124,6 @@
   color: #EEE;
 }
 
-.solve-status-sel {
+.solve-status-selected {
   color: #FFF;
-}
-
-.solve-status-sel:hover {
-  color: #FFF;
-}
-
-#puzzles-dropdown-info {
-  height: 100%;
-  font-size: 25px;
-  position: absolute;
-  top: 0;
-  left: 20px;
-}
-
-#puzzle-name-header {
-  float: left;
-  color: #3498d8;
-  height: 100%;
-  cursor: pointer;
-}
-
-#puzzle-button-header {
-  overflow: hidden;
-  float: right;
-  -webkit-transition: opacity 0.5s linear;
-  transition: opacity 0.5s linear;
-}
-
-.button-header-hidden {
-  opacity: 0.0;
-  transform: rotate(360deg);
-}
-
-.puzzle-name {
-  cursor: pointer;
-  float: left;
-  height: 100%;
-  margin-top: 3px;
-}
-
-.down-arrow {
-  float: right;
-  width: 20px;
-  height: 20px;
-  position: relative;
-  top: 10px;
-  left: 5px;
-  margin-right: 10px;
-  margin-top: 0;
-  background-image: url('../image/arrow.png');
-  background-size: 20px 20px;
-}
-
-.header-circle {
-  float: right;
-  background-size: 100% 100%;
-  width: 26px;
-  height: 26px;
-  margin-top: 7px;
-  margin-left: 10px;
-  
-  -webkit-transition: -webkit-transform 0.7s ease;
-  transition: transform 0.7s ease;
-}
-
-#minus-button {
-  transition-delay: 0.05s;
-  -webkit-transition-delay: 0.05s;
-}
-
-.button-header-visible .header-circle {
-  transform: translate(0px, 0px) rotate(0deg);
-  -webkit-transform: translate(0px, 0px) rotate(0deg);
-}
-
-.button-header-hidden .header-circle {
-  transform: translate(-70px, 0px) rotate(-401deg);
-  -webkit-transform: translate(-70px, 0px) rotate(-401deg);
-}
-
-.button-header-visible {
-  cursor: pointer;
-}
-
-.minus-deselected {
-  background-image: url('../image/minus.png');
-}
-
-.plus-deselected {
-  background-image: url('../image/plus.png');
 }

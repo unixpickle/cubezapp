@@ -1,25 +1,31 @@
-part of timer_page;
+part of home_page;
 
 class Header {
   final DivElement element;
-  DivElement puzzleButtons;
-  DivElement puzzleName;
-  bool hidden = true;
+  final DivElement buttons;
+  bool showing;
+  List<StreamSubscription> subs = [];
   
-  Header(this.element) {
-    puzzleName = this.element.querySelector('#puzzle-name-header');
-    puzzleButtons = this.element.querySelector('#puzzle-button-header');
-    puzzleName.onClick.listen(showHide);
+  Header(DivElement element) : element = element,
+      buttons = element.querySelector('.buttons') {
+    showing = buttons.classes.contains('buttons-visible');
+    subs.add(element.querySelector('.name-field').onClick.listen(_showHide));
   }
   
-  showHide(_) {
-    if (hidden) {
-      puzzleButtons.classes.remove('button-header-hidden');
-      puzzleButtons.classes.add('button-header-visible');
-    } else {
-      puzzleButtons.classes.remove('button-header-visible');
-      puzzleButtons.classes.add('button-header-hidden');
+  void destroy() {
+    for (StreamSubscription sub in subs) {
+      sub.cancel();
     }
-    hidden = !hidden;
+  }
+  
+  void _showHide(_) {
+    if (showing) {
+      buttons.classes.remove('buttons-visible');
+      buttons.classes.add('buttons-hidden');
+    } else {
+      buttons.classes.remove('buttons-hidden');
+      buttons.classes.add('buttons-visible');
+    }
+    showing = !showing;
   }
 }
