@@ -53,23 +53,24 @@ class TimeInput {
   
   void _handleKeyPress(KeyboardEvent event) {
     event.preventDefault();
-    if (event.keyCode == 0xd || event.keyCode == 0x20) {
+    if (event.charCode == 0xd || event.charCode == 0x20) {
       _onSubmitController.add(event);
       return;
     }
     
     if (numbers.length > 6) return;
-    if (event.keyCode < 0x30 || event.keyCode > 0x39) {
+    if (event.charCode < 0x30 || event.charCode > 0x39) {
       return;
     }
-    if (numbers.length == 0 && event.keyCode == 0x30) {
+    if (numbers.length == 0 && event.charCode == 0x30) {
       return;
     }
-    numbers.add(event.keyCode - 0x30);
+    numbers.add(event.charCode - 0x30);
     _updateInputValue();
   }
   
   void _handleKeyDown(KeyboardEvent event) {
+    // backspace handler
     if (event.keyCode == 8) {
       event.preventDefault();
       if (numbers.length > 0) {
