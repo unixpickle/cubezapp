@@ -11,7 +11,7 @@ class Theme {
 .theme-background, .tab-selected {
   background-color: $colorStr;
 }
-.theme-color, .tab-unselected {
+.theme-color, .tab-unselected, .solve-status-unselected {
   color: $colorStr;
 }
 """;

@@ -21,31 +21,35 @@
 
 .dropdown-stub .name-field {
   display: inline-block;
+  vertical-align: top;
   cursor: pointer;
+  height: 100%;
 }
 
 .dropdown-stub label {
   cursor: pointer;
   display: block;
   float: left;
+  
   height: 100%;
   
-  margin-top: 3px;
   padding-right: 5px;
-  padding-left: 5px;
+  padding-left: 8px;
+  line-height: 40px;
+  vertical-align: middle;
 }
 
 .dropdown-stub .arrow-down {
   display: block;
   float: right;
   
-  background-size: 100% 100%;
+  background-size: 20px 20px;
   background-image: url('../image/arrow.png');
-  
-  margin-top: 10px;
+  background-repeat: no-repeat;
+  background-position: center;
   
   width: 20px;
-  height: 20px;  
+  height: 100%;
 }
 
 .dropdown-stub .buttons {
@@ -112,16 +116,14 @@
 }
 
 .solve-status {
-  position: relative;
-  top: 8px;
+  display: inline-block;
+  
+  height: 100%;
+  line-height: 40px;
   padding-left: 10px;
   padding-right: 10px;
-  color: #999;
+  
   cursor: pointer;
-}
-
-.solve-status:hover {
-  color: #EEE;
 }
 
 .solve-status-selected {

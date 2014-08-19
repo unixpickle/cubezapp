@@ -9,13 +9,17 @@
     <link rel="stylesheet" href="style/home.css">
     <link rel="stylesheet" href="style/header.css">
     <link rel="stylesheet" href="style/footer.css">
+    <link rel="stylesheet" href="style/footer-session.css">
+    <link rel="stylesheet" href="style/footer-puzzle.css">
+    <link rel="stylesheet" href="style/footer-settings.css">
     <link rel="stylesheet" href="style/pentagons.css">
+    <link rel="stylesheet" href="style/initial.css">
     <style id="theme-style">
     <!--
     .theme-background {
       background-color: #3498d8;
     }
-    .theme-color {
+    .theme-color, -solve-status-unselected {
       color: #3498d8;
     }
     -->
@@ -24,12 +28,12 @@
  
   <body style="margin: 0" class="theme-background">
     <!-- begin page header -->
-    <div class="page-header">
+    <div class="page-header slide-in-item slide-down-start">
     
       <!-- begin solve statuses -->
       <div class="solve-statuses">
-        <a class="solve-status solve-status-plus-two">+2</a>
-        <a class="solve-status solve-status-dnf">DNF</a>
+        <a class="solve-status solve-status-plus-two solve-status-unselected">+2</a>
+        <a class="solve-status solve-status-dnf solve-status-unselected">DNF</a>
         <a class="solve-status solve-status-ok solve-status-selected">OK</a>
       </div>
       <!-- end solve statuses -->
@@ -51,7 +55,7 @@
     <!-- end page header -->
     
     <!-- begin footer -->
-    <div class="noselect page-footer footer-up">
+    <div class="noselect page-footer slide-in-item slide-up-start">
 
       <!-- begin tab bar -->
       <div class="noselect tab-bar">
@@ -61,18 +65,18 @@
             <button class="tab tab2 tab-unselected">Puzzle Stats</button>
             <button class="tab tab3 tab-unselected">Settings</button>
           </div>
-          <canvas width="40" height="40" class="close-button"></canvas>
+          <canvas width="30" height="30" class="close-button"></canvas>
         </div>
       </div>
       <!-- end tab bar -->
       
       <!-- begin footer -->
       <div class="content">
-        <div class="footer-view session-view footer-view-visible">
+        <div class="footer-view view1 footer-view-visible">
         </div>
-        <div class="footer-view puzzle-view footer-view-hidden">
+        <div class="footer-view view2 footer-view-hidden">
         </div>
-        <div class="footer-view settings-view footer-view-hidden">
+        <div class="footer-view view3 footer-view-hidden">
         </div>
       </div>
       <!-- end footer -->

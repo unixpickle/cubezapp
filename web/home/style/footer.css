@@ -45,6 +45,7 @@
   font-family: inherit;
   
   font-size: 18px;
+  line-height: 26px;
   text-decoration: none;
   font-weight: 100;
   
@@ -75,13 +76,23 @@
 }
 
 .page-footer .footer-view {
-  background-color: #FF0;
   width: 100%;
   height: 100%;
 }
 
-.close-button {
+.page-footer .footer-view-visible {
+  display: block;
+}
+
+.page-footer .footer-view-hidden {
+  display: none;
+}
+
+.page-footer .close-button {
   display: block;
   position: absolute;
-  right: 0;
+  right: 4px;
+  top: 4px;
+  width: 30px;
+  height: 30px;
 }
