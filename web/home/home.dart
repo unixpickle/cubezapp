@@ -15,8 +15,6 @@ Footer footer;
 Burger burger;
 
 void main() {
-  // set the default theme
-  
   // 33ce75
   Theme th = new Theme([0x34, 0x98, 0xd8]);
   //Theme th = new Theme([0x33, 0xce, 0x75]);
@@ -26,11 +24,16 @@ void main() {
   //Theme th = new Theme([230, 126, 34]);
   th.activate();
   
+  querySelector('.page-footer').style.display = 'block';
+  
   header = new Header(querySelector('.page-header'));
   footer = new Footer(querySelector('.page-footer'), false);
   
   setupPentagons();
-  initialAnimations();
+  
+  // perform the initial animations after the DOM has been updated so that no
+  // unwanted transitions occur on page load
+  new Future(initialAnimations);
 }
 
 void setupPentagons() {
@@ -48,11 +51,18 @@ void setupPentagons() {
 }
 
 void initialAnimations() {
+  // enable animations
+  for (Element e in querySelectorAll('.no-load-animation')) {
+    e.classes.remove('no-load-animation');
+  }
+  
+  // remove the slide classes so they slide to their correct positions
   for (Element e in querySelectorAll('.slide-in-item')) {
-    print('foo');
     e.classes.remove('slide-down-start');
     e.classes.remove('slide-up-start');
   }
+  
+  // once the animations are done, enable the items by removing a class
   new Timer(new Duration(seconds: 1), () {
     for (Element e in querySelectorAll('.slide-in-item')) {
       e.classes.remove('slide-in-item');

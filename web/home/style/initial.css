@@ -1,3 +1,8 @@
+.no-load-animation {
+  transition: none !important;
+  -webkit-transition: none !important;
+}
+
 .slide-in-item {
   pointer-events: none;
   
