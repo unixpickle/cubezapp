@@ -53,7 +53,7 @@ class Burger {
   void draw() {
     context.clearRect(0, 0, width, height);
     
-    double inset = 7.0;
+    num inset = 7 * window.devicePixelRatio;
     
     context.lineWidth = 3 * window.devicePixelRatio;
     context.lineCap = 'round';
@@ -61,7 +61,7 @@ class Burger {
     
     context.beginPath();
     
-    double xProg = pow(_progress.abs(), 1.5);
+    num xProg = pow(_progress.abs(), 1.5);
     
     // top burger line
     context.moveTo(inset + (width - inset * 2) * _progress, inset);

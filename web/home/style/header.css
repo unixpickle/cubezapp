@@ -4,11 +4,31 @@
   width: 100%;
   height: 40px;
   
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   
   background-color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+
+body.uninitialized .page-header {
+  display: none;
+}
+
+body.before-load-animation .page-header {
+  transform: translate(0px, -30px);
+  -webkit-transform: translate(0px, -30px);
+  opacity: 0.0;
+}
+
+body.load-animation .page-header {
+  transition: transform 1.0s ease, opacity 1.0s ease;
+  -webkit-transition: -webkit-transform 1.0s ease, opacity 1.0s ease;
+}
+
+body.loaded .page-header {
+  pointer-events: auto;
 }
 
 .dropdown-stub {

@@ -24,16 +24,11 @@ void main() {
   //Theme th = new Theme([230, 126, 34]);
   th.activate();
   
-  querySelector('.page-footer').style.display = 'block';
-  
   header = new Header(querySelector('.page-header'));
   footer = new Footer(querySelector('.page-footer'), false);
   
   setupPentagons();
-  
-  // perform the initial animations after the DOM has been updated so that no
-  // unwanted transitions occur on page load
-  new Future(initialAnimations);
+  initializePage();
 }
 
 void setupPentagons() {
@@ -50,22 +45,19 @@ void setupPentagons() {
   pents.draw();
 }
 
-void initialAnimations() {
-  // enable animations
-  for (Element e in querySelectorAll('.no-load-animation')) {
-    e.classes.remove('no-load-animation');
-  }
-  
-  // remove the slide classes so they slide to their correct positions
-  for (Element e in querySelectorAll('.slide-in-item')) {
-    e.classes.remove('slide-down-start');
-    e.classes.remove('slide-up-start');
-  }
-  
-  // once the animations are done, enable the items by removing a class
-  new Timer(new Duration(seconds: 1), () {
-    for (Element e in querySelectorAll('.slide-in-item')) {
-      e.classes.remove('slide-in-item');
-    }
+void initializePage() {
+  new Future(() {
+    document.body.classes.add('before-load-animation');
+    document.body.classes.remove('uninitialized');
+    return new Future(() => null);
+  }).then((_) {
+    document.body.classes.add('load-animation');
+    return new Future(() => null);
+  }).then((_) {
+    document.body.classes.remove('before-load-animation');
+    return new Future.delayed(new Duration(milliseconds: 1200));
+  }).then((_) {
+    document.body.classes.add('loaded');
+    document.body.classes.remove('load-animation');
   });
 }

@@ -2,8 +2,8 @@
 
 <html style="margin: 0">
   <head>
-  	<meta charset="utf-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=700, user-scalable=no">
     <title>Cubezapp - Home</title>
     <link rel="stylesheet" href="style/general.css">
     <link rel="stylesheet" href="style/home.css">
@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="style/footer-puzzle.css">
     <link rel="stylesheet" href="style/footer-settings.css">
     <link rel="stylesheet" href="style/pentagons.css">
-    <link rel="stylesheet" href="style/initial.css">
     <style id="theme-style">
     <!--
     .theme-background {
@@ -26,11 +25,11 @@
     </style>
   </head>
  
-  <body style="margin: 0" class="theme-background no-load-animation">
+  <body style="margin: 0" class="theme-background uninitialized">
     <canvas id="pentagons"></canvas>
   
     <!-- begin page header -->
-    <div class="page-header slide-in-item slide-down-start">
+    <div class="page-header">
     
       <!-- begin solve statuses -->
       <div class="solve-statuses">
@@ -57,13 +56,12 @@
     <!-- end page header -->
     
     <!-- begin footer -->
-    <div class="noselect page-footer footer-up slide-in-item slide-up-start"
-         style="display: none">
+    <div class="noselect page-footer footer-up">
 
       <!-- begin tab bar -->
       <div class="noselect tab-bar">
         <div class="filler">
-          <div class="tabs no-load-animation">
+          <div class="tabs">
             <button class="tab tab1 tab-selected">Session Stats</button>
             <button class="tab tab2 tab-unselected">Puzzle Stats</button>
             <button class="tab tab3 tab-unselected">Settings</button>
