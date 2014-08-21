@@ -23,7 +23,7 @@ class Burger {
       _controller = new StreamController.broadcast() {
     _closed = isClosed;
     _progress = isClosed ? 0.0 : 1.0;
-    double ratio = window.devicePixelRatio;
+    double ratio = screenScale();
     canvas.height = canvas.width = (size * ratio).round();
     canvas.style.width = '${size}px';
     canvas.style.height = '${size}px';
@@ -53,9 +53,9 @@ class Burger {
   void draw() {
     context.clearRect(0, 0, width, height);
     
-    num inset = 7 * window.devicePixelRatio;
+    num inset = 7 * screenScale();
     
-    context.lineWidth = 3 * window.devicePixelRatio;
+    context.lineWidth = 3 * screenScale();
     context.lineCap = 'round';
     context.strokeStyle = 'rgb(137, 137, 137)';
     

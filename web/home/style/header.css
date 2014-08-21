@@ -32,7 +32,7 @@ body.loaded .page-header {
 }
 
 .dropdown-stub {
-  display: inline-block;
+  display: block;
   height: 100%;
   font-size: 25px;
   position: absolute;
@@ -41,6 +41,7 @@ body.loaded .page-header {
 
 .dropdown-stub .name-field {
   display: inline-block;
+  float: left;
   vertical-align: top;
   cursor: pointer;
   height: 100%;
@@ -75,6 +76,7 @@ body.loaded .page-header {
 .dropdown-stub .buttons {
   display: inline-block;
   overflow: hidden;
+  float: right;
   -webkit-transition: opacity 0.5s linear;
   transition: opacity 0.5s linear;
 }
@@ -87,43 +89,27 @@ body.loaded .page-header {
   opacity: 0.0;
 }
 
-.dropdown-stub .buttons button {
+.dropdown-stub .buttons canvas {
   float: right;
-  background-size: 100% 100%;
   width: 26px;
   height: 26px;
   margin-top: 7px;
   margin-left: 10px;
   
-  border: none;
-  background-color: transparent;
-  background-size: 100% 100%;
   cursor: pointer;
   
-  -webkit-transition: -webkit-transform 0.7s ease;
-  transition: transform 0.7s ease;
+  -webkit-transition: -webkit-transform 0.7s ease, border 0.4s ease;
+  transition: transform 0.7s ease, border 0.4s ease;
 }
 
-.dropdown-stub .buttons button:focus {
-  outline: 0;
-}
-
-.dropdown-stub .buttons-visible button {
+.dropdown-stub .buttons-visible canvas {
   transform: translate(0px, 0px) rotate(0deg);
   -webkit-transform: translate(0px, 0px) rotate(0deg);
 }
 
-.dropdown-stub .buttons-hidden button {
+.dropdown-stub .buttons-hidden canvas {
   transform: translate(-72px, 0px) rotate(-401deg);
   -webkit-transform: translate(-72px, 0px) rotate(-401deg);
-}
-
-.dropdown-stub .buttons .minus-deselected {
-  background-image: url('../image/minus.png');
-}
-
-.dropdown-stub .buttons .plus-deselected {
-  background-image: url('../image/plus.png');
 }
 
 .solve-statuses {

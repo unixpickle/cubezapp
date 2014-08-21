@@ -67,6 +67,7 @@ body.loaded .tabs {
 
 .footer-down .tabs {
   opacity: 0.0;
+  pointer-events: none;
 }
 
 .tab {
