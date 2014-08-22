@@ -27,3 +27,19 @@ body.load-animation #pentagons {
   transition-delay: 0.2s;
   -webkit-transition-delay: 0.2s;
 }
+
+body.blurring #pentagons {
+  transition: all 1.0s linear;
+  -webkit-transition: all 1.0s linear;
+  transition-delay: 0.1s;
+  -webkit-transition-delay: 0.1s;
+}
+
+body.blurred #pentagons {
+  filter: url('../home.html#blur');
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  -moz-filter: blur(5px);
+}

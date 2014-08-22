@@ -16,19 +16,23 @@ body.uninitialized .page-header {
   display: none;
 }
 
-body.before-load-animation .page-header {
+body.before-load-animation .page-header, body.blurred .page-header {
   transform: translate(0px, -30px);
   -webkit-transform: translate(0px, -30px);
   opacity: 0.0;
 }
 
-body.load-animation .page-header {
+body.load-animation .page-header, body.blurring .page-header {
   transition: transform 1.0s ease, opacity 1.0s ease;
   -webkit-transition: -webkit-transform 1.0s ease, opacity 1.0s ease;
 }
 
 body.loaded .page-header {
   pointer-events: auto;
+}
+
+body.blurring .page-header {
+  pointer-events: none;
 }
 
 .dropdown-stub {

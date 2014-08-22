@@ -1,15 +1,25 @@
 part of home_page;
 
 class PopupContext {
-  void start() {
-    querySelector('.page-header').classes.add('blurred');
-    querySelector('.page-footer').classes.add('blurred');
-    querySelector('#pentagons').classes.add('blurred');
+  Future start() {
+    querySelector('body').classes.add('blurring');
+    querySelector('body').classes.add('blurred');
+    pentagons.pause();
+    Future f = new Future.delayed(new Duration(milliseconds: 1200));
+    window.history.pushState('login', 'Login', '#login');
+    window.onPopState.first.then((_) {
+      window.history.replaceState('home', 'Cubezapp - Home', '');
+      f.then((_) => stop());
+    });
+    return f;
   }
   
-  void stop() {
-    querySelector('.page-header').classes.remove('blurred');
-    querySelector('.page-footer').classes.remove('blurred');
-    querySelector('#pentagons').classes.remove('blurred');
+  Future stop() {
+    querySelector('body').classes.remove('blurred');
+    return new Future.delayed(new Duration(milliseconds: 1200)).then((_) {
+      querySelector('body').classes.remove('blurring');
+      pentagons.resume();
+      return new Future(() => null);
+    });
   }
 }

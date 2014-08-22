@@ -1,6 +1,7 @@
 part of pentagons;
 
 class PentagonView {
+  Timer _timer;
   final CanvasElement element;
   final List<Pentagon> pentagons;
   CanvasRenderingContext2D context;
@@ -42,19 +43,31 @@ class PentagonView {
     }
     
     animations = [];
+    resume();
+  }
+  
+  void pause() {
+    for (Animation a in animations) {
+      a.cancel();
+    }
+    _timer.cancel();
+    _timer = null;
+  }
+  
+  void resume() {
     for (Pentagon p in pentagons) {
       Function gen;
       gen = () {
         Animation a = p.generateAnimation(pentagons);
         animations.add(a);
-        a.run().then((_) {
+        a.run().then((bool cancelled) {
           animations.remove(a);
-          gen();
+          if (!cancelled) gen();
         });
       };
       gen();
     }
-    new Timer.periodic(new Duration(milliseconds: 35), (_) => draw());
+    _timer = new Timer.periodic(new Duration(milliseconds: 35), (_) => draw());
   }
   
   void draw() {

@@ -13,6 +13,7 @@ part 'lib/burger.dart';
 part 'lib/volume_button.dart';
 part 'lib/popup_context.dart';
 
+PentagonView pentagons;
 Header header;
 Footer footer;
 Burger burger;
@@ -75,13 +76,13 @@ void setupAddDelButtons() {
 void setupPentagons() {
   DpiMonitor monitor = new DpiMonitor();
   CanvasElement canvas = querySelector('#pentagons');
-  PentagonView pents = new PentagonView(canvas);
-  pents.start();
+  pentagons = new PentagonView(canvas);
+  pentagons.start();
   
   void resizePentagons(_) {
     canvas.width = (window.innerWidth * monitor.pixelRatio).round();
     canvas.height = (window.innerHeight * monitor.pixelRatio).round();
-    pents.draw();
+    pentagons.draw();
   };
   
   window.onResize.listen(resizePentagons);

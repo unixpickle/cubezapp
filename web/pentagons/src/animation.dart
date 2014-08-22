@@ -2,7 +2,7 @@ part of pentagons;
 
 abstract class Animation {
   DateTime _start;
-  Completer _completer;
+  Completer<bool> _completer;
   final double duration;
   final Pentagon pentagon;
   bool done;
@@ -21,6 +21,10 @@ abstract class Animation {
     done = false;
   }
   
+  void cancel() {
+    _completer.complete(true);
+  }
+  
   Future run() {
     _start = new DateTime.now();
     _completer = new Completer();
@@ -32,7 +36,7 @@ abstract class Animation {
   void tick() {
     if (done) return;
     if (timeRunning > duration) {
-      scheduleMicrotask(() => _completer.complete());
+      scheduleMicrotask(() => _completer.complete(false));
       done = true;
       return;
     }
