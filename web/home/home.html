@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="style/footer-puzzle.css">
     <link rel="stylesheet" href="style/footer-settings.css">
     <link rel="stylesheet" href="style/pentagons.css">
+    <link rel="stylesheet" href="style/popup.css">
     <style id="theme-style">
     <!--
     .theme-background {
@@ -27,6 +28,14 @@
  
   <body style="margin: 0" class="theme-background uninitialized">
     <canvas id="pentagons"></canvas>
+  
+    <svg>
+      <defs>
+        <filter id="blur">
+          <feGaussianBlur stdDeviation="5" />
+        </filter>
+      </defs>
+    </svg>
   
     <!-- begin page header -->
     <div class="page-header">
@@ -51,6 +60,15 @@
         </div>
       </div>
       <!-- end left dropdown stub -->
+      
+      <!-- begin right dropdown stub -->
+      <div class="noselect dropdown-stub right-dropdown-stub">
+        <div class="name-field theme-color">
+          <label class="theme-color">Jon</label>
+          <div class="theme-color arrow-down"></div>
+        </div>
+      </div>
+      <!-- end right dropdown stub -->
       
     </div>
     <!-- end page header -->

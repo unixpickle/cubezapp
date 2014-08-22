@@ -11,6 +11,7 @@ part 'lib/header.dart';
 part 'lib/footer.dart';
 part 'lib/burger.dart';
 part 'lib/volume_button.dart';
+part 'lib/popup_context.dart';
 
 Header header;
 Footer footer;
@@ -43,8 +44,18 @@ void main() {
   th.activate();
   
   header = new Header(querySelector('.page-header'));
-  footer = new Footer(querySelector('.page-footer'), false);
+  footer = new Footer(querySelector('.page-footer'), true);
   
+  querySelector('.right-dropdown-stub').onClick.listen((_) {
+    new PopupContext().start();
+  });
+  
+  setupAddDelButtons();
+  setupPentagons();
+  initializePage();
+}
+
+void setupAddDelButtons() {
   VolumeButton addButton = new VolumeButton(querySelector('.plus-button'), 26,
       true);
   VolumeButton minusButton = new VolumeButton(querySelector('.minus-button'),
@@ -59,9 +70,6 @@ void main() {
   })..onMouseLeave.listen((_) {
     minusButton.focused = false;
   });
-  
-  setupPentagons();
-  initializePage();
 }
 
 void setupPentagons() {

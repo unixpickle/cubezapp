@@ -64,12 +64,12 @@ body.loaded .page-header {
   display: block;
   float: right;
   
-  background-size: 20px 20px;
+  background-size: 15px 15px;
   background-image: url('../image/arrow.png');
   background-repeat: no-repeat;
   background-position: center;
   
-  width: 20px;
+  width: 15px;
   height: 100%;
 }
 
@@ -110,6 +110,13 @@ body.loaded .page-header {
 .dropdown-stub .buttons-hidden canvas {
   transform: translate(-72px, 0px) rotate(-401deg);
   -webkit-transform: translate(-72px, 0px) rotate(-401deg);
+}
+
+.right-dropdown-stub {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin-right: 10px;
 }
 
 .solve-statuses {
