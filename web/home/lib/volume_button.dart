@@ -1,14 +1,11 @@
 part of home_page;
 
-class VolumeButton {
+class VolumeButton extends ScalableCanvas {
   static const double ANIMATION_DURATION = 0.5;
   
-  final CanvasElement element;
   final int size;
   final bool addButton;
   CanvasRenderingContext2D context;
-  
-  int get scaledSize => element.width;
   
   double _progress;
   bool _focused;
@@ -30,51 +27,48 @@ class VolumeButton {
     _animateTimer = new Timer.periodic(new Duration(milliseconds: 33), _tick);
   }
   
-  VolumeButton(this.element, this.size, this.addButton,
-               {bool initFocused: false}) {
-    element.width = (size * screenScale()).round();
-    element.height = (size * screenScale()).round();
-    element.style.width = '${size}px';
-    element.style.height = '${size}px';
-    context = element.getContext('2d');
+  VolumeButton(CanvasElement canvas, int size, this.addButton,
+               {bool initFocused: false})
+      : super(canvas, size, size), size = size {
+    context = canvas.getContext('2d');
     _focused = initFocused;
     _progress = initFocused ? 1.0 : 0.0;
     draw();
   }
   
   void draw() {
-    context.clearRect(0, 0, scaledSize, scaledSize);
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
     
     if (_progress > 0 && _progress < 1.0) {
-      int innerSize = scaledSize - 2;
+      int innerSize = canvasWidth - 2;
       double width = _progress * innerSize / 2;
       context.strokeStyle = 'rgba(0, 0, 0, 0.5)';
       context.lineWidth = width;
       context.beginPath();
-      context.arc(scaledSize / 2, scaledSize / 2, innerSize / 2 - width / 2,
+      context.arc(canvasWidth / 2, canvasWidth / 2, innerSize / 2 - width / 2,
           0, PI * 2);
       context.stroke();
     } else if (_progress == 1.0) {
       context.fillStyle = 'rgba(0, 0, 0, 0.5)';
       context.beginPath();
-      context.arc(scaledSize / 2, scaledSize / 2, scaledSize / 2, 0, PI * 2);
+      context.arc(canvasWidth / 2, canvasWidth / 2, canvasWidth / 2, 0, PI * 2);
       context.fill();
     }
     
     context.lineCap = 'round';
     context.strokeStyle = 'rgba(255, 255, 255, 1.0)';
-    context.lineWidth = 2 * screenScale();
+    context.lineWidth = 2 * pixelRatio;
     context.beginPath();
-    context.arc(scaledSize / 2, scaledSize / 2, scaledSize / 2 -
+    context.arc(canvasWidth / 2, canvasWidth / 2, canvasWidth / 2 -
         context.lineWidth / 2, 0, PI * 2);
     
-    double textInset = 9 * screenScale();
-    context.moveTo(textInset, scaledSize / 2);
-    context.lineTo(scaledSize - textInset, scaledSize / 2);
+    double textInset = 9 * pixelRatio;
+    context.moveTo(textInset, canvasWidth / 2);
+    context.lineTo(canvasWidth - textInset, canvasWidth / 2);
     
     if (addButton) {
-      context.moveTo(scaledSize / 2, textInset);
-      context.lineTo(scaledSize / 2, scaledSize - textInset);
+      context.moveTo(canvasWidth / 2, textInset);
+      context.lineTo(canvasWidth / 2, canvasWidth - textInset);
     }
     
     context.stroke();

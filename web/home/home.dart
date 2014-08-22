@@ -4,8 +4,8 @@ import 'dart:html';
 import 'dart:math';
 import 'dart:async';
 import '../pentagons/pentagons.dart';
+import 'package:crystal/crystal.dart';
 
-part 'lib/scale.dart';
 part 'lib/theme.dart';
 part 'lib/header.dart';
 part 'lib/footer.dart';
@@ -49,12 +49,12 @@ void main() {
       true);
   VolumeButton minusButton = new VolumeButton(querySelector('.minus-button'),
       26, false);
-  addButton.element..onMouseEnter.listen((_) {
+  addButton.canvas..onMouseEnter.listen((_) {
     addButton.focused = true;
   })..onMouseLeave.listen((_) {
     addButton.focused = false;
   });
-  minusButton.element..onMouseEnter.listen((_) {
+  minusButton.canvas..onMouseEnter.listen((_) {
     minusButton.focused = true;
   })..onMouseLeave.listen((_) {
     minusButton.focused = false;
@@ -65,17 +65,20 @@ void main() {
 }
 
 void setupPentagons() {
+  DpiMonitor monitor = new DpiMonitor();
   CanvasElement canvas = querySelector('#pentagons');
   PentagonView pents = new PentagonView(canvas);
   pents.start();
-  window.onResize.listen((_) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+  
+  void resizePentagons(_) {
+    canvas.width = (window.innerWidth * monitor.pixelRatio).round();
+    canvas.height = (window.innerHeight * monitor.pixelRatio).round();
     pents.draw();
-  });
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  pents.draw();
+  };
+  
+  window.onResize.listen(resizePentagons);
+  monitor.onChange.listen(resizePentagons);
+  resizePentagons(null);
 }
 
 void initializePage() {

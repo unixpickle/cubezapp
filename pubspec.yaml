@@ -2,4 +2,7 @@ name: cubezapp
 description: A sample web application
 dependencies:
   browser: any
+  crystal:
+    git: https://github.com/unixpickle/crystal.git
+    version: 0.0.7
   static: any

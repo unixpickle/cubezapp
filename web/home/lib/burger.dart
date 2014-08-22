@@ -1,11 +1,10 @@
 part of home_page;
 
-class Burger {
-  final CanvasElement canvas;
+class Burger extends ScalableCanvas {
   CanvasRenderingContext2D context;
   
   final StreamController _controller;
-  StreamSubscription _sub;
+  StreamSubscription _clickSub;
     
   double _start;
   double _end;
@@ -15,26 +14,23 @@ class Burger {
   double _progress;
   bool _closed;
   
-  int get width => canvas.width;
-  int get height => canvas.height;
+  final int size;
+  
   Stream<MouseEvent> get onChange => _controller.stream;
   
-  Burger(CanvasElement canvas, num size, bool isClosed) : canvas = canvas,
+  Burger(CanvasElement canvas, int size, bool isClosed) :
+      super(canvas, size, size), size = size,
       _controller = new StreamController.broadcast() {
     _closed = isClosed;
     _progress = isClosed ? 0.0 : 1.0;
-    double ratio = screenScale();
-    canvas.height = canvas.width = (size * ratio).round();
-    canvas.style.width = '${size}px';
-    canvas.style.height = '${size}px';
     context = canvas.getContext('2d');
     draw();
     
-    _sub = canvas.onClick.listen(_clickHandler);
+    _clickSub = canvas.onClick.listen(_clickHandler);
   }
   
   void destroy() {
-    _sub.cancel();
+    _clickSub.cancel();
   }
   
   bool get closed => _closed;
@@ -51,11 +47,11 @@ class Burger {
   }
   
   void draw() {
-    context.clearRect(0, 0, width, height);
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
     
-    num inset = 7 * screenScale();
+    num inset = 7 * pixelRatio;
     
-    context.lineWidth = 3 * screenScale();
+    context.lineWidth = 3 * pixelRatio;
     context.lineCap = 'round';
     context.strokeStyle = 'rgb(137, 137, 137)';
     
@@ -64,22 +60,23 @@ class Burger {
     num xProg = pow(_progress.abs(), 1.5);
     
     // top burger line
-    context.moveTo(inset + (width - inset * 2) * _progress, inset);
-    context.lineTo(width - inset - (width - inset * 2) * xProg,
-        inset + (height - inset * 2) * _progress);
+    context.moveTo(inset + (canvasWidth - inset * 2) * _progress, inset);
+    context.lineTo(canvasWidth - inset - (canvasWidth - inset * 2) * xProg,
+        inset + (canvasHeight - inset * 2) * _progress);
     
     // bottom burger line
-    context.moveTo(inset + (width - inset * 2) * _progress, height - inset);
-    context.lineTo(width - inset - (width - inset * 2) * xProg,
-        height - inset - (height - inset * 2) * _progress);
+    context.moveTo(inset + (canvasWidth - inset * 2) * _progress, canvasHeight -
+        inset);
+    context.lineTo(canvasWidth - inset - (canvasWidth - inset * 2) * xProg,
+    canvasHeight - inset - (canvasHeight - inset * 2) * _progress);
     
     context.stroke();
     
     if (_progress < 0.5) {
       context.strokeStyle = 'rgba(137, 137, 137, ${1.0 - _progress * 2})';
       context.beginPath();
-      context.moveTo(inset, height / 2);
-      context.lineTo(width - inset, height / 2);
+      context.moveTo(inset, canvasHeight / 2);
+      context.lineTo(canvasWidth - inset, canvasHeight / 2);
       context.stroke();
     }
   }
