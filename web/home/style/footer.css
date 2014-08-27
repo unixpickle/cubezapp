@@ -1,44 +1,11 @@
 .page-footer {
-  pointer-events: none;
   position: fixed;
   left: 0;
   bottom: 0;
   
   height: 300px;
   width: 100%;
-}
-
-body.uninitialized .page-footer {
   display: none;
-}
-
-body.loaded .page-footer {
-  pointer-events: auto;
-  transition: bottom 0.5s ease;
-  -webkit-transition: bottom 0.5s ease;
-}
-
-body.before-load-animation .page-footer, body.blurred .page-footer {
-  transform: translate(0px, 30px);
-  -webkit-transform: translate(0px, 30px);
-  opacity: 0.0;
-}
-
-body.load-animation .page-footer, body.blurring .page-footer {
-  transition: transform 1.0s ease, opacity 1.0s ease;
-  -webkit-transition: -webkit-transform 1.0s ease, opacity 1.0s ease;
-}
-
-body.blurring .page-footer {
-  pointer-events: none;
-}
-
-.footer-up {
-  bottom: 0;
-}
-
-.footer-down {
-  bottom: -260px;
 }
 
 .tab-bar {
@@ -55,20 +22,6 @@ body.blurring .page-footer {
 .tabs {
   display: inline-block;
   margin-top: 7px;
-}
-
-body.loaded .tabs {
-  transition: opacity 0.5s ease;
-  -webkit-transition: opacity 0.5s ease;
-}
-
-.footer-up .tabs {
-  opacity: 1.0;
-}
-
-.footer-down .tabs {
-  opacity: 0.0;
-  pointer-events: none;
 }
 
 .tab {

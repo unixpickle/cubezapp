@@ -42,14 +42,14 @@ class VolumeButton extends ScalableCanvas {
     if (_progress > 0 && _progress < 1.0) {
       int innerSize = canvasWidth - 2;
       double width = _progress * innerSize / 2;
-      context.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+      context.strokeStyle = 'rgba(0, 0, 0, 0.3)';
       context.lineWidth = width;
       context.beginPath();
       context.arc(canvasWidth / 2, canvasWidth / 2, innerSize / 2 - width / 2,
           0, PI * 2);
       context.stroke();
     } else if (_progress == 1.0) {
-      context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      context.fillStyle = 'rgba(0, 0, 0, 0.3)';
       context.beginPath();
       context.arc(canvasWidth / 2, canvasWidth / 2, canvasWidth / 2, 0, PI * 2);
       context.fill();

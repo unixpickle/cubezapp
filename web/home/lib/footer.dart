@@ -1,16 +1,21 @@
 part of home_page;
 
-class Footer {
-  final DivElement element;
+class Footer extends View {
+  final Element tabsElement;
   final List<ButtonElement> tabs = [];
   final List<DivElement> views = [];
   final List<StreamSubscription> subs = [];
   Burger burger;
   
-  bool _expanded;
+  bool get slideDirection => false;
   
-  Footer(this.element, bool isExpanded) {
-    ElementList tabEls = element.querySelectorAll('.tab');
+  Future _expandFuture = new Future(() => null);
+  FooterSlideup slideupAnimation;
+  FadeAnimation fadeAnimation;
+  
+  Footer(Element e, {bool expand: true}) : super(e),
+      tabsElement = e.querySelector('.tabs') {
+    ElementList tabEls = tabsElement.querySelectorAll('.tab');
     for (ButtonElement el in tabEls) {
       tabs.add(el);
       subs.add(el.onClick.listen(_tabPressed));
@@ -18,19 +23,16 @@ class Footer {
     for (int i = 0; i < 3; ++i) {
       views.add(element.querySelector('.view${i + 1}'));
     }
-    _expanded = isExpanded;
+    
+    slideupAnimation = new FooterSlideup(element);
+    fadeAnimation = new FadeAnimation(tabsElement);
+    
     burger = new Burger(element.querySelector('.close-button'),
-                        32, !isExpanded);
-    if (_expanded) {
-      element.classes.remove('footer-down');
-      element.classes.add('footer-up');
-    } else {
-      element.classes.remove('footer-up');
-      element.classes.add('footer-down');
-    }
+                        32, !expand);
     burger.onChange.listen((_) {
-      expanded = !burger.closed;
+      setExpanded(!burger.closed);
     });
+    setExpanded(expand, animate: false);
   }
   
   void destroy() {
@@ -40,17 +42,11 @@ class Footer {
     burger.destroy();
   }
   
-  bool get expanded => _expanded;
-  
-  void set expanded(bool flag) {
-    _expanded = flag;
-    if (_expanded) {
-      element.classes.remove('footer-down');
-      element.classes.add('footer-up');
-    } else {
-      element.classes.remove('footer-up');
-      element.classes.add('footer-down');
-    }
+  void setExpanded(bool flag, {bool animate: true}) {
+    _expandFuture = _expandFuture.then((_) {
+      return Future.wait([slideupAnimation.setFinished(flag, animate: animate),
+                          fadeAnimation.setFinished(flag, animate: animate)]);
+    });
   }
   
   void _tabPressed(MouseEvent tabEvent) {

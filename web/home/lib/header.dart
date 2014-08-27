@@ -1,31 +1,25 @@
 part of home_page;
 
-class Header {
-  final DivElement element;
+class Header extends View {
   final DivElement buttons;
-  bool showing;
   List<StreamSubscription> subs = [];
   
-  Header(DivElement element) : element = element,
-      buttons = element.querySelector('.buttons') {
-    showing = buttons.classes.contains('buttons-visible');
-    subs.add(element.querySelector('.name-field').onClick.listen(_showHide));
+  bool get slideDirection => true;
+  
+  Header(Element element) : super(element),
+      buttons = element.querySelector('.volume-buttons') {
+    element.querySelector('.name-field').onClick.listen((_) {
+      if (buttons.classes.contains('volume-buttons-hidden')) {
+        buttons.classes.remove('volume-buttons-hidden');
+      } else {
+        buttons.classes.add('volume-buttons-hidden');
+      }
+    });
   }
   
   void destroy() {
     for (StreamSubscription sub in subs) {
       sub.cancel();
     }
-  }
-  
-  void _showHide(_) {
-    if (showing) {
-      buttons.classes.remove('buttons-visible');
-      buttons.classes.add('buttons-hidden');
-    } else {
-      buttons.classes.remove('buttons-hidden');
-      buttons.classes.add('buttons-visible');
-    }
-    showing = !showing;
   }
 }

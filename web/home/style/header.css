@@ -9,30 +9,7 @@
   left: 0;
   
   background-color: rgba(255, 255, 255, 0.5);
-  pointer-events: none;
-}
-
-body.uninitialized .page-header {
   display: none;
-}
-
-body.before-load-animation .page-header, body.blurred .page-header {
-  transform: translate(0px, -30px);
-  -webkit-transform: translate(0px, -30px);
-  opacity: 0.0;
-}
-
-body.load-animation .page-header, body.blurring .page-header {
-  transition: transform 1.0s ease, opacity 1.0s ease;
-  -webkit-transition: -webkit-transform 1.0s ease, opacity 1.0s ease;
-}
-
-body.loaded .page-header {
-  pointer-events: auto;
-}
-
-body.blurring .page-header {
-  pointer-events: none;
 }
 
 .dropdown-stub {
@@ -77,23 +54,21 @@ body.blurring .page-header {
   height: 100%;
 }
 
-.dropdown-stub .buttons {
+.dropdown-stub .volume-buttons {
   display: inline-block;
   overflow: hidden;
   float: right;
-  -webkit-transition: opacity 0.5s linear;
-  transition: opacity 0.5s linear;
+  
+  transition: opacity 0.5s ease;
+  -webkit-transition: opacity 0.5s ease;
 }
 
-.dropdown-stub .buttons-visible {
-  opacity: 1.0;
-}
-
-.dropdown-stub .buttons-hidden {
+.dropdown-stub .volume-buttons-hidden {
   opacity: 0.0;
+  pointer-events: none;
 }
 
-.dropdown-stub .buttons canvas {
+.dropdown-stub .volume-buttons canvas {
   float: right;
   width: 26px;
   height: 26px;
@@ -102,18 +77,15 @@ body.blurring .page-header {
   
   cursor: pointer;
   
-  -webkit-transition: -webkit-transform 0.7s ease, border 0.4s ease;
-  transition: transform 0.7s ease, border 0.4s ease;
-}
-
-.dropdown-stub .buttons-visible canvas {
+  transition: transform 0.5s ease;
+  -webkit-transition: -webkit-transform 0.5s ease;
   transform: translate(0px, 0px) rotate(0deg);
   -webkit-transform: translate(0px, 0px) rotate(0deg);
 }
 
-.dropdown-stub .buttons-hidden canvas {
-  transform: translate(-72px, 0px) rotate(-401deg);
-  -webkit-transform: translate(-72px, 0px) rotate(-401deg);
+.dropdown-stub .volume-buttons-hidden canvas {
+  transform: translate(-70px, 0px) rotate(-308deg);
+  -webkit-transform: translate(-70px, 0px) rotate(-308deg);
 }
 
 .right-dropdown-stub {
