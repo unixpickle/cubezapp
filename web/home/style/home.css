@@ -3,3 +3,7 @@ body {
   font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Open Sans', sans-serif;
   font-size: 10px;
 }
+
+svg {
+  display: block;
+}

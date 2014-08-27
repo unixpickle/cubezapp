@@ -11,49 +11,51 @@ part 'lib/header.dart';
 part 'lib/footer.dart';
 part 'lib/burger.dart';
 part 'lib/volume_button.dart';
-part 'lib/popup_context.dart';
+part 'lib/login_context.dart';
 
 PentagonView pentagons;
 Header header;
 Footer footer;
 Burger burger;
 
+LoginContext loginContext = new LoginContext();
+
 void main() {
-  List<int> color = [0x34, 0x98, 0xd8];
-  if (window.location.hash != null) {
-    Match m = new RegExp(r'([a-fA-F0-9]+)$').firstMatch(window.location.hash);
-    if (m != null) {
-      int colorValue = int.parse(m.group(1), radix: 16);
-      color = [(colorValue >> 16), (colorValue >> 8) & 0xff, colorValue & 0xff];
-    }
-  }
-  // 33ce75
-  //Theme th = new Theme([0x34, 0x98, 0xd8]);
-  //Theme th = new Theme([46, 204, 113]);
-  //Theme th = new Theme([239, 72, 54]);
-  //Theme th = new Theme([0x2c, 0x3e, 0x50]);
-  //Theme th = new Theme([0x9b, 0x59, 0xb6]);
-  //Theme th = new Theme([230, 126, 34]);
-  //Theme th = new Theme([149, 165, 166]);
-  //Theme th = new Theme([149, 165, 166]);
-  //Theme th = new Theme([232, 201, 47]);
-  //Theme th = new Theme([0, 0, 0]);
-  //Theme th = new Theme([0xf2, 0xc3, 0x00]);
-  //Theme th = new Theme([0x59, 0x30, 0x01]);
-  //Theme th = new Theme([152,68,24]);
-  Theme th = new Theme(color);
+  Theme th = new Theme([0x34, 0x98, 0xd8]);
   th.activate();
+  
+  handleURLChange();
   
   header = new Header(querySelector('.page-header'));
   footer = new Footer(querySelector('.page-footer'), true);
   
   querySelector('.right-dropdown-stub').onClick.listen((_) {
-    new PopupContext().start();
+    loginContext.start(true);
+  });
+  window.onPopState.listen((PopStateEvent e) {
+    handleURLChange();
   });
   
   setupAddDelButtons();
   setupPentagons();
   initializePage();
+}
+
+void handleURLChange() {
+  if (window.location.hash.length > 0) {
+    Match m = new RegExp(r'([a-fA-F0-9]+)$').firstMatch(window.location.hash);
+    if (m != null) {
+      int colorValue = int.parse(m.group(1), radix: 16);
+      List<int> color = [(colorValue >> 16), (colorValue >> 8) & 0xff,
+                         colorValue & 0xff];
+      Theme th = new Theme(color);
+      th.activate();
+    } else if (window.location.hash == '#login') {
+      loginContext.start();
+    }
+  } else {
+    loginContext.stop();
+  }
 }
 
 void setupAddDelButtons() {

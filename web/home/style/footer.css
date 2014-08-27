@@ -6,9 +6,6 @@
   
   height: 300px;
   width: 100%;
-  
-  transform: translate(0px, 0px);
-  -webkit-transform: translate(0px, 0px);
 }
 
 body.uninitialized .page-footer {
