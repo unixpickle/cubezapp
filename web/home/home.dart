@@ -5,13 +5,9 @@ import 'dart:math';
 import 'dart:async';
 import '../pentagons/pentagons.dart';
 import 'package:crystal/crystal.dart';
+import 'package:presenter/presenter.dart';
 
-part 'lib/animations/animator.dart';
-part 'lib/animations/view.dart';
-part 'lib/animations/footer_slideup.dart';
-part 'lib/animations/fade_animation.dart';
-part 'lib/animations/inward_animation.dart';
-
+part 'lib/animations.dart';
 part 'lib/theme.dart';
 part 'lib/header.dart';
 part 'lib/footer.dart';

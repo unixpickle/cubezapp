@@ -7,25 +7,41 @@ class Application {
   final LSDialog dialog;
   Theme theme;
   
+  bool switchedPage = false;
   bool get isLoginPage => window.location.hash == '#login';
+  Future switchFuture = new Future(() => null);
   
   Application() : header = new Header(querySelector('.page-header')),
       footer = new Footer(querySelector('.page-footer')),
       dialog = new LSDialog(querySelector('.login-signup')),
       pentagons = new PentagonView(querySelector('#pentagons')) {
+    Animatable pentFade = new Animatable(pentagons.element,
+        pentagonsPresentation);
+    
     new Future.delayed(new Duration(milliseconds: 150)).then((_) {
-      InwardAnimation anim = new InwardAnimation(pentagons.element);
-      anim.setFinished(true);
-      pentagons.element.style.display = 'block';
+      pentFade.run(true, duration: 0.7);
     });
     
     _setupPentagons();
     _setupAddDelButtons();
+    
+    header.rightDropdown.onClick.listen((_) {
+      switchedPage = true;
+      window.history.pushState('login', 'Cubezapp - Login', '#login');
+      switchPage();
+    });
+    window.onPopState.listen((_) {
+      switchPage();
+    });
+    
     if (!isLoginPage) {
-      header.setFinished(true);
-      footer.setFinished(true);
+      header.run(true, duration: 0.7);
+      footer.run(true, duration: 0.7);
+      dialog.run(false);
     } else {
-      dialog.setFinished(true);
+      dialog.run(true, duration: 0.7);
+      header.run(false);
+      footer.run(false);
     }
   }
   
@@ -59,6 +75,30 @@ class Application {
       minusButton.focused = true;
     })..onMouseLeave.listen((_) {
       minusButton.focused = false;
+    });
+  }
+  
+  void switchPage() {
+    if (!switchedPage) return; // deal with Safari
+    bool showLogin = isLoginPage;
+    switchFuture = switchFuture.then((_) {
+      String easing = 'ease-out';
+      if (showLogin) {
+        return Future.wait([
+            dialog.run(true, duration: 0.7, delay: 0.45,
+                       timingFunction: easing),
+            header.run(false, duration: 0.7, timingFunction: easing),
+            footer.run(false, duration: 0.7, timingFunction: easing)
+        ]);
+      } else {
+        return Future.wait([
+            dialog.run(false, duration: 0.7, timingFunction: easing),
+            header.run(true, duration: 0.7, delay: 0.45,
+                       timingFunction: easing),
+            footer.run(true, duration: 0.7, delay: 0.45,
+                       timingFunction: easing)
+        ]);
+      }
     });
   }
 }

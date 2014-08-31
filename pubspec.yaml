@@ -5,4 +5,5 @@ dependencies:
   crystal:
     git: https://github.com/unixpickle/crystal.git
     version: 0.0.7
+  presenter: 0.0.12
   static: any

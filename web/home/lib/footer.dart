@@ -1,6 +1,6 @@
 part of home_page;
 
-class Footer extends View {
+class Footer extends Animatable {
   final Element tabsElement;
   final List<ButtonElement> tabs = [];
   final List<DivElement> views = [];
@@ -10,11 +10,16 @@ class Footer extends View {
   bool get slideDirection => false;
   
   Future _expandFuture = new Future(() => null);
-  FooterSlideup slideupAnimation;
-  FadeAnimation fadeAnimation;
+  Animatable slideUpAnimation;
+  Animatable fadeInAnimation;
   
-  Footer(Element e, {bool expand: true}) : super(e),
+  Footer(Element e, {bool expand: true}) : super(e, footerPresentation),
       tabsElement = e.querySelector('.tabs') {
+    slideUpAnimation = new Animatable(element, propertyKeyframes('bottom',
+        '-260px', '0px'));
+    fadeInAnimation = new Animatable(tabsElement, propertyKeyframes('opacity',
+        '0.0', '1.0'));
+    
     ElementList tabEls = tabsElement.querySelectorAll('.tab');
     for (ButtonElement el in tabEls) {
       tabs.add(el);
@@ -23,10 +28,7 @@ class Footer extends View {
     for (int i = 0; i < 3; ++i) {
       views.add(element.querySelector('.view${i + 1}'));
     }
-    
-    slideupAnimation = new FooterSlideup(element);
-    fadeAnimation = new FadeAnimation(tabsElement);
-    
+        
     burger = new Burger(element.querySelector('.close-button'),
                         32, !expand);
     burger.onChange.listen((_) {
@@ -44,8 +46,14 @@ class Footer extends View {
   
   void setExpanded(bool flag, {bool animate: true}) {
     _expandFuture = _expandFuture.then((_) {
-      return Future.wait([slideupAnimation.setFinished(flag, animate: animate),
-                          fadeAnimation.setFinished(flag, animate: animate)]);
+      double duration = animate ? 0.5 : 0.0;
+      if (!flag) {
+        tabsElement.style.pointerEvents = 'none';
+      } else {
+        tabsElement.style.pointerEvents = 'auto';
+      }
+      return Future.wait([slideUpAnimation.run(flag, duration: duration),
+                          fadeInAnimation.run(flag, duration: duration)]);
     });
   }
   

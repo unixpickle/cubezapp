@@ -5,6 +5,127 @@
   top: 0px;
   width: 100%;
   height: 100%;
+  text-align: center;
+}
+
+.login-signup .circle {
+  display: inline-block;
+  margin-top: 100px;
+  width: 400px;
+  height: 400px;
+  border-radius: 200px;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.login-signup .signin-view h1 {
+  display: block;
+  margin-top: 50px;
+  margin-bottom: 15px;
+  padding: 0;
+  font-size: 46px;
+  color: #FFF;
+}
+
+.login-signup .signin-view input {
+  font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Open Sans', sans-serif;
   
-  font-size: 40px;
+  display: block;
+  width: 252px;
+  height: 44px;
+  border-radius: 8px;
+  border: none;
+  margin-left: 50px;
+  margin-bottom: 15px;
+  background-color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  font-size: 22px;
+  
+  padding-left: 48px;
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-position: 7px 7px;
+}
+
+.login-signup .signin-view .username {
+  background-image: url('../image/username.png');
+}
+
+.login-signup .signin-view .password {
+  background-image: url('../image/password.png');
+}
+
+::-webkit-input-placeholder {
+   color: #777777;
+}
+
+:-moz-placeholder {
+   color: #777777;
+}
+
+::-moz-placeholder {
+   color: #777777;
+}
+
+:-ms-input-placeholder {  
+   color: #777777;
+}
+
+.login-signup .signin-view input:focus {
+  outline: 0;
+}
+
+.login-signup .signin-view .enter {
+  font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Open Sans', sans-serif;
+  display: block;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  width: 300px;
+  height: 44px;
+  margin-left: 50px;
+  margin-bottom: 15px;
+  font-size: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #666666;
+  transition: background-color 0.5s ease;
+  -webkit-transition: background-color 0.5s ease;
+}
+
+.login-signup .signin-view .enter:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.login-signup .signin-view button:focus {
+  outline: 0;
+}
+
+.login-signup .signin-view a {
+  color: #FFF;
+  text-decoration: underline;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.login-signup .signin-view .password-container {
+  display: block;
+  position: relative;
+}
+
+.login-signup .signin-view .password-container input {
+  padding-right: 40px;
+  width: 212px;
+}
+
+.login-signup .signin-view .help {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 12px;
+  left: 320px;
+  border: none;
+  background-color: transparent;
+  background-image: url('../image/help.png');
+  background-size: 20px 20px;
+  cursor: pointer;
 }
