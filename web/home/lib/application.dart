@@ -39,6 +39,7 @@ class Application {
       footer.run(true, duration: 0.7);
       dialog.run(false);
     } else {
+      dialog.reset();
       dialog.run(true, duration: 0.7);
       header.run(false);
       footer.run(false);
@@ -84,6 +85,7 @@ class Application {
     switchFuture = switchFuture.then((_) {
       String easing = 'ease-out';
       if (showLogin) {
+        dialog.reset();
         return Future.wait([
             dialog.run(true, duration: 0.7, delay: 0.45,
                        timingFunction: easing),

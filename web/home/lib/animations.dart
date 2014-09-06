@@ -13,3 +13,8 @@ Keyframes get headerPresentation {
 Keyframes get pentagonsPresentation {
   return transformFadeKeyframes('scale(1.1, 1.1)', 0.0);
 }
+
+Keyframes get lsPagePresentation {
+  return transformFadeKeyframes('none', 0.0, disableEvents: true,
+      hideOnZero: true);
+}
