@@ -2,19 +2,27 @@ part of home_page;
 
 class Application {
   final PentagonView pentagons;
-  final Header header;
+  Header header;
   final Footer footer;
   final LSDialog dialog;
+  final VolumeButton addButton;
+  final VolumeButton minusButton;
+  final PuzzlesView puzzles;
   Theme theme;
   
   bool switchedPage = false;
   bool get isLoginPage => window.location.hash == '#login';
   Future switchFuture = new Future(() => null);
   
-  Application() : header = new Header(querySelector('.page-header')),
-      footer = new Footer(querySelector('.page-footer')),
-      dialog = new LSDialog(querySelector('.login-signup')),
-      pentagons = new PentagonView(querySelector('#pentagons')) {
+  Application()
+      : footer = new Footer(querySelector('.page-footer')),
+        dialog = new LSDialog(querySelector('.login-signup')),
+        pentagons = new PentagonView(querySelector('#pentagons')),
+        addButton = new VolumeButton(querySelector('.plus-button'), 26, true),
+        minusButton = new VolumeButton(querySelector('.minus-button'), 26,
+            false),
+        puzzles = new PuzzlesView(querySelector('.puzzles-dropdown')) {
+    header = new Header(this, querySelector('.page-header'));
     Animatable pentFade = new Animatable(pentagons.element,
         pentagonsPresentation);
     
@@ -32,6 +40,10 @@ class Application {
     });
     window.onPopState.listen((_) {
       switchPage();
+    });
+    
+    window.onResize.listen((_) {
+      puzzles.handleResize();
     });
     
     if (!isLoginPage) {
@@ -63,10 +75,6 @@ class Application {
   }
   
   void _setupAddDelButtons() {
-    VolumeButton addButton = new VolumeButton(querySelector('.plus-button'), 26,
-        true);
-    VolumeButton minusButton = new VolumeButton(querySelector('.minus-button'),
-        26, false);
     addButton.canvas..onMouseEnter.listen((_) {
       addButton.focused = true;
     })..onMouseLeave.listen((_) {

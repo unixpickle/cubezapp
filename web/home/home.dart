@@ -15,12 +15,14 @@ part 'lib/burger.dart';
 part 'lib/volume_button.dart';
 part 'lib/application.dart';
 part 'lib/lsdialog.dart';
+part 'lib/puzzles_view.dart';
+part 'lib/puzzle_view.dart';
 
 Application app;
 
 void main() {
-  Theme th = new Theme([0x34, 0x98, 0xd8]);
-  th.activate();
-  
   app = new Application();
+  
+  Theme th = new Theme([0x34, 0x98, 0xd8], app);
+  th.activate();
 }

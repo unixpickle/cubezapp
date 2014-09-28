@@ -5,6 +5,7 @@ class VolumeButton extends ScalableCanvas {
   
   final int size;
   final bool addButton;
+  String strokeStyle = 'white';
   CanvasRenderingContext2D context;
   
   double _progress;
@@ -42,21 +43,21 @@ class VolumeButton extends ScalableCanvas {
     if (_progress > 0 && _progress < 1.0) {
       int innerSize = canvasWidth - 2;
       double width = _progress * innerSize / 2;
-      context.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+      context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
       context.lineWidth = width;
       context.beginPath();
       context.arc(canvasWidth / 2, canvasWidth / 2, innerSize / 2 - width / 2,
           0, PI * 2);
       context.stroke();
     } else if (_progress == 1.0) {
-      context.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      context.fillStyle = 'rgba(0, 0, 0, 0.2)';
       context.beginPath();
       context.arc(canvasWidth / 2, canvasWidth / 2, canvasWidth / 2, 0, PI * 2);
       context.fill();
     }
     
     context.lineCap = 'round';
-    context.strokeStyle = 'rgba(255, 255, 255, 1.0)';
+    context.strokeStyle = strokeStyle;
     context.lineWidth = 2 * pixelRatio;
     context.beginPath();
     context.arc(canvasWidth / 2, canvasWidth / 2, canvasWidth / 2 -

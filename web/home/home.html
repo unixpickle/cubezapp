@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="style/header.css">
     <link rel="stylesheet" href="style/footer.css">
     
+    <link rel="stylesheet" href="style/puzzles-dropdown.css">
     <link rel="stylesheet" href="style/footer-session.css">
     <link rel="stylesheet" href="style/footer-puzzle.css">
     <link rel="stylesheet" href="style/footer-settings.css">
@@ -73,8 +74,10 @@
             <div class="image-container">
               <img src="image/big_lock.png" width="90" height="90"/>
             </div>
-            <input class="password" placeholder="Password"></input>
-            <input class="confirm" placeholder="Confirm Password"></input>
+            <input class="password" placeholder="Password"
+                   type="password"></input>
+            <input class="confirm" placeholder="Confirm Password"
+                   type="password"></input>
             <a class="enter">Enter</a>
           </div>
           <!-- end login page two -->
@@ -97,18 +100,12 @@
       </div>
     </div>
     <!-- end login/signup -->
+    
+    <div class="puzzles-dropdown">
+    </div>
   
     <!-- begin page header -->
     <div class="page-header">
-    
-      <!-- begin solve statuses -->
-      <div class="solve-statuses">
-        <a class="solve-status solve-status-plus-two solve-status-unselected">+2</a>
-        <a class="solve-status solve-status-dnf solve-status-unselected">DNF</a>
-        <a class="solve-status solve-status-ok solve-status-selected">OK</a>
-      </div>
-      <!-- end solve statuses -->
-    
       <!-- begin left dropdown stub -->
       <div class="noselect dropdown-stub left-dropdown-stub">
         <div class="name-field theme-color">
