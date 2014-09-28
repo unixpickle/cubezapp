@@ -1,7 +1,7 @@
 part of home_page;
 
 class Application {
-  final PentagonView pentagons;
+  PentagonsView pentagons;
   Header header;
   final Footer footer;
   final LSDialog dialog;
@@ -17,13 +17,12 @@ class Application {
   Application()
       : footer = new Footer(querySelector('.page-footer')),
         dialog = new LSDialog(querySelector('.login-signup')),
-        pentagons = new PentagonView(querySelector('#pentagons')),
         addButton = new VolumeButton(querySelector('.plus-button'), 26, true),
         minusButton = new VolumeButton(querySelector('.minus-button'), 26,
             false),
         puzzles = new PuzzlesView(querySelector('.puzzles-dropdown')) {
     header = new Header(this, querySelector('.page-header'));
-    Animatable pentFade = new Animatable(pentagons.element,
+    Animatable pentFade = new Animatable(querySelector('#pentagons'),
         pentagonsPresentation);
     
     new Future.delayed(new Duration(milliseconds: 150)).then((_) {
@@ -61,17 +60,21 @@ class Application {
   void _setupPentagons() {
     DpiMonitor monitor = new DpiMonitor();
     CanvasElement canvas = querySelector('#pentagons');
-    pentagons.start();
+    pentagons = new PentagonsView(canvas, 18);
     
     void resizePentagons(_) {
       canvas.width = (window.innerWidth * monitor.pixelRatio).round();
       canvas.height = (window.innerHeight * monitor.pixelRatio).round();
+      pentagons.updateContext();
       pentagons.draw();
     };
     
     window.onResize.listen(resizePentagons);
     monitor.onChange.listen(resizePentagons);
     resizePentagons(null);
+    new Timer.periodic(new Duration(milliseconds: 35), (_) {
+      pentagons.draw();
+    });
   }
   
   void _setupAddDelButtons() {

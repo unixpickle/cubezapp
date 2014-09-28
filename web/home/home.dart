@@ -3,7 +3,7 @@ library home_page;
 import 'dart:html';
 import 'dart:math';
 import 'dart:async';
-import '../pentagons/pentagons.dart';
+import 'package:pentagons/pentagons.dart';
 import 'package:crystal/crystal.dart';
 import 'package:presenter/presenter.dart';
 

@@ -1,9 +1,10 @@
 name: cubezapp
-description: A sample web application
+description: A nice cube timer
 dependencies:
   browser: any
   crystal:
     git: https://github.com/unixpickle/crystal.git
     version: 0.0.7
+  pentagons: 1.0.0
   presenter: 0.0.13
   static: any
