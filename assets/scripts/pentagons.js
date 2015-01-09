@@ -1,3 +1,12 @@
+// This is a simple library for drawing and animating a pentagon-based pattern
+// in a canvas. You can use it as follows:
+//
+//     var myCanvas = document.getElementById(...);
+//     var pents = new window.app.Pentagons(myCanvas);
+//     pents.begin();
+//
+// It is your responsibility to resize the canvas as needed.
+
 (function() {
   
   function Animation(start, end, duration) {
@@ -8,11 +17,11 @@
   }
   
   Animation.prototype.elapsed = function() {
-    return (new Date()).getTime() - this.timestamp;
+    return ((new Date()).getTime()-this.timestamp)/1000;
   };
   
   Animation.prototype.intermediate = function(pg) {
-    percentage = Math.min(this.elapsed() / this.duration, 1);
+    var percentage = Math.min(this.elapsed() / this.duration, 1);
     pg.x = this.start.x + (this.end.x-this.start.x)*percentage;
     pg.y = this.start.y + (this.end.y-this.start.y)*percentage;
     pg.radius = this.start.radius +
@@ -50,7 +59,7 @@
     var rotation = this.rotation;
     var x = this.x;
     var y = this.y;
-    var size = Math.min(width, height);
+    var size = Math.max(width, height);
     
     // TODO: use this.___ in here instead of local variables.
     
@@ -75,19 +84,24 @@
     this.movingPentagons = [];
     
     // Generate some pentagons to start
-    for (var i = 0; i < (count || 10); ++i) {
-      var pent = this.randomPentagon();
-      var moving = new MovingPentagon(initial);
+    for (var i = 0; i < (count || 18); ++i) {
+      var moving = new MovingPentagon(this.random());
       this.movingPentagons.push(moving);
     }
   }
+  
+  Pentagons.prototype.begin = function() {
+    setInterval(function() {
+      this.draw();
+    }.bind(this), 1000/24);
+  };
   
   Pentagons.prototype.draw = function() {
     var context = this.canvas.getContext('2d');
     var width = this.canvas.width;
     var height = this.canvas.height;
     
-    context.clear(0, 0, width, height);
+    context.clearRect(0, 0, width, height);
     
     // Animate and draw the pentagons
     for (var i = 0, len = this.movingPentagons.length; i < len; ++i) {
@@ -101,15 +115,60 @@
         // Generate a new animation
         var newPent = this.random(i);
         var duration = 30 + 30*Math.random();
-        p.animation = new Animation(p.pentagon, newPent, duration);
+        p.animation = new Animation(p.pentagon.copy(), newPent, duration);
       }
     }
   };
   
   Pentagons.prototype.random = function(ignoreIdx) {
-    // This is sloppy and is sure to be improved...
-    return new Pentagon(Math.random(), Math.random(), Math.random(),
-      Math.random(), Math.random());
+    var radius = 0.05 + (Math.pow(Math.random(), 15)+1.0)*0.075;
+    var opacity = Math.max((Math.random()-0.1)*0.22, 0.0);
+    
+    if ('undefined' === typeof ignoreIdx) {
+      return new Pentagon(Math.random(), Math.random(), radius,
+        Math.random()*Math.PI*2, opacity);
+    }
+    
+    // The new pentagon is dependent on the previous pentagon.
+    var last = this.movingPentagons[ignoreIdx].pentagon;
+    var coords = this._gravityCoords(ignoreIdx, last);
+    var rotation = Math.PI*(Math.random()-0.5) + last.rotation;
+    
+    return new Pentagon(coords.x, coords.y, radius, rotation, opacity);
+  };
+  
+  Pentagons.prototype._gravityCoords = function(ignoreIdx, last) {
+    var newCoords = {};
+    
+    // Use gravity to figure out where the pentagon "wants" to go.
+    for (var j = 0; j < 2; ++j) {
+      var axis = (j === 0 ? "x" : "y");
+      var axisCoord = last[axis];
+      
+      // Apply inverse square forces from edges.
+      var force = 1/Math.pow(axisCoord, 2) - 1/Math.pow(1-axisCoord, 2);
+      
+      // Apply inverse square forces from other pentagons.
+      for (var i = 0; i < this.movingPentagons.length; ++i) {
+        if (i === ignoreIdx) {
+          continue;
+        }
+        var p = this.movingPentagons[i].pentagon;
+        var dSquared = Math.pow(p.x-last.x, 2) + Math.pow(p.y-last.y, 2);
+        var forceMag = 1/dSquared;
+        var distance = Math.sqrt(dSquared);
+        force -= forceMag * (p[axis]-axisCoord) / distance;
+      }
+      
+      // Add a random element to the force.
+      force += (Math.random()-0.5) * 20;
+      
+      // Cap the force at +/- 0.2 and add it to the current coordinate.
+      force = Math.max(Math.min(force, 100), -100) / 500;
+      newCoords[axis] = Math.max(Math.min(force+axisCoord, 1), 0);
+    }
+    
+    return newCoords;
   };
   
   if (!window.app) {
