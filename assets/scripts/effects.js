@@ -1,17 +1,16 @@
 (function() {
   
-  window.addEventListener('load', function() {
-    var pentsCanvas = document.getElementById('pentagons');
-    var pents = new window.app.Pentagons(pentsCanvas);
+  $(function() {
+    var canvas = $('#pentagons')[0];
+    var pents = new window.app.Pentagons(canvas);
     pents.begin();
-    pentsCanvas.width = window.innerWidth;
-    pentsCanvas.height = window.innerHeight;
-  });
-
-  window.addEventListener('resize', function() {
-    var pentsCanvas = document.getElementById('pentagons');
-    pentsCanvas.width = window.innerWidth;
-    pentsCanvas.height = window.innerHeight;
+    var resizeFunc = function() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      pents.draw();
+    };
+    $(window).resize(resizeFunc);
+    resizeFunc();
   });
   
 })();
