@@ -123,8 +123,8 @@
     var delay = parseTime(this.timerField.val());
     this.session.add(delay);
     this.table.add(delay);
-    this.showTime(0);
     this.updateStats();
+    this.table.selectRow(this.session.times.length - 1);
   };
   
   Timer.prototype.showTime = function(time) {
@@ -203,7 +203,7 @@
     }.bind(this));
     
     this.rowDivs.push(rowElement);
-    this.element.append($(rowElement));
+    this.element.prepend($(rowElement));
   };
   
   TimesTable.prototype.delete = function(idx) {
