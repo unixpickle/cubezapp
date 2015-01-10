@@ -1,0 +1,13 @@
+#timer {
+  border: none;
+  background-color: transparent;
+  width: 100%;
+  margin-top: 100px;
+  text-align: center;
+  font-size: 70px;
+  color: white;
+}
+
+#timer:focus {
+    outline: none;
+}

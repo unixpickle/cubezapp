@@ -2,11 +2,29 @@
   <head>
     <title>Cubezapp</title>
     <link rel="stylesheet" type="text/css" href="styles/body.css">
+    <link rel="stylesheet" type="text/css" href="styles/timer.css">
+    <link rel="stylesheet" type="text/css" href="styles/footer.css">
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="scripts/pentagons.js"></script>
     <script src="scripts/effects.js"></script>
+    <script src="scripts/timer.js"></script>
   </head>
   <body>
     <canvas id="pentagons"></canvas>
+    
+    <div id="header"></div>
+    
+    <input id="timer" value="0.00"></input>
+    
+    <div id="footer">
+      <div id="footer-header">
+        <button id="footer-close">X</button>
+      </div>
+      <div id="footer-view">
+        <div id="times-list"></div>
+        <div id="session-stats"></div>
+      </div>
+    </div>
+    
   </body>
 </html>
