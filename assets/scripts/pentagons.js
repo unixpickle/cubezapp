@@ -133,7 +133,7 @@
     var last = this.movingPentagons[ignoreIdx].pentagon;
     var coords = this._gravityCoords(ignoreIdx, last);
     var rotation = Math.PI*(Math.random()-0.5) + last.rotation;
-    
+
     return new Pentagon(coords.x, coords.y, radius, rotation, opacity);
   };
   
@@ -146,10 +146,10 @@
       var axisCoord = last[axis];
       
       // Apply inverse square forces from edges.
-      var force = 1/Math.pow(axisCoord, 2) - 1/Math.pow(1-axisCoord, 2);
+      var force = 1/Math.pow(axisCoord+0.01, 2) - 1/Math.pow(1.01-axisCoord, 2);
       
       // Apply inverse square forces from other pentagons.
-      for (var i = 0; i < this.movingPentagons.length; ++i) {
+      for (var i = 0, len = this.movingPentagons.length; i < len; ++i) {
         if (i === ignoreIdx) {
           continue;
         }
@@ -166,8 +166,11 @@
       // Cap the force at +/- 0.2 and add it to the current coordinate.
       force = Math.max(Math.min(force, 100), -100) / 500;
       newCoords[axis] = Math.max(Math.min(force+axisCoord, 1), 0);
+      if (isNaN(newCoords[axis])) {
+        newCoords[axis] = Math.random();
+      }
     }
-    
+
     return newCoords;
   };
   
