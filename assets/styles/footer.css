@@ -43,8 +43,21 @@
   background-color: white;
 }
 
+#times-list .time-row .delete {
+  float: right;
+  display: none;
+}
+
+#times-list .time-row:hover .delete {
+  display: inline;
+}
+
 #times-list .time-row-selected {
-  background-color: #f2f2f2;
+  background-color: #dbeffa;
+}
+
+#times-list .time-row-selected label {
+  color: #3498d8;
 }
 
 #session-stats {

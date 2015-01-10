@@ -8,15 +8,37 @@
     this.times.push(new TimeInfo(time));
   };
   
+  Session.prototype.best = function() {
+    if (this.times.length === 0) {
+      return 'N/A';
+    }
+    var best = Math.pow(10, 10);
+    for (var i = 0, len = this.times.length; i < len; ++i) {
+      best = Math.min(this.times[i].millis, best);
+    }
+    return printableTime(best);
+  };
+  
   Session.prototype.totalAverage = function() {
     if (this.times.length === 0) {
-      return 0;
+      return 'N/A';
     }
     var sum = 0;
     for (var i = 0, len = this.times.length; i < len; ++i) {
       sum += this.times[i].millis;
     }
     return printableTime(Math.round(sum / this.times.length));
+  };
+  
+  Session.prototype.worst = function() {
+    if (this.times.length === 0) {
+      return 'N/A';
+    }
+    var worst = -1;
+    for (var i = 0, len = this.times.length; i < len; ++i) {
+      worst = Math.max(this.times[i].millis, worst);
+    }
+    return printableTime(worst);
   };
   
   function TimeInfo(millis) {
@@ -44,6 +66,12 @@
       this.timerField.prop('disabled', true);
       var time = this.session.times[this.table.selected];
       this.showTime(time.millis);
+    }.bind(this);
+    
+    this.table.ondelete = function(idx) {
+      this.session.times.splice(idx, 1);
+      this.table.delete(idx);
+      this.updateStats();
     }.bind(this);
     
     // Spacebar event for starting/stopping
@@ -118,6 +146,9 @@
       this.session.add(delay);
       this.table.add(delay);
       this.showTime(delay);
+      if (this.table.selected < 0) {
+        this.table.selectRow(this.session.times.length-1);
+      }
       clearInterval(this.interval);
       this.interval = null;
       this.start = null;
@@ -128,14 +159,19 @@
   Timer.prototype.updateStats = function() {
     var solveCount = this.session.times.length;
     var totalAverage = this.session.totalAverage();
+    var best = this.session.best();
+    var worst = this.session.worst();
     $('#session-stats').html('Solve count: ' + solveCount + '<br>' +
-      'Total average: ' + totalAverage);
+      'Total average: ' + totalAverage + '<br>' +
+      'Best time: ' + best + '<br>' +
+      'Worst time: ' + worst);
   };
   
   function TimesTable() {
     this.element = $('#times-list');
     this.rowDivs = [];
     this.onselect = null;
+    this.ondelete = null;
     this.selected = -1;
     this.element.click(function() {
       this._selectRow(-1);
@@ -149,16 +185,38 @@
     solveTime.className = 'time';
     solveTime.innerHTML = printableTime(time);
     rowElement.appendChild(solveTime);
+    var deleteButton = document.createElement('button');
+    deleteButton.className = 'delete';
+    deleteButton.innerHTML = 'x';
+    rowElement.appendChild(deleteButton);
     
     // Allow them to click on the row.
-    var index = this.rowDivs.length;
     $(rowElement).click(function(e) {
       e.stopPropagation();
-      this._selectRow(index);
+      this._selectRow(this.rowDivs.indexOf(rowElement));
+    }.bind(this));
+    $(deleteButton).click(function(e) {
+      e.stopPropagation();
+      if (this.ondelete) {
+        this.ondelete(this.rowDivs.indexOf(rowElement));
+      }
     }.bind(this));
     
     this.rowDivs.push(rowElement);
     this.element.append($(rowElement));
+  };
+  
+  TimesTable.prototype.delete = function(idx) {
+    if (idx < 0 || idx >= this.rowDivs.length) {
+      return;
+    }
+    $(this.rowDivs[idx]).remove();
+    this.rowDivs.splice(idx, 1);
+    if (idx == this.selected) {
+      this._selectRow(-1);
+    } else if (idx < this.selected) {
+      --this.selected;
+    }
   };
   
   TimesTable.prototype.selectRow = function(idx) {
@@ -167,7 +225,7 @@
       return;
     }
     // Deselect the last row
-    if (this.selected >= 0) {
+    if (this.selected >= 0 && this.selected < this.rowDivs.length) {
       this.rowDivs[this.selected].className = 'time-row';
     }
     
@@ -175,6 +233,7 @@
     this.selected = idx;
     if (idx >= 0) {
       this.rowDivs[idx].className = 'time-row time-row-selected';
+      // TODO: scroll to this
     }
   };
   
