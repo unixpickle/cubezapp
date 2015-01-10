@@ -19,6 +19,28 @@
     return printableTime(best);
   };
   
+  Session.prototype.average = function(start, count) {
+    var list = [];
+    for (var i = start; i < start+count; ++i) {
+      list.push(this.times[i].millis);
+    }
+    
+    if (count === 5 || count === 12) {
+      // Remove best and worst times.
+      list.sort(function(a, b) {
+        return a - b;
+      });
+      list.splice(0, 1);
+      list.splice(list.length-1, 1);
+    }
+    
+    var average = 0;
+    for (var i = 0, len = list.length; i < len; ++i) {
+      average += list[i];
+    }
+    return printableTime(average / list.length);
+  };
+  
   Session.prototype.totalAverage = function() {
     if (this.times.length === 0) {
       return 'N/A';
@@ -77,7 +99,8 @@
     // Spacebar event for starting/stopping
     $(document).keypress(function(k) {
       // TODO: make sure no input is selected...
-      if (k.keyCode == 0x20) {
+      var keyCode = k.charCode || k.keyCode;
+      if (keyCode == 0x20) {
         k.preventDefault();
         this.toggleTimer();
       }
@@ -86,7 +109,8 @@
     // Manual time editing.
     this.timerField.on('input', this.inputChanged.bind(this));
     this.timerField.keypress(function(e) {
-      if (e.keyCode == 13) {
+      var keyCode = e.charCode || e.keyCode;
+      if (keyCode == 13) {
         this.inputSubmit();
       }
     }.bind(this));
@@ -162,10 +186,27 @@
     var totalAverage = this.session.totalAverage();
     var best = this.session.best();
     var worst = this.session.worst();
-    $('#session-stats').html('Solve count: ' + solveCount + '<br>' +
+    var contents = 'Solve count: ' + solveCount + '<br>' +
       'Total average: ' + totalAverage + '<br>' +
       'Best time: ' + best + '<br>' +
-      'Worst time: ' + worst);
+      'Worst time: ' + worst;
+    var sizes = [5, 12, 100];
+    for (var i = 0; i < sizes.length; ++i) {
+      var size = sizes[i];
+      if (size > this.session.times.length) {
+        break;
+      }
+      var lastStart = this.session.times.length - size;
+      var lastAverage = this.session.average(lastStart, size);
+      var bestAverage = lastAverage;
+      for (var j = 0; j < lastStart; ++j) {
+        var avg = this.session.average(j, size);
+        bestAverage = Math.min(bestAverage, avg);
+      }
+      contents += '<br>Best average of ' + size + ': ' + bestAverage;
+      contents += '<br>Last average of ' + size + ': ' + lastAverage;
+    }
+    $('#session-stats').html(contents);
   };
   
   function TimesTable() {
