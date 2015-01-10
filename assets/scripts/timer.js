@@ -78,6 +78,7 @@
     $(document).keypress(function(k) {
       // TODO: make sure no input is selected...
       if (k.keyCode == 0x20) {
+        k.preventDefault();
         this.toggleTimer();
       }
     }.bind(this));
