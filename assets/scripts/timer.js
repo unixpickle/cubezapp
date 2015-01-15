@@ -308,44 +308,7 @@
   }
   
   function parseTime(time) {
-    // It works. Don't judge.
-    var digits = filterDigits(time);
-    var multipliers = [10, 100, 1000, 10000, 60000, 600000, 6*600000, 6*6000000,
-      6*6*600000];
-    var number = 0;
-    for (var i = 0; i < digits.length; i++) {
-      var mult = multipliers[digits.length - i - 1];
-      var digit = digits.charCodeAt(i) - 0x30;
-      number += digit * mult;
-    }
-    return number;
-  }
-  
-  function printableTime(millis) {
-    // This is the definition of ugly code.
-    var centiseconds = '' + (Math.floor(millis/10)%100);
-    var seconds = '' + (Math.floor(millis/1000)%60);
-    var minutes = '' + (Math.floor(millis/60000)%60);
-    var hours = '' + (Math.floor(millis/3600000)%60);
-    if (centiseconds.length < 2) {
-      centiseconds = '0' + centiseconds;
-    }
-    if (minutes === '0' && hours === '0') {
-      return seconds + '.' + centiseconds;
-    } else if (hours === '0') {
-      if (seconds.length < 2) {
-        seconds += '0';
-      }
-      return minutes + ':' + seconds + '.' + centiseconds;
-    } else {
-      if (seconds.length < 2) {
-        seconds += '0';
-      }
-      if (minutes.length < 2) {
-        minutes += '0';
-      }
-      return hours + ':' + minutes + ':' + seconds + '.' + centiseconds;
-    }
+    
   }
   
   $(function() {
