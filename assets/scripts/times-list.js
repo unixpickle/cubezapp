@@ -1,7 +1,7 @@
 (function() {
   
-  function TimesTable() {
-    this.element = $('#times-table');
+  function TimesList() {
+    this.element = $('#times-list');
     this.ondelete = null;
     this.onopen = null;
     this.onselect = null;
@@ -12,15 +12,15 @@
     this.element.click(this._select.bind(this, -1));
   }
   
-  TimesTable.prototype.add = function(record) {
+  TimesList.prototype.add = function(record) {
     this.insert(record, 0);
   };
   
-  TimesTable.prototype.count = function() {
+  TimesList.prototype.count = function() {
     return this._rows.length;
   };
   
-  TimesTable.prototype.delete = function(idx) {
+  TimesList.prototype.delete = function(idx) {
     if (idx < 0 || idx >= this._rows.length) {
       return;
     }
@@ -33,17 +33,17 @@
     }
   };
   
-  TimesTable.prototype.insert = function(record, insertIdx) {
+  TimesList.prototype.insert = function(record, insertIdx) {
     var row = document.createElement('div');
-    row.className = 'times-table-row';
+    row.className = 'times-list-row';
     
     var time = document.createElement('label');
-    time.className = 'times-table-time';
+    time.className = 'times-list-time';
     time.innerHTML = record.toHTML();
     row.appendChild(time);
     
     var deleteButton = document.createElement('button');
-    deleteButton.className = 'times-table-delete';
+    deleteButton.className = 'times-list-delete';
     deleteButton.innerHTML = 'x';
     row.appendChild(deleteButton);
     
@@ -62,7 +62,7 @@
     this._rows.splice(insertIdx, 0, row);
   };
   
-  TimesTable.prototype.select = function(idx) {
+  TimesList.prototype.select = function(idx) {
     if (idx >= this.count()) {
       this.select(-1);
       return;
@@ -70,27 +70,27 @@
     
     // Deselect the currently selected row.
     if (this._selected >= 0 && this._selected < this.count()) {
-      this._rows[this._selected].className = 'times-table-row';
+      this._rows[this._selected].className = 'times-list-row';
     }
     
     // Select the new row.
     this._selected = idx;
     if (idx >= 0) {
-      this._rows[idx].className = 'times-table-row times-table-selected';
+      this._rows[idx].className = 'times-list-row times-list-row-selected';
       // TODO: scroll to the element in the list.
     }
   };
   
-  TimesTable.prototype.selected = function() {
+  TimesList.prototype.selected = function() {
     return this._selected;
   };
   
-  TimesTable.prototype._handleClick = function(row, e) {
+  TimesList.prototype._handleClick = function(row, e) {
     e.stopPropagation();
     this._select(this._rows.indexOf(row));
   };
   
-  TimesTable.prototype._handleDelete = function(row, e) {
+  TimesList.prototype._handleDelete = function(row, e) {
     e.stopPropagation();
     var idx = this._rows.indexOf(row);
     this.delete(idx);
@@ -99,7 +99,7 @@
     }
   };
   
-  TimesTable.prototype._handleDouble = function(row, e) {
+  TimesList.prototype._handleDouble = function(row, e) {
     e.stopPropagation();
     var idx = this._rows.indexOf(row);
     this._select(idx);
@@ -108,7 +108,7 @@
     }
   };
   
-  TimesTable.prototype._select = function(idx) {
+  TimesList.prototype._select = function(idx) {
     var cur = this._selected;
     this.select(idx);
     if (this.onselect && cur !== this._selected) {
@@ -120,6 +120,6 @@
     window.app = {};
   }
   
-  window.app.TimesTable = TimesTable;
+  window.app.TimesList = TimesList;
   
-});
+})();

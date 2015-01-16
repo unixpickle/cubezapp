@@ -1,0 +1,27 @@
+#times-list {
+  width: 100%;
+}
+
+.times-list-row {
+  padding: 5px 5px 5px 5px;
+  color: #6a6f71;
+  font-size: 20px;
+  background-color: white;
+}
+
+.times-list-delete {
+  float: right;
+  display: none;
+}
+
+.times-list-row:hover .times-list-delete {
+  display: inline;
+}
+
+.times-list-row-selected {
+  background-color: #dbeffa;
+}
+
+.times-list-row-selected label {
+  color: #3498d8;
+}

@@ -2,28 +2,39 @@
   <head>
     <title>Cubezapp</title>
     <link rel="stylesheet" type="text/css" href="styles/body.css">
-    <link rel="stylesheet" type="text/css" href="styles/timer.css">
     <link rel="stylesheet" type="text/css" href="styles/footer.css">
     <link rel="stylesheet" type="text/css" href="styles/header.css">
+    <link rel="stylesheet" type="text/css" href="styles/microwave.css">
+    <link rel="stylesheet" type="text/css" href="styles/session-stats.css">
+    <link rel="stylesheet" type="text/css" href="styles/times-list.css">
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="scripts/pentagons.js"></script>
     <script src="scripts/effects.js"></script>
     <script src="scripts/timer.js"></script>
+    <script src="scripts/session.js"></script>
+    <script src="scripts/session-stats.js"></script>
+    <script src="scripts/record.js"></script>
+    <script src="scripts/microwave.js"></script>
+    <script src="scripts/times-list.js"></script>
   </head>
   <body>
     <canvas id="pentagons"></canvas>
     
     <div id="header"></div>
     
-    <input id="timer" value="0.00"></input>
+    <input id="microwave" value="0.00"></input>
     
     <div id="footer">
       <div id="footer-header">
         <button id="footer-close">X</button>
       </div>
       <div id="footer-view">
-        <div id="times-list"></div>
-        <div id="session-stats"></div>
+        <div id="footer-left-view">
+          <div id="times-list"></div>
+        </div>
+        <div id="footer-right-view">
+          <div id="session-stats"></div>
+        </div>
       </div>
     </div>
     

@@ -23,48 +23,20 @@
 
 #footer-view {
   position: relative;
-  height: calc(100% - 44px);
+  height: 266;
   background-color: white;
 }
 
-#times-list {
-  overflow-y: scroll;
-  overflow-x: hidden;
+#footer-left-view {
   float: left;
   width: 300px;
   height: 100%;
   border-right: 2px solid #f2f2f2;
 }
 
-#times-list .time-row {
-  padding: 5px 5px 5px 5px;
-  color: #6a6f71;
-  font-size: 20px;
-  background-color: white;
-}
-
-#times-list .time-row .delete {
-  float: right;
-  display: none;
-}
-
-#times-list .time-row:hover .delete {
-  display: inline;
-}
-
-#times-list .time-row-selected {
-  background-color: #dbeffa;
-}
-
-#times-list .time-row-selected label {
-  color: #3498d8;
-}
-
-#session-stats {
+#footer-right-view {
   float: right;
   width: 300px;
   height: 100%;
   border-left: 2px solid #f2f2f2;
-  padding: 5px 5px 5px 5px;
-  line-height: 22px;
 }

@@ -87,4 +87,4 @@
   
   window.app.Record = Record;
   
-});
+})();
