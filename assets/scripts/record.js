@@ -47,6 +47,13 @@
     }
   };
   
+  Record.prototype.virtualTime = function() {
+    if (this.plus2) {
+      return this.time + 2;
+    }
+    return this.time;
+  };
+  
   function filterDigits(value) {
     // Remove all non-digit characters. I bet there's a fancier JS way to do
     // this.

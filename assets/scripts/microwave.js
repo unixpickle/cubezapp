@@ -18,12 +18,12 @@
   };
   
   Microwave.prototype.disable = function() {
-    this.element.prop('disabled', false);
+    this.element.prop('disabled', true);
     this.element.blur();
   };
   
   Microwave.prototype.enable = function() {
-    this.element.prop('disabled', true);
+    this.element.prop('disabled', false);
     this.element.blur();
   };
   
