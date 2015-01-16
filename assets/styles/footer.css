@@ -10,6 +10,9 @@
   height: 44px;
   width: 100%;
   background-color: #f2f2f2;
+  text-align: center;
+  line-height: 44px;
+  font-size: 25px;
 }
 
 #footer-close {
@@ -18,7 +21,6 @@
   right: 7;
   width: 30px;
   height: 30px;
-  
 }
 
 #footer-view {
