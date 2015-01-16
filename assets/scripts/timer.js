@@ -18,7 +18,7 @@
     }.bind(this);
     
     this.list.ondelete = function(idx) {
-      this.session.delete(idx);
+      this.session.delete(this.session.count() - (idx+1));
       this.stats.update(this.session);
     }.bind(this);
     
