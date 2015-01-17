@@ -60,10 +60,10 @@
       if (size > this.count()) {
         break;
       }
-      var lastAverage = this.session.average(size);
+      var lastAverage = this.average(size);
       var bestAverage = lastAverage;
-      for (var j = 0, len = this.count()-size; j < len; ++j) {
-        var avg = this.session.average(size, j);
+      for (var j = 0, len2 = this.count()-size; j < len2; ++j) {
+        var avg = this.average(size, j);
         bestAverage = Math.min(bestAverage, avg);
       }
       result.push([size, lastAverage, bestAverage]);

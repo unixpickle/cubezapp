@@ -6,7 +6,7 @@
     this.microwave = new window.app.Microwave();
     this.stats = new window.app.SessionStats();
     
-    $('#header').html(window.app.scramble3x3());
+    $('#header').text(window.app.scramble('3x3x3'));
     
     this._start = null;
     this._interval = null;
@@ -61,10 +61,8 @@
     this._interval = null;
     this._start = null;
     this.stats.update(this.session);
-    setTimeout(function() {
-      $('#footer-header').text($('#header').text());
-      $('#header').text(window.app.scramble3x3());
-    }, 1000);
+    $('#footer-header').text($('#header').text());
+    $('#header').text(window.app.scramble('3x3x3'));
   };
   
   $(function() {
