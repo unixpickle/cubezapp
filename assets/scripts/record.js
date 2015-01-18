@@ -32,17 +32,11 @@
     if (minutes === '0' && hours === '0') {
       return seconds + '.' + centiseconds;
     } else if (hours === '0') {
-      if (seconds.length < 2) {
-        seconds += '0';
-      }
+      seconds = padZero(seconds);
       return minutes + ':' + seconds + '.' + centiseconds;
     } else {
-      if (seconds.length < 2) {
-        seconds += '0';
-      }
-      if (minutes.length < 2) {
-        minutes += '0';
-      }
+      seconds = padZero(seconds);
+      minutes = padZero(minutes);
       return hours + ':' + minutes + ':' + seconds + '.' + centiseconds;
     }
   };
@@ -72,6 +66,13 @@
       return rawChars.substring(0, 7);
     }
     return rawChars;
+  }
+  
+  function padZero(s) {
+    if (s.length < 2) {
+      return '0' + s;
+    }
+    return s;
   }
   
   function parseTime(timeStr) {
