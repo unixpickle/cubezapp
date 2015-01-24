@@ -1,24 +1,28 @@
 (function() {
   
-  function Record(time) {
+  function Solve(time) {
     this.dnf = false;
     this.inspection = 0;
-    this.plus2 = false;
     this.memo = -1;
     this.notes = '';
-    if ('string' === typeof time) {
-      this.time = parseTime(time);
-    } else {
-      this.time = time;
-    }
+    this.plus2 = false;
+    this.time = time;
   }
   
-  Record.prototype.toHTML = function() {
+  Solve.parse = function(timeStr) {
+    return new Solve(parseTime(timeStr));
+  };
+  
+  Solve.unpack = function(jsonObject) {
+    return Object.create(Solve.prototype, jsonObject);
+  };
+  
+  Solve.prototype.toHTML = function() {
     // TODO: here, cross out or add +2 or some magic thing.
     return this.toString();
   };
   
-  Record.prototype.toString = function() {
+  Solve.prototype.toString = function() {
     var millis = this.time;
     
     // This is the definition of ugly code.
@@ -41,7 +45,7 @@
     }
   };
   
-  Record.prototype.virtualTime = function() {
+  Solve.prototype.virtualTime = function() {
     if (this.plus2) {
       return this.time + 2;
     }
@@ -93,6 +97,6 @@
     window.app = {};
   }
   
-  window.app.Record = Record;
+  window.app.Solve = Solve;
   
 })();
