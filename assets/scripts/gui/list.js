@@ -33,13 +33,18 @@
     }
   };
   
-  TimesList.prototype.insert = function(record, insertIdx) {
+  TimesList.prototype.deleteAll = function() {
+    this._rows = [];
+    this.element.html('');
+  };
+  
+  TimesList.prototype.insert = function(solve, insertIdx) {
     var row = document.createElement('div');
     row.className = 'times-list-row';
     
     var time = document.createElement('label');
     time.className = 'times-list-time';
-    time.innerHTML = record.toHTML();
+    time.innerHTML = solve.toHTML();
     row.appendChild(time);
     
     var deleteButton = document.createElement('button');
@@ -119,7 +124,6 @@
   if (!window.app) {
     window.app = {};
   }
-  
   window.app.TimesList = TimesList;
   
 })();

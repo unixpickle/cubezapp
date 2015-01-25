@@ -1,17 +1,19 @@
 (function() {
   
-  function Session(solves) {
+  function Session() {
     this.id = '' + Math.random() + (new Date()).getTime();
     this.solves = [];
   }
   
-  Session.unpack = function(sessionStr) {
+  Session.unpack = function(info) {
     var solves = [];
-    var list = JSON.parse(sessionStr);
-    for (var i = 0, len = list.length; i < len; ++i) {
-      solves[i] = window.app.Solve.unpack(list[i]);
+    for (var i = 0, len = info.solves.length; i < len; ++i) {
+      solves[i] = window.app.Solve.unpack(info.solves[i]);
     }
-    return Object.create(Session.prototype, {solves: solves});
+    var res = Object.create(Session.prototype);
+    res.id = info.id;
+    res.solves = solves;
+    return res;
   };
   
   Session.prototype.add = function(solve) {
@@ -29,7 +31,6 @@
   if (!window.app) {
     window.app = {};
   }
-  
   window.app.Session = Session;
   
 })();

@@ -1,29 +1,29 @@
 (function() {
   
   function LocalDb() {
-    this._handlerFunction = this._handleChange.bind(this);
-    this.onchange = null;
-    this.puzzles = [];
-    this.currentPuzzle = null;
-    this._load();
-    if (window.addEventListener) {
-      window.addEventListener("storage", this._handlerFunction, false);
-    } else {
-      window.attachEvent("onstorage", this._handlerFunction);
-    }
+    this.puzzles = decodePuzzles();
+    this.currentPuzzle = localStorage.getItem('current_puzzle');
   }
   
-  LocalDb.prototype.dispose = function() {
-    if (window.removeEventListener) {
-      window.removeEventListener("storage", this._handlerFunction);
+  LocalDb.listen = function(handler) {
+    if (window.addEventListener) {
+      window.addEventListener("storage", handler, false);
     } else {
-      window.detachEvent("onstorage", this._handlerFunction);
+      window.attachEvent("onstorage", handler);
     }
   };
   
-  LocalDb.prototype.findPuzzle = function(puzzle, id) {
+  LocalDb.unlisten = function(handler) {
+    if (window.removeEventListener) {
+      window.removeEventListener("storage", handler);
+    } else {
+      window.detachEvent("onstorage", handler);
+    }
+  };
+  
+  LocalDb.prototype.findPuzzle = function(id) {
     for (var i = 0; i <= this.puzzles.length; ++i) {
-      if (this.puzzles.id === id) {
+      if (this.puzzles[i].id === id) {
         return this.puzzles[i];
       }
     }
@@ -37,25 +37,12 @@
     }
   };
   
-  LocalDb.prototype._handleChange = function() {
-    this._load();
-    if (this.onchange) {
-      this.onchange();
-    }
-  };
-  
-  LocalDb.prototype._load = function() {
-    this.puzzles = decodePuzzles();
-    this.currentPuzzle = localStorage.getItem('current_puzzle');
-  };
-  
   function decodePuzzles() {
-    var puzzleKeys = localStorage.getItem('puzzles');
-    if (puzzleKeys === null) {
+    var puzzleData = localStorage.getItem('puzzles');
+    if (puzzleData === null) {
       return [];
     }
-    var obj = JSON.parse(puzzleKeys);
-    var packed = obj.puzzles;
+    var packed = JSON.parse(puzzleData);
     var puzzles = [];
     for (var i = 0, len = packed.length; i < len; ++i) {
       puzzles[i] = window.app.Puzzle.unpack(packed[i]);

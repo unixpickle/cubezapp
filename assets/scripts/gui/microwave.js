@@ -31,8 +31,8 @@
     this.element.focus();
   };
   
-  Microwave.prototype.show = function(record) {
-    this.element.val(record.toString());
+  Microwave.prototype.show = function(solve) {
+    this.element.val(solve.toString());
   };
   
   Microwave.prototype._change = function() {
@@ -63,15 +63,14 @@
   
   Microwave.prototype._submit = function() {
     if (this.oninput) {
-      var record = new window.app.Record(this.element.val());
-      this.oninput(record);
+      var solve = window.app.Solve.parse(this.element.val());
+      this.oninput(solve);
     }
   };
   
   if (!window.app) {
     window.app = {};
   }
-  
   window.app.Microwave = Microwave;
   
 })();

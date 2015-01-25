@@ -6,12 +6,17 @@
     this.settings = settings;
   }
   
+  Puzzle.generate = function() {
+    return new Puzzle('' + Math.random() + (new Date()).getTime(),
+      [], {name: "3x3x3", icon: "3x3x3"});
+  };
+  
   Puzzle.unpack = function(data) {
     var sessions = [];
     for (var i = 0, len = data.sessions.length; i < len; ++i) {
       sessions[i] = window.app.Session.unpack(data.sessions[i]);
     }
-    return new Puzzle(sessions, data.settings);
+    return new Puzzle(data.id, sessions, data.settings);
   };
   
   Puzzle.prototype.findSession = function(id) {

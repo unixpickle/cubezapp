@@ -1,28 +1,43 @@
 <html>
   <head>
     <title>Cubezapp</title>
+    
     <link rel="stylesheet" type="text/css" href="styles/body.css">
     <link rel="stylesheet" type="text/css" href="styles/footer.css">
     <link rel="stylesheet" type="text/css" href="styles/header.css">
+    <link rel="stylesheet" type="text/css" href="styles/list.css">
     <link rel="stylesheet" type="text/css" href="styles/microwave.css">
-    <link rel="stylesheet" type="text/css" href="styles/session_stats.css">
-    <link rel="stylesheet" type="text/css" href="styles/times_list.css">
+    <link rel="stylesheet" type="text/css" href="styles/stats.css">
+    
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-    <script src="scripts/pentagons.js"></script>
-    <script src="scripts/effects.js"></script>
-    <script src="scripts/timer.js"></script>
-    <script src="scripts/session.js"></script>
-    <script src="scripts/stats.js"></script>
-    <script src="scripts/record.js"></script>
-    <script src="scripts/microwave.js"></script>
-    <script src="scripts/times_list.js"></script>
+    
+    <script src="scripts/gui/context_view.js"></script>
+    <script src="scripts/gui/list.js"></script>
+    <script src="scripts/gui/microwave.js"></script>
+    <script src="scripts/gui/pentagons.js"></script>
+    <script src="scripts/gui/puzzles.js"></script>
+    <script src="scripts/gui/stats.js"></script>
+    <script src="scripts/gui/timer.js"></script>
+    
+    <script src="scripts/data/solve.js"></script>
+    <script src="scripts/data/session.js"></script>
+    <script src="scripts/data/puzzle.js"></script>
+    <script src="scripts/data/local_db.js"></script>
+    <script src="scripts/data/context.js"></script>
+    
     <script src="scripts/scrambles/puzzlejs_rubik_move.js"></script>
     <script src="scripts/scrambles/scramble.js"></script>
   </head>
   <body>
     <canvas id="pentagons"></canvas>
     
-    <div id="header"></div>
+    <div id="header">
+      <a id="header-puzzles-stub" 
+         href="javascript:window.app.puzzlesDropdown.showHide()">Puzzles</a>
+      <div id="puzzles-dropdown">
+        <div id="puzzles-list"></div>
+      </div>
+    </div>
     
     <input id="microwave" value="0.00"></input>
     

@@ -1,76 +1,90 @@
 (function() {
   
   function Timer() {
-    this.session = new window.app.Session();
-    this.list = new window.app.TimesList();
-    this.microwave = new window.app.Microwave();
-    this.stats = new window.app.SessionStats();
-    
-    $('#header').text(window.app.scramble('3x3x3'));
-    
-    this._start = null;
+    this._enabled = false;
+    this._running = false;
+    this._startTime = null;
     this._interval = null;
     
-    this.microwave.disable();
+    this.onstart = null;
+    this.onchange = null;
+    this.onstop = null;
     
-    this.list.onselect = function() {
-      // Go to the place in the graph.
-    }.bind(this);
-    
-    this.list.ondelete = function(idx) {
-      this.session.delete(this.session.count() - (idx+1));
-      this.stats.update(this.session);
-    }.bind(this);
-    
-    // Spacebar event for starting/stopping
-    $(document).keypress(function(k) {
+    // Space bar event for starting.
+    // Note: we should ignore keyup events if they occur right after a keydown
+    // event stopped the time.
+    var dontProcessUp = false;
+    $(document).keyup(function(k) {
+      if (!this._enabled) {
+        return;
+      } else if (dontProcessUp) {
+        dontProcessUp = false;
+        return;
+      }
       var keyCode = k.charCode || k.keyCode;
-      if (keyCode == 0x20) {
+      if (keyCode === 0x20) {
         k.preventDefault();
-        this.startStop();
+        this.start();
+        if (this.onstart) {
+          this.onstart();
+        }
       }
     }.bind(this));
-    
-    this.stats.update(this.session);
+    $(document).keydown(function(k) {
+      if (!this._running) {
+        return;
+      }
+      var keyCode = k.charCode || k.keyCode;
+      if (keyCode === 0x20) {
+        k.preventDefault();
+        dontProcessUp = true;
+        var solve = this.stop();
+        if (this.onstop) {
+          this.onstop(solve);
+        }
+      }
+    }.bind(this));
   }
   
-  Timer.prototype.start = function() {
-    this.list.select(-1);
-    this._start = new Date();
-    this._interval = setInterval(function() {
-      var delay = (new Date()).getTime() - this._start.getTime();
-      this.microwave.show(new window.app.Record(delay));
-    }.bind(this), 33);
-  };
-  
-  Timer.prototype.startStop = function() {
-    if (this._start === null) {
-      this.start();
-    } else {
+  Timer.prototype.disable = function() {
+    this._enabled = false;
+    if (this._running) {
       this.stop();
     }
   };
   
-  Timer.prototype.stop = function() {
-    var delay = (new Date()).getTime() - this._start.getTime();
-    var record = new window.app.Record(delay);
-    this.session.add(record);
-    this.list.add(record);
-    this.microwave.show(record);
-    clearInterval(this._interval);
-    this._interval = null;
-    this._start = null;
-    this.stats.update(this.session);
-    $('#footer-header').text($('#header').text());
-    $('#header').text(window.app.scramble('3x3x3'));
+  Timer.prototype.enable = function() {
+    this._enabled = true;
   };
   
-  $(function() {
-    if (!window.app) {
-      window.app = {};
+  Timer.prototype.start = function() {
+    if (this._running) {
+      return;
     }
-    
-    window.app.timer = new Timer();
-  });
+    this._running = true;
+    this._startTime = (new Date()).getTime();
+    this._interval = setInterval(function() {
+      var delay = (new Date()).getTime() - this._startTime;
+      var solve = new window.app.Solve(delay);
+      if (this.onchange) {
+        this.onchange(solve);
+      }
+    }.bind(this), 43);
+  };
+  
+  Timer.prototype.stop = function() {
+    if (!this._running) {
+      return;
+    }
+    this._running = false;
+    clearInterval(this._interval);
+    var delay = (new Date()).getTime() - this._startTime;
+    return new window.app.Solve(delay);
+  };
+  
+  if (!window.app) {
+    window.app = {};
+  }
+  window.app.timer = new Timer();
   
 })();

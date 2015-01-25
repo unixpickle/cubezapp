@@ -14,7 +14,14 @@
   };
   
   Solve.unpack = function(jsonObject) {
-    return Object.create(Solve.prototype, jsonObject);
+    var res = Object.create(Solve.prototype);
+    for (var key in jsonObject) {
+      if (!jsonObject.hasOwnProperty(key)) {
+        continue;
+      }
+      res[key] = jsonObject[key];
+    }
+    return res;
   };
   
   Solve.prototype.toHTML = function() {
