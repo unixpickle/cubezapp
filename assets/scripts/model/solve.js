@@ -6,6 +6,7 @@
     this.memo = -1;
     this.notes = '';
     this.plus2 = false;
+    this.scramble = '';
     this.time = time;
   }
   
@@ -25,7 +26,11 @@
   };
   
   Solve.prototype.toHTML = function() {
-    // TODO: here, cross out or add +2 or some magic thing.
+    if (this.plus2) {
+      return this.toString() + '+';
+    } else {
+      return '<s>' + this.toString() + '</s>';
+    }
     return this.toString();
   };
   
@@ -103,7 +108,6 @@
   if (!window.app) {
     window.app = {};
   }
-  
   window.app.Solve = Solve;
   
 })();
