@@ -1,10 +1,10 @@
 (function() {
   
-  function TimesList() {
-    this.element = $('#times-list');
-    this.ondelete = null;
-    this.onopen = null;
-    this.onselect = null;
+  function Times(element) {
+    this.element = element;
+    this.onDelete = null;
+    this.onOpen = null;
+    this.onSelect = null;
     this._selected = -1;
     this._rows = [];
     
@@ -12,43 +12,43 @@
     this.element.click(this._select.bind(this, -1));
   }
   
-  TimesList.prototype.add = function(record) {
-    this.insert(record, 0);
+  Times.prototype.add = function(solve) {
+    this.insert(solve, 0);
   };
   
-  TimesList.prototype.count = function() {
+  Times.prototype.count = function() {
     return this._rows.length;
   };
   
-  TimesList.prototype.delete = function(idx) {
+  Times.prototype.delete = function(idx) {
     if (idx < 0 || idx >= this._rows.length) {
       return;
     }
     $(this._rows[idx]).remove();
     this._rows.splice(idx, 1);
-    if (idx === this.selected) {
+    if (idx === this._selected) {
       this._select(-1);
-    } else if (idx < this.selected) {
-      this._select(this.selected - 1);
+    } else if (idx < this._selected) {
+      this._select(this._selected - 1);
     }
   };
   
-  TimesList.prototype.deleteAll = function() {
+  Times.prototype.deleteAll = function() {
     this._rows = [];
     this.element.html('');
   };
   
-  TimesList.prototype.insert = function(solve, insertIdx) {
+  Times.prototype.insert = function(solve, insertIdx) {
     var row = document.createElement('div');
-    row.className = 'times-list-row';
+    row.className = 'row';
     
     var time = document.createElement('label');
-    time.className = 'times-list-time';
-    time.innerHTML = solve.toHTML();
+    time.className = 'time';
+    time.innerHTML = window.app.solveToHTML(solve);
     row.appendChild(time);
     
     var deleteButton = document.createElement('button');
-    deleteButton.className = 'times-list-delete';
+    deleteButton.className = 'delete';
     deleteButton.innerHTML = 'x';
     row.appendChild(deleteButton);
     
@@ -62,12 +62,12 @@
     if (insertIdx === 0) {
       this.element.prepend(jRow);
     } else {
-      this._rows[insertIdx-1].after(jRow);
+      this._rows[insertIdx - 1].after(jRow);
     }
     this._rows.splice(insertIdx, 0, row);
   };
   
-  TimesList.prototype.select = function(idx) {
+  Times.prototype.select = function(idx) {
     if (idx >= this.count()) {
       this.select(-1);
       return;
@@ -75,55 +75,55 @@
     
     // Deselect the currently selected row.
     if (this._selected >= 0 && this._selected < this.count()) {
-      this._rows[this._selected].className = 'times-list-row';
+      this._rows[this._selected].className = 'row';
     }
     
     // Select the new row.
     this._selected = idx;
     if (idx >= 0) {
-      this._rows[idx].className = 'times-list-row times-list-row-selected';
+      this._rows[idx].className = 'row row-selected';
       // TODO: scroll to the element in the list.
     }
   };
   
-  TimesList.prototype.selected = function() {
+  Times.prototype.selected = function() {
     return this._selected;
   };
   
-  TimesList.prototype._handleClick = function(row, e) {
+  Times.prototype._handleClick = function(row, e) {
     e.stopPropagation();
     this._select(this._rows.indexOf(row));
   };
   
-  TimesList.prototype._handleDelete = function(row, e) {
+  Times.prototype._handleDelete = function(row, e) {
     e.stopPropagation();
     var idx = this._rows.indexOf(row);
     this.delete(idx);
-    if (this.ondelete) {
-      this.ondelete(idx);
+    if ('function' === typeof this.onDelete) {
+      this.onDelete(idx);
     }
   };
   
-  TimesList.prototype._handleDouble = function(row, e) {
+  Times.prototype._handleDouble = function(row, e) {
     e.stopPropagation();
     var idx = this._rows.indexOf(row);
     this._select(idx);
-    if (this.onopen) {
-      this.onopen(idx);
+    if ('function' === typeof this.onOpen) {
+      this.onOpen(idx);
     }
   };
   
-  TimesList.prototype._select = function(idx) {
+  Times.prototype._select = function(idx) {
     var cur = this._selected;
     this.select(idx);
-    if (this.onselect && cur !== this._selected) {
-      this.onselect(this._selected);
+    if ('function' === typeof this.onSelect && cur !== this._selected) {
+      this.onSelect(this._selected);
     }
   };
   
   if (!window.app) {
     window.app = {};
   }
-  window.app.TimesList = TimesList;
+  window.app.Times = Times;
   
 })();

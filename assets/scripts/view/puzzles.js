@@ -1,13 +1,13 @@
 (function() {
   
-  function PuzzlesDropdown() {
+  function Puzzles() {
     this.element = $('#puzzles-dropdown');
     this.showing = false;
-    window.app.context.addListener(this._update.bind(this));
+    window.app.store.onPuzzlesChanged = this._update.bind(this);
     this._update();
   }
   
-  PuzzlesDropdown.prototype.showHide = function() {
+  Puzzles.prototype.showHide = function() {
     if (!this.showing) {
       this.element.animate({height: 200});
     } else {
@@ -16,19 +16,22 @@
     this.showing = !this.showing;
   };
   
-  PuzzlesDropdown.prototype._update = function() {
-    var puzzles = window.app.context.puzzles();
+  Puzzles.prototype._update = function() {
+    $('#puzzles-list').html('');
+    var puzzles = window.app.store.getPuzzles();
     var body = $('<div />');
     body.css({width: 200 * puzzles.length});
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       var puzzle = puzzles[i];
       var puzzleEl = $('<div class="puzzle" />');
-      puzzleEl.html('<img src="images/puzzles/' + puzzle.settings.icon +
-        '.png"><br>' + '<label>' + puzzle.settings.name + '</label>');
+      puzzleEl.html('<img src="images/puzzles/' + puzzle.icon +
+        '.png"><br>' + '<label>' + puzzle.name + '</label>');
       puzzleEl.click(function(puzzle) {
-        window.app.context.changePuzzle(puzzle);
-        window.app.contextView.update();
-      }.bind(null, puzzle));
+        window.app.store.switchPuzzle(puzzle.id, function(err) {
+          this._update();
+          window.app.session.update();
+        }.bind(this));
+      }.bind(this, puzzle));
       body.append(puzzleEl);
     }
     $('#puzzles-list').append(body);
@@ -38,7 +41,7 @@
     if (!window.app) {
       window.app = {};
     }
-    window.app.puzzlesDropdown = new PuzzlesDropdown();
+    window.app.puzzlesDropdown = new Puzzles();
   });
   
 })();

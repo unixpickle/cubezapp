@@ -53,7 +53,7 @@
       if (!settings.hasOwnProperty(key)) {
         continue;
       }
-      this._puzzle[key] = settings[key];
+      this._puzzle.puzzle[key] = settings[key];
     }
   };
   
@@ -84,7 +84,7 @@
       throw new Error('Cannot delete the current session.');
     }
     localStorage.removeItem('session_' + id);
-    this._puzzle.sessionIds.splice(idx, 1);
+    this._puzzle.puzzles.sessionIds.splice(idx, 1);
     this._save();
   };
   
@@ -135,7 +135,8 @@
     }
     if (!keepLast) {
       localStorage.removeItem('session_' + this._session.id);
-      this._puzzle.sessionIds.splice(this._puzzle.sessionIds.length-1, 1);
+      var lastIdx = this._puzzle.sessionIds.length - 1;
+      this._puzzle.sessionIds.splice(lastIdx, 1);
     }
     this._session = {solves: [], id: window.app.generateId()};
     this._puzzle.sessionIds.push(this._session.id);
@@ -153,20 +154,36 @@
     if (this._puzzle.sessionIds.length === 0) {
       throw new Error('No sessions in current puzzle.');
     }
-    var sessionId = this._puzzle.sessionIds[this._puzzle.sessionIds.length - 1]
+    
+    // Move the new puzzle to the front of the list.
+    var idx = this._puzzles.indexOf(this._puzzle);
+    this._puzzles.splice(idx, 1);
+    this._puzzles.splice(0, 0, this._puzzle);
+    
+    var lastIdx = this._puzzle.sessionIds.length - 1;
+    var sessionId = this._puzzle.sessionIds[lastIdx];
     this._session = this._findSession(sessionId);
-    setTimeout(function() {
-      callback(null);
-    }, 10);
+    this._save();
+    
+    // Run the callback on another iteration of the event loop.
+    if ('function' === typeof callback) {
+      setTimeout(function() {
+        callback(null);
+      }, 10);
+    }
   };
   
   LocalDb.prototype._findPuzzle = function(id) {
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
-      if (this._puzzles[i].id === id) {
+      if (this._puzzles[i].puzzle.id === id) {
         return this._puzzles[i];
       }
     }
     return null;
+  };
+  
+  LocalDb.prototype._findSession = function(id) {
+    return JSON.parse(localStorage.getItem('session_' + id));
   };
   
   LocalDb.prototype._load = function() {
@@ -184,7 +201,8 @@
     if (this._puzzle.sessionIds.length === 0) {
       throw new Error('No sessions in current puzzle.');
     }
-    var sessionId = this._puzzle.sessionIds[this._puzzle.sessionIds.length - 1]
+    var lastIdx = this._puzzle.sessionIds.length - 1;
+    var sessionId = this._puzzle.sessionIds[lastIdx];
     this._session = this._findSession(sessionId);
   };
   
@@ -201,7 +219,7 @@
   LocalDb.prototype._save = function() {
     localStorage.setItem('puzzles', JSON.stringify(this._puzzles));
     if (this._puzzle !== null) {
-      localStorage.setItem('activePuzzle', this._puzzle.id)
+      localStorage.setItem('activePuzzle', this._puzzle.puzzle.id)
       localStorage.setItem('session_' + this._session.id,
         JSON.stringify(this._session));
     }

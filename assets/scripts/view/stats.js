@@ -4,11 +4,7 @@
     this.element = $('#session-stats');
   }
   
-  SessionStats.prototype.update = function(session) {
-    if (session.count() === 0) {
-      this.element.html('<div class="no-stats">No stats.</div>');
-      return;
-    }
+  SessionStats.prototype.update = function() {
     this.element.html('<div class="no-stats">NYI</div>');
   };
   

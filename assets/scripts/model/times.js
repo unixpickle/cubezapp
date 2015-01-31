@@ -57,7 +57,7 @@
     var str = timeToString(solve.time);
     if (this.plus2) {
       return str + '+';
-    } else {
+    } else if (this.dnf) {
       return '<s>' + str + '</s>';
     }
     return str;
@@ -87,10 +87,11 @@
   if (!window.app) {
     window.app = {};
   }
+  window.app.filterDigits = filterDigits;
   window.app.parseTime = parseTime;
   window.app.solveFromTime = solveFromTime;
   window.app.solveTime = solveTime;
-  window.app.timeToHTML = timeToHTML;
+  window.app.solveToHTML = solveToHTML;
   window.app.timeToString = timeToString;
   
 })();

@@ -2,7 +2,7 @@
   
   function Microwave() {
     this.element = $('#microwave');
-    this.oninput = null;
+    this.onInput = null;
     
     this.element.on('input', this._change.bind(this));
     this.element.keypress(function(e) {
@@ -31,13 +31,13 @@
     this.element.focus();
   };
   
-  Microwave.prototype.show = function(solve) {
-    this.element.val(solve.toString());
+  Microwave.prototype.show = function(time) {
+    this.element.val(window.app.timeToString(time));
   };
   
   Microwave.prototype._change = function() {
-    // Compute the new time
-    var digits = filterDigits(this.element.val());
+    // Add colons and periods where necessary.
+    var digits = window.app.filterDigits(this.element.val());
     var newTimeString = '';
     if (digits.length > 6) {
       newTimeString = digits.substring(0, digits.length-6) + ':' +
@@ -62,9 +62,8 @@
   };
   
   Microwave.prototype._submit = function() {
-    if (this.oninput) {
-      var solve = window.app.Solve.parse(this.element.val());
-      this.oninput(solve);
+    if (this.onInput) {
+      this.onInput(window.app.parseTime(this.element.val()));
     }
   };
   

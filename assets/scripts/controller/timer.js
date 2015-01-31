@@ -6,9 +6,9 @@
     this._startTime = null;
     this._interval = null;
     
-    this.onstart = null;
-    this.onchange = null;
-    this.onstop = null;
+    this.onStart = null;
+    this.onChange = null;
+    this.onStop = null;
     
     // Space bar event for starting.
     // Note: we should ignore keyup events if they occur right after a keydown
@@ -25,8 +25,8 @@
       if (keyCode === 0x20) {
         k.preventDefault();
         this.start();
-        if (this.onstart) {
-          this.onstart();
+        if ('function' === typeof this.onStart) {
+          this.onStart();
         }
       }
     }.bind(this));
@@ -39,8 +39,8 @@
         k.preventDefault();
         dontProcessUp = true;
         var solve = this.stop();
-        if (this.onstop) {
-          this.onstop(solve);
+        if ('function' === typeof this.onStop) {
+          this.onStop(solve);
         }
       }
     }.bind(this));
@@ -65,9 +65,8 @@
     this._startTime = (new Date()).getTime();
     this._interval = setInterval(function() {
       var delay = (new Date()).getTime() - this._startTime;
-      var solve = new window.app.Solve(delay);
-      if (this.onchange) {
-        this.onchange(solve);
+      if ('function' === typeof this.onChange) {
+        this.onChange(delay);
       }
     }.bind(this), 43);
   };
@@ -78,8 +77,7 @@
     }
     this._running = false;
     clearInterval(this._interval);
-    var delay = (new Date()).getTime() - this._startTime;
-    return new window.app.Solve(delay);
+    return (new Date()).getTime() - this._startTime;
   };
   
   if (!window.app) {
