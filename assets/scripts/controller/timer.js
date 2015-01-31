@@ -17,12 +17,13 @@
     $(document).keyup(function(k) {
       if (!this._enabled) {
         return;
-      } else if (dontProcessUp) {
-        dontProcessUp = false;
-        return;
       }
       var keyCode = k.charCode || k.keyCode;
       if (keyCode === 0x20) {
+        if (dontProcessUp) {
+          dontProcessUp = false;
+          return;
+        }
         k.preventDefault();
         k.stopPropagation();
         this.start();
