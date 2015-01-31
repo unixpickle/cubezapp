@@ -10,7 +10,7 @@
     for (var i = 0, len = addPuzzles.length; i < len; ++i) {
       var x = addPuzzles[i];
       var puzzleName = x + 'x' + x + 'x' + x;
-      var puzzle = {name: puzzleName, icon: '3x3x3', scrambler: '3x3x3',
+      var puzzle = {name: puzzleName, icon: puzzleName, scrambler: '3x3x3',
         scrambleType: 'moves', scrambleLength: -1};
       window.app.store.addPuzzle(puzzle);
     }
