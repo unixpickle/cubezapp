@@ -35,6 +35,8 @@
   width: 200px;
   height: 100%;
   border-right: 2px solid #f2f2f2;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 #footer-right-view {

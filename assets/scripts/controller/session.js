@@ -14,6 +14,7 @@
       var solve = window.app.solveFromTime(time);
       this.times.add(solve);
       window.app.store.addSolve(solve);
+      this.stats.update();
     }.bind(this);
     
     this.times.onDelete = function(idx) {
@@ -23,7 +24,8 @@
         return;
       }
       window.app.store.deleteSolve(solves[solves.length - (idx+1)].id);
-    };
+      this.stats.update();
+    }.bind(this);
     
     this.update();
     window.app.store.onSessionChanged = this.update.bind(this);
@@ -31,6 +33,7 @@
   
   Session.prototype.update = function() {
     this.microwave.disable();
+    this.stats.update();
     window.app.timer.enable();
     var solves = window.app.store.getActiveSession().solves;
     this.times.deleteAll();
