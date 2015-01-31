@@ -17,6 +17,8 @@
   };
   
   Puzzles.prototype._update = function() {
+    $('#header-puzzles-stub').text(window.app.store.getActivePuzzle().name);
+    
     $('#puzzles-list').html('');
     var puzzles = window.app.store.getPuzzles();
     var body = $('<div />');
@@ -31,6 +33,7 @@
           this._update();
           window.app.session.update();
         }.bind(this));
+        this.showHide();
       }.bind(this, puzzle));
       body.append(puzzleEl);
     }

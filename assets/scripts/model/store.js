@@ -6,15 +6,13 @@
   
   // Create some default puzzles...
   if (window.app.store.getActivePuzzle() === null) {
-    for (var i = 2; i < 8; ++i) {
-      var puzzleName = i + 'x' + i + 'x' + i;
+    var addPuzzles = [7, 6, 5, 4, 2, 3];
+    for (var i = 0, len = addPuzzles.length; i < len; ++i) {
+      var x = addPuzzles[i];
+      var puzzleName = x + 'x' + x + 'x' + x;
       var puzzle = {name: puzzleName, icon: '3x3x3'};
       window.app.store.addPuzzle(puzzle);
     }
-    // Make the 3x3x3 the default puzzle.
-    var puzzles = window.app.store.getPuzzles();
-    var rubiksCube = puzzles[puzzles.length - 2];
-    window.app.store.switchPuzzle(rubiksCube.id);
   }
   
 })();

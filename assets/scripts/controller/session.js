@@ -16,6 +16,15 @@
       window.app.store.addSolve(solve);
     }.bind(this);
     
+    this.times.onDelete = function(idx) {
+      var solves = window.app.store.getActiveSession().solves;
+      if (idx < 0 || idx >= solves.length) {
+        // This "could" happen in some sort of race condition, I suppose.
+        return;
+      }
+      window.app.store.deleteSolve(solves[solves.length - (idx+1)].id);
+    };
+    
     this.update();
     window.app.store.onSessionChanged = this.update.bind(this);
   }

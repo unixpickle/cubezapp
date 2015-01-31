@@ -80,11 +80,14 @@
       throw new Error('Cannot delete a session without a current puzzle.');
     }
     var idx = this._puzzle.sessionIds.indexOf(id);
+    if (idx < 0) {
+      throw new Error('Cannot delete the session because it does not exist.');
+    }
     if (idx === this._puzzle.sessionIds.length-1) {
       throw new Error('Cannot delete the current session.');
     }
     localStorage.removeItem('session_' + id);
-    this._puzzle.puzzles.sessionIds.splice(idx, 1);
+    this._puzzle.sessionIds.splice(idx, 1);
     this._save();
   };
   
@@ -92,9 +95,9 @@
     if (this._session === null) {
       throw new Error('Cannot delete a solve without a current session.');
     }
-    for (var i = this._session.length-1; i >= 0; --i) {
-      if (this._sessions[i].id === id) {
-        this._sessions.splice(index, 1);
+    for (var i = this._session.solves.length-1; i >= 0; --i) {
+      if (this._session.solves[i].id === id) {
+        this._session.solves.splice(i, 1);
         this._save();
         return;
       }
