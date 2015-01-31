@@ -40,6 +40,7 @@
     if (this._session === null) {
       throw new Error('Cannot add a solve without a current session.');
     }
+    solve.id = window.app.generateId();
     this._session.solves.push(solve);
     this._save();
   };
@@ -56,6 +57,24 @@
     }
   };
   
+  LocalDb.prototype.changeSolve = function(id, solve) {
+    if (this._session === null) {
+      throw new Error('Cannot change a solve without a current session.');
+    }
+    for (var i = this._session.length-1; i >= 0; --i) {
+      if (this._sessions[i].id === id) {
+        for (var key in solve) {
+          if (!solve.hasOwnProperty(key)) {
+            continue;
+          }
+          this._sessions[i][key] = solve[key];
+        }
+        this._save();
+        return;
+      }
+    }
+  };
+  
   LocalDb.prototype.deleteSession = function(id) {
     if (this._puzzle === null) {
       throw new Error('Cannot delete a session without a current puzzle.');
@@ -69,15 +88,17 @@
     this._save();
   };
   
-  LocalDb.prototype.deleteSolve = function(index) {
+  LocalDb.prototype.deleteSolve = function(id) {
     if (this._session === null) {
       throw new Error('Cannot delete a solve without a current session.');
     }
-    if (index < 0 || index >= this._session.solves.length) {
-      throw new Error('Solve index out of bounds');
+    for (var i = this._session.length-1; i >= 0; --i) {
+      if (this._sessions[i].id === id) {
+        this._sessions.splice(index, 1);
+        this._save();
+        return;
+      }
     }
-    this._session.solves.splice(index, 1);
-    this._save();
   };
   
   LocalDb.prototype.detach = function() {
@@ -108,7 +129,7 @@
     return res;
   };
   
-  LocalDb.prototype.newSession = function(keepLast) {
+  LocalDb.prototype.newSession = function(keepLast, callback) {
     if (this._puzzle === null || this._session === null) {
       throw new Error('Cannot create a new session: no current session.');
     }
@@ -119,6 +140,9 @@
     this._session = {solves: [], id: window.app.generateId()};
     this._puzzle.sessionIds.push(this._session.id);
     this._save();
+    setTimeout(function() {
+      callback(null);
+    }, 10);
   };
   
   LocalDb.prototype.switchPuzzle = function(id, callback) {

@@ -1,69 +1,5 @@
 (function() {
   
-  function Solve(time) {
-    this.dnf = false;
-    this.inspection = 0;
-    this.memo = -1;
-    this.notes = '';
-    this.plus2 = false;
-    this.scramble = '';
-    this.time = time;
-  }
-  
-  Solve.parse = function(timeStr) {
-    return new Solve(parseTime(timeStr));
-  };
-  
-  Solve.unpack = function(jsonObject) {
-    var res = Object.create(Solve.prototype);
-    for (var key in jsonObject) {
-      if (!jsonObject.hasOwnProperty(key)) {
-        continue;
-      }
-      res[key] = jsonObject[key];
-    }
-    return res;
-  };
-  
-  Solve.prototype.toHTML = function() {
-    if (this.plus2) {
-      return this.toString() + '+';
-    } else {
-      return '<s>' + this.toString() + '</s>';
-    }
-    return this.toString();
-  };
-  
-  Solve.prototype.toString = function() {
-    var millis = this.time;
-    
-    // This is the definition of ugly code.
-    var centiseconds = '' + (Math.floor(millis/10)%100);
-    var seconds = '' + (Math.floor(millis/1000)%60);
-    var minutes = '' + (Math.floor(millis/60000)%60);
-    var hours = '' + (Math.floor(millis/3600000)%60);
-    if (centiseconds.length < 2) {
-      centiseconds = '0' + centiseconds;
-    }
-    if (minutes === '0' && hours === '0') {
-      return seconds + '.' + centiseconds;
-    } else if (hours === '0') {
-      seconds = padZero(seconds);
-      return minutes + ':' + seconds + '.' + centiseconds;
-    } else {
-      seconds = padZero(seconds);
-      minutes = padZero(minutes);
-      return hours + ':' + minutes + ':' + seconds + '.' + centiseconds;
-    }
-  };
-  
-  Solve.prototype.virtualTime = function() {
-    if (this.plus2) {
-      return this.time + 2;
-    }
-    return this.time;
-  };
-  
   function filterDigits(value) {
     // Remove all non-digit characters. I bet there's a fancier JS way to do
     // this.
@@ -105,9 +41,56 @@
     return number;
   }
   
+  function solveFromTime(time) {
+    return {dnf: false, inspection: 0, memo: -1, notes: '', plus2: false,
+      scramble: '', time: time};
+  }
+  
+  function solveTime(solve) {
+    if (solve.plus2) {
+      return solve.time + 2;
+    }
+    return solve.time;
+  }
+  
+  function solveToHTML(solve) {
+    var str = timeToString(solve.time);
+    if (this.plus2) {
+      return str + '+';
+    } else {
+      return '<s>' + str + '</s>';
+    }
+    return str;
+  }
+  
+  function timeToString(millis) {
+    // This is the definition of ugly code.
+    var centiseconds = '' + (Math.floor(millis/10)%100);
+    var seconds = '' + (Math.floor(millis/1000)%60);
+    var minutes = '' + (Math.floor(millis/60000)%60);
+    var hours = '' + (Math.floor(millis/3600000)%60);
+    if (centiseconds.length < 2) {
+      centiseconds = '0' + centiseconds;
+    }
+    if (minutes === '0' && hours === '0') {
+      return seconds + '.' + centiseconds;
+    } else if (hours === '0') {
+      seconds = padZero(seconds);
+      return minutes + ':' + seconds + '.' + centiseconds;
+    } else {
+      seconds = padZero(seconds);
+      minutes = padZero(minutes);
+      return hours + ':' + minutes + ':' + seconds + '.' + centiseconds;
+    }
+  }
+  
   if (!window.app) {
     window.app = {};
   }
-  window.app.Solve = Solve;
+  window.app.parseTime = parseTime;
+  window.app.solveFromTime = solveFromTime;
+  window.app.solveTime = solveTime;
+  window.app.timeToHTML = timeToHTML;
+  window.app.timeToString = timeToString;
   
 })();
