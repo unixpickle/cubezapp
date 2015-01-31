@@ -13,6 +13,7 @@
   }
   
   Times.prototype.add = function(solve) {
+    this._select(-1);
     this.insert(solve, 0);
   };
   

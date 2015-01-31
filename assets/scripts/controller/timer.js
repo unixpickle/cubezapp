@@ -24,6 +24,7 @@
       var keyCode = k.charCode || k.keyCode;
       if (keyCode === 0x20) {
         k.preventDefault();
+        k.stopPropagation();
         this.start();
         if ('function' === typeof this.onStart) {
           this.onStart();
@@ -37,11 +38,19 @@
       var keyCode = k.charCode || k.keyCode;
       if (keyCode === 0x20) {
         k.preventDefault();
+        k.stopPropagation();
         dontProcessUp = true;
         var solve = this.stop();
         if ('function' === typeof this.onStop) {
           this.onStop(solve);
         }
+      }
+    }.bind(this));
+    $(document).keypress(function(k) {
+      var keyCode = k.charCode || k.keyCode;
+      if (keyCode === 0x20) {
+        k.preventDefault();
+        k.stopPropagation();
       }
     }.bind(this));
   }
