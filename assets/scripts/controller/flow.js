@@ -19,7 +19,9 @@
     this.timer.onStop = this.stop.bind(this);
     this.timer.enable();
     
-    // Setup stats.
+    // Setup store events.
+    window.app.store.onPuzzleChanged = this.puzzleChanged.bind(this);
+    window.app.store.onSolvesChanged = this.solvesChanged.bind(this);
     window.app.store.onStatsComputed = this.updateStats.bind(this);
     
     // Setup microwave.
@@ -36,6 +38,14 @@
   Flow.prototype.deleteSolve = function(solve) {
     this.times.deleteSolve(solve.id);
     window.app.store.deleteSolve(solve.id);
+  };
+  
+  Flow.prototype.puzzleChanged = function() {
+    this.puzzles.update();
+  };
+  
+  Flow.prototype.solvesChanged = function() {
+    this.times.reload();
   };
   
   Flow.prototype.start = function() {

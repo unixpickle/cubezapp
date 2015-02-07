@@ -12,8 +12,6 @@
     this.onMoreLoaded = null;
     this.onReload = null;
     this.onReloadError = null;
-    
-    window.app.store.onSolvesChanged = this.reload.bind(this);
   }
   
   SolveBuffer.prototype.add = function(solve) {

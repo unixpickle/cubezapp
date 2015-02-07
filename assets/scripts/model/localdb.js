@@ -18,14 +18,13 @@
     
     // Register change events.
     if (window.addEventListener) {
-      window.addEventListener("storage", this._listenFunc, false);
+      window.addEventListener('storage', this._listenFunc, false);
     } else {
-      window.attachEvent("onstorage", this._listenFunc);
+      window.attachEvent('onstorage', this._listenFunc);
     }
     
     // Load the data.
     this._load();
-    this._recomputeStats();
   }
   
   LocalDb.prototype.addPuzzle = function(info, cb) {
@@ -112,9 +111,9 @@
   LocalDb.prototype.detach = function() {
     // Register change events.
     if (window.removeEventListener) {
-      window.removeEventListener("storage", this._listenFunc, false);
+      window.removeEventListener('storage', this._listenFunc, false);
     } else {
-      window.detachEvent("onstorage", this._listenFunc);
+      window.detachEvent('onstorage', this._listenFunc);
     }
   };
   
@@ -200,6 +199,7 @@
     if (this._active === null) {
       throw new Error('The active puzzle does not exist.');
     }
+    this._recomputeStats();
   };
   
   LocalDb.prototype._recomputeStats = function() {
