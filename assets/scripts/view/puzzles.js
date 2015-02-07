@@ -1,50 +1,72 @@
 (function() {
   
-  function Puzzles() {
-    this.element = $('#puzzles-dropdown');
+  function Puzzles() { 
+    this.dropdown = $('#puzzles');
+    this.scroller = $('#puzzles-scroller');
+    this.name = $('#puzzle-name');
     this.showing = false;
-    window.app.store.onPuzzlesChanged = this._update.bind(this);
-    this._update();
+    
+    this.name.click(this.toggle.bind(this));
+    
+    this.update();
   }
   
-  Puzzles.prototype.showHide = function() {
-    if (!this.showing) {
-      this.element.animate({height: 200});
-    } else {
-      this.element.animate({height: 0});
-    }
+  Puzzles.prototype.toggle = function() {
     this.showing = !this.showing;
+    this.dropdown.stop(true, true);
+    if (!this.showing) {
+      this.dropdown.animate({height: 0});
+    } else {
+      this.dropdown.animate({height: 200});
+    }
   };
   
-  Puzzles.prototype._update = function() {
-    $('#header-puzzles-stub').text(window.app.store.getActivePuzzle().name);
+  Puzzles.prototype.update = function() {
+    this.name.text(window.app.store.getActivePuzzle().name);
     
-    $('#puzzles-list').html('');
+    this.scroller.html('');
+    
     var puzzles = window.app.store.getPuzzles();
-    var body = $('<div />');
-    body.css({width: 200 * puzzles.length});
+    if (puzzles.length === 0) {
+      this.scroller.css({width: 0});
+      return;
+    }
+    
+    // Resize puzzles scroller
+    var width = 200;
+    var spacing = 20;
+    var totalWidth = puzzles.length*width + (puzzles.length+1)*spacing;
+    this.scroller.css({width: totalWidth});
+    
+    // Add each puzzle
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       var puzzle = puzzles[i];
-      var puzzleEl = $('<div class="puzzle" />');
-      puzzleEl.html('<img src="images/puzzles/' + puzzle.icon +
-        '.png"><br>' + '<label>' + puzzle.name + '</label>');
-      puzzleEl.click(function(puzzle) {
-        window.app.store.switchPuzzle(puzzle.id, function(err) {
-          this._update();
-          window.app.session.update();
+      (function(puzzle) {
+        var element = $('<div class="puzzle" />');
+        var label = $('<label />');
+        var frame = $('<div class="img-frame" />');
+        var img = $('<img />');
+        label.text(puzzle.name);
+        img.attr('src', 'images/puzzles/' + puzzle.icon + '.png');
+        frame.append(img);
+        element.append(label);
+        element.append(frame);
+        element.css({left: i*width + (i+1)*spacing});
+        this.scroller.append(element);
+        element.click(function() {
+          window.app.store.switchPuzzle(puzzle.id);
+          this.update();
+          this.toggle();
         }.bind(this));
-        this.showHide();
-      }.bind(this, puzzle));
-      body.append(puzzleEl);
+      }).call(this, puzzles[i]);
     }
-    $('#puzzles-list').append(body);
   };
   
   $(function() {
     if (!window.app) {
       window.app = {};
     }
-    window.app.puzzlesDropdown = new Puzzles();
+    window.app.puzzles = new Puzzles();
   });
   
 })();

@@ -43,7 +43,7 @@
   
   function solveFromTime(time) {
     return {dnf: false, inspection: 0, memo: -1, notes: '', plus2: false,
-      scramble: '', time: time};
+      scramble: '', time: time, date: (new Date()).getTime()};
   }
   
   function solveTime(solve) {

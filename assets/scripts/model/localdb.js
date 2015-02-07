@@ -7,13 +7,13 @@
    */
   function LocalDb() {
     // Create hidden class.
-    this._puzzle = null;
-    this._session = null;
+    this._active = null;
     this._puzzles = null;
-    this.onSessionChanged = null;
+    this.onPuzzleChanged = null;
     this.onPuzzlesChanged = null;
     this.onStatsComputed = null;
     this.onStatsLoading = null;
+    this.onTimesChanged = null;
     this._listenFunc = this._reload.bind(this);
     
     // Register change events.
@@ -27,37 +27,35 @@
     this._load();
   }
   
-  LocalDb.prototype.addPuzzle = function(info) {
-    // Generate a new puzzle with a single, empty session.
-    var session = {solves: [], id: window.app.generateId()};
+  LocalDb.prototype.addPuzzle = function(info, cb) {
+    // Generate the ID and empty solves list.
     info.id = window.app.generateId();
-    
-    // The localPuzzle contains the standard puzzle info, but with the added
-    // bonus of a list of session IDs. This way, we can keep a reference to
-    // every session in the localStorage.
-    var localPuzzle = {puzzle: info, sessionIds: [session.id]};
+    info.solves = [];
     
     // Add the puzzle to the front of the list and make it the current puzzle
     // and session.
-    this._puzzles.splice(0, 0, localPuzzle);
-    this._puzzle = localPuzzle;
-    this._session = session;
+    this._puzzles.splice(0, 0, info);
+    this._active = info;
     this._save();
+    
+    if ('function' === typeof cb) {
+      asyncCall(function() {
+        cb(null);
+      });
+    }
   };
   
   LocalDb.prototype.addSolve = function(solve) {
-    if (this._session === null) {
-      throw new Error('Cannot add a solve without a current session.');
+    if (this._active === null) {
+      throw new Error('Cannot add a solve without an active puzzle.');
     }
     solve.id = window.app.generateId();
-    this._session.solves.push(solve);
-    // TODO: to boost performance a bit, we could probably just save the current
-    // session rather than calling this._save().
+    this._active.solves.push(solve);
     this._save();
   };
   
   LocalDb.prototype.changePuzzle = function(settings) {
-    if (this.getActivePuzzle() === null) {
+    if (this._active === null) {
       throw new Error('Cannot use changePuzzle with no active puzzle.');
     }
     
@@ -66,23 +64,25 @@
       if (!settings.hasOwnProperty(key)) {
         continue;
       }
-      this.getActivePuzzle()[key] = settings[key];
+      this._active[key] = settings[key];
     }
   };
   
-  LocalDb.prototype.changeSolve = function(id, solve) {
-    if (this._session === null) {
-      throw new Error('Cannot change a solve without a current session.');
+  LocalDb.prototype.changeSolve = function(id, props) {
+    if (this._active === null) {
+      throw new Error('Cannot change a solve without an active puzzle.');
     }
-    // Find the session.
-    for (var i = this._session.length-1; i >= 0; --i) {
-      if (this._sessions[i].id === id) {
+    
+    // Find the solve by ID, then apply each key to it.
+    for (var i = this._active.solves.length-1; i >= 0; --i) {
+      var solve = this._active.solves[i];
+      if (this._active.solves[i].id === id) {
         // Set each key.
-        for (var key in solve) {
-          if (!solve.hasOwnProperty(key)) {
+        for (var key in props) {
+          if (!props.hasOwnProperty(key)) {
             continue;
           }
-          this._sessions[i][key] = solve[key];
+          solve[key] = props[key];
         }
         this._save();
         return;
@@ -90,32 +90,13 @@
     }
   };
   
-  LocalDb.prototype.deleteSession = function(id) {
-    if (this._puzzle === null) {
-      throw new Error('Cannot delete a session without a current puzzle.');
-    }
-    var idx = this._puzzle.sessionIds.indexOf(id);
-    if (idx < 0) {
-      throw new Error('Cannot delete the session because it does not exist.');
-    }
-    if (idx === this._puzzle.sessionIds.length-1) {
-      throw new Error('Cannot delete the current session.');
-    }
-    // Delete the session both from localStorage and from the puzzle's list of
-    // session ids. We remove it from localStorage after calling _save() to
-    // avoid a race condition.
-    this._puzzle.sessionIds.splice(idx, 1);
-    this._save();
-    localStorage.removeItem('session_' + id);
-  };
-  
   LocalDb.prototype.deleteSolve = function(id) {
-    if (this._session === null) {
-      throw new Error('Cannot delete a solve without a current session.');
+    if (this._active === null) {
+      throw new Error('Cannot delete a solve without an active puzzle.');
     }
-    for (var i = this._session.solves.length-1; i >= 0; --i) {
-      if (this._session.solves[i].id === id) {
-        this._session.solves.splice(i, 1);
+    for (var i = this._puzzle.solves.length-1; i >= 0; --i) {
+      if (this._puzzle.solves[i].id === id) {
+        this._puzzle.solves.splice(i, 1);
         this._save();
         return;
       }
@@ -132,96 +113,73 @@
   };
   
   LocalDb.prototype.getActivePuzzle = function() {
-    if (this._puzzle === null) {
-      return null;
-    }
-    return this._puzzle.puzzle;
-  };
-  
-  LocalDb.prototype.getActiveSession = function() {
-    return this._session;
+    return this._active;
   };
   
   LocalDb.prototype.getPuzzles = function() {
-    // this._puzzles is an array of "local" puzzles which have an additional
-    // "sessionIds" field. Thus, we need to get the canonical puzzle objects out
-    // of each of these local puzzles.
-    var res = [];
-    for (var i = 0, len = this._puzzles.length; i < len; ++i) {
-      res[i] = this._puzzles[i].puzzle;
-    }
-    return res;
+    return this._puzzles;
   };
   
-  LocalDb.prototype.newSession = function(keepLast, callback) {
-    if (this._puzzle === null || this._session === null) {
-      throw new Error('Cannot create a new session: no current session.');
+  LocalDb.prototype.getSolveCount = function(cb) {
+    if ('function' !== typeof cb) {
+      return;
     }
-    
-    // Optionally delete the current session.
-    var removeId = this._session.id;
-    if (!keepLast) {
-      // Delete the ID from this list. We delete the "session_" value after
-      // saving the puzzle to avoid a race condition where other tabs see the
-      // session ID in the puzzle but can't load it from the store.
-      var lastIdx = this._puzzle.sessionIds.length - 1;
-      this._puzzle.sessionIds.splice(lastIdx, 1);
+    if (this._active === null) {
+      asyncCall(function() {
+        cb(new Error('No active puzzle.'), null);
+      });
+      return;
     }
-    
-    // Create a new session and add it to the puzzle.
-    this._session = {solves: [], id: window.app.generateId()};
-    this._puzzle.sessionIds.push(this._session.id);
-    this._save();
-    
-    if (!keepLast) {
-      localStorage.removeItem('session_' + removeId);
+    var count = this._active.solves.length;
+    asyncCall(function() {
+      cb(null, count);
+    });
+  }
+  
+  LocalDb.prototype.getSolves = function(start, count, cb) {
+    if ('function' !== typeof cb) {
+      return;
     }
-    
-    setTimeout(function() {
-      callback(null);
-    }, 10);
+    if (this._active === null) {
+      asyncCall(function() {
+        cb(new Error('No active puzzle.'), null);
+      });
+      return;
+    }
+    var result = this._active.solves.slice(start, start+count);
+    asyncCall(function() {
+      cb(null, result);
+    });
   };
   
   LocalDb.prototype.switchPuzzle = function(id, callback) {
     // Validate the puzzle we're switching to.
-    this._puzzle = this._findPuzzle(id);
-    if (this._puzzle === null) {
+    this._active = this._findPuzzle(id);
+    if (this._active === null) {
       throw new Error('The puzzle does not exist.');
     }
-    if (this._puzzle.sessionIds.length === 0) {
-      throw new Error('No sessions in current puzzle.');
-    }
     
-    // Move the new puzzle to the front of the list.
-    var idx = this._puzzles.indexOf(this._puzzle);
+    // Move the new puzzle to the front of the list and save the list.
+    var idx = this._puzzles.indexOf(this._active);
     this._puzzles.splice(idx, 1);
-    this._puzzles.splice(0, 0, this._puzzle);
-    
-    // Switch to the latest session.
-    var lastIdx = this._puzzle.sessionIds.length - 1;
-    var sessionId = this._puzzle.sessionIds[lastIdx];
-    this._session = this._findSession(sessionId);
+    this._puzzles.splice(0, 0, this._active);
     this._save();
     
     // Run the callback on a later iteration of the event loop.
     if ('function' === typeof callback) {
-      setTimeout(function() {
+      asyncCall(function() {
         callback(null);
-      }, 10);
+      });
     }
   };
   
   LocalDb.prototype._findPuzzle = function(id) {
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
-      if (this._puzzles[i].puzzle.id === id) {
+      if (this._puzzles[i].id === id) {
         return this._puzzles[i];
       }
     }
     return null;
-  };
-  
-  LocalDb.prototype._findSession = function(id) {
-    return JSON.parse(localStorage.getItem('session_' + id));
   };
   
   LocalDb.prototype._load = function() {
@@ -232,24 +190,20 @@
     if (!activeId) {
       return;
     }
-    this._puzzle = this._findPuzzle(activeId);
-    if (this._puzzle === null) {
+    this._active = this._findPuzzle(activeId);
+    if (this._active === null) {
       throw new Error('The active puzzle does not exist.');
     }
-    if (this._puzzle.sessionIds.length === 0) {
-      throw new Error('No sessions in current puzzle.');
-    }
-    // Get the active session
-    var lastIdx = this._puzzle.sessionIds.length - 1;
-    var sessionId = this._puzzle.sessionIds[lastIdx];
-    this._session = this._findSession(sessionId);
   };
   
   LocalDb.prototype._reload = function() {
     // Reload literally everything, includinng the current puzzle and session.
     this._load();
-    if ('function' === typeof this.onSessionChanged) {
-      this.onSessionChanged();
+    if ('function' === typeof this.onSolvesChanged) {
+      this.onSolvesChanged();
+    }
+    if ('function' === typeof this.onPuzzleChanged) {
+      this.onPuzzleChanged();
     }
     if ('function' === typeof this.onPuzzlesChanged) {
       this.onPuzzlesChanged();
@@ -257,21 +211,18 @@
   };
   
   LocalDb.prototype._save = function() {
-    // Save the current session first to avoid race conditions with other tabs.
-    if (this._puzzle !== null) {
-      localStorage.setItem('session_' + this._session.id,
-        JSON.stringify(this._session));
-    }
-    
     // Save all the puzzles.
     localStorage.setItem('puzzles', JSON.stringify(this._puzzles));
     
-    // Save the current puzzle.
-    if (this._puzzle !== null) {
-      localStorage.setItem('activePuzzle', this._puzzle.puzzle.id)
-      
+    // Save the active puzzle.
+    if (this._active !== null) {
+      localStorage.setItem('activePuzzle', this._active.id);
     }
   };
+  
+  function asyncCall(cb) {
+    setTimeout(cb, 10);
+  }
   
   function loadPuzzles() {
     var puzzlesData = localStorage.getItem('puzzles');

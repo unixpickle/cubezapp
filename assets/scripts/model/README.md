@@ -25,24 +25,24 @@ The global object `window.app.store` has various properties and methods which pr
 
 The store has the following properties for event handlers:
 
- * `onSessionChanged` - something in the session was changed remotely by another window or client.
+ * `onPuzzleChanged` - the current puzzle's settings were changed.
  * `onPuzzlesChanged` - a puzzle was changed, deleted, or re-ordered remotely by another window or client.
- * `onStatsComputed` - the overall puzzle stats were computed.
- * `onStatsLoading` - the overall puzzle stats are being calculated and are not currently available.
+ * `onSolvesChanged` - times in the current puzzle were added, removed, or modified remotely.
+ * `onStatsComputed` - the stats were computed.
+ * `onStatsLoading` - the stats are being calculated and are not currently available.
 
 The store provides the following methods which make it possible to manipulate data:
 
- * `addPuzzle(puzzle)` - provide a [Puzzle](#puzzle-object) to add to the store. This will automatically switch to the added puzzle and create a blank session.
- * `addSolve(solve)` - adds a solve to the session. Provide a [Solve](#solve-object).
- * `changePuzzle(attrs)` - modifies the current puzzle. Provide a dictionary containing keys to set on the current puzzle.
- * `changeSolve(id, attrs)` - modifies the properties of a solve in the current session. Provide a solve id and an object containing properties to set.
- * `deleteSession(id)` - delete a session from the current puzzle, provided it is not the current session.
- * `deleteSolve(id)` - delete a solve from the current session.
+ * `addPuzzle(puzzle, cb)` - provide a [Puzzle](#puzzle-object) to add to the store. This will automatically switch to the added puzzle. The `cb` argument is called after an error occurs or the puzzle is added and switched.
+ * `addSolve(solve)` - adds a solve to the current puzzle. Provide a [Solve](#solve-object).
+ * `changePuzzle(attrs, cb)` - modifies the current puzzle. Provide a dictionary containing keys to set on the current puzzle.
+ * `changeSolve(id, attrs)` - modifies the properties of a solve in the current puzzle. Provide a solve id and an object containing properties to set.
+ * `deleteSolve(id)` - delete a solve from the current puzzle.
  * `getActivePuzzle()` - get the current [Puzzle](#puzzle-object)
- * `getActiveSession()` - get the current [Session](#session-object)
  * `getPuzzles()` - get a list of [Puzzle](#puzzle-object) objects.
- * `newSession(keepLast, callback)` - create a new session. If `keepLast` is false, the current session will be deleted after a new one is added. The `callback` is called with an error argument after the session is added or the addition fails.
- * `switchPuzzle(id, callback)` - switch to a new puzzle. The `callback` is called with an error argument after the puzzle is switched or an error occurs.
+ * `getSolveCount(cb)` - get the number of [Solve](#solve-object) objects for the current puzzle.
+ * `getSolves(start, count, cb)` - get a list of [Solve](#solve-object) objects from a callback.
+ * `switchPuzzle(id, cb)` - switch to a new puzzle. The `cb` argument is called with an error argument after the puzzle is switched or an error occurs.
 
 <a name="solve-object" />
 ## Solve
@@ -68,11 +68,3 @@ The **Puzzle** object stores the general information about a puzzle. Currently, 
  * `icon` - string - the icon identifier
 
 Additionally, Puzzle objects which have been added to the store have an `id` attribute which is a string.
-
-<a name="session-object" />
-## Session
-
-The **Session** object stores general information about a session. Here are its fields:
-
- * `solves` - string - an array of [Solves](#solve-object)
- * `id` - string - an identifier for the session in the store

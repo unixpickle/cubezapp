@@ -130,10 +130,10 @@
     }
   }
   
-  function statsForSession(session) {
+  function statsForSolves(solves) {
     var times = [];
-    for (var i = 0, len = session.solves.length; i < len; ++i) {
-      times[i] = window.app.solveTime(session.solves[i]);
+    for (var i = 0, len = solves.length; i < len; ++i) {
+      times[i] = window.app.solveTime(solves[i]);
     }
     return computeStatistics(times);
   }
@@ -152,6 +152,6 @@
     window.app = {};
   }
   window.app.computeStatistics = computeStatistics;
-  window.app.statsForSession = statsForSession;
+  window.app.statsForSolves = statsForSolves;
   
 })();
