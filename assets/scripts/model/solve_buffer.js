@@ -5,7 +5,7 @@
   function SolveBuffer() {
     this._count = 0;
     this._loadingMore = false;
-    this._moreTicket = 0;
+    this._ticket = 0;
     this._reloading = false;
     this._solves = [];
     this.onMoreError = null;
@@ -15,6 +15,18 @@
     
     window.app.store.onSolvesChanged = this.reload.bind(this);
   }
+  
+  SolveBuffer.prototype.add = function(solve) {
+    this._solves.splice(0, 0, solve);
+  }
+  
+  SolveBuffer.prototype.cancel = function() {
+    if (this._loadingMore || this._reloading) {
+      ++this._ticket;
+      this._loadingMore = false;
+      this._reloading = false;
+    }
+  };
   
   SolveBuffer.prototype.getCount = function() {
     return this._count;
@@ -28,11 +40,15 @@
     if (this._reloading) {
       return;
     } else if (this._loadingMore) {
-      this._moreTicket++;
+      this._ticket++;
       this._loadingMore = false;
     }
     this._reloading = true;
+    var ticket = ++this._ticket;
     window.app.store.getSolveCount(function(err, count) {
+      if (this._ticket !== ticket) {
+        return;
+      }
       if (err !== null) {
         this._reloading = false;
         this._callReloadError(err);
@@ -44,6 +60,9 @@
       }
       var start = count - len;
       window.app.store.getSolves(start, len, function(err, solves) {
+        if (this._ticket !== ticket) {
+          return;
+        }
         this._reloading = false;
         if (err !== null) {
           this._callReloadError(err);
@@ -75,11 +94,11 @@
     
     // Setup the state
     this._loadingMore = true;
-    var ticket = ++this._moreTicket;
+    var ticket = ++this._ticket;
     
     // Request the data
     window.app.store.getSolves(start, len, function(err, solves) {
-      if (ticket !== this._moreTicket) {
+      if (ticket !== this._ticket) {
         return;
       }
       this._loadingMore = false;
@@ -103,5 +122,10 @@
       this.onReloadError(err);
     }
   };
+  
+  if (window.app) {
+    window.app = {};
+  }
+  window.app.SolveBuffer = SolveBuffer;
   
 })();
