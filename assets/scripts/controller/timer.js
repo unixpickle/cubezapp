@@ -41,9 +41,9 @@
         k.preventDefault();
         k.stopPropagation();
         dontProcessUp = true;
-        var solve = this.stop();
+        var time = this.stop();
         if ('function' === typeof this.onStop) {
-          this.onStop(solve);
+          this.onStop(time);
         }
       }
     }.bind(this));
@@ -93,6 +93,6 @@
   if (!window.app) {
     window.app = {};
   }
-  window.app.timer = new Timer();
+  window.app.Timer = Timer;
   
 })();

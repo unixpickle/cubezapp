@@ -18,7 +18,8 @@
   
   SolveBuffer.prototype.add = function(solve) {
     this._solves.splice(0, 0, solve);
-  }
+    ++this._count;
+  };
   
   SolveBuffer.prototype.cancel = function() {
     if (this._loadingMore || this._reloading) {
@@ -26,6 +27,17 @@
       this._loadingMore = false;
       this._reloading = false;
     }
+  };
+  
+  SolveBuffer.prototype.deleteSolve = function(id) {
+    for (var i = 0, len = this._solves.length; i < len; ++i) {
+      if (this._solves[i].id === id) {
+        this._solves.splice(i, 1);
+        --this._count;
+        return i;
+      }
+    }
+    return -1;
   };
   
   SolveBuffer.prototype.getCount = function() {
@@ -58,8 +70,7 @@
       if (len > BUFFER_SIZE) {
         len = BUFFER_SIZE
       }
-      var start = count - len;
-      window.app.store.getSolves(start, len, function(err, solves) {
+      window.app.store.getSolves(0, len, function(err, solves) {
         if (this._ticket !== ticket) {
           return;
         }
@@ -90,7 +101,7 @@
     if (len > BUFFER_SIZE) {
       len = BUFFER_SIZE;
     }
-    var start = this._count - (len+this._solves.length);
+    var start = this._solves.length;
     
     // Setup the state
     this._loadingMore = true;
@@ -108,7 +119,7 @@
         }
         return;
       }
-      for (var i = 0, len = solves.length; ++i) {
+      for (var i = 0, len = solves.length; i < len; ++i) {
         this._solves.push(solves[i]);
       }
       if ('function' === typeof this.onMoreLoaded) {
@@ -123,7 +134,7 @@
     }
   };
   
-  if (window.app) {
+  if (!window.app) {
     window.app = {};
   }
   window.app.SolveBuffer = SolveBuffer;

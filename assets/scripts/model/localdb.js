@@ -25,6 +25,7 @@
     
     // Load the data.
     this._load();
+    this._recomputeStats();
   }
   
   LocalDb.prototype.addPuzzle = function(info, cb) {
@@ -37,6 +38,7 @@
     this._puzzles.splice(0, 0, info);
     this._active = info;
     this._save();
+    this._recomputeStats();
     
     if ('function' === typeof cb) {
       asyncCall(function() {
@@ -50,8 +52,9 @@
       throw new Error('Cannot add a solve without an active puzzle.');
     }
     solve.id = window.app.generateId();
-    this._active.solves.push(solve);
+    this._active.solves.splice(0, 0, solve);
     this._save();
+    this._recomputeStats();
   };
   
   LocalDb.prototype.changePuzzle = function(settings) {
@@ -66,6 +69,7 @@
       }
       this._active[key] = settings[key];
     }
+    this._save();
   };
   
   LocalDb.prototype.changeSolve = function(id, props) {
@@ -85,6 +89,7 @@
           solve[key] = props[key];
         }
         this._save();
+        this._recomputeStats();
         return;
       }
     }
@@ -94,10 +99,11 @@
     if (this._active === null) {
       throw new Error('Cannot delete a solve without an active puzzle.');
     }
-    for (var i = this._puzzle.solves.length-1; i >= 0; --i) {
-      if (this._puzzle.solves[i].id === id) {
-        this._puzzle.solves.splice(i, 1);
+    for (var i = this._active.solves.length-1; i >= 0; --i) {
+      if (this._active.solves[i].id === id) {
+        this._active.solves.splice(i, 1);
         this._save();
+        this._recomputeStats();
         return;
       }
     }
@@ -194,6 +200,23 @@
     if (this._active === null) {
       throw new Error('The active puzzle does not exist.');
     }
+  };
+  
+  LocalDb.prototype._recomputeStats = function() {
+    asyncCall(function() {
+      if (this._active === null) {
+        return;
+      }
+      if ('function' === typeof this.onStatsLoading) {
+        this.onStatsLoading();
+      }
+      
+      // Compute the stats and send them to the callback.
+      var stats = window.app.statsForSolves(this._active.solves);
+      if ('function' === typeof this.onStatsComputed) {
+        this.onStatsComputed(stats);
+      }
+    }.bind(this));
   };
   
   LocalDb.prototype._reload = function() {

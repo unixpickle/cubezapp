@@ -4,6 +4,7 @@
     this.dropdown = $('#puzzles');
     this.scroller = $('#puzzles-scroller');
     this.name = $('#puzzle-name');
+    this.onChoose = null;
     this.showing = false;
     
     this.name.click(this.toggle.bind(this));
@@ -58,19 +59,18 @@
         element.css({left: i*width + (i+1)*spacing});
         this.scroller.append(element);
         element.click(function() {
-          window.app.store.switchPuzzle(puzzle.id);
-          this.update();
+          if ('function' === typeof this.onChoose) {
+            this.onChoose(puzzle);
+          }
           this.toggle();
         }.bind(this));
       }).call(this, puzzles[i]);
     }
   };
   
-  $(function() {
-    if (!window.app) {
-      window.app = {};
-    }
-    window.app.puzzles = new Puzzles();
-  });
+  if (!window.app) {
+    window.app = {};
+  }
+  window.app.Puzzles = Puzzles;
   
 })();
