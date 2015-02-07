@@ -11,9 +11,9 @@
     this._puzzles = null;
     this.onPuzzleChanged = null;
     this.onPuzzlesChanged = null;
+    this.onSolvesChanged = null;
     this.onStatsComputed = null;
     this.onStatsLoading = null;
-    this.onTimesChanged = null;
     this._listenFunc = this._reload.bind(this);
     
     // Register change events.
@@ -199,14 +199,14 @@
   LocalDb.prototype._reload = function() {
     // Reload literally everything, includinng the current puzzle and session.
     this._load();
-    if ('function' === typeof this.onSolvesChanged) {
-      this.onSolvesChanged();
-    }
     if ('function' === typeof this.onPuzzleChanged) {
       this.onPuzzleChanged();
     }
     if ('function' === typeof this.onPuzzlesChanged) {
       this.onPuzzlesChanged();
+    }
+    if ('function' === typeof this.onSolvesChanged) {
+      this.onSolvesChanged();
     }
   };
   
