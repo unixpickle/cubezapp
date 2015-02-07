@@ -9,13 +9,18 @@
     this._changed();
   }
   
+  Times.prototype.visibleRange = function() {
+    
+  };
+  
   Times.prototype._changed = function() {
     window.app.store.getPuzzleCount(function(err, count) {
       if (err !== null) {
         return;
       }
-      // TODO: this
-    });
+      var oldCount = this.count;
+      this.count = count;
+    }.bind(this));
   };
   
   if (!window.app) {

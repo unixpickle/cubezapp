@@ -15,9 +15,13 @@
     this.showing = !this.showing;
     this.dropdown.stop(true, true);
     if (!this.showing) {
-      this.dropdown.animate({height: 0});
+      this.dropdown.animate({height: 0,
+        'background-color': 'rgba(242, 242, 242, 0.5)'});
+      $('#header').animate({'background-color': 'rgba(255, 255, 255, 0.5)'});
     } else {
-      this.dropdown.animate({height: 200});
+      this.dropdown.animate({height: 210,
+        'background-color': 'rgba(242, 242, 242, 1.0)'});
+      $('#header').animate({'background-color': 'white'});
     }
   };
   
