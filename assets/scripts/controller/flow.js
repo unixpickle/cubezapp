@@ -26,6 +26,15 @@
     
     // Setup microwave.
     this.microwave.disable();
+    
+    // Temporary scramble setup.
+    this.showScramble();
+    this.times.onSelect = function(solve) {
+      $('#temp-last-scramble').text(solve.scramble);
+    };
+    this.times.onDeselect = function() {
+      $('#temp-last-scramble').text('');
+    };
   }
   
   Flow.prototype.changePuzzle = function(puzzle) {
@@ -48,6 +57,10 @@
     this.times.reload();
   };
   
+  Flow.prototype.showScramble = function() {
+    $('#temp-scramble').text(window.app.scramble('3x3x3', 'moves'));
+  };
+  
   Flow.prototype.start = function() {
     this.microwave.show(0);
   };
@@ -55,8 +68,10 @@
   Flow.prototype.stop = function(time) {
     this.microwave.show(time);
     var solve = window.app.solveFromTime(time);
+    solve.scramble = $('#temp-scramble').text();
     window.app.store.addSolve(solve);
     this.times.add(solve);
+    this.showScramble();
   };
   
   Flow.prototype.timerChanged = function(time) {

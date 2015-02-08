@@ -170,6 +170,7 @@
     this._puzzles.splice(0, 0, this._active);
     this._save();
     
+    this._recomputeStats();
     // Run the callback on a later iteration of the event loop.
     if ('function' === typeof callback) {
       asyncCall(function() {

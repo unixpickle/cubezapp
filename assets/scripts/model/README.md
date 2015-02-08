@@ -49,6 +49,7 @@ The store provides the following methods which make it possible to manipulate da
 
 The **Solve** object stores all the information for a single recorded time. Here are the fields and their types:
 
+ * `date` - int - the UNIX nanotime when the timer was stopped
  * `dnf` - bool - indicates if the solve was a DNF
  * `inspection` - int - the number of milliseconds the user inspected for
  * `memo` - int - the number of milliseconds the user took to memorize a cube for BLD

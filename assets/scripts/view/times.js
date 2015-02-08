@@ -11,6 +11,7 @@
     this.element = element;
     this.onDelete = null;
     this.onSelect = null;
+    this.onDeselect = null;
     
     // Setup buffer
     this.buffer.onMoreLoaded = this._moreLoaded.bind(this);
@@ -46,6 +47,9 @@
   Times.prototype.deselect = function() {
     if (this._selected < 0) {
       return;
+    }
+    if ('function' === typeof this.onDeselect) {
+      this.onDeselect();
     }
     var row = this._rows[this._selected];
     row.removeClass('row-selected');

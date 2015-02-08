@@ -6,7 +6,7 @@
   
   Stats.prototype.update = function(stats) {
     if (stats.count === 0) {
-      this.element.html('<div class="no-stats">NYI</div>');
+      this.element.html('<div class="no-stats">Solve the cube.</div>');
       return;
     }
 
