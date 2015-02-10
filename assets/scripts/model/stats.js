@@ -78,7 +78,7 @@
     if (times.length < count) {
       return NaN;
     }
-    var subList = times.slice(times.length-count, times.length);
+    var subList = times.slice(0, count);
     removeBestWorst(subList);
     return mean(subList);
   }
@@ -87,7 +87,7 @@
     if (times.length < count) {
       return NaN;
     }
-    var subList = times.slice(times.length-count, times.length);
+    var subList = times.slice(0, count);
     return mean(subList);
   }
   
