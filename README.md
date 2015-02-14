@@ -4,7 +4,6 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 # TODO
 
- * Add elements to the times list in bulk using jquery append().
  * Implement multiple selection in times list
  * Implement stats on selected region of solves
  * Compute stats in background WebWorker

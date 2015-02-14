@@ -1,6 +1,6 @@
 (function() {
   
-  var BUFFER_SIZE = 1000;
+  var BUFFER_SIZE = 200;
   
   function SolveBuffer() {
     this._count = 0;

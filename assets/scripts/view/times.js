@@ -79,12 +79,14 @@
   };
   
   Times.prototype._appendSolves = function(solves) {
+    var toAdd = [];
     for (var i = 0, len = solves.length; i < len; ++i) {
       var solve = solves[i];
       var element = this._elementForSolve(solve);
-      this.element.append(element);
+      toAdd.push(element);
       this._rows.push(element);
     }
+    this.element.append(toAdd);
   };
   
   Times.prototype._changed = function() {
