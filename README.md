@@ -5,6 +5,7 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 # TODO
 
  * Create color "themes"
+ * "Squeeze in" animation on page load
  * Implement multiple selection in times list
  * Implement stats on selected region of solves
  * Compute stats in background WebWorker

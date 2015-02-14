@@ -42,8 +42,8 @@
       <a id="puzzle-name">Puzzles</a>
       <label id="temp-scramble" style="position: absolute; left: 0; top: 0; width: 100%; color: white; font-size: 24px; line-height: 44px; margin-right: 20px; text-align: center; pointer-events: none"></label>
       <div id="edit-buttons">
-        <button id="add-button">+</button>
-        <button id="remove-button">-</button>
+        <button id="add-button"></button>
+        <button id="remove-button"></button>
       </div>
       <div id="puzzles">
         <div id="puzzles-scroller"></div>
@@ -53,9 +53,10 @@
     <div id="footer">
       
       <div id="footer-header">
-        <button id="stats-tab-button"
-          class="tab tab-selected">Session Stats</button>
-        <button id="settings-tab-button" class="tab">Settings</button>
+        <div id="tab-buttons">
+          <button id="stats-tab-button" class="tab tab-selected">Session Stats</button>
+          <button id="settings-tab-button" class="tab">Settings</button>
+        </div>
         <button id="footer-close"></button>
       </div>
       

@@ -46,9 +46,9 @@
     for (var i = 0, len = views.length; i < len; ++i) {
       var view = views[i];
       var button = $('<button class="delete-puzzle"></button>');
-      var offset = $(views[i]).offset();
-      var width = $(views[i]).width()
-      button.css({left: offset.left+width-15, top: offset.top-54});
+      var offset = $(views[i]).position();
+      var width = $(views[i]).width();
+      button.css({left: offset.left+width-20, top: offset.top-10});
       this.scroller.append(button);
       this.deleteButtons.push(button);
       (function(identifier) {
@@ -67,6 +67,7 @@
     this.showing = !this.showing;
     this.dropdown.stop(true, false);
     this.header.stop(true, false);
+    this.editButtons.stop(true, false);
     if (!this.showing) {
       this.editButtons.animate({opacity: 0}, {complete: function() {
         this.editButtons.css({display: 'none'});

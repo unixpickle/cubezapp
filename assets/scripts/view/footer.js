@@ -4,6 +4,7 @@
   
   function Footer() {
     this.element = $('#footer');
+    this.buttons = $('#tab-buttons');
     this.open = !(localStorage.footerOpen === 'false');
     this.statsTab = this.element.find('#stats-tab');
     this.settingsTab = this.element.find('#settings-tab');
@@ -13,7 +14,8 @@
     this.onNameChanged = null;
     
     if (!this.open) {
-      this.element.css({'bottom': -256});
+      this.element.css({bottom: -256});
+      this.buttons.css({display: 'none', opacity: 0});
     }
     
     var closeButton = this.element.find('#footer-close');
@@ -26,7 +28,7 @@
     $('#change-name').click(function() {
       var newName = prompt('Enter a new name for ' +
         window.app.store.getActivePuzzle().name);
-      if (newName == '') {
+      if (newName.trim() === '') {
         return;
       }
       if ('function' === typeof this.onNameChanged) {
@@ -70,11 +72,16 @@
       this.open = false;
       this.element.stop(true, true);
       this.element.animate({'bottom': -256});
+      this.buttons.animate({opacity: 0}, {complete: function() {
+        this.buttons.css({display: 'none'});
+      }.bind(this)});
     } else {
       localStorage.footerOpen = 'true';
       this.open = true;
       this.element.stop(true, true);
       this.element.animate({'bottom': 0});
+      this.buttons.css({display: 'block'});
+      this.buttons.animate({opacity: 1});
     }
   };
   

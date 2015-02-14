@@ -48,6 +48,24 @@
 #edit-buttons button {
   width: 25px;
   height: 25px;
+  border: none;
+  background-color: transparent;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+#edit-buttons button:focus {
+  outline: none;
+}
+
+#add-button {
+  background-image: url('../images/plus.png');
+}
+
+#remove-button {
+  background-image: url('../images/minus.png');
 }
 
 .delete-puzzle {
