@@ -12,8 +12,28 @@
   background-color: #f2f2f2;
   text-align: center;
   line-height: 44px;
-  font-size: 25px;
   color: #777;
+}
+
+#footer .tab {
+  background-color: transparent;
+  color: #3498d8;
+}
+
+#footer .tab, #footer .tab-selected {
+  height: 25px;
+  border: none;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  padding-left: 20px;
+  padding-right: 20px;
+  cursor: pointer;
+}
+
+#footer .tab-selected {
+  color: white;
+  background-color: #3498d8;
+  border-radius: 12px;
 }
 
 #footer-close {
@@ -35,12 +55,16 @@
   outline: 0;
 }
 
-#footer-view {
+#stats-tab, #settings-tab {
   position: absolute;
   top: 44px;
   width: 100%;
   height: 256px;
   background-color: white;
+}
+
+#settings-tab {
+  display: none;
 }
 
 #footer-left-view {

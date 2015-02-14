@@ -46,18 +46,28 @@
     </div>
     
     <div id="footer">
+      
       <div id="footer-header">
-        <label id="temp-last-scramble" style="position: absolute; left: 0; top: 0; width: 100%; color: #777; font-size: 24px; line-height: 44px; margin-right: 20px; text-align: center; pointer-events: none"></label>
+        <button id="stats-tab-button"
+          class="tab tab-selected">Session Stats</button>
+        <button id="settings-tab-button" class="tab">Settings</button>
         <button id="footer-close"></button>
       </div>
-      <div id="footer-view">
+      
+      <div id="stats-tab">
         <div id="footer-left-view">
           <div id="times" class="times"></div>
         </div>
+        <label id="temp-last-scramble" style="position: absolute; left: 200px; width: calc(100% - 500px); font-size: 20px; text-align: center; top: 10px"></label>
         <div id="footer-right-view">
           <div id="stats" class="stats"></div>
         </div>
       </div>
+      
+      <div id="settings-tab">
+        Here are some puzzle settings.
+      </div>
+      
     </div>
     
   </body>
