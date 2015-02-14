@@ -4,7 +4,12 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 # TODO
 
- * Remove sessions from the model.
+ * Add elements to the times list in bulk using jquery append().
+ * Implement multiple selection in times list
+ * Implement stats on selected region of solves
+ * Compute stats in background WebWorker
+ * Create puzzle settings tab
+ * Create mechanism for adding and removing puzzles
 
 # License
 
