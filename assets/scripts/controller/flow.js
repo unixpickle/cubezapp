@@ -6,6 +6,7 @@
     this.times = new window.app.Times($('#times'));
     this.puzzles = new window.app.Puzzles();
     this.stats = new window.app.Stats();
+    this.footer = new window.app.Footer();
     
     // Setup puzzles.
     this.puzzles.onChoose = this.changePuzzle.bind(this);

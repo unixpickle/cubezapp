@@ -25,8 +25,14 @@
   border: none;
   background-color: transparent;
   background-image: url('../images/close.png');
-  background-size: 100% 100%;
+  background-size: 25px 25px;
+  background-position: center;
+  background-repeat: no-repeat;
   cursor: pointer;
+}
+
+#footer-close:focus {
+  outline: 0;
 }
 
 #footer-view {
