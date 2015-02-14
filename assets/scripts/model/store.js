@@ -11,7 +11,7 @@
       var x = addPuzzles[i];
       var puzzleName = x + 'x' + x + 'x' + x;
       var puzzle = {name: puzzleName, icon: puzzleName, scrambler: '3x3x3',
-        scrambleType: 'moves', scrambleLength: -1};
+        scrambleType: 'moves', scrambleLength: 25, theme: 'blueberry'};
       window.app.store.addPuzzle(puzzle);
     }
   }

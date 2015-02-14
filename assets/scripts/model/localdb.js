@@ -99,7 +99,6 @@
   };
   
   LocalDb.prototype.deletePuzzle = function(id, cb) {
-    console.log('deleting', id, 'current', this._active.id);
     if (this._active === null) {
       throw new Error('Cannot delete without active puzzle.');
     } else if (id === this._active.id) {

@@ -54,6 +54,7 @@
       this.times.reload();
       this.microwave.show(0);
       this.footer.updateSettings();
+      $('#temp-last-scramble').text('');
     }.bind(this));
   }
   
@@ -80,6 +81,7 @@
       this.times.reload();
       this.microwave.show(0);
       this.footer.updateSettings();
+      $('#temp-last-scramble').text('');
     }.bind(this));
   };
   
@@ -106,6 +108,7 @@
   
   Flow.prototype.solvesChanged = function() {
     this.times.reload();
+    $('#temp-last-scramble').text('');
   };
   
   Flow.prototype.showScramble = function() {

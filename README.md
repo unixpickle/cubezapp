@@ -4,11 +4,12 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 # TODO
 
+ * Create color "themes"
  * Implement multiple selection in times list
  * Implement stats on selected region of solves
  * Compute stats in background WebWorker
- * Create puzzle settings tab
- * Create mechanism for adding and removing puzzles
+ * Re-code puzzle deletion
+ * Implement *real* puzzle creation flow
 
 # License
 
