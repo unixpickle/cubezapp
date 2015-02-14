@@ -67,6 +67,17 @@
   display: none;
 }
 
+#settings-tab .puzzle {
+  margin-left: 10px;
+  background-color: rgba(242, 242, 242, 1.0);
+}
+
+#settings-content {
+  position: absolute;
+  left: 250px;
+  top: 10px;
+}
+
 #footer-left-view {
   float: left;
   width: 200px;

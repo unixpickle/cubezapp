@@ -56,7 +56,7 @@
     this._recomputeStats();
   };
   
-  LocalDb.prototype.changePuzzle = function(settings) {
+  LocalDb.prototype.changePuzzle = function(settings, cb) {
     if (this._active === null) {
       throw new Error('Cannot use changePuzzle with no active puzzle.');
     }
@@ -69,6 +69,10 @@
       this._active[key] = settings[key];
     }
     this._save();
+    
+    asyncCall(function() {
+      cb();
+    });
   };
   
   LocalDb.prototype.changeSolve = function(id, props) {
@@ -92,6 +96,27 @@
         return;
       }
     }
+  };
+  
+  LocalDb.prototype.deletePuzzle = function(id, cb) {
+    console.log('deleting', id, 'current', this._active.id);
+    if (this._active === null) {
+      throw new Error('Cannot delete without active puzzle.');
+    } else if (id === this._active.id) {
+      throw new Error('Cannot delete active puzzle.');
+    }
+    
+    for (var i = 0, len = this._puzzles.length; i < len; ++i) {
+      if (this._puzzles[i].id === id) {
+        this._puzzles.splice(i, 1);
+        this._save();
+        break;
+      }
+    }
+    
+    asyncCall(function() {
+      cb(null);
+    });
   };
   
   LocalDb.prototype.deleteSolve = function(id) {

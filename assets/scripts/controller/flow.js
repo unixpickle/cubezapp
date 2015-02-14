@@ -9,7 +9,9 @@
     this.footer = new window.app.Footer();
     
     // Setup puzzles.
+    this.puzzles.onAdd = this.addPuzzle.bind(this);
     this.puzzles.onChoose = this.changePuzzle.bind(this);
+    this.puzzles.onDelete = this.deletePuzzle.bind(this);
     
     // Setup times.
     this.times.onDelete = this.deleteSolve.bind(this);
@@ -22,8 +24,13 @@
     
     // Setup store events.
     window.app.store.onPuzzleChanged = this.puzzleChanged.bind(this);
+    window.app.store.onPuzzlesChanged = this.puzzlesChanged.bind(this);
     window.app.store.onSolvesChanged = this.solvesChanged.bind(this);
     window.app.store.onStatsComputed = this.updateStats.bind(this);
+    
+    // Setup settings.
+    this.footer.onIconChanged = this.changeIcon.bind(this);
+    this.footer.onNameChanged = this.changeName.bind(this);
     
     // Setup microwave.
     this.microwave.disable();
@@ -36,13 +43,51 @@
     this.times.onDeselect = function() {
       $('#temp-last-scramble').text('');
     };
+    
+    this.footer.updateSettings();
+  }
+  
+  Flow.prototype.addPuzzle = function(info) {
+    window.app.store.addPuzzle(info, function() {
+      // TODO: here, handle error
+      this.puzzles.update();
+      this.times.reload();
+      this.microwave.show(0);
+      this.footer.updateSettings();
+    }.bind(this));
+  }
+  
+  Flow.prototype.changeIcon = function(newIcon) {
+    window.app.store.changePuzzle({icon: newIcon}, function() {
+      // TODO: here, handle error
+      this.puzzles.update();
+      this.footer.updateSettings();
+    }.bind(this));
+  }
+  
+  Flow.prototype.changeName = function(newName) {
+    window.app.store.changePuzzle({name: newName}, function() {
+      // TODO: here, handle error
+      this.puzzles.update();
+      this.footer.updateSettings();
+    }.bind(this));
   }
   
   Flow.prototype.changePuzzle = function(puzzle) {
-    window.app.store.switchPuzzle(puzzle.id);
-    this.puzzles.update();
-    this.times.reload();
-    this.microwave.show(0);
+    window.app.store.switchPuzzle(puzzle.id, function() {
+      // TODO: here, handle error
+      this.puzzles.update();
+      this.times.reload();
+      this.microwave.show(0);
+      this.footer.updateSettings();
+    }.bind(this));
+  };
+  
+  Flow.prototype.deletePuzzle = function(id) {
+    window.app.store.deletePuzzle(id, function() {
+      // TODO: here, handle error
+      this.puzzlesChanged();
+    }.bind(this));
   };
   
   Flow.prototype.deleteSolve = function(solve) {
@@ -51,6 +96,11 @@
   };
   
   Flow.prototype.puzzleChanged = function() {
+    this.puzzles.update();
+    this.footer.updateSettings();
+  };
+  
+  Flow.prototype.puzzlesChanged = function() {
     this.puzzles.update();
   };
   

@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="styles/times.css">
     <link rel="stylesheet" type="text/css" href="styles/microwave.css">
     <link rel="stylesheet" type="text/css" href="styles/stats.css">
+    <link rel="stylesheet" type="text/css" href="styles/puzzle.css">
     
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="scripts/3rdparty/jquery.color-2.1.0.min.js"></script>
@@ -40,6 +41,10 @@
     <div id="header">
       <a id="puzzle-name">Puzzles</a>
       <label id="temp-scramble" style="position: absolute; left: 0; top: 0; width: 100%; color: white; font-size: 24px; line-height: 44px; margin-right: 20px; text-align: center; pointer-events: none"></label>
+      <div id="edit-buttons">
+        <button id="add-button">+</button>
+        <button id="remove-button">-</button>
+      </div>
       <div id="puzzles">
         <div id="puzzles-scroller"></div>
       </div>
@@ -65,7 +70,29 @@
       </div>
       
       <div id="settings-tab">
-        Here are some puzzle settings.
+        <div class="puzzle">
+          <div class="img-frame">
+            <img />
+          </div>
+          <label>Name</label>
+        </div>
+        <div id="settings-content">
+          Name: <button id="change-name">Change Name</button>
+          <br />
+          Icon: <select id="icon-dropdown">
+            <option value="2x2x2">2x2x2</option>
+            <option value="3x3x3">3x3x3</option>
+            <option value="4x4x4">4x4x4</option>
+            <option value="5x5x5">5x5x5</option>
+            <option value="6x6x6">6x6x6</option>
+            <option value="7x7x7">7x7x7</option>
+            <option value="BLD">Blindfolded</option>
+            <option value="clock">Rubik's clock</option>
+            <option value="OH">OH</option>
+            <option value="skewb">Skewb</option>
+            <option value="square1">Square-1</option>
+          </select>
+        </div>
       </div>
       
     </div>

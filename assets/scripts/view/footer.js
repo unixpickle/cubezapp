@@ -1,3 +1,5 @@
+// I know all this code is disgusting. It is a rough draft.
+
 (function() {
   
   function Footer() {
@@ -6,6 +8,9 @@
     this.statsTab = this.element.find('#stats-tab');
     this.settingsTab = this.element.find('#settings-tab');
     this.currentTab = 0;
+    
+    this.onIconChanged = null;
+    this.onNameChanged = null;
     
     if (!this.open) {
       this.element.css({'bottom': -256});
@@ -16,6 +21,25 @@
     
     $('#stats-tab-button').click(this.showStatsTab.bind(this));
     $('#settings-tab-button').click(this.showSettingsTab.bind(this));
+    
+    // Temporary settings.
+    $('#change-name').click(function() {
+      var newName = prompt('Enter a new name for ' +
+        window.app.store.getActivePuzzle().name);
+      if (newName == '') {
+        return;
+      }
+      if ('function' === typeof this.onNameChanged) {
+        this.onNameChanged(newName);
+      }
+    }.bind(this));
+    
+    $('#icon-dropdown').change(function() {
+      var newIcon = $('#icon-dropdown').val();
+      if ('function' === typeof this.onIconChanged) {
+        this.onIconChanged(newIcon);
+      }
+    }.bind(this));
   }
   
   Footer.prototype.showSettingsTab = function() {
@@ -52,6 +76,14 @@
       this.element.stop(true, true);
       this.element.animate({'bottom': 0});
     }
+  };
+  
+  Footer.prototype.updateSettings = function() {
+    var current = window.app.store.getActivePuzzle();
+    this.element.find('#settings-tab .puzzle label').text(current.name);
+    this.element.find('#settings-tab .puzzle img').attr('src',
+      'images/puzzles/' + current.icon + '.png');
+    this.element.find('#icon-dropdown').val(current.icon);
   };
   
   if (!window.app) {

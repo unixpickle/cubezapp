@@ -37,6 +37,7 @@ The store provides the following methods which make it possible to manipulate da
  * `addSolve(solve)` - adds a solve to the current puzzle. Provide a [Solve](#solve-object).
  * `changePuzzle(attrs, cb)` - modifies the current puzzle. Provide a dictionary containing keys to set on the current puzzle.
  * `changeSolve(id, attrs)` - modifies the properties of a solve in the current puzzle. Provide a solve id and an object containing properties to set.
+ * `deletePuzzle(id, cb)` - delete a puzzle (besides the current puzzle) given its identifier. The `cb` argument will be called with a possible error.
  * `deleteSolve(id)` - delete a solve from the current puzzle.
  * `getActivePuzzle()` - get the current [Puzzle](#puzzle-object)
  * `getPuzzles()` - get a list of [Puzzle](#puzzle-object) objects.
