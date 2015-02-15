@@ -1,11 +1,32 @@
 (function() {
 
+  // Uncomment the following line and put in the webworker path if necessary.
+  // var workerPath = 'puzzlejs/webscrambler_worker.js';
+  
+  var workerPath = null;
+
   var scrambleWorker = null;
-  var workerPath = 'scripts/puzzlejs/webscrambler_worker.js';
   var callbacks = {};
   var ticketId = 0;
 
   if ('undefined' !== typeof window.Worker) {
+    // We may need to find the worker's path manually.
+    if (workerPath === null) {
+      // Use the current script's "src" attribute to figure out where the
+      // scripts are.
+      var scripts = document.getElementsByTagName('script');
+      if (scripts.length === 0) {
+        throw new Error('unable to find worker path');
+      }
+      var scriptPath = scripts[scripts.length-1].src.split('?')[0];
+      var slashIdx = scriptPath.lastIndexOf('/');
+      if (slashIdx >= 0) {
+        workerPath = scriptPath.slice(0, slashIdx) + '/webscrambler_worker.js';
+      } else {
+        workerPath = 'webscrambler_worker.js';
+      }
+    }
+    
     // Setup the webworker to call our callbacks.
     scrambleWorker = new window.Worker(workerPath);
     scrambleWorker.onmessage = function(e) {
