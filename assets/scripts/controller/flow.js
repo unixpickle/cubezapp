@@ -112,7 +112,10 @@
   };
   
   Flow.prototype.showScramble = function() {
-    $('#temp-scramble').text(window.app.scramble('3x3x3', 'moves'));
+    var genFunc = window.puzzlejs.webscrambler.generateScramble;
+    var scramble = genFunc('3x3x3', 'Moves', 25, function(scramble) {
+      $('#temp-scramble').text(scramble);
+    });
   };
   
   Flow.prototype.start = function() {
