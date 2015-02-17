@@ -105,7 +105,9 @@
     
     var menuName = $('#scrambler-main').val();
     if (menuName == 'None') {
-      window.app.store.changePuzzle({scrambler: 'None'});
+      window.app.store.changePuzzle({scrambler: 'None'}, function() {
+        window.app.flow.showScramble();
+      });
       $('#scrambler-sub').css({display: 'none'});
       $('#scrambler-moves').css({display: 'none'});
       return;
