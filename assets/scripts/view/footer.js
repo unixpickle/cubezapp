@@ -42,6 +42,10 @@
         this.onIconChanged(newIcon);
       }
     }.bind(this));
+    
+    $('#scrambler-main').change(changeMenu);
+    $('#scrambler-moves').change(changeMoves);
+    $('#scrambler-sub').change(changeSubmenu);
   }
   
   Footer.prototype.showSettingsTab = function() {
@@ -91,7 +95,96 @@
     this.element.find('#settings-tab .puzzle img').attr('src',
       'images/puzzles/' + current.icon + '.png');
     this.element.find('#icon-dropdown').val(current.icon);
+    
+    $('#scrambler-main').val(current.scrambler);
+    populateSubmenu();
   };
+  
+  function changeMenu() {
+    var current = window.app.store.getActivePuzzle();
+    
+    var menuName = $('#scrambler-main').val();
+    if (menuName == 'None') {
+      window.app.store.changePuzzle({scrambler: 'None'});
+      $('#scrambler-sub').css({display: 'none'});
+      $('#scrambler-moves').css({display: 'none'});
+      return;
+    }
+    
+    var scramblers =
+      window.puzzlejs.scrambler.scramblersForPuzzle(menuName);
+    window.app.store.changePuzzle({scrambler: menuName, scrambleLength: 25,
+      scrambleType: scramblers[0].name}, function() {
+      populateSubmenu();
+      window.app.flow.showScramble();
+    });
+  }
+  
+  function changeMoves() {
+    var count = parseInt($('#scrambler-moves').val());
+    if (isNaN(count)) {
+      count = 25;
+      $('#scrambler-moves').val(count);
+    }
+    window.app.store.changePuzzle({scrambleLength: count}, function() {
+      window.app.flow.showScramble();
+    });
+  }
+  
+  function changeSubmenu() {
+    var current = window.app.store.getActivePuzzle();
+    var scramblers =
+      window.puzzlejs.scrambler.scramblersForPuzzle(current.scrambler);
+    var submenuName = $('#scrambler-sub').val();
+    for (var i = 0, len = scramblers.length; i < len; ++i) {
+      var scrambler = scramblers[i];
+      if (scrambler.name !== submenuName) {
+        continue;
+      }
+      if (!scrambler.moves) {
+        $('#scrambler-moves').css({display: 'none'});
+      } else {
+        $('#scrambler-moves').css({display: 'inline-block'});
+        $('#scrambler-moves').val(25);
+      }
+    }
+    window.app.store.changePuzzle({scrambleType: submenuName,
+      scrambleLength: 25}, function() {
+      window.app.flow.showScramble();
+    });
+  }
+  
+  function populateSubmenu() {
+    var current = window.app.store.getActivePuzzle();
+    
+    if (current.scrambler === 'None') {
+      $('#scrambler-sub').css({display: 'none'});
+      $('#scrambler-moves').css({display: 'none'});
+      return;
+    }
+    
+    // Setup the sub menu
+    var subMenu = $('#scrambler-sub');
+    subMenu.html('');
+    var scramblers =
+      window.puzzlejs.scrambler.scramblersForPuzzle(current.scrambler);
+    for (var i = 0, len = scramblers.length; i < len; ++i) {
+      var scrambler = scramblers[i];
+      var option = $('<option name="' + scrambler.name + '">' +
+        scrambler.name + '</options>');
+      subMenu.append(option);
+      if (scrambler.name === current.scrambleType) {
+        if (!scrambler.moves) {
+          $('#scrambler-moves').css({display: 'none'});
+        } else {
+          $('#scrambler-moves').css({display: 'inline-block'});
+          $('#scrambler-moves').val(current.scrambleLength);
+        }
+      }
+    }
+    subMenu.css({display: 'inline-block'});
+    subMenu.val(current.scrambleType);
+  }
   
   if (!window.app) {
     window.app = {};

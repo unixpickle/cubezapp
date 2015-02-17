@@ -81,6 +81,7 @@
       this.times.reload();
       this.microwave.show(0);
       this.footer.updateSettings();
+      this.showScramble();
       $('#temp-last-scramble').text('');
     }.bind(this));
   };
@@ -112,8 +113,16 @@
   };
   
   Flow.prototype.showScramble = function() {
+    var current = window.app.store.getActivePuzzle();
+    if (current.scrambler === 'None') {
+      $('#temp-scramble').text('');
+      return;
+    }
     var genFunc = window.puzzlejs.webscrambler.generateScramble;
-    var scramble = genFunc('3x3x3', 'Moves', 25, function(scramble) {
+    var a = current.scrambler;
+    var b = current.scrambleType;
+    var c = current.scrambleLength;
+    var scramble = genFunc(a, b, c, function(scramble) {
       $('#temp-scramble').text(scramble);
     });
   };

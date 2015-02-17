@@ -70,9 +70,11 @@
     }
     this._save();
     
-    asyncCall(function() {
-      cb();
-    });
+    if ('function' === typeof cb) {
+      asyncCall(function() {
+        cb();
+      });
+    }
   };
   
   LocalDb.prototype.changeSolve = function(id, props) {
@@ -113,9 +115,11 @@
       }
     }
     
-    asyncCall(function() {
-      cb(null);
-    });
+    if ('function' === typeof cb) {
+      asyncCall(function() {
+        cb(null);
+      });
+    }
   };
   
   LocalDb.prototype.deleteSolve = function(id) {
@@ -160,9 +164,11 @@
       return;
     }
     var count = this._active.solves.length;
-    asyncCall(function() {
-      cb(null, count);
-    });
+    if ('function' === typeof cb) {
+      asyncCall(function() {
+        cb(null, count);
+      });
+    }
   }
   
   LocalDb.prototype.getSolves = function(start, count, cb) {
@@ -176,9 +182,11 @@
       return;
     }
     var result = this._active.solves.slice(start, start+count);
-    asyncCall(function() {
-      cb(null, result);
-    });
+    if ('function' === typeof cb) {
+      asyncCall(function() {
+        cb(null, result);
+      });
+    }
   };
   
   LocalDb.prototype.switchPuzzle = function(id, callback) {
@@ -277,7 +285,23 @@
     if (!puzzlesData) {
       return [];
     }
-    return JSON.parse(puzzlesData);
+    var result = JSON.parse(puzzlesData);
+    
+    // Canonicalize the puzzles
+    for (var i = 0, len = result.length; i < len; ++i) {
+      var puzzle = result[i];
+      if (!puzzle.scrambler) {
+        puzzle.scrambler = '3x3x3';
+      }
+      if (!puzzle.scrambleType || puzzle.scrambleType === 'moves') {
+        puzzle.scrambleType = 'Moves';
+      }
+      if (!puzzle.scrambleLength || puzzle.scrambleLength < 0) {
+        puzzle.scrambleLength = 25;
+      }
+    }
+    
+    return result;
   }
   
   if (!window.app) {
