@@ -10,26 +10,36 @@
     this.onChange = null;
     this.onStop = null;
     
+    this.dontProcessUp = false;
+    
+    if ('ontouchstart' in document) {
+      $('#temp-scramble').css({'font-size': '17px'});
+      $('#pentagons').on('touchstart', function() {
+        if (!this._running) {
+          return;
+        }
+        this.startDown();
+      }.bind(this));
+      $('#pentagons').on('touchend', function() {
+        if (!this._enabled) {
+          return;
+        }
+        this.startUp();
+      }.bind(this));
+    }
+    
     // Space bar event for starting.
     // Note: we should ignore keyup events if they occur right after a keydown
     // event stopped the time.
-    var dontProcessUp = false;
     $(document).keyup(function(k) {
       if (!this._enabled) {
         return;
       }
       var keyCode = k.charCode || k.keyCode;
       if (keyCode === 0x20) {
-        if (dontProcessUp) {
-          dontProcessUp = false;
-          return;
-        }
         k.preventDefault();
         k.stopPropagation();
-        this.start();
-        if ('function' === typeof this.onStart) {
-          this.onStart();
-        }
+        this.startUp();
       }
     }.bind(this));
     $(document).keydown(function(k) {
@@ -40,11 +50,7 @@
       if (keyCode === 0x20) {
         k.preventDefault();
         k.stopPropagation();
-        dontProcessUp = true;
-        var time = this.stop();
-        if ('function' === typeof this.onStop) {
-          this.onStop(time);
-        }
+        this.startDown();
       }
     }.bind(this));
     $(document).keypress(function(k) {
@@ -79,6 +85,25 @@
         this.onChange(delay);
       }
     }.bind(this), 43);
+  };
+  
+  Timer.prototype.startDown = function() {
+    this.dontProcessUp = true;
+    var time = this.stop();
+    if ('function' === typeof this.onStop) {
+      this.onStop(time);
+    }
+  };
+  
+  Timer.prototype.startUp = function() {
+    if (this.dontProcessUp) {
+      this.dontProcessUp = false;
+      return;
+    }
+    this.start();
+    if ('function' === typeof this.onStart) {
+      this.onStart();
+    }
   };
   
   Timer.prototype.stop = function() {
