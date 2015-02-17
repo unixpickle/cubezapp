@@ -4,6 +4,16 @@
   left: 0;
   width: 100%;
   height: 300px;
+  
+  opacity: 0;
+  
+  -webkit-transition: -webkit-transform 0.9s, opacity 0.9s;
+  transition: transform 0.9s, opacity 0.9s;
+  -ms-transition: -ms-transform 0.9s, opacity 0.9s;
+  
+  -ms-transform: translateY(20px);
+  -webkit-transform: translateY(20px);
+  transform: translateY(20px);
 }
 
 #footer-header {
@@ -18,6 +28,10 @@
 #footer .tab {
   background-color: transparent;
   color: #3498d8;
+}
+
+#footer .tab:focus, #footer .tab-selected:focus {
+  outline: none;
 }
 
 #footer .tab, #footer .tab-selected {

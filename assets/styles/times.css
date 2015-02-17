@@ -37,6 +37,10 @@
   display: inline;
 }
 
+.times .delete:focus {
+  outline: none;
+}
+
 .times .row-selected {
   background-color: #dbeffa;
 }
