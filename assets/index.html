@@ -2,7 +2,7 @@
   <head>
     <title>Cubezapp</title>
     
-    <meta name="viewport" content="width=700px">
+    <meta name="viewport" content="width=700">
     
     <link rel="stylesheet" type="text/css" href="styles/body.css">
     <link rel="stylesheet" type="text/css" href="styles/footer.css">
@@ -38,11 +38,13 @@
   <body>
     <canvas id="pentagons"></canvas>
     
-    <input id="microwave" value="0.00"></input>
+    <div id="main-content">
+      <input id="microwave" value="0.00"></input>
+    </div>
     
     <div id="header">
       <a id="puzzle-name">Puzzles</a>
-      <label id="temp-scramble" style="position: absolute; left: 0; top: 0; width: 100%; color: white; font-size: 24px; line-height: 44px; margin-right: 20px; text-align: center; pointer-events: none"></label>
+      <label id="temp-scramble" style="position: absolute; left: 0; top: 0; width: 100%; color: white; font-size: 24px; line-height: 44px; margin-right: 20px; text-align: center; pointer-events: all"></label>
       <div id="edit-buttons">
         <button id="add-button"></button>
         <button id="remove-button"></button>

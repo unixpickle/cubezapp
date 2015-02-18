@@ -15,8 +15,15 @@
     
     if (!this.open) {
       this.element.css({bottom: -256});
+      $('#main-content').css({height: 'calc(100% - 88px)'})
       this.buttons.css({display: 'none', opacity: 0});
     }
+    
+    $('#main-content').css({
+      '-webkit-transition': 'height 0.5s',
+      transition: 'height 0.5s',
+      '-ms-transition': 'height 0.5s'
+    });
     
     var closeButton = this.element.find('#footer-close');
     closeButton.click(this.toggleOpen.bind(this));
@@ -79,6 +86,7 @@
       this.buttons.animate({opacity: 0}, {complete: function() {
         this.buttons.css({display: 'none'});
       }.bind(this)});
+      $('#main-content').css({height: 'calc(100% - 88px)'})
     } else {
       localStorage.footerOpen = 'true';
       this.open = true;
@@ -86,6 +94,7 @@
       this.element.animate({'bottom': 0});
       this.buttons.css({display: 'block'});
       this.buttons.animate({opacity: 1});
+      $('#main-content').css({height: 'calc(100% - 344px)'})
     }
   };
   
