@@ -1,5 +1,5 @@
 #microwave {
-  position: absolute;
+  position: fixed;
   top: calc(50% - 175px);
   left: 0;
   
