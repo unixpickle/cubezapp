@@ -21,7 +21,8 @@
       if ('function' !== typeof this.onAdd) {
         return;
       }
-      var info = {name: 'Untitled', icon: '3x3x3'};
+      var info = {name: 'Untitled', icon: '3x3x3', scrambler: '3x3x3',
+        scrambleType: 'Moves', scrambleLength: 25};
       this.onAdd(info);
       this.toggle();
     }.bind(this));
