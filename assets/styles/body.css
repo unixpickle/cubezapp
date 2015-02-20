@@ -1,3 +1,8 @@
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -33,4 +38,21 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+#temp-scramble, #temp-last-scramble {
+  -webkit-touch-callout: all;
+  -webkit-user-select: all;
+  -khtml-user-select: all;
+  -moz-user-select: all;
+  -ms-user-select: all;
+  user-select: all;
+  z-index: -1;
+}
+
+#main-content {
+  position: fixed;
+  width: 100%;
+  top: 44px;
+  height: calc(100% - 344px);
 }

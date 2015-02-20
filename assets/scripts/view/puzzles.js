@@ -70,6 +70,7 @@
     this.header.stop(true, false);
     this.editButtons.stop(true, false);
     if (!this.showing) {
+      $('#temp-scramble').css({display: 'block'});
       this.editButtons.animate({opacity: 0}, {complete: function() {
         this.editButtons.css({display: 'none'});
       }.bind(this)});
@@ -77,6 +78,7 @@
         'background-color': 'rgba(242, 242, 242, 0.5)'});
       this.header.animate({'background-color': 'rgba(255, 255, 255, 0.5)'});
     } else {
+      $('#temp-scramble').css({display: 'none'});
       this.editButtons.css({display: 'inline-block'});
       this.editButtons.animate({opacity: 1});
       this.dropdown.animate({height: 210,

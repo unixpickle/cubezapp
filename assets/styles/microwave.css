@@ -1,6 +1,6 @@
 #microwave {
-  position: fixed;
-  top: calc(50% - 175px);
+  position: absolute;
+  top: calc(50% - 50px);
   left: 0;
   
   border: none;
