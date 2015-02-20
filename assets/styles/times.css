@@ -1,7 +1,5 @@
 .times {
   width: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
 }
 
 .times .row {
