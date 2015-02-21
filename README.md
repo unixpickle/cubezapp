@@ -1,5 +1,7 @@
 # Cubezapp
 
+**CURRENT STATUS**: Right now, this is a *rough draft*. The code is terrible. Please don't even use this. It's just for a select group of testers. I emphasize again: if you are looking at this to evaluate how good at programming I am, please stop. Just go away. Close your eyes. Thanks, bye.
+
 Cubezapp will be the best cube timer in existence. It will support scramble generation and 3D rendering (with WebGL), online cloud storage for times, graphs, statistic analysis, and more.
 
 # TODO
