@@ -81,10 +81,10 @@
     $('#microwave').stop(true, true);
     if (resized) {
       $('#microwave').animate({'font-size': fontSize,
-        top: (height-fontSize) / 2});
+        top: 44 + (height-fontSize)/2});
     } else {
       $('#microwave').css({'font-size': fontSize,
-        top: (height-fontSize) / 2});
+        top: 44 + (height-fontSize)/2});
     }
   };
   

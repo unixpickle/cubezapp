@@ -14,13 +14,13 @@
     
     if ('ontouchstart' in document) {
       $('#temp-scramble').css({'font-size': '17px'});
-      $('#main-content').on('touchstart', function() {
+      $('#pentagons').on('touchstart', function() {
         if (!this._running) {
           return;
         }
         this.startDown();
       }.bind(this));
-      $('#main-content').on('touchend', function() {
+      $('#pentagons').on('touchend', function() {
         if (!this._enabled) {
           return;
         }
