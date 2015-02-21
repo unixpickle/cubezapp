@@ -69,13 +69,13 @@
       height = 0;
     }
     var width = $(window).width();
-    var fontSize = Math.ceil(height/2);
+    var fontSize = Math.ceil(height/4);
     if (width < fontSize*5) {
       fontSize = width / 5;
     }
     
-    if (fontSize < 20) {
-      fontSize = 20;
+    if (fontSize < 100) {
+      fontSize = 100;
     }
     
     $('#microwave').stop(true, true);
