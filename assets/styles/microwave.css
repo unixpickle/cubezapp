@@ -1,13 +1,11 @@
 #microwave {
   position: absolute;
-  top: calc(50% - 50px);
   left: 0;
   
   border: none;
   background-color: transparent;
   width: 100%;
   text-align: center;
-  font-size: 100px;
   color: white;
   
   opacity: 0;

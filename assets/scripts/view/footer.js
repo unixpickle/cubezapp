@@ -15,9 +15,10 @@
     
     if (!this.open) {
       this.element.css({bottom: -256});
-      $('#main-content').css({height: 'calc(100% - 88px)'})
       this.buttons.css({display: 'none', opacity: 0});
     }
+    
+    this.resizeMicrowave(false);
     
     $('#main-content').css({
       '-webkit-transition': 'height 0.5s',
@@ -53,7 +54,39 @@
     $('#scrambler-main').change(changeMenu);
     $('#scrambler-moves').change(changeMoves);
     $('#scrambler-sub').change(changeSubmenu);
+    
+    $(window).resize(this.resizeMicrowave.bind(this, false));
   }
+  
+  Footer.prototype.resizeMicrowave = function(resized) {
+    var height;
+    if (this.open) {
+      height = $(window).height() - 388;
+    } else {
+      height = $(window).height() - 88;
+    }
+    if (height < 0) {
+      height = 0;
+    }
+    var width = $(window).width();
+    var fontSize = Math.ceil(height/2);
+    if (width < fontSize*5) {
+      fontSize = width / 5;
+    }
+    
+    if (fontSize < 20) {
+      fontSize = 20;
+    }
+    
+    $('#microwave').stop(true, true);
+    if (resized) {
+      $('#microwave').animate({'font-size': fontSize,
+        top: (height-fontSize) / 2});
+    } else {
+      $('#microwave').css({'font-size': fontSize,
+        top: (height-fontSize) / 2});
+    }
+  };
   
   Footer.prototype.showSettingsTab = function() {
     if (this.currentTab === 1) {
@@ -86,7 +119,6 @@
       this.buttons.animate({opacity: 0}, {complete: function() {
         this.buttons.css({display: 'none'});
       }.bind(this)});
-      $('#main-content').css({height: 'calc(100% - 88px)'})
     } else {
       localStorage.footerOpen = 'true';
       this.open = true;
@@ -94,8 +126,8 @@
       this.element.animate({'bottom': 0});
       this.buttons.css({display: 'block'});
       this.buttons.animate({opacity: 1});
-      $('#main-content').css({height: 'calc(100% - 344px)'})
     }
+    this.resizeMicrowave(true);
   };
   
   Footer.prototype.updateSettings = function() {
