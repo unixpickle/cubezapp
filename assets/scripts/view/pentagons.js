@@ -66,7 +66,7 @@
     ctx.fillStyle = 'rgba(255, 255, 255, ' + this.opacity + ')';
     ctx.beginPath();
     for (var i = 0; i < 5; ++i) {
-      var ang = rotation + i * Math.PI * 2 / 5.0;
+      var ang = rotation + i * Math.PI * 2 / 5;
       if (i == 0) {
         ctx.moveTo((x + Math.cos(ang) * radius) * size,
             (y + Math.sin(ang) * radius) * size);
@@ -122,7 +122,7 @@
   
   Pentagons.prototype.random = function(ignoreIdx) {
     var radius = 0.05 + (Math.pow(Math.random(), 15)+1.0)*0.075;
-    var opacity = Math.max((Math.random()-0.1)*0.22, 0.0);
+    var opacity = Math.random()*0.22 + 0.02;
     
     if ('undefined' === typeof ignoreIdx) {
       return new Pentagon(Math.random(), Math.random(), radius,

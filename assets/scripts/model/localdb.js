@@ -185,7 +185,7 @@
     });
   };
   
-  LocalDb.prototype.switchPuzzle = function(id, callback) {
+  LocalDb.prototype.switchPuzzle = function(id, cb) {
     // Validate the puzzle we're switching to.
     this._active = this._findPuzzle(id);
     if (this._active === null) {
@@ -202,8 +202,8 @@
     
     // Run the callback on a later iteration of the event loop.
     return new Ticket(function() {
-      if ('function' === typeof callback) {
-        callback(null);
+      if ('function' === typeof cb) {
+        cb(null);
       }
     });
   };
