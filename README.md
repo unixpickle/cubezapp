@@ -6,7 +6,6 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 # TODO
 
- * Make model requests cancellable
  * Create color "themes"
  * Implement multiple selection in times list
  * Implement stats on selected region of solves

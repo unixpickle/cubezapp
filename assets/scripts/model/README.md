@@ -31,19 +31,24 @@ The store has the following properties for event handlers:
  * `onStatsComputed` - the stats were computed.
  * `onStatsLoading` - the stats are being calculated and are not currently available.
 
-The store provides the following methods which make it possible to manipulate data:
+The store provides the following methods which make it possible to manipulate data. Many of these methods take a `cb` argument which is called with an error and an optional return value. If the function has a `cb` argument and would naturally return a value upon success, `cb` is called as `cb(error, value)`.
 
- * `addPuzzle(puzzle, cb)` - provide a [Puzzle](#puzzle-object) to add to the store. This will automatically switch to the added puzzle. The `cb` argument is called after an error occurs or the puzzle is added and switched.
+ * `addPuzzle(puzzle, cb)` - provide a [Puzzle](#puzzle-object) to add to the store. This will automatically switch to the added puzzle. This returns a [Ticket](#ticket-object).
  * `addSolve(solve)` - adds a solve to the current puzzle. Provide a [Solve](#solve-object).
- * `changePuzzle(attrs, cb)` - modifies the current puzzle. Provide a dictionary containing keys to set on the current puzzle.
+ * `changePuzzle(attrs, cb)` - modifies the current puzzle. Provide a dictionary containing keys to set on the current puzzle. This returns a [Ticket](#ticket-object).
  * `changeSolve(id, attrs)` - modifies the properties of a solve in the current puzzle. Provide a solve id and an object containing properties to set.
- * `deletePuzzle(id, cb)` - delete a puzzle (besides the current puzzle) given its identifier. The `cb` argument will be called with a possible error.
+ * `deletePuzzle(id, cb)` - delete a puzzle (besides the current puzzle) given its identifier. This returns a [Ticket](#ticket-object).
  * `deleteSolve(id)` - delete a solve from the current puzzle.
  * `getActivePuzzle()` - get the current [Puzzle](#puzzle-object)
  * `getPuzzles()` - get a list of [Puzzle](#puzzle-object) objects.
- * `getSolveCount(cb)` - get the number of [Solve](#solve-object) objects for the current puzzle.
- * `getSolves(start, count, cb)` - get a list of [Solve](#solve-object) objects from a callback.
- * `switchPuzzle(id, cb)` - switch to a new puzzle. The `cb` argument is called with an error argument after the puzzle is switched or an error occurs.
+ * `getSolveCount(cb)` - get the number of [Solve](#solve-object) objects for the current puzzle. This returns a [Ticket](#ticket-object).
+ * `getSolves(start, count, cb)` - get a list of [Solve](#solve-object) objects from a callback. This returns a [Ticket](#ticket-object).
+ * `switchPuzzle(id, cb)` - switch to a new puzzle. This returns a [Ticket](#ticket-object).
+
+<a name="ticket-object" />
+## Ticket
+
+A **Ticket** represents an asynchronous operation. A ticket has one method, `cancel()`, which cancels the operation. Tickets are returned from many asynchronous operations in the model.
 
 <a name="solve-object" />
 ## Solve

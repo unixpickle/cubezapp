@@ -39,11 +39,11 @@
     this._save();
     this._recomputeStats();
     
-    if ('function' === typeof cb) {
-      asyncCall(function() {
+    return new Ticket(function() {
+      if ('function' === typeof cb) {
         cb(null);
-      });
-    }
+      }
+    });
   };
   
   LocalDb.prototype.addSolve = function(solve) {
@@ -70,11 +70,11 @@
     }
     this._save();
     
-    if ('function' === typeof cb) {
-      asyncCall(function() {
-        cb();
-      });
-    }
+    return new Ticket(function() {
+      if ('function' === typeof cb) {
+        cb(null);
+      }
+    });
   };
   
   LocalDb.prototype.changeSolve = function(id, props) {
@@ -115,11 +115,11 @@
       }
     }
     
-    if ('function' === typeof cb) {
-      asyncCall(function() {
+    return new Ticket(function() {
+      if ('function' === typeof cb) {
         cb(null);
-      });
-    }
+      }
+    });
   };
   
   LocalDb.prototype.deleteSolve = function(id) {
@@ -155,38 +155,34 @@
   
   LocalDb.prototype.getSolveCount = function(cb) {
     if ('function' !== typeof cb) {
-      return;
+      return new Ticket(function() {});
     }
+    
+    // If there is no active puzzle, there are no solves to count.
     if (this._active === null) {
-      asyncCall(function() {
-        cb(new Error('No active puzzle.'), null);
-      });
-      return;
+      throw new Error('No active puzzle.');
     }
+    
     var count = this._active.solves.length;
-    if ('function' === typeof cb) {
-      asyncCall(function() {
-        cb(null, count);
-      });
-    }
+    return new Ticket(function() {
+      cb(null, count);
+    });
   }
   
   LocalDb.prototype.getSolves = function(start, count, cb) {
     if ('function' !== typeof cb) {
-      return;
+      return new Ticket(function() {});
     }
+    
+    // If there is no active puzzle, there are no solves to get.
     if (this._active === null) {
-      asyncCall(function() {
-        cb(new Error('No active puzzle.'), null);
-      });
-      return;
+      throw new Error('No active puzzle.');
     }
+    
     var result = this._active.solves.slice(start, start+count);
-    if ('function' === typeof cb) {
-      asyncCall(function() {
-        cb(null, result);
-      });
-    }
+    return new Ticket(function() {
+      cb(null, result);
+    });
   };
   
   LocalDb.prototype.switchPuzzle = function(id, callback) {
@@ -203,12 +199,13 @@
     this._save();
     
     this._recomputeStats();
+    
     // Run the callback on a later iteration of the event loop.
-    if ('function' === typeof callback) {
-      asyncCall(function() {
+    return new Ticket(function() {
+      if ('function' === typeof callback) {
         callback(null);
-      });
-    }
+      }
+    });
   };
   
   LocalDb.prototype._findPuzzle = function(id) {
@@ -276,8 +273,22 @@
     }
   };
   
+  function Ticket(cb) {
+    this.ticket = asyncCall(function() {
+      this.ticket = null;
+      cb();
+    }.bind(this));
+  }
+  
+  Ticket.prototype.cancel = function() {
+    if (this.ticket !== null) {
+      clearTimeout(this.ticket);
+      this.ticket = null;
+    }
+  };
+  
   function asyncCall(cb) {
-    setTimeout(cb, 10);
+    return setTimeout(cb, 10);
   }
   
   function loadPuzzles() {

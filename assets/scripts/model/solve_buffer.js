@@ -4,9 +4,8 @@
   
   function SolveBuffer() {
     this._count = 0;
-    this._loadingMore = false;
-    this._ticket = 0;
     this._reloading = false;
+    this._ticket = null;
     this._solves = [];
     this.onMoreError = null;
     this.onMoreLoaded = null;
@@ -20,11 +19,12 @@
   };
   
   SolveBuffer.prototype.cancel = function() {
-    if (this._loadingMore || this._reloading) {
-      ++this._ticket;
-      this._loadingMore = false;
-      this._reloading = false;
+    if (this._ticket === null) {
+      return;
     }
+    this._ticket.cancel();
+    this._ticket = null;
+    this._reloading = false;
   };
   
   SolveBuffer.prototype.deleteSolve = function(id) {
@@ -49,34 +49,32 @@
   SolveBuffer.prototype.reload = function() {
     if (this._reloading) {
       return;
-    } else if (this._loadingMore) {
-      this._ticket++;
-      this._loadingMore = false;
     }
+    this.cancel();
+    
     this._reloading = true;
-    var ticket = ++this._ticket;
-    window.app.store.getSolveCount(function(err, count) {
-      if (this._ticket !== ticket) {
-        return;
-      }
+    this._ticket = window.app.store.getSolveCount(function(err, count) {
+      // If there was an error, give up.
       if (err !== null) {
+        this._ticket = null;
         this._reloading = false;
         this._callReloadError(err);
         return;
       }
+      
       var len = Math.min(count, BUFFER_SIZE);
       if (len > BUFFER_SIZE) {
         len = BUFFER_SIZE
       }
-      window.app.store.getSolves(0, len, function(err, solves) {
-        if (this._ticket !== ticket) {
-          return;
-        }
+      this._ticket = window.app.store.getSolves(0, len, function(err, solves) {
+        this._ticket = null;
         this._reloading = false;
         if (err !== null) {
           this._callReloadError(err);
           return;
         }
+        // We wait until here to set this._count so that it doesn't change if we
+        // encounter an error.
         this._count = count;
         this._solves = solves;
         if ('function' === typeof this.onReload) {
@@ -87,7 +85,7 @@
   };
   
   SolveBuffer.prototype.requestMore = function() {
-    if (this._reloading || this._loadingMore) {
+    if (this._reloading) {
       return;
     }
     
@@ -99,18 +97,11 @@
     if (len > BUFFER_SIZE) {
       len = BUFFER_SIZE;
     }
-    var start = this._solves.length;
-    
-    // Setup the state
-    this._loadingMore = true;
-    var ticket = ++this._ticket;
+    var s = this._solves.length;
     
     // Request the data
-    window.app.store.getSolves(start, len, function(err, solves) {
-      if (ticket !== this._ticket) {
-        return;
-      }
-      this._loadingMore = false;
+    this._ticket = window.app.store.getSolves(s, len, function(err, solves) {
+      this._ticket = null;
       if (err !== null) {
         if ('function' === typeof this.onMoreError) {
           this.onMoreError(err);
