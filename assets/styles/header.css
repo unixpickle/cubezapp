@@ -1,0 +1,29 @@
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 44px;
+  
+  background-color: rgba(255, 255, 255, 0.5);
+  
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+#header .top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 44px;
+  width: 100%;
+}
+
+#header .dropdown {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  /* The height of the dropdown depends on whether there's a scrollbar. */
+  width: 100%;
+  display: none;
+}

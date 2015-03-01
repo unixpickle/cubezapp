@@ -1,0 +1,99 @@
+#footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 300px;
+  width: 100%;
+  /* NOTE: the height will be changed by code. */
+  
+  background-color: #f0f0f0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+#footer .top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 44px;
+  width: 100%;
+  
+  background-color: white;
+  text-align: center;
+}
+
+#footer .top .tab {
+  height: 44px;
+  
+  color: #999999;
+  background-color: transparent;
+  border: none;
+  font-size: 22px;
+  line-height: 44px;
+  
+  cursor: pointer;
+}
+
+#footer .top .bar {
+  position: absolute;
+  /* This will be resized/moved around by a script */
+  top: 44px;
+  height: 5px;
+  border-radius: 2.5px;
+  display: none;
+}
+
+#footer .bottom {
+  position: absolute;
+  top: 49px;
+  left: 0;
+  height: calc(100% - 49px);
+  width: 200%;
+}
+
+#footer .stats-contents {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+}
+
+#footer .times, #footer .graph, #footer .stats {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-color: white;
+}
+
+#footer .times {
+  left: 0;
+  /* NOTE: the width will be changed by code. */
+  width: 150px;
+  border-top-right-radius: 5px;
+}
+
+#footer .graph {
+  left: 155px;
+  /* NOTE: the width will be changed by code. */
+  width: calc(100% - 410px);
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+#footer .stats {
+  right: 0;
+  /* NOTE: the width will be changed by code. */
+  width: 250px;
+  border-top-left-radius: 5px;
+}
+
+#footer .settings-contents {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  width: 50%;
+  
+  background-color: white;
+}
