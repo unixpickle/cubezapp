@@ -34,6 +34,10 @@
   cursor: pointer;
 }
 
+#footer .top .tab:focus {
+  outline: 0;
+}
+
 #footer .top .bar {
   position: absolute;
   /* This will be resized/moved around by a script */
