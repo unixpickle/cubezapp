@@ -2,3 +2,8 @@ body, html {
   margin: 0;
   padding: 0;
 }
+
+body, button {
+  font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Open Sans',
+    sans-serif;
+}

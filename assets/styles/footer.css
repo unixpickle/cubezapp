@@ -11,6 +11,15 @@
   overflow-y: hidden;
 }
 
+#footer .top .tab, #footer .top {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 #footer .top {
   position: absolute;
   top: 0;
@@ -20,6 +29,8 @@
   
   background-color: white;
   text-align: center;
+  
+  cursor: row-resize;
 }
 
 #footer .top .tab {
@@ -45,6 +56,23 @@
   height: 5px;
   border-radius: 2.5px;
   display: none;
+}
+
+#footer .top .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 44px;
+  width: 44px;
+  
+  border: none;
+  cursor: pointer;
+  
+  background-color: transparent;
+  background-image: url('../images/close.png');
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #footer .bottom {

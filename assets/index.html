@@ -29,6 +29,9 @@
     <script src="scripts/view/pentagons.js"></script>
     <script src="scripts/view/footer.js"></script>
     
+    <!-- Controller scripts implement the glue between controllers and views -->
+    <script src="scripts/controller/layout.js"></script>
+    
     <!-- This style will be modified by JavaScript code -->
     <style type="text/css" id="theme-style">
     .theme-background {
@@ -65,7 +68,11 @@
       <div class="top">
         <button class="tab stats-tab">Stats</button>
         <button class="tab settings-tab">Settings</button>
+        
+        <!-- This bar indicates which tab is currently selected -->
         <div class="bar theme-background"></div>
+        
+        <button class="close"></button>
       </div>
       <div class="bottom">
         <div class="stats-contents">
