@@ -1,7 +1,16 @@
+// The footer is more complex than it first appears. It is resizable, tabbed,
+// and closable. Furthermore, the footer becomes completely hidden if the
+// browser window is too short. In addition to all this, the state of the
+// footer is saved and loaded to and from localStorage.
+//
+// As a result of all the above features, the footer requires a significant
+// amount of code. I have documented the code so it's easier to navigate and
+// maintain, but at the moment it's probably not as clean as it could be.
 (function() {
   
   var MIN_HEIGHT = 250;
   var MAX_HEIGHT = 400;
+  var MIN_CONTENT = 350;
   
   function Footer() {
     // Get elements and set them as instance variables.
@@ -15,6 +24,7 @@
     this.closeButton = $('#footer .top .close');
     this.bottom = $('#footer .bottom');
     this.topHeight = 44;
+    this.timesList = new window.app.TimesList();
     
     // This will be changed by the _resizeFooter() and layout() functions.
     this.hidden = false;
@@ -22,14 +32,7 @@
     // Load configuration from localStorage.
     this.closed = (localStorage.footerOpen === 'false');
     this.height = parseInt(localStorage.footerHeight || '300');
-    if (this.closed) {
-      this.element.css({height: this.height,
-        bottom: -(this.height - this.topHeight)});
-      this.top.css({cursor: 'pointer'});
-      this.topContent.css({display: 'none'});
-    } else {
-      this.element.css({height: this.height});
-    }
+    this._initLayout();
     
     // Register events from tab buttons.
     this.statsButton.click(function() {
@@ -53,7 +56,6 @@
     // Setup resizing via dragging.
     this._setupResize();
     
-    this._
     this.layout();
     this.topBar.css({display: 'block'});
   }
@@ -72,6 +74,9 @@
     } else if (this.currentTab === this.settingsButton) {
       this.bottom.css({left: -$(window).width()});
     }
+
+    // Layout subviews.
+    this.timesList.layout();
   };
   
   Footer.prototype.toggle = function() {
@@ -114,10 +119,23 @@
       return this.height;
     }
   };
+
+  Footer.prototype._initLayout = function() {
+    // By default, the footer is open and has a height of 300px.
+    // At initialization time, we must adjust this.
+    if (this.closed) {
+      this.element.css({height: this.height,
+        bottom: -(this.height - this.topHeight)});
+      this.top.css({cursor: 'pointer'});
+      this.topContent.css({display: 'none'});
+    } else {
+      this.element.css({height: this.height});
+    }
+  };
   
   Footer.prototype._maxHeight = function() {
     // Compute the maximum height that the footer can currently be.
-    var neededHeight = $(window).innerHeight() - 400;
+    var neededHeight = $(window).innerHeight() - MIN_CONTENT;
     if (neededHeight < MIN_HEIGHT) {
       return 0;
     } else {
@@ -137,8 +155,8 @@
     // Compute new height and hidden status for the footer.
     var lastHidden = this.hidden;
     var lastHeight = this.height;
-    if ($(window).innerHeight() - this.height < 400) {
-      var neededHeight = $(window).innerHeight() - 400;
+    if ($(window).innerHeight() - this.height < MIN_CONTENT) {
+      var neededHeight = $(window).innerHeight() - MIN_CONTENT;
       if (neededHeight < MIN_HEIGHT) {
         this.hidden = true;
       } else {

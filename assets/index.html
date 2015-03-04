@@ -16,16 +16,22 @@
     <!-- These APIs aren't specific to Cubezapp, but hey, they're nice -->
     <script src="scripts/external/jquery-2.1.3.min.js"></script>
     <script src="scripts/puzzlejs/puzzle.web.0.1.0.js"></script>
+
+    <!-- The window.app object is populated by the rest of the scripts -->
+    <script type="text/javascript">
+    window.app = {};
+    </script>
     
     <!-- Model scripts provide data management functionality -->
     <script src="scripts/model/stats.js"></script>
     
     <!-- View scripts provide the front-end experience -->
-    <script src="scripts/view/pentagons.js"></script>
     <script src="scripts/view/footer.js"></script>
+    <script src="scripts/view/pentagons.js"></script>
+    <script src="scripts/view/times_list.js"></script>
     
     <!-- Controller scripts implement the glue between controllers and views -->
-    <script src="scripts/controller/layout.js"></script>
+    <script src="scripts/controller/home.js"></script>
     
     <!-- This style will be modified by JavaScript code -->
     <style type="text/css" id="theme-style">

@@ -148,9 +148,6 @@
     return worst;
   }
   
-  if (!window.app) {
-    window.app = {};
-  }
   window.app.computeStatistics = computeStatistics;
   window.app.statsForSolves = statsForSolves;
   

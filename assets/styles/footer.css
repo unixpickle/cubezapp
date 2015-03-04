@@ -47,7 +47,7 @@
   cursor: pointer;
 }
 
-#footer .top .tab:focus {
+#footer .top .tab:focus, #footer .top .close:focus {
   outline: 0;
 }
 
