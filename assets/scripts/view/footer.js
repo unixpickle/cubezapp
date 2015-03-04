@@ -16,10 +16,20 @@
     this.bottom = $('#footer .bottom');
     this.topHeight = 44;
     
-    // TODO: load this information from the model or from localStorage.
-    this.closed = false;
+    // This will be changed by the _resizeFooter() and layout() functions.
     this.hidden = false;
-    this.height = 300;
+    
+    // Load configuration from localStorage.
+    this.closed = (localStorage.footerOpen === 'false');
+    this.height = parseInt(localStorage.footerHeight || '300');
+    if (this.closed) {
+      this.element.css({height: this.height,
+        bottom: -(this.height - this.topHeight)});
+      this.top.css({cursor: 'pointer'});
+      this.topContent.css({display: 'none'});
+    } else {
+      this.element.css({height: this.height});
+    }
     
     // Register events from tab buttons.
     this.statsButton.click(function() {
@@ -43,19 +53,10 @@
     // Setup resizing via dragging.
     this._setupResize();
     
+    this._
     this.layout();
     this.topBar.css({display: 'block'});
   }
-  
-  Footer.prototype.height = function() {
-    if (this.hidden) {
-      return 0;
-    } else if (this.closed) {
-      return 44;
-    } else {
-      return this.height;
-    }
-  };
   
   Footer.prototype.layout = function() {
     // Hide/unhide/squeeze the footer as necessary.
@@ -78,21 +79,39 @@
     this.element.stop(true, false);
     this.topContent.stop(true, false);
     if (this.closed) {
+      localStorage.footerOpen = 'true';
+      
       // Open the footer.
       this.closed = false;
-      this.top.css({cursor: 'row-resize'});
       this.element.animate({bottom: 0});
       this.topContent.fadeIn();
+      
+      // Give the top the correct cursor for resizing.
+      this.top.css({cursor: 'row-resize'});
       
       // While the bar was closed, the indicator's position could not be
       // re-calculated because the top had "display: none".
       this._positionIndicator();
     } else {
+      localStorage.footerOpen = 'false';
+      
       // Close the footer.
       this.closed = true;
-      this.top.css({cursor: 'pointer'});
       this.element.animate({bottom: -(this.height - this.topHeight)});
       this.topContent.fadeOut();
+      
+      // Give the top the correct cursor for opening.
+      this.top.css({cursor: 'pointer'});
+    }
+  };
+  
+  Footer.prototype.visibleHeight = function() {
+    if (this.hidden) {
+      return 0;
+    } else if (this.closed) {
+      return 44;
+    } else {
+      return this.height;
     }
   };
   
@@ -141,6 +160,7 @@
     
     // If the height changed, we must resize the element.
     if (this.height != lastHeight) {
+      localStorage.footerHeight = '' + this.height;
       this.element.stop(true, true);
       // Make sure the element is properly offset if it was closed.
       if (this.closed) {
@@ -153,6 +173,7 @@
   };
   
   Footer.prototype._setupResize = function() {
+    // This state is used for footer resizing mouse events.
     var mouseIsDown = false;
     var dragOffset = 0;
     
@@ -194,6 +215,7 @@
       } else {
         this.height = height;
       }
+      localStorage.footerHeight = '' + this.height;
       
       // Set the height.
       this.element.stop(true, true);

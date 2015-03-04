@@ -2,16 +2,18 @@
   position: fixed;
   bottom: 0;
   left: 0;
+  
+  /* NOTE: the height is changed by code. */
   height: 300px;
   width: 100%;
-  /* NOTE: the height will be changed by code. */
   
   background-color: #f0f0f0;
   overflow-x: hidden;
   overflow-y: hidden;
 }
 
-#footer .top .tab, #footer .top {
+#footer .top {
+  /* Don't let them select the top of the footer */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;

@@ -19,11 +19,6 @@
     
     <!-- Model scripts provide data management functionality -->
     <script src="scripts/model/stats.js"></script>
-    <script src="scripts/model/id.js"></script>
-    <script src="scripts/model/localdb.js"></script>
-    <script src="scripts/model/times.js"></script>
-    <script src="scripts/model/solve_buffer.js"></script>
-    <script src="scripts/model/store.js"></script>
     
     <!-- View scripts provide the front-end experience -->
     <script src="scripts/view/pentagons.js"></script>
@@ -66,20 +61,25 @@
     <!-- The footer shows times, graphs, settings, and stats -->
     <div id="footer">
       <div class="top">
+        <!-- These are the two tab buttons -->
         <button class="tab stats-tab">Stats</button>
         <button class="tab settings-tab">Settings</button>
         
         <!-- This bar indicates which tab is currently selected -->
         <div class="bar theme-background"></div>
         
+        <!-- This is the button which closes the footer -->
         <button class="close"></button>
       </div>
       <div class="bottom">
+        <!-- This constitutes the "Stats" tab -->
         <div class="stats-contents">
           <div class="times"></div>
           <div class="graph"></div>
           <div class="stats"></div>
         </div>
+        
+        <!-- This constitutes the "Settings" tab -->
         <div class="settings-contents">
         </div>
       </div>
