@@ -1,17 +1,8 @@
 # Cubezapp
 
-**CURRENT STATUS**: Right now, this is a *rough draft*. The code is terrible. Please don't even use this. It's just for a select group of testers. I emphasize again: if you are looking at this to evaluate how good at programming I am, please stop. Just go away. Close your eyes. Thanks, bye.
-
 Cubezapp will be the best cube timer in existence. It will support scramble generation and 3D rendering (with WebGL), online cloud storage for times, graphs, statistic analysis, and more.
 
-# TODO
-
- * Create color "themes"
- * Implement multiple selection in times list
- * Implement stats on selected region of solves
- * Compute stats in background WebWorker
- * Re-code puzzle deletion
- * Implement *real* puzzle creation flow
+**CURRENT STATUS**: I have just begun rewriting this webapp to implement the full design and feature list.
 
 # License
 
