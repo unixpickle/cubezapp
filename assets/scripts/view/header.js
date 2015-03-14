@@ -19,24 +19,32 @@
     $(document).append(this._scrambleTest);
   }
   
-  Header.prototype.showScramble = function(scramble) {
-    // TODO: support something on the right of the header...
-    
+  Header.prototype.showScramble = function(scramble, animate) {
     // Put the text inside the test label and measure it.
     this._scrambleTest.text(scramble);
     var width = this._scrambleTest.width();
     
-    var nameWidth = this._name.width();
     // NOTE: we multiply nameWidth by 2 because the text is centered.
+    var nameWidth = this._name.width();
     if (width+nameWidth*2 > this._element.width()) {
-      // Scramble is too long.
-      this._scramble.css({display: 'none'});
+      this._scramble.stop(true, false);
+      if (animate) {
+        this._scramble.fadeOut();
+      } else {
+        this._scramble.css({display: 'none'});
+      }
       return false;
     }
     
     // Show the scramble.
     this._scramble.text(scramble);
-    this._scramble.css({display: 'block'});
+    this._scramble.stop(true, false);
+    if (animate) {
+      this._scramble.fadeIn();
+    } else {
+      this._scramble.css({display: 'block'});
+    }
+    return true;
   };
   
 })();
