@@ -10,205 +10,136 @@
   
   var MIN_HEIGHT = 250;
   var MAX_HEIGHT = 400;
-  var MIN_CONTENT = 350;
   
   function Footer() {
-    // Get elements and set them as instance variables.
-    this.element = $('#footer');
-    this.top = $('#footer .top');
-    this.topContent = $('#footer .top button, #footer .top div');
-    this.topBar = $('#footer .top .bar');
-    this.statsButton = $('#footer .top .stats-tab');
-    this.settingsButton = $('#footer .top .settings-tab');
-    this.currentTab = this.statsButton;
-    this.closeButton = $('#footer .top .close');
-    this.bottom = $('#footer .bottom');
-    this.topHeight = 44;
+    // Get/create views and set them as instance variables.
+    this._element = $('#footer');
+    this._top = new FooterTop();
+    this._bottom = this._element.find('.bottom');
+    this._maxHeight = MAX_HEIGHT;
+    this.graph = new window.app.Graph();
+    this.stats = new window.app.Stats();
     this.timesList = new window.app.TimesList();
     
-    // This will be changed by the _resizeFooter() and layout() functions.
-    this.hidden = false;
-    
     // Load configuration from localStorage.
-    this.closed = (localStorage.footerOpen === 'false');
-    this.height = parseInt(localStorage.footerHeight || '300');
-    this._initLayout();
+    this._closed = (localStorage.footerOpen === 'false');
+    this._height = parseInt(localStorage.footerHeight || '300');
+    if (this._closed) {
+      this._top.hideContent(false);
+    }
     
-    // Register events from tab buttons.
-    this.statsButton.click(function() {
-      this._tabPressed(this.statsButton);
-    }.bind(this));
-    this.settingsButton.click(function() {
-      this._tabPressed(this.settingsButton);
-    }.bind(this));
+    // This lets us know whether or not to restart the footer fade animation.
+    this._tooSmall = false;
     
-    // Register close/open click events.
-    this.closeButton.click(function(e) {
-      e.stopPropagation();
-      this.toggle();
-    }.bind(this));
-    this.element.click(function() {
-      if (this.closed) {
-        this.toggle();
-      }
-    }.bind(this));
-    
-    // Setup resizing via dragging.
-    this._setupResize();
-    
-    this.layout();
-    this.topBar.css({display: 'block'});
+    // Setup events which are triggered by the top bar.
+    this._setupResizing();
+    this._top.onToggle = this.toggle.bind(this);
+    this._top.onSwitch = this._switch.bind(this);
   }
   
-  Footer.prototype.layout = function() {
-    // Hide/unhide/squeeze the footer as necessary.
-    this._resizeFooter();
+  Footer.prototype.layout = function(maxHeight) {
+    this._maxHeight = Math.min(maxHeight, MAX_HEIGHT);
     
-    // Move the tab indicator bar.
-    this._positionIndicator();
-    
-    // Resize the tab content.
-    this.bottom.stop(true, true);
-    if (this.currentTab === this.statsButton) {
-      this.bottom.css({left: 0});
-    } else if (this.currentTab === this.settingsButton) {
-      this.bottom.css({left: -$(window).width()});
+    // If there's not enough room, we must hide the footer.
+    if (maxHeight < MIN_HEIGHT) {
+      if (!this._tooSmall) {
+        this._element.stop(true, false);
+        this._element.fadeOut();
+        this._tooSmall = true;
+      }
+      // As long as this element is at least partially visible, we should layout
+      // the content.
+      if (this._element.css('display') === 'block') {
+        this._top.layout();
+        this.graph.layout();
+        this.stats.layout();
+        this.timesList.layout();
+      }
+      return;
     }
-
-    // Layout subviews.
+    
+    // Fade in the footer if it was faded out.
+    if (this._tooSmall) {
+      this._element.stop(true, false);
+      this._element.fadeIn();
+      this._tooSmall = false;
+    }
+    
+    // Layout the entire footer element.
+    if (this._closed) {
+      this._layoutClosed();
+    } else {
+      this._layoutOpen();
+    }
+    
+    // Layout the top part of the footer.
+    this._top.layout();
+    this.graph.layout();
     this.timesList.layout();
+    this.stats.layout();
   };
   
   Footer.prototype.toggle = function() {
-    // Stop all the existing animations before running more.
-    this.element.stop(true, false);
-    this.topContent.stop(true, false);
-    if (this.closed) {
+    this._element.stop(true, true);
+    if (this._closed) {
+      // Change the state.
       localStorage.footerOpen = 'true';
+      this._closed = false;
       
-      // Open the footer.
-      this.closed = false;
-      this.element.animate({bottom: 0});
-      this.topContent.fadeIn();
+      // Update top bar.
+      this._top.showContent();
       
-      // Give the top the correct cursor for resizing.
-      this.top.css({cursor: 'row-resize'});
-      
-      // While the bar was closed, the indicator's position could not be
-      // re-calculated because the top had "display: none".
-      this._positionIndicator();
+      // Update footer element.
+      this._element.animate({bottom: 0});
     } else {
+      // Change the state.
       localStorage.footerOpen = 'false';
+      this._closed = true;
       
-      // Close the footer.
-      this.closed = true;
-      this.element.animate({bottom: -(this.height - this.topHeight)});
-      this.topContent.fadeOut();
+      // Update top bar.
+      this._top.hideContent(true);
       
-      // Give the top the correct cursor for opening.
-      this.top.css({cursor: 'pointer'});
+      // Update footer element.
+      var height = this._element.height();
+      this._element.animate({bottom: -(height-this._top.height()) + 'px'});
     }
   };
   
-  Footer.prototype.visibleHeight = function() {
-    if (this.hidden) {
-      return 0;
-    } else if (this.closed) {
-      return 44;
-    } else {
-      return this.height;
+  Footer.prototype._layoutClosed = function() {
+    var height = this._maxHeight;
+    if (height > this._height) {
+      height = this._height;
     }
-  };
-
-  Footer.prototype._initLayout = function() {
-    // By default, the footer is open and has a height of 300px.
-    // At initialization time, we must adjust this.
-    if (this.closed) {
-      this.element.css({height: this.height,
-        bottom: -(this.height - this.topHeight)});
-      this.top.css({cursor: 'pointer'});
-      this.topContent.css({display: 'none'});
-    } else {
-      this.element.css({height: this.height});
-    }
+    this._element.css({
+      bottom: -(height-this._top.height()) + 'px',
+      height: height + 'px',
+      display: 'block'
+    });
   };
   
-  Footer.prototype._maxHeight = function() {
-    // Compute the maximum height that the footer can currently be.
-    var neededHeight = $(window).innerHeight() - MIN_CONTENT;
-    if (neededHeight < MIN_HEIGHT) {
-      return 0;
-    } else {
-      return Math.min(neededHeight, MAX_HEIGHT);
+  Footer.prototype._layoutOpen = function(maxHeight) {
+    var height = this._maxHeight;
+    if (height > this._height) {
+      height = this._height;
     }
+    this._element.css({
+      bottom: 0,
+      height: height + 'px',
+      display: 'block'
+    });
   };
   
-  Footer.prototype._positionIndicator = function() {
-    // Move the tab indicator under the current tab.
-    var left = this.currentTab.offset().left;
-    var width = this.currentTab.outerWidth();
-    this.topBar.stop(true, true);
-    this.topBar.css({left: left, width: width});
-  };
-  
-  Footer.prototype._resizeFooter = function() {
-    // Compute new height and hidden status for the footer.
-    var lastHidden = this.hidden;
-    var lastHeight = this.height;
-    if ($(window).innerHeight() - this.height < MIN_CONTENT) {
-      var neededHeight = $(window).innerHeight() - MIN_CONTENT;
-      if (neededHeight < MIN_HEIGHT) {
-        this.hidden = true;
-      } else {
-        this.height = neededHeight;
-        this.hidden = false;
-      }
-    } else {
-      this.hidden = false;
-    }
-    
-    // Hide/unhide the footer.
-    if (this.hidden != lastHidden) {
-      if (this.hidden) {
-        this.element.css({display: 'none'});
-      } else {
-        this.element.css({display: 'block'});
-      }
-    }
-    
-    // If the height changed, we must resize the element.
-    if (this.height != lastHeight) {
-      localStorage.footerHeight = '' + this.height;
-      this.element.stop(true, true);
-      // Make sure the element is properly offset if it was closed.
-      if (this.closed) {
-        this.element.css({height: this.height,
-          bottom: -(this.height - this.topHeight)});
-      } else {
-        this.element.css({height: this.height});
-      }
-    }
-  };
-  
-  Footer.prototype._setupResize = function() {
-    // This state is used for footer resizing mouse events.
+  Footer.prototype._setupResizing = function() {
+    // This state is used to know what's going on in mouse events.
     var mouseIsDown = false;
     var dragOffset = 0;
     
-    // Make tabs and close button stop forwarding mouse events.
-    $('#footer .top .tab').mousedown(function(e) {
-      e.stopPropagation();
-    });
-    this.closeButton.mousedown(function(e) {
-      e.stopPropagation();
-    });
-    
-    // Make sure mouseIsDown is accurate.
-    this.top.mousedown(function(e) {
+    // Capture mouse events for state.
+    this._top.onMouseDown = function(e) {
       mouseIsDown = true;
       var offset = e.clientY || e.pageY;
-      dragOffset = this.height - ($(window).innerHeight() - offset);
-    }.bind(this));
+      dragOffset = this._height - ($(window).innerHeight() - offset);
+    }.bind(this);
     $(document).mouseup(function() {
       mouseIsDown = false;
     });
@@ -216,49 +147,141 @@
       mouseIsDown = false;
     });
     
-    // Handle drag events.
+    // Handle the drag event.
     $(document).mousemove(function(e) {
-      if (!mouseIsDown || this.closed || this.hidden) {
+      if (!mouseIsDown || this._closed || this._tooSmall) {
         return;
       }
       
       // Compute the height based on their mouse.
       var offset = e.clientY || e.pageY;
       var height = Math.round($(window).innerHeight() - offset + dragOffset);
-      var maxHeight = this._maxHeight();
       if (height < MIN_HEIGHT) {
-        this.height = MIN_HEIGHT;
-      } else if (height > maxHeight) {
-        this.height = maxHeight;
+        this._height = MIN_HEIGHT;
+      } else if (height > this._maxHeight) {
+        this._height = this._maxHeight;
       } else {
-        this.height = height;
+        this._height = height;
       }
-      localStorage.footerHeight = '' + this.height;
+      localStorage.footerHeight = '' + this._height;
       
       // Set the height.
-      this.element.stop(true, true);
-      this.element.css({height: this.height});
+      this.layout(this._maxHeight);
     }.bind(this));
+  }
+  
+  Footer.prototype._switch = function(page) {
+    this._bottom.stop(true, false);
+    if (page === 0) {
+      this._bottom.animate({left: 0});
+    } else {
+      this._bottom.animate({left: -$(window).width()});
+    }
   };
   
-  Footer.prototype._tabPressed = function(tab) {
-    if (tab === this.currentTab) {
+  function FooterTop() {
+    this._element = $('#footer .top');
+    this._content = this._element.children();
+    this._bar = this._element.find('.bar');
+    this._stats = this._element.find('.stats-tab');
+    this._settings = this._element.find('.settings-tab');
+    this._currentTab = this._stats;
+    this._closeButton = this._element.find('.close');
+    this._contentShowing = true;
+    
+    this.onMouseDown = null;
+    this.onSwitch = null;
+    this.onToggle = null;
+    
+    // Tab change events.
+    this._stats.click(function() {
+      this._switchTab(this._stats);
+    }.bind(this));
+    this._settings.click(function() {
+      this._switchTab(this._settings);
+    }.bind(this));
+    
+    // Close/open events.
+    this._closeButton.click(function(e) {
+      if (this._contentShowing && 'function' === typeof this.onToggle) {
+        e.stopPropagation();
+        this.onToggle();
+      }
+    }.bind(this));
+    this._element.click(function(e) {
+      if (!this._contentShowing && 'function' === typeof this.onToggle) {
+        e.stopPropagation();
+        this.onToggle();
+      }
+    }.bind(this));
+    
+    // Prevent resizing by dragging close button, stats, or settings.
+    var sel = '.stats-tab, .settings-tab, .close';
+    this._element.find(sel).mousedown(function(e) {
+      e.stopPropagation();
+    });
+    
+    // Mouse down event.
+    this._element.mousedown(function(e) {
+      if ('function' === typeof this.onMouseDown) {
+        this.onMouseDown(e);
+      }
+    }.bind(this));
+  }
+  
+  FooterTop.prototype.height = function() {
+    return 44;
+  };
+  
+  FooterTop.prototype.hideContent = function(animate) {
+    this._contentShowing = false;
+    this._content.stop(true, true);
+    if (animate) {
+      this._content.fadeOut();
+    } else {
+      this._content.css({display: 'none'});
+    }
+    this._element.css({cursor: 'pointer'});
+  };
+  
+  FooterTop.prototype.layout = function() {
+    // Move the tab indicator under the current tab.
+    var left = this._currentTab.offset().left;
+    var width = this._currentTab.outerWidth();
+    this._bar.stop(true, true);
+    this._bar.css({left: left, width: width});
+  };
+  
+  FooterTop.prototype.showContent = function() {
+    this._contentShowing = true;
+    this._content.stop(true, true);
+    this._content.fadeIn();
+    this._element.css({cursor: 'row-resize'});
+    
+    // Make sure the indicator bar is in the right place.
+    this.layout();
+  };
+  
+  FooterTop.prototype._switchTab = function(tab) {
+    // Make sure we don't switch to the current tab.
+    if (tab === this._currentTab) {
       return;
     }
+    this._currentTab = tab;
     
     // Animate the current tab indicator to the right place.
-    this.currentTab = tab;
-    var left = this.currentTab.offset().left;
-    var width = this.currentTab.outerWidth();
-    this.topBar.stop(true, true);
-    this.topBar.animate({left: left, width: width});
+    var left = this._currentTab.offset().left;
+    var width = this._currentTab.outerWidth();
+    this._bar.stop(true, false);
+    this._bar.animate({left: left, width: width});
     
-    // Animate the bottom contents to the right page.
-    this.bottom.stop(true, true);
-    if (this.currentTab === this.statsButton) {
-      this.bottom.animate({left: 0});
-    } else if (this.currentTab === this.settingsButton) {
-      this.bottom.animate({left: -$(window).width()});
+    // Run the tab callback.
+    if ('function' === typeof this.onSwitch) {
+      if (tab == this._stats) {
+        this.onSwitch(0);
+      } else {
+        this.onSwitch(1);
+      }
     }
   };
   

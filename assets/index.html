@@ -10,8 +10,8 @@
     <link rel="stylesheet" type="text/css" href="styles/body.css">
     <link rel="stylesheet" type="text/css" href="styles/footer.css">
     <link rel="stylesheet" type="text/css" href="styles/header.css">
+    <link rel="stylesheet" type="text/css" href="styles/middle.css">
     <link rel="stylesheet" type="text/css" href="styles/pentagons.css">
-    <link rel="stylesheet" type="text/css" href="styles/time.css">
     
     <!-- These APIs aren't specific to Cubezapp, but hey, they're nice -->
     <script src="scripts/external/jquery-2.1.3.min.js"></script>
@@ -26,8 +26,13 @@
     <script src="scripts/model/stats.js"></script>
     
     <!-- View scripts provide the front-end experience -->
+    <script src="scripts/view/app.js"></script>
     <script src="scripts/view/footer.js"></script>
+    <script src="scripts/view/graph.js"></script>
+    <script src="scripts/view/header.js"></script>
+    <script src="scripts/view/middle.js"></script>
     <script src="scripts/view/pentagons.js"></script>
+    <script src="scripts/view/stats.js"></script>
     <script src="scripts/view/times_list.js"></script>
     
     <!-- Controller scripts implement the glue between controllers and views -->
@@ -50,19 +55,21 @@
     <!-- The header has the puzzle manager and account info -->
     <div id="header">
       <div class="top">
-        <div class="name">
-          <label></label>
-        </div>
+        <label class="name"></label>
+        
+        <!-- Scrambles will appear here if they're small enough -->
+        <label class="scramble"></label>
       </div>
       <div class="dropdown"></div>
     </div>
     
-    <!-- The scramble appears here -->
-    <div id="scramble">
-    </div>
+    <div id="middle">
+      <!-- The scramble appears here -->
+      <div class="scramble"></div>
     
-    <!-- The time field shows the current time -->
-    <input id="time">
+      <!-- The time field shows the current time -->
+      <input class="time">
+    </div>
     
     <!-- The footer shows times, graphs, settings, and stats -->
     <div id="footer">

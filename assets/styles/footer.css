@@ -1,4 +1,7 @@
 #footer {
+  /* Footer should only be displayed once code loads it. */
+  display: none;
+  
   position: fixed;
   bottom: 0;
   left: 0;
@@ -57,7 +60,6 @@
   top: 44px;
   height: 5px;
   border-radius: 2.5px;
-  display: none;
 }
 
 #footer .top .close {
@@ -93,33 +95,64 @@
   width: 50%;
 }
 
-#footer .times, #footer .graph, #footer .stats {
+#footer .stats-contents .times, #footer .stats-contents .graph,
+  #footer .stats-contents .stats {
   position: absolute;
   top: 0;
   height: 100%;
   background-color: white;
 }
 
-#footer .times {
-  left: 0;
-  /* NOTE: the width will be changed by code. */
-  width: 150px;
-  border-top-right-radius: 5px;
+@media screen and (min-width: 800px) {
+  #footer .stats-contents .times {
+    left: 0;
+    width: 150px;
+    border-top-right-radius: 5px;
+  }
+
+  #footer .stats-contents .graph {
+    left: 155px;
+    width: calc(100% - 410px);
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+  }
+
+  #footer .stats-contents .stats {
+    right: 0;
+    width: 250px;
+    border-top-left-radius: 5px;
+  }
 }
 
-#footer .graph {
-  left: 155px;
-  /* NOTE: the width will be changed by code. */
-  width: calc(100% - 410px);
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
+@media screen and (max-width: 800px) and (min-width: 300px) {
+  #footer .stats-contents .times {
+    left: 0;
+    width: calc(40% - 5px);
+  }
+
+  #footer .stats-contents .graph {
+    display: none;
+  }
+
+  #footer .stats-contents .stats {
+    right: 0;
+    width: 60%;
+  }
 }
 
-#footer .stats {
-  right: 0;
-  /* NOTE: the width will be changed by code. */
-  width: 250px;
-  border-top-left-radius: 5px;
+@media screen and (max-width: 400px) {
+  #footer .stats-contents .times {
+    left: 0;
+    width: 100%;
+  }
+
+  #footer .stats-contents .graph {
+    display: none;
+  }
+
+  #footer .stats-contents .stats {
+    display: none;
+  }
 }
 
 #footer .settings-contents {
