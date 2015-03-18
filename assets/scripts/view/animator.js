@@ -28,7 +28,7 @@
     var fraction = Math.max((elapsed/this.duration)-this.delay, 0);
     if (fraction >= 1) {
       this._done = true;
-      fraction = 1;
+      return this.end;
     }
     return this.start + (this.end-this.start)*this.curve(fraction);
   };

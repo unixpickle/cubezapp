@@ -1,6 +1,7 @@
 (function() {
   
   function AppView() {
+    this.animator = new window.app.Animator();
     this.footer = new window.app.Footer();
     $(window).resize(this.layout.bind(this));
     this.layout();

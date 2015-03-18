@@ -1,8 +1,7 @@
 (function() {
   
   var MIN_TIME_SIZE = 30;
-  var MEMO_SIZE = 20;
-  var 
+  var MEMO_SIZE_RATIO = 0.5;
   
   function Middle() {
     this._element = $('#middle');
@@ -12,13 +11,8 @@
     this._time = this._element.find('.time');
   }
   
-  Middle.prototype.layout = function(maxHeight) {
-    
-  };
-  
-  Middle.prototype.minHeight = function() {
-    // Minimum time height + minimum memo time height + minimum "new PB" height.
-    return 
+  Middle.prototype.constraints = function() {
+    // TODO: return {minSize: ..., hardMinSize: ...}
   };
   
   window.app.Middle = Middle;
