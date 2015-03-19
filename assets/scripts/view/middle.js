@@ -14,10 +14,16 @@
   }
   
   Middle.prototype.constraints = function() {
-    // Compute the soft and bare minimum sizes.
-    var scrambleHeight = this._scramble.height();
+    // Compute the soft and bare minimum sizes assuming no scramble.
     var bareMinimum = MIN_TIME_SIZE * (1 + MEMO_SIZE_RATIO) + PB_SIZE;
-    var softMinimum = bareMinimum + scrambleHeight + SCRAMBLE_PADDING*2;
+    var softMinimum = bareMinimum;
+
+    // If there is a scramble, it contributes to the soft minimum.
+    if (this._scramble.text().length > 0) {
+      var scrambleHeight = this._scramble.height();
+      softMinimum = bareMinimum + scrambleHeight + SCRAMBLE_PADDING*2;
+    }
+
     return {bare: bareMinimum, soft: softMinimum};
   };
 
