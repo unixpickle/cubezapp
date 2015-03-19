@@ -21,7 +21,7 @@
     this.timestamp = new Date().getTime();
     this._done = false;
   }
-  
+
   // current returns the current value for the animating value.
   Animation.prototype.current = function() {
     var elapsed = new Date().getTime() - this.timestamp;
@@ -44,6 +44,7 @@
     this._animations = {};
     this._current = {};
     this._done = true;
+    this.onAnimate = null;
     for (var i = 0, len = attributes.length; i < len; ++i) {
       this._animations[attributes[i]] = null;
       this._current[attributes[i]] = 0;
@@ -57,12 +58,21 @@
       curve) {
     this._animations[attr] = new Animation(this._current[attr], dest,
       duration, delay, curve);
-    this._done = false;
+    if (this._done) {
+      this._done = false;
+      this._requestAnimationFrame();
+    }
+  };
+
+  Animator.prototype.animating = function() {
+    return !this._done;
+  };
+
+  Animator.prototype.current = function() {
+    return _current;
   };
   
-  // current returns an object with all the animation attributes for the current
-  // frame.
-  Animator.prototype.current = function() {
+  Animator.prototype._refresh() = function() {
     // Update the current state based on animations.
     this._done = true;
     for (var i = 0, len = attributes.length; i < len; ++i) {
@@ -78,13 +88,21 @@
       }
     }
     
-    // Return the current state.
-    return this._current;
+    // Pass the current state to the callback if it's available.
+    if ('function' === typeof this.onAnimate) {
+      this.onAnimate(this._current);
+    }
+    if (!this._done) {
+      this._requestAnimationFrame();
+    }
   };
-  
-  // done returns true if there are no active animations.
-  Animator.prototype.done = function() {
-    return this._done;
+
+  Animator.prototype._requestAnimationFrame = function() {
+    if ('function' === typeof Window.requestAnimationFrame) {
+      Window.requestAnimationFrame(this._refresh.bind(this));
+    } else {
+      setTimeout(this._refresh.bind(this), 1000/60);
+    }
   };
   
   // setAttribute sets a value for a given attribute without animating it.

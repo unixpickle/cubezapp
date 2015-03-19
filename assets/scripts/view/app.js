@@ -1,14 +1,21 @@
 (function() {
   
   function AppView() {
-    this.animator = new window.app.Animator();
-    this.footer = new window.app.Footer();
-    $(window).resize(this.layout.bind(this));
-    this.layout();
+    // Create instance variables
+    this._animator = new window.app.Animator();
+    this._footer = new window.app.Footer();
+    this._state = null;
+
+    // Setup event handlers.
+    $(window).resize(this._resized.bind(this));
+    this._footer.onToggle = this._toggleFooter.bind(this);
   }
   
-  AppView.prototype.layout = function() {
-    this.footer.layout($(window).height() - 300);
+  AppView.prototype._resized = function() {
+  };
+
+  AppView.prototype._toggleFooter = function() {
+    // TODO: open/close footer here and animate the change.
   };
   
   function State(attrs) {

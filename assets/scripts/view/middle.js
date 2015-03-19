@@ -56,6 +56,10 @@
     this._memoTime.text(text || '');
   };
 
+  Middle.prototype.setPB = function(pb) {
+    this._pbStatus.text(pb || '');
+  }
+
   Middle.prototype.setScramble = function(text) {
     this._scramble.text(text || '');
   };
