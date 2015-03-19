@@ -35,7 +35,7 @@
   
   Footer.prototype.layout = function(attrs) {
     if (attrs.opacity === 0) {
-      this.element.css({display: 'none'});
+      this._element.css({display: 'none'});
       return;
     }
     
@@ -47,11 +47,12 @@
     }
     
     // Use the attributes to layout the footer.
-    this.element.css({
+    this._element.css({
+      display: 'block',
       opacity: attrs.footerOpacity,
       height: attrs.footerHeight,
-      bottom: -(attrs.footerClosedness - this._top.height() +
-        attrs.footerOffset),
+      bottom: -attrs.footerOffset -
+        attrs.footerClosedness*(this._top.height()-attrs.footerOffset) 
     });
     this._top.setClosedness(attrs.footerClosedness);
     

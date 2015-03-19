@@ -20,11 +20,11 @@
       var usedSpace = this.scrambleHeight() + SCRAMBLE_PADDING*2
       var usableSize = height - usedSpace;
       timeSize = (usableSize-PB_SIZE) / (1+MEMO_SIZE_RATIO);
-      timeSize = Math.max(timeSize, MIN_TIMER_SIZE);
+      timeSize = Math.max(timeSize, MIN_TIME_SIZE);
       timeY = (usableSize-timeSize)/2 + usedSpace;
     } else {
       timeSize = (height-PB_SIZE) / (1+MEMO_SIZE_RATIO);
-      timeSize = Math.max(timeSize, MIN_TIMER_SIZE);
+      timeSize = Math.max(timeSize, MIN_TIME_SIZE);
       timeY = (height-timeSize) / 2;
     }
     return {timeY: timeY, timeSize: timeSize};
@@ -45,7 +45,7 @@
   };
 
   Middle.prototype.layout = function(attrs) {
-    this._element.css({height: attrs.middleHeight});
+    this._element.css({height: attrs.middleHeight, top: attrs.middleY});
     
     // Memo time.
     if (attrs.memoOpacity === 0) {
@@ -73,11 +73,18 @@
     }
     
     // Time label.
-    this._time.css({
-      opacity: attrs.timeOpacity,
-      top: attrs.timeY,
-      'font-size': attrs.timeSize * attrs.timeScale
-    });
+    if (attrs.timeOpacity === 0) {
+      this._time.css({display: 'none'});
+    } else {
+      var size = Math.round(attrs.timeSize * attrs.timeScale);
+      this._time.css({
+        display: 'block',
+        opacity: attrs.timeOpacity,
+        top: attrs.timeY,
+        height: size,
+        'font-size': Math.round(size*0.8)
+      });
+    }
   };
   
   Middle.prototype.scrambleHeight = function() {

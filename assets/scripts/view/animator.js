@@ -16,8 +16,8 @@
   function Animation(start, end, duration, delay, curve) {
     this.start = start;
     this.end = end;
-    this.duration = duration || 0.4;
-    this.delay = delay || 0;
+    this.duration = duration*1000 || 400;
+    this.delay = delay*1000 || 0;
     this.curve = curve || defaultCurve();
     this.timestamp = new Date().getTime();
     this._done = false;
@@ -26,7 +26,7 @@
   // current returns the current value for the animating value.
   Animation.prototype.current = function() {
     var elapsed = new Date().getTime() - this.timestamp;
-    var fraction = Math.max((elapsed/this.duration)-this.delay, 0);
+    var fraction = Math.max((elapsed-this.delay)/this.duration, 0);
     if (fraction >= 1) {
       this._done = true;
       return this.end;
@@ -37,7 +37,7 @@
   // done returns true if the animation is complete. The value returned is
   // updated whenever current() is called.
   Animation.prototype.done = function() {
-    this._done;
+    return this._done;
   };
   
   // An Animator performs a set of animations.
@@ -70,7 +70,7 @@
   };
 
   Animator.prototype.current = function() {
-    return _current;
+    return this._current;
   };
   
   // setAttribute sets a value for a given attribute without animating it.
@@ -95,14 +95,14 @@
     }
   };
   
-  Animator.prototype._refresh() = function() {
+  Animator.prototype._refresh = function() {
     // Update the current state based on animations.
     this._done = true;
     for (var i = 0, len = attributes.length; i < len; ++i) {
       var attr = attributes[i];
       var animation = this._animations[attr];
       if (animation !== null) {
-        this._current = animation.current();
+        this._current[attr] = animation.current();
         if (animation.done()) {
           this._animations[attr] = null;
         } else {

@@ -53,21 +53,26 @@
       headerHeight = this._header.height();
     }
     
-    // Return the layout of the middle part.
+    // Compute the middle layout.
     var middleHeight = windowHeight - (headerHeight + footerHeight);
-    return this._middle.computeLayout(middleHeight,
+    var middleY = headerHeight;
+    var middleLayout = this._middle.computeLayout(middleHeight,
       this._state.scrambleVisible);
+    middleLayout.y = headerHeight;
+    middleLayout.height = middleHeight;
+    
+    return middleLayout;
   };
 
   AppView.prototype._computeState = function() {
     var constraints = this._middle.constraints();
     var available = $(window).height() - this._header.height();
-    var headerSize = available - constraints.soft;
+    var footerSize = available - constraints.soft;
     
     // If the header size is large enough, everything is visible.
-    if (headerSize >= MIN_FOOTER_SIZE) {
+    if (footerSize >= MIN_FOOTER_SIZE) {
       var res = new State(this._state);
-      res.footerHeight = headerSize;
+      res.footerHeight = Math.min(footerSize, this._userFooterHeight);
       res.footerVisible = true;
       if (res.scrambleAvailable) {
         res.scrambleVisible = true;
@@ -92,7 +97,17 @@
   AppView.prototype._footerResized = function(height) {
     this._userFooterHeight = Math.min(height, MAX_FOOTER_SIZE);
     localStorage.footerHeight = height;
-    this._updateState(true);
+    
+    // Nothing in the state should change besides the footer height.
+    this._state = this._computeState();
+    var middleLayout = this._computeMiddleLayout();
+    this._animator.setAttributes({
+      footerHeight: this._state.footerHeight,
+      middleHeight: middleLayout.height,
+      middleY: middleLayout.y,
+      timeSize: middleLayout.timeSize,
+      timeY: middleLayout.timeY
+    });
   };
 
   AppView.prototype._initializeAnimator = function() {
@@ -107,6 +122,9 @@
       // Header attributes
       headerOffset: -20,
       headerOpacity: 0,
+      // Middle attributes
+      middleHeight: middleLayout.height,
+      middleY: middleLayout.y,
       // Miscellaneous attributes
       memoOpacity: 0,
       pbOpacity: 0,
@@ -147,48 +165,55 @@
   };
   
   AppView.prototype._layout = function(attrs) {
-    
+    this._footer.layout(attrs);
+    this._header.layout(attrs);
+    this._middle.layout(attrs);
   };
   
-  AppView.prototype._resize = function() {
-    this._updateState(true);
+  AppView.prototype._resized = function() {
+    var state = this._computeState();
+    var old = this._state;
+    this._state = state;
+    
+    // Animate/update the view changes as needed.
+    var majorChange = false;
+    if (state.footerHeight != old.footerHeeight) {
+      this._animator.setAttribute('footerHeight', state.footerHeight);
+    }
+    if (state.footerVisible != old.footerVisible) {
+      this._animator.animateAttribute('footerOpacity',
+        state.footerVisible ? 1 : 0);
+      majorChange = true;
+    }
+    if (state.scrambleVisible != old.scrambleVisible) {
+      this._animator.animateAttribute('scrambleOpacity',
+        state.scrambleVisible ? 1 : 0);
+      majorChange = true;
+    }
+    
+    var middleLayout = this._computeMiddleLayout();
+    if (majorChange) {
+      // Animate middle changes.
+      this._animator.animateAttribute('middleHeight', middleLayout.height);
+      this._animator.animateAttribute('middleY', middleLayout.y);
+      this._animator.animateAttribute('timeSize', middleLayout.timeSize);
+      this._animator.animateAttribute('timeY', middleLayout.timeY);
+    } else {
+      // Set middle changes without animation.
+      this._animator.setAttributes({
+        middleHeight: middleLayout.height,
+        middleY: middleLayout.y,
+        timeSize: middleLayout.timeSize,
+        timeY: middleLayout.timeY
+      });
+    }
+    
+    this._layout(this._animator.current());
   };
 
   AppView.prototype._toggleFooter = function() {
     // TODO: open/close footer here and animate the change.
   };
-  
-  AppView.prototype._updateState = function(resize) {
-    var old = this._state;
-    var state = this._computeState();
-    
-    // Animate the state change as needed.
-    if (state.footerHeight != old.footerHeeight) {
-      if (resize) {
-        this._animator.setAttribute('footerHeight', newState.footerHeight);
-      } else {
-        this._animator.animateAttribute('footerHeight', newState.footerHeight);
-      }
-    }
-    if (state.footerOpen != old.footerOpen) {
-      this._animator.animateAttribute('footerClosedness',
-        state.footerClosed ? 1 : 0);
-    }
-    if (state.footerVisible != old.footerVisible) {
-      this._animator.animateAttribute('footerOpacity',
-        state.footerVisible ? 1 : 0);
-    }
-    if (state.headerVisible != old.headerVisible) {
-      this._animator.animateAttribute('headerOpacity',
-        state.headerVisible ? 1 : 0);
-    }
-    if (state.scrambleVisible != old.scrambleVisible) {
-      this._animator.animateAttribute('scrambleOpacity',
-        state.scrambleVisible ? 1 : 0);
-    }
-    
-    this._state = state;
-  }
   
   function State(attrs) {
     this.footerHeight = attrs.footerHeight;
