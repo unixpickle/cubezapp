@@ -1,4 +1,7 @@
 #header {
+  /* Header should only be displayed once code loads it. */
+  display: none;
+  
   position: fixed;
   top: 0;
   left: 0;

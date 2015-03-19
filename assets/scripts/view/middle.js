@@ -13,6 +13,23 @@
     this._time = this._element.find('.time');
   }
   
+  Middle.prototype.computeLayout = function(height, showScramble) {
+    var timeY;
+    var timeSize;
+    if (showScramble) {
+      var usedSpace = this.scrambleHeight() + SCRAMBLE_PADDING*2
+      var usableSize = height - usedSpace;
+      timeSize = (usableSize-PB_SIZE) / (1+MEMO_SIZE_RATIO);
+      timeSize = Math.max(timeSize, MIN_TIMER_SIZE);
+      timeY = (usableSize-timeSize)/2 + usedSpace;
+    } else {
+      timeSize = (height-PB_SIZE) / (1+MEMO_SIZE_RATIO);
+      timeSize = Math.max(timeSize, MIN_TIMER_SIZE);
+      timeY = (height-timeSize) / 2;
+    }
+    return {timeY: timeY, timeSize: timeSize};
+  };
+  
   Middle.prototype.constraints = function() {
     // Compute the soft and bare minimum sizes assuming no scramble.
     var bareMinimum = MIN_TIME_SIZE * (1 + MEMO_SIZE_RATIO) + PB_SIZE;
@@ -20,7 +37,7 @@
 
     // If there is a scramble, it contributes to the soft minimum.
     if (this._scramble.text().length > 0) {
-      var scrambleHeight = this._scramble.height();
+      var scrambleHeight = this.scrambleHeight();
       softMinimum = bareMinimum + scrambleHeight + SCRAMBLE_PADDING*2;
     }
 
@@ -28,18 +45,22 @@
   };
 
   Middle.prototype.layout = function(attrs) {
+    this._element.css({height: attrs.middleHeight});
+    
     // Memo time.
     if (attrs.memoOpacity === 0) {
       this._memoTime.css({display: 'none'});
     } else {
       this._memoTime.css({opacity: attrs.memoOpacity, display: 'block'});
     }
+    
     // PB label.
     if (attrs.pbOpacity === 0) {
       this._pbStatus.css({display: 'none'});
     } else {
       this._pbStatus.css({opacity: attrs.pbOpacity, display: 'block'});
     }
+    
     // Show/hide the scramble without setting display=none. Otherwise, it would
     // not be possible to measure the scramble while it's invisible.
     if (attrs.scrambleOpacity === 0) {
@@ -50,6 +71,7 @@
         visibility: 'visible'
       });
     }
+    
     // Time label.
     this._time.css({
       opacity: attrs.timeOpacity,
@@ -57,6 +79,10 @@
       'font-size': attrs.timeSize * attrs.timeScale
     });
   };
+  
+  Middle.prototype.scrambleHeight = function() {
+    return this._scramble.height();
+  }
 
   Middle.prototype.setMemo = function(memo) {
     this._memoTime.text(text || '');

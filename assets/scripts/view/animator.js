@@ -6,6 +6,7 @@
     'footerClosedness', 'footerHeight', 'footerOffset', 'footerOpacity',
     'headerOffset', 'headerOpacity',
     'memoOpacity',
+    'middleHeight', 'middleY',
     'pbOpacity',
     'scrambleOpacity',
     'timeOpacity', 'timeScale', 'timeSize', 'timeY'
@@ -72,6 +73,28 @@
     return _current;
   };
   
+  // setAttribute sets a value for a given attribute without animating it.
+  // If the attribute was already being animated, the given value is set as the
+  // destination for the existing animation.
+  Animator.prototype.setAttribute = function(attr, val) {
+    var animation = this._animations[attr];
+    if (animation !== null) {
+      animation.end = val;
+    } else {
+      this._current[attr] = val;
+    }
+  };
+  
+  // setAttributes sets a bunch of values.
+  Animator.prototype.setAttributes = function(map) {
+    for (var key in map) {
+      if (!map.hasOwnProperty(key)) {
+        continue;
+      }
+      this.setAttribute(key, map[key]);
+    }
+  };
+  
   Animator.prototype._refresh() = function() {
     // Update the current state based on animations.
     this._done = true;
@@ -102,18 +125,6 @@
       Window.requestAnimationFrame(this._refresh.bind(this));
     } else {
       setTimeout(this._refresh.bind(this), 1000/60);
-    }
-  };
-  
-  // setAttribute sets a value for a given attribute without animating it.
-  // If the attribute was already being animated, the given value is set as the
-  // destination for the existing animation.
-  Animator.prototype.setAttribute = function(attr, val) {
-    var animation = this._animations[attr];
-    if (animation !== null) {
-      animation.end = val;
-    } else {
-      this._current[attr] = val;
     }
   };
   

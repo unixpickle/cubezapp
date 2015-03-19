@@ -29,6 +29,10 @@
     }.bind(this);
   }
   
+  Footer.prototype.closedHeight = function() {
+    return 44;
+  };
+  
   Footer.prototype.layout = function(attrs) {
     if (attrs.opacity === 0) {
       this.element.css({display: 'none'});
