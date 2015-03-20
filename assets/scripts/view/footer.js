@@ -52,7 +52,7 @@
       opacity: attrs.footerOpacity,
       height: attrs.footerHeight,
       bottom: -attrs.footerOffset -
-        attrs.footerClosedness*(this._top.height()-attrs.footerOffset) 
+        attrs.footerClosedness*(attrs.footerHeight-this._top.height())
     });
     this._top.setClosedness(attrs.footerClosedness);
     
@@ -74,6 +74,12 @@
       var offset = e.clientY || e.pageY;
       var height = this._element.height();
       dragOffset = height - ($(window).innerHeight() - offset);
+      
+      // This is necessary to prevent selecting the rest of the page if they try
+      // to make the footer too big.
+      e.stopPropagation();
+      e.preventDefault();
+      return false;
     }.bind(this);
     $(document).mouseup(function() {
       mouseIsDown = false;
@@ -92,6 +98,12 @@
       var offset = e.clientY || e.pageY;
       var height = Math.round($(window).innerHeight() - offset + dragOffset);
       this.onResize(height);
+      
+      // This is necessary to prevent selecting the rest of the page if they try
+      // to make the footer too big.
+      e.stopPropagation();
+      e.preventDefault();
+      return false;
     }.bind(this));
   }
   
@@ -174,12 +186,14 @@
     if (closedness === 1) {
       this._content.css({display: 'none'});
     } else {
-      this._content.css({display: 'block', opacity: 1-closedness});
+      this._content.css({display: 'inline-block', opacity: 1-closedness});
     }
     if (closedness === 0) {
-      this._element.css({cursor: 'pointer'});
+      this._contentShowing = true;
+      this._element.css({cursor: 'row-resize'});
     } else {
-      this._element.css({cursor: 'auto'});
+      this._contentShowing = false;
+      this._element.css({cursor: 'pointer'});
     }
   };
   

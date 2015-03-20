@@ -34,6 +34,53 @@
     this._layout(this._animator.current());
   }
   
+  AppView.prototype.setScramble = function(scramble) {
+    if (scramble !== null) {
+      this._middle.setScramble(scramble);
+    }
+    
+    // Update the state.
+    var oldState = this._state;
+    this._state = new State(this._state);
+    this._state.scrambleAvailable = (scramble !== null);
+    if (!this._state.scrambleAvailable) {
+      this._state.scrambleVisible = false;
+    }
+    this._state = this._computeState();
+    
+    // Animate changes.
+    this._animateAllChanges(oldState, this._state);
+  };
+  
+  AppView.prototype._animateAllChanges = function(oldState, state) {
+    if (oldState.footerHeight != state.footerHeight) {
+      this._animator.animateAttribute('footerHeight', state.footerHeight);
+    }
+    if (oldState.footerOpen != state.footerOpen) {
+      this._animator.animateAttribute('footerClosedness',
+        state.footerOpen ? 0 : 1);
+    }
+    if (oldState.footerVisible != state.footerVisible) {
+      this._animator.animateAttribute('footerOpacity',
+        state.footerVisible ? 1 : 0);
+    }
+    if (oldState.headerVisible != state.headerVisible) {
+      this._animator.animateAttribute('headerOpacity',
+        state.headerVisible ? 1 : 0);
+    }
+    if (oldState.scrambleVisible != state.scrambleVisible) {
+      this._animator.animateAttribute('scrambleOpacity',
+        state.scrambleVisible ? 1 : 0);
+    }
+    
+    // Animate middle changes.
+    var middleLayout = this._computeMiddleLayout();
+    this._animator.animateAttribute('middleHeight', middleLayout.height);
+    this._animator.animateAttribute('middleY', middleLayout.y);
+    this._animator.animateAttribute('timeSize', middleLayout.timeSize);
+    this._animator.animateAttribute('timeY', middleLayout.timeY);
+  };
+  
   AppView.prototype._computeMiddleLayout = function() {
     // Figure out the size of everything on-screen for the current state.
     var windowHeight = $(window).height();
@@ -65,6 +112,8 @@
   };
 
   AppView.prototype._computeState = function() {
+    // TODO: if the footer is closed, some logic is different.
+    
     var constraints = this._middle.constraints();
     var available = $(window).height() - this._header.height();
     var footerSize = available - constraints.soft;
@@ -86,7 +135,7 @@
     
     // Make the footer its minimum size and see if it fits.
     res.footerHeight = MIN_FOOTER_SIZE;
-    if (available-constraints.hard >= MIN_FOOTER_SIZE) {
+    if (available-constraints.bare >= MIN_FOOTER_SIZE) {
       res.footerVisible = true;
     } else {
       res.footerVisible = false;
@@ -95,8 +144,9 @@
   };
 
   AppView.prototype._footerResized = function(height) {
-    this._userFooterHeight = Math.min(height, MAX_FOOTER_SIZE);
-    localStorage.footerHeight = height;
+    this._userFooterHeight = Math.max(Math.min(height, MAX_FOOTER_SIZE),
+      MIN_FOOTER_SIZE);
+    localStorage.footerHeight = this._userFooterHeight;
     
     // Nothing in the state should change besides the footer height.
     this._state = this._computeState();
@@ -108,6 +158,7 @@
       timeSize: middleLayout.timeSize,
       timeY: middleLayout.timeY
     });
+    this._layout(this._animator.current());
   };
 
   AppView.prototype._initializeAnimator = function() {
@@ -177,7 +228,7 @@
     
     // Animate/update the view changes as needed.
     var majorChange = false;
-    if (state.footerHeight != old.footerHeeight) {
+    if (state.footerHeight != old.footerHeight) {
       this._animator.setAttribute('footerHeight', state.footerHeight);
     }
     if (state.footerVisible != old.footerVisible) {
@@ -195,14 +246,12 @@
     if (majorChange) {
       // Animate middle changes.
       this._animator.animateAttribute('middleHeight', middleLayout.height);
-      this._animator.animateAttribute('middleY', middleLayout.y);
       this._animator.animateAttribute('timeSize', middleLayout.timeSize);
       this._animator.animateAttribute('timeY', middleLayout.timeY);
     } else {
       // Set middle changes without animation.
       this._animator.setAttributes({
         middleHeight: middleLayout.height,
-        middleY: middleLayout.y,
         timeSize: middleLayout.timeSize,
         timeY: middleLayout.timeY
       });
@@ -212,7 +261,15 @@
   };
 
   AppView.prototype._toggleFooter = function() {
-    // TODO: open/close footer here and animate the change.
+    var old = this._state;
+    this._state = new State(this._state);
+    this._state.footerOpen = !this._state.footerOpen;
+    this._state = this._computeState();
+    var state = this._state;
+    
+    localStorage.footerOpen = state.footerOpen;
+    
+    this._animateAllChanges(old, state);
   };
   
   function State(attrs) {

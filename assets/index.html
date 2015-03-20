@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="styles/footer.css">
     <link rel="stylesheet" type="text/css" href="styles/header.css">
     <link rel="stylesheet" type="text/css" href="styles/middle.css">
+    <link rel="stylesheet" type="text/css" href="styles/noselect.css">
     <link rel="stylesheet" type="text/css" href="styles/pentagons.css">
     
     <!-- These APIs aren't specific to Cubezapp, but hey, they're nice -->
@@ -57,9 +58,6 @@
     <div id="header">
       <div class="top">
         <label class="name"></label>
-        
-        <!-- Scrambles will appear here if they're small enough -->
-        <label class="scramble"></label>
       </div>
       <div class="dropdown"></div>
     </div>
@@ -69,7 +67,10 @@
       <div class="scramble"></div>
     
       <!-- The time field shows the current time -->
-      <input class="time" value="Hit Space">
+      <!-- Chrome seems to have a bug where animating the input is screwing it
+        up -->
+      <!-- <input class="time" value="Hit Space"> -->
+      <div class="time">Hit Space</div>
       <div class="memo-time"></div>
       
       <!-- This will show the user if they got a PB -->

@@ -14,17 +14,19 @@
   }
   
   Middle.prototype.computeLayout = function(height, showScramble) {
+    var maxForWidth = $(window).width() / 5;
+    
     var timeY;
     var timeSize;
     if (showScramble) {
       var usedSpace = this.scrambleHeight() + SCRAMBLE_PADDING*2
       var usableSize = height - usedSpace;
       timeSize = (usableSize-PB_SIZE) / (1+MEMO_SIZE_RATIO);
-      timeSize = Math.max(timeSize, MIN_TIME_SIZE);
+      timeSize = Math.min(Math.max(timeSize, MIN_TIME_SIZE), maxForWidth);
       timeY = (usableSize-timeSize)/2 + usedSpace;
     } else {
       timeSize = (height-PB_SIZE) / (1+MEMO_SIZE_RATIO);
-      timeSize = Math.max(timeSize, MIN_TIME_SIZE);
+      timeSize = Math.min(Math.max(timeSize, MIN_TIME_SIZE), maxForWidth);
       timeY = (height-timeSize) / 2;
     }
     return {timeY: timeY, timeSize: timeSize};
@@ -76,13 +78,13 @@
     if (attrs.timeOpacity === 0) {
       this._time.css({display: 'none'});
     } else {
-      var size = Math.round(attrs.timeSize * attrs.timeScale);
+      var size = attrs.timeSize * attrs.timeScale;
       this._time.css({
         display: 'block',
         opacity: attrs.timeOpacity,
         top: attrs.timeY,
         height: size,
-        'font-size': Math.round(size*0.8)
+        'font-size': size*0.8,
       });
     }
   };

@@ -16,7 +16,7 @@
   function Animation(start, end, duration, delay, curve) {
     this.start = start;
     this.end = end;
-    this.duration = duration*1000 || 400;
+    this.duration = duration*1000 || 300;
     this.delay = delay*1000 || 0;
     this.curve = curve || defaultCurve();
     this.timestamp = new Date().getTime();
