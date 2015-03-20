@@ -30,7 +30,7 @@
   }
   
   Footer.prototype.closedHeight = function() {
-    return 44;
+    return this._top.height();
   };
   
   Footer.prototype.layout = function(attrs) {
@@ -171,7 +171,7 @@
   }
   
   FooterTop.prototype.height = function() {
-    return 44;
+    return 40;
   };
   
   FooterTop.prototype.layout = function() {

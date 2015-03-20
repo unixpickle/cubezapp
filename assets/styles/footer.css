@@ -19,7 +19,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  height: 44px;
+  height: 40px;
   width: 100%;
   
   background-color: white;
@@ -27,13 +27,13 @@
 }
 
 #footer .top .tab {
-  height: 44px;
+  height: 40px;
   
   color: #999999;
   background-color: transparent;
   border: none;
-  font-size: 22px;
-  line-height: 44px;
+  font-size: 20px;
+  line-height: 40px;
   
   cursor: pointer;
 }
@@ -45,33 +45,33 @@
 #footer .top .bar {
   position: absolute;
   /* This will be resized/moved around by a script */
-  top: 44px;
-  height: 5px;
-  border-radius: 2.5px;
+  top: 40px;
+  height: 3px;
+  border-radius: 1.5px;
 }
 
 #footer .top .close {
   position: absolute;
   top: 0;
   right: 0;
-  height: 44px;
-  width: 44px;
+  height: 40px;
+  width: 40px;
   
   border: none;
   cursor: pointer;
   
   background-color: transparent;
   background-image: url('../images/close.png');
-  background-size: 20px 20px;
+  background-size: 18px 18px;
   background-repeat: no-repeat;
   background-position: center;
 }
 
 #footer .bottom {
   position: absolute;
-  top: 49px;
+  top: 43px;
   left: 0;
-  height: calc(100% - 49px);
+  height: calc(100% - 43px);
   width: 200%;
 }
 
@@ -95,27 +95,23 @@
   #footer .stats-contents .times {
     left: 0;
     width: 150px;
-    border-top-right-radius: 5px;
   }
 
   #footer .stats-contents .graph {
-    left: 155px;
-    width: calc(100% - 410px);
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
+    left: 153px;
+    width: calc(100% - 406px);
   }
 
   #footer .stats-contents .stats {
     right: 0;
     width: 250px;
-    border-top-left-radius: 5px;
   }
 }
 
 @media screen and (max-width: 800px) and (min-width: 300px) {
   #footer .stats-contents .times {
     left: 0;
-    width: calc(40% - 5px);
+    width: calc(40% - 3px);
   }
 
   #footer .stats-contents .graph {
