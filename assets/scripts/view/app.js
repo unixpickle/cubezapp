@@ -267,7 +267,7 @@
     // Update the user's footer height, capping it as necessary.
     this._userFooterHeight = Math.max(Math.min(height, MAX_FOOTER_SIZE),
       MIN_FOOTER_SIZE);
-    localStorage.footerHeight = this._userFooterHeight;
+    this._saveFooterHeight();
     
     // Nothing in the state should change besides the footer height.
     this._updateState();
@@ -336,6 +336,20 @@
     this._layout(this._animator.current());
   };
 
+  AppView.prototype._saveFooterHeight = function() {
+    try {
+      localStorage.footerHeight = this._userFooterHeight;
+    } catch (e) {
+    }
+  };
+  
+  AppView.prototype._saveFooterOpen = function() {
+    try {
+      localStorage.footerOpen = this._state.footerOpen;
+    } catch (e) {
+    }
+  };
+
   AppView.prototype._toggleFooter = function() {
     // Update the state and backup the old state.
     var old = new State(this._state);
@@ -343,7 +357,7 @@
     this._updateState();
     
     // Save the change in localStorage.
-    localStorage.footerOpen = this._state.footerOpen;
+    this._saveFooterOpen();
     
     // Animate the state change.
     this._animateStateChange(old);
