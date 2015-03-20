@@ -5,7 +5,7 @@
 // The AppView manages these interacting UI components. It does so by receiving
 // callbacks from its subviews and from the DOM.
 
-// In essence, the AppView is a magical genie.
+// In essence, the AppView is a magical genie in a bottle.
 (function() {
 
   var MIN_FOOTER_SIZE = 250;
@@ -236,7 +236,7 @@
     // We do this mainly so that this._updateState() can work.
     this._state = new State({
       footerHeight: 0,
-      footerOpen: localStorage.footerOpen === 'true',
+      footerOpen: localStorage.footerOpen !== 'false',
       footerVisible: false,
       headerVisible: true,
       memoVisible: false,
