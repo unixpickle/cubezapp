@@ -16,21 +16,44 @@
   function Animation(start, end, duration, delay, curve) {
     this.start = start;
     this.end = end;
-    this.duration = duration*1000 || 300;
-    this.delay = delay*1000 || 0;
-    this.curve = curve || defaultCurve();
+    
+    // Optional arguments.
+    if ('number' === typeof duration) {
+      this.duration = duration * 1000;
+    } else {
+      this.duration = 300;
+    }
+    if ('number' === typeof delay) {
+      this.delay = delay * 1000;
+    } else {
+      this.delay = 0;
+    }
+    if ('function' === typeof curve) {
+      this.curve = curve;
+    } else {
+      this.curve = defaultCurve;
+    }
+    
     this.timestamp = new Date().getTime();
     this._done = false;
   }
 
   // current returns the current value for the animating value.
   Animation.prototype.current = function() {
+    if (this.duration === 0) {
+      this._done = true;
+      return this.end;
+    }
+    
+    // See how much of the animation has elapsed.
     var elapsed = new Date().getTime() - this.timestamp;
     var fraction = Math.max((elapsed-this.delay)/this.duration, 0);
     if (fraction >= 1) {
       this._done = true;
       return this.end;
     }
+    
+    // Compute the intermediate value.
     return this.start + (this.end-this.start)*this.curve(fraction);
   };
   
@@ -57,6 +80,9 @@
   // The duration, delay and curve arguments are optional.
   Animator.prototype.animateAttribute = function(attr, dest, duration, delay,
       curve) {
+    if (!this._current.hasOwnProperty(attr)) {
+      throw new Error('unknown attribute: ' + attr);
+    }
     this._animations[attr] = new Animation(this._current[attr], dest,
       duration, delay, curve);
     if (this._done) {
@@ -77,6 +103,11 @@
   // If the attribute was already being animated, the given value is set as the
   // destination for the existing animation.
   Animator.prototype.setAttribute = function(attr, val) {
+    if (!this._current.hasOwnProperty(attr)) {
+      throw new Error('unknown attribute: ' + attr);
+    } else if (isNaN(val)) {
+      throw new Error('setting NaN attribute for: ' + attr);
+    }
     var animation = this._animations[attr];
     if (animation !== null) {
       animation.end = val;
@@ -128,10 +159,8 @@
     }
   };
   
-  function defaultCurve() {
-    return function(x) {
-      return x;
-    };
+  function defaultCurve(x) {
+    return x;
   }
   
   window.app.Animator = Animator;

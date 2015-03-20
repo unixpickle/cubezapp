@@ -19,6 +19,32 @@
       window.app.view.setScramble(scrambles[scrambleIdx]);
     });
     $('#header .top').append(button);
+    
+    // Create temporary button that toggles memo time.
+    var hasMemo = false;
+    button = $('<button>Memo</button>');
+    button.click(function() {
+      if (!hasMemo) {
+        window.app.view.setMemo("13:37.15")
+      } else {
+        window.app.view.setMemo(null);
+      }
+      hasMemo = !hasMemo;
+    });
+    $('#header .top').append(button);
+    
+    // Create temporary button that toggles PB text.
+    var hasPB = false;
+    button = $('<button>PB</button>');
+    button.click(function() {
+      if (!hasPB) {
+        window.app.view.setPB('New PB average');
+      } else {
+        window.app.view.setPB(null);
+      }
+      hasPB = !hasPB;
+    });
+    $('#header .top').append(button);
   });
   
 })();

@@ -10,7 +10,7 @@
   visibility: hidden;
   
   display: inline-block;
-  max-width: calc(100% - 200px);
+  max-width: calc(100% - 100px);
   margin-top: 10px;
   padding: 10px 10px 10px 10px;
   
@@ -39,6 +39,12 @@
 #middle .memo-time {
   /* Invisible until code loads it. */
   display: none;
+  
+  position: absolute;
+  width: 100%;
+  
+  text-align: center;
+  color: white;
 }
 
 #middle .pb-status {
@@ -49,4 +55,6 @@
   width: 100%;
   text-align: center;
   bottom: 0;
+  
+  color: white;
 }
