@@ -73,16 +73,16 @@
   AppView.prototype.setScramble = function(scramble) {
     var hasScramble = (scramble !== null);
     
-    // Update the state.
-    var oldState = new State(this._state);
-    this._state.scrambleAvailable = hasScramble;
-    this._updateState();
-    
     // If the scramble is null, we keep the last scramble in the scramble box so
     // it can fade out.
     if (hasScramble) {
       this._middle.setScramble(scramble);
     }
+    
+    // Update the state.
+    var oldState = new State(this._state);
+    this._state.scrambleAvailable = hasScramble;
+    this._updateState();
     
     this._animateStateChange(oldState);
   };
@@ -301,7 +301,8 @@
       majorChange = true;
     }
     if (this._state.pbVisible !== old.pbVisible) {
-      this._animator.animateAttribute('pbOpacity', state.pbVisible ? 1 : 0);
+      this._animator.animateAttribute('pbOpacity',
+        this._state.pbVisible ? 1 : 0);
       majorChange = true;
     }
     
