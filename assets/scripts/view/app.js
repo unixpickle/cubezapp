@@ -182,20 +182,20 @@
       scrambleOpacity: 0,
       // Time attributes
       timeOpacity: 0,
-      timeScale: 1.5,
+      timeScale: 1.2,
       timeSize: middleLayout.timeSize,
       timeY: middleLayout.timeY
     });
     
     // Run the page-load animation.
-    this._animator.animateAttribute('footerOffset', 0);
+    this._animator.animateAttribute('footerOffset', 0, 0.3);
     if (this._state.footerVisible) {
-      this._animator.animateAttribute('footerOpacity', 1);
+      this._animator.animateAttribute('footerOpacity', 1, 0.3);
     }
-    this._animator.animateAttribute('headerOffset', 0);
-    this._animator.animateAttribute('headerOpacity', 1);
-    this._animator.animateAttribute('timeOpacity', 1);
-    this._animator.animateAttribute('timeScale', 1);
+    this._animator.animateAttribute('headerOffset', 0, 0.3);
+    this._animator.animateAttribute('headerOpacity', 1, 0.3);
+    this._animator.animateAttribute('timeOpacity', 1, 0.25, 0.1);
+    this._animator.animateAttribute('timeScale', 1, 0.25, 0.1);
   };
 
   AppView.prototype._initializeState = function() {

@@ -78,13 +78,19 @@
     if (attrs.timeOpacity === 0) {
       this._time.css({display: 'none'});
     } else {
-      var size = attrs.timeSize * attrs.timeScale;
+      var transform = 'none';
+      if (attrs.timeScale) {
+        transform = 'scale(' + attrs.timeScale + ',' + attrs.timeScale + ')';
+      }
       this._time.css({
         display: 'block',
         opacity: attrs.timeOpacity,
         top: attrs.timeY,
-        height: size,
-        'font-size': size*0.8,
+        height: attrs.timeSize,
+        'font-size': attrs.timeSize*0.8,
+        transform: transform,
+        '-ms-transform': transform,
+        '-webkit-transform': transform
       });
     }
   };

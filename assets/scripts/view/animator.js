@@ -121,8 +121,8 @@
   };
 
   Animator.prototype._requestAnimationFrame = function() {
-    if ('function' === typeof Window.requestAnimationFrame) {
-      Window.requestAnimationFrame(this._refresh.bind(this));
+    if ('function' === typeof window.requestAnimationFrame) {
+      window.requestAnimationFrame(this._refresh.bind(this));
     } else {
       setTimeout(this._refresh.bind(this), 1000/60);
     }
