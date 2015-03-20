@@ -45,6 +45,12 @@
       hasPB = !hasPB;
     });
     $('#header .top').append(button);
+    
+    var focused = false;
+    $(window).keydown(function(e) {
+      focused = !focused;
+      window.app.view.setFocusMode(focused);
+    });
   });
   
 })();

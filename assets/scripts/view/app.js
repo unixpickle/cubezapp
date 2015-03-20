@@ -20,6 +20,7 @@
 
     // Initialize state instance variables.
     this._state = null;
+    this._focusMode = false;
     this._userFooterHeight = parseInt(localStorage.footerHeight || '300');
 
     // Setup event handlers.
@@ -33,6 +34,13 @@
     this._initializeAnimator();
     this._layout(this._animator.current());
   }
+  
+  AppView.prototype.setFocusMode = function(on) {
+    this._focusMode = on;
+    var oldState = new State(this._state);
+    this._updateState();
+    this._animateStateChange(oldState);
+  };
   
   // setMemo updates the memo time. If the memo time is null, the memo time will
   // be hidden.
@@ -345,7 +353,17 @@
   // figure out the state which the app view should currently have.
   AppView.prototype._updateState = function() {
     // TODO: if the footer is closed, we may wish to make the scramble visible.
-    // TODO: if they are in focused-timer-mode, this is really simple.
+    
+    // Focus mode is completely different.
+    if (this._focusMode) {
+      this._state.pbVisible = false;
+      this._state.footerVisible = false;
+      this._state.scrambleVisible = false;
+      this._state.headerVisible = false;
+      return;
+    }
+    
+    this._state.headerVisible = true;
     
     // Get the constraints from this._middle.
     var pb = (this._state.pbAvailable && !this._state.footerOpen);
