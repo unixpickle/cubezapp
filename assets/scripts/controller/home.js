@@ -48,8 +48,13 @@
     
     var focused = false;
     $(window).keydown(function(e) {
-      focused = !focused;
-      window.app.view.setFocusMode(focused);
+      var keyCode = e.charCode || e.keyCode;
+      if (keyCode === 0x20) {
+        e.preventDefault();
+        e.stopPropagation();
+        focused = !focused;
+        window.app.view.setFocusMode(focused);
+      }
     });
   });
   

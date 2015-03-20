@@ -160,7 +160,7 @@
   };
   
   function defaultCurve(x) {
-    return x;
+    return 3*Math.pow(x, 2) - 2*Math.pow(x, 3);
   }
   
   window.app.Animator = Animator;
