@@ -12,7 +12,7 @@
     this._memoTime = this._element.find('.memo-time');
     this._pbStatus = this._element.find('.pb-status');
     this._scramble = this._element.find('.scramble');
-    this._time = this._element.find('.time');
+    this._time = new window.app.Time();
   }
   
   // computeTimeLayout uses a size and a state to figure out the layout of the
@@ -148,25 +148,7 @@
     }
     
     // Time label.
-    if (attrs.timeOpacity === 0) {
-      this._time.css({display: 'none'});
-    } else {
-      var transform = 'none';
-      if (attrs.timeScale) {
-        transform = 'scale(' + attrs.timeScale + ',' + attrs.timeScale + ')';
-      }
-      this._time.css({
-        display: 'block',
-        opacity: attrs.timeOpacity,
-        top: attrs.timeY,
-        height: attrs.timeSize,
-        'font-size': attrs.timeSize + 'px',
-        'line-height': attrs.timeSize + 'px',
-        transform: transform,
-        '-ms-transform': transform,
-        '-webkit-transform': transform
-      });
-    }
+    this._time.layout(attrs);
     
     // Memo label.
     if (attrs.memoOpacity === 0) {
@@ -210,6 +192,11 @@
   Middle.prototype.setTime = function(time) {
     this._time.text(time || '');
   };
+  
+  // setTimeBlinking sets whether the time blinker is blinking.
+  Middle.prototype.setTimeBlinking = function(flag) {
+    this._time.setBlinking(flag);
+  }
   
   window.app.Middle = Middle;
   

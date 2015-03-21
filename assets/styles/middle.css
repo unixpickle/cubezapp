@@ -36,6 +36,22 @@
   padding: 0;
 }
 
+#middle .time label {
+  display: inline-block;
+}
+
+#middle .time .blinker {
+  /* Invisible until code shows it. */
+  display: none;
+  
+  position: absolute;
+  top: 0;
+  
+  height: 100%;
+  width: 1px;
+  background-color: white;
+}
+
 #middle .memo-time {
   /* Invisible until code loads it. */
   display: none;

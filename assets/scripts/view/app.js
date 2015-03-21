@@ -95,6 +95,16 @@
     this._animateStateChange(oldState);
   };
   
+  // setTime sets the time's text contents.
+  AppView.prototype.setTime = function(time) {
+    this._middle.setTime(time || '');
+  };
+  
+  // setTimeBlinking sets whether the time blinker is blinking.
+  AppView.prototype.setTimeBlinking = function(flag) {
+    this._middle.setTimeBlinking(flag);
+  }
+  
   // _animateStateChange animates the transition between an old state and the
   // current state.
   AppView.prototype._animateStateChange = function(oldState) {

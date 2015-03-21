@@ -38,6 +38,7 @@
     <script src="scripts/view/middle.js"></script>
     <script src="scripts/view/pentagons.js"></script>
     <script src="scripts/view/stats.js"></script>
+    <script src="scripts/view/time.js"></script>
     <script src="scripts/view/times_list.js"></script>
     
     <!-- Controller scripts implement the glue between controllers and views -->
@@ -70,10 +71,10 @@
       <div class="scramble theme-text"></div>
     
       <!-- The time field shows the current time -->
-      <!-- Chrome seems to have a bug where animating the input is screwing it
-        up -->
-      <!-- <input class="time" value="Hit Space"> -->
-      <div class="time">14:50.01</div>
+      <div class="time">
+        <label>14:50.01</label>
+        <div class="blinker"></div>
+      </div>
       <div class="memo-time"></div>
       
       <!-- This will show the user if they got a PB -->
