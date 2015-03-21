@@ -3,6 +3,12 @@
   <head>
     <title>Cubezapp</title>
     
+    <!-- IE favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    
+    <!-- Other browsers favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    
     <!-- This is a font import. -->
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
     
@@ -27,6 +33,7 @@
     </script>
     
     <!-- Model scripts provide data management functionality -->
+    <script src="scripts/model/format.js"></script>
     <script src="scripts/model/stats.js"></script>
     
     <!-- View scripts provide the front-end experience -->
@@ -43,6 +50,8 @@
     
     <!-- Controller scripts implement the glue between controllers and views -->
     <script src="scripts/controller/home.js"></script>
+    <script src="scripts/controller/keyboard.js"></script>
+    <script src="scripts/controller/timer.js"></script>
     
     <!-- This style will be modified by JavaScript code -->
     <style type="text/css" id="theme-style">

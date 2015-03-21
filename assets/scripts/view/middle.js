@@ -50,8 +50,8 @@
       contentRatio += MEMO_SIZE_RATIO;
     }
     var timeSize = usableHeight / contentRatio;
-    if (timeSize > width/5) {
-      timeSize = width / 5;
+    if (timeSize > width/5.5) {
+      timeSize = width / 5.5;
     }
     
     if ('number' !== typeof timeSize || isNaN(timeSize)) {

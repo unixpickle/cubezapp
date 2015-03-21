@@ -46,16 +46,25 @@
     });
     $('#header .top').append(button);
     
-    var focused = false;
-    $(window).keydown(function(e) {
-      var keyCode = e.charCode || e.keyCode;
-      if (keyCode === 0x20) {
-        e.preventDefault();
-        e.stopPropagation();
-        focused = !focused;
-        window.app.view.setFocusMode(focused);
-      }
-    });
+    var timer = new window.app.Timer();
+    timer.onCancel = function() {
+      window.app.view.setFocusMode(false);
+    };
+    timer.onDone = function(record) {
+      window.app.view.setFocusMode(false);
+      console.log(record);
+    };
+    timer.onMemo = function(memo) {
+      window.app.view.setMemo(memo);
+    };
+    timer.onStart = function() {
+      window.app.view.setMemo(null);
+      window.app.view.setFocusMode(true);
+    };
+    timer.onUpdateTime = function(t) {
+      window.app.view.setTime(t);
+    };
+    timer.setModeBLD();
   });
   
 })();
