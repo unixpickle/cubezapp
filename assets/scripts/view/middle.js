@@ -3,7 +3,7 @@
 (function() {
   
   var MEMO_SIZE_RATIO = 0.3;
-  var MIN_TIME_SIZE = 30;
+  var MIN_TIME_SIZE = 50;
   var PB_SIZE_RATIO = 0.2;
   var SCRAMBLE_PADDING = 10;
   
