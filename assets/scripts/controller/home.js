@@ -48,6 +48,8 @@
     
     var timer = new window.app.Timer();
     timer.onCancel = function() {
+      window.app.view.setMemo(null);
+      window.app.view.setTime('Last time');
       window.app.view.setTheaterMode(false);
     };
     timer.onDone = function(record) {

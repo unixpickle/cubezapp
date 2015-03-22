@@ -85,6 +85,7 @@
     if (this._session === null) {
       return;
     }
+    this._session.cancel();
     this._session = null;
     
     if (this._mode < MODE_REGULAR) {
