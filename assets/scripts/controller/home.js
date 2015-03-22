@@ -64,7 +64,8 @@
     timer.onUpdateTime = function(t) {
       window.app.view.setTime(t);
     };
-    timer.setModeBLD();
+    timer.setMode(window.app.Timer.MODE_BLD);
+    timer.setAccuracy(window.app.Timer.ACCURACY_CENTISECONDS);
   });
   
 })();

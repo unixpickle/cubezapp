@@ -2,30 +2,35 @@
   
   var MODE_DISABLED = 0;
   var MODE_ENTRY = 1;
-  var MODE_REGULAR = 2;
-  var MODE_INSPECTION = 3;
-  var MODE_BLD = 4;
+  var MODE_STACKMAT = 2;
+  var MODE_REGULAR = 3;
+  var MODE_INSPECTION = 4;
+  var MODE_BLD = 5;
+  
+  var ACCURACY_CENTISECONDS = 0;
+  var ACCURACY_SECONDS = 1;
+  var ACCURACY_NONE = 2;
   
   function Timer() {
-    // State of timer.
+    // this._accuracy is used to determine how to show the time mid-solve.
+    this._accuracy = ACCURACY_CENTISECONDS;
+    
+    // this._mode is used to determine the current timer mode.
     this._mode = MODE_DISABLED;
     
-    // this._spaceUpAction is a function which is run on the next key up event
-    // for the space bar.
-    this._spaceUpAction = nullAction;
+    // this._upAction is a function which is run on the next space-up or
+    // touch-up event for MODE_REGULAR, MODE_INSPECTION, and MODE_BLD.
+    this._upAction = nullAction;
     
-    // this._running is true if the timer is running.
-    this._running = false;
-    
-    // this._startTime represents the time since the last user action. In
+    // this._startTime represents the time since the beginning of the solve. In
     // MODE_REGULAR, this is the time when the user started the timer. In
     // MODE_INSPECTION, this is either the time when the user started inspection
-    // time or the time when they started the timer. In MODE_BLD, this is either
-    // the time they started memo or the time they started execution.
+    // time or the time when they started the timer. In MODE_BLD, this is the
+    // time they started memo. In all other modes, this is meaningless.
     this._startTime = -1;
     
-    // this._firstPart is the amount of time required for the first "part" of
-    // the time. This only has meaning in MODE_INSPECTION and MODE_BLD,
+    // this._firstPart is the amount of time used for the first "part" of the
+    // time. This only has meaning in MODE_INSPECTION and MODE_BLD,
     // representing inspection time and memo time respectively.
     this._firstPart = -1;
     
@@ -33,120 +38,204 @@
     // timer text.
     this._timerInterval = null;
     
+    // this._started is true if this.onStart was called more recently than      
+    // this.onCancel or this.onCancel.
+    this._started = false;
+    
+    // Event sources.
+    this._spaceListener = new SpaceListener();
+    this._spaceListener.onCancel = this._cancel.bind(this);
+    this._spaceListener.onDown = this._down.bind(this);
+    this._spaceListener.onUp = this._up.bind(this);
+    this._touches = new window.app.Touches();
+    this._touches.onDown = this._down.bind(this);
+    this._touches.onUp = this._up.bind(this);
+    this._stackmat = new window.app.Stackmat();
+    this._stackmat.onWait = this._stackmatWait.bind(this);
+    this._stackmat.onReady = this._stackmatReady.bind(this);
+    this._stackmat.onTime = this._stackmatTime.bind(this);
+    this._stackmat.onDone = this._stackmatDone.bind(this);
+    this._stackmat.onCancel = this._stackmatCancel.bind(this);
+    
     // Event handlers.
     this.onCancel = null;
     this.onDone = null;
     this.onMemo = null;
     this.onStart = null;
     this.onUpdateTime = null;
-    
-    window.app.keyboard.push(this);
   }
   
-  Timer.prototype.keydown = function(e) {
-    // If this is not MODE_REGULAR, MODE_INSPECTION, or MODE_BLD, the space bar
-    // does nothing.
-    if (this._mode < MODE_REGULAR || e.which !== 0x20) {
-      return true;
-    }
+  Timer.MODE_DISABLED = MODE_DISABLED;
+  Timer.MODE_ENTRY = MODE_ENTRY;
+  Timer.MODE_STACKMAT = MODE_STACKMAT;
+  Timer.MODE_REGULAR = MODE_REGULAR;
+  Timer.MODE_INSPECTION = MODE_INSPECTION;
+  Timer.MODE_BLD = MODE_BLD;
+  
+  Timer.ACCURACY_CENTISECONDS = ACCURACY_CENTISECONDS;
+  Timer.ACCURACY_SECONDS = ACCURACY_SECONDS;
+  Timer.ACCURACY_NONE = ACCURACY_NONE;
+  
+  Timer.prototype.setAccuracy = function(accuracy) {
+    this._accuracy = accuracy;
+  }
+  
+  Timer.prototype.setMode = function(mode) {
+    this._cancel();
+    this._mode = mode;
     
-    // Repeating space events are ignored.
-    if (e.repeat) {
-      return false;
+    // Setup the input method.
+    switch (mode) {
+    case MODE_DISABLED:
+    case MODE_ENTRY:
+      this._stackmat.disconnect();
+      this._touches.disable();
+      this._spaceListener.disable();
+      break;
+    case MODE_STACKMAT:
+      this._stackmat.connect();
+      this._touches.disable();
+      this._spaceListener.disable();
+      break;
+    case MODE_REGULAR:
+    case MODE_INSPECTION:
+    case MODE_BLD:
+      this._stackmat.disconnect();
+      this._touches.enable();
+      this._spaceListener.enable();
+      break;
+    default:
+      break;
     }
-    
-    // If the timer is not running, releasing the space bar should start the
-    // timer.
-    if (!this._running) {
-      this._prepareStart();
-      this._spaceUpAction = this._start;
-      return false;
+  }
+  
+  Timer.prototype._cancel = function() {
+    if (this.mode < MODE_REGULAR) {
+      throw new Error('cancel event in wrong mode: ' + this._mode);
     }
-    
-    // In regular mode, pressing down the space bar stops the timer.
-    if (this._mode === MODE_REGULAR) {
-      // Stop the timer.
-      this._stopRegularSolve();
-      this._spaceUpAction = nullAction;
-    } else if (this._mode === MODE_INSPECTION) {
-      if (this._firstPart > 0) {
-        // Stop the timer.
-        this._stopInspectionSolve();
-        this._spaceUpAction = nullAction;
-      } else {
-        // On key up, stop the inspection time.
-        this._spaceUpAction = this._stopInspection;
+    if (this._timerInterval) {
+      clearInterval(this._timerInterval);
+      this._timerInterval = null;
+    }
+    this._upAction = nullAction;
+    this._startTime = -1;
+    this._firstPart = -1;
+    if (this._started) {
+      this._started = false;
+      if ('function' === typeof this.onCancel) {
+        this.onCancel();
       }
-    } else if (this._mode === MODE_BLD) {
-      if (this._firstPart > 0) {
-        // Stop the timer.
-        this._stopBLDSolve();
-        this._spaceUpAction = nullAction;
-      } else {
-        // On key up, stop the memo time.
-        this._stopMemo();
-        this._spaceUpAction = nullAction;
-      }
+    }
+  };
+  
+  Timer.prototype._down = function() {
+    // If they have a touchscreen and a keyboard, it's possible this._down
+    // could be called multiple times before this._up. This is how we check.
+    if (this._upAction !== nullAction) {
+      return;
     }
     
-    return false;
-  };
-  
-  Timer.prototype.keyup = function(e) {
-    // If this is not MODE_REGULAR, MODE_INSPECTION, or MODE_BLD, the space bar
-    // does nothing.
-    if (this._mode < MODE_REGULAR || e.which !== 0x20) {
-      return true;
+    if (this._mode < MODE_REGULAR) {
+      throw new Error('down event in wrong mode: ' + this._mode);
     }
     
-    this._spaceUpAction();
-    this._spaceUpAction = nullAction;
+    // If the timer is not started, we prepare the timer.
+    if (!this._started) {
+      this._ready();
+      this._upAction = this._startTimer;
+      return;
+    }
     
-    return false;
+    // This press may start a new step of the solve.
+    if (this._mode === MODE_INSPECTION && this._firstPart < 0) {
+      this._upAction = this._stopInspection;
+      return;
+    } else if (this._mode == MODE_BLD && this._firstPart < 0) {
+      this._stopMemo();
+      return;
+    }
+    
+    // The time is ending.
+    this._prepareStop();
   };
   
-  Timer.prototype.setModeBLD = function() {
-    this._mode = MODE_BLD;
-    var wasRunning = this._running;
-    this._stop();
-    if (wasRunning && 'function' === typeof this.onCancel) {
-      this.onCancel();
-    }
+  Timer.prototype._generateBLDSolve = function() {
+    var time = Math.max(new Date().getTime() - this._startTime, 0);
+    return {
+      date: new Date().getTime(),
+      dnf: false,
+      inspection: 0,
+      memo: this._firstPart,
+      notes: '',
+      plus2: false,
+      time: time
+    };
   };
   
-  Timer.prototype.setModeEntry = function() {
-    this._mode = MODE_ENTRY;
-    var wasRunning = this._running;
-    this._stop();
-    if (wasRunning && 'function' === typeof this.onCancel) {
-      this.onCancel();
-    }
+  Timer.prototype._generateInspectionSolve = function() {
+    var time = Math.max(new Date().getTime() - this._startTime, 0);
+    return {
+      date: new Date().getTime(),
+      dnf: false,
+      inspection: this._firstPart,
+      memo: 0,
+      notes: '',
+      plus2: this._isPlus2(),
+      time: time
+    };
   };
   
-  Timer.prototype.setModeInspection = function() {
-    this._mode = MODE_INSPECTION;
-    var wasRunning = this._running;
-    this._stop();
-    if (wasRunning && 'function' === typeof this.onCancel) {
-      this.onCancel();
-    }
-  };
-  
-  Timer.prototype.setModeRegular = function() {
-    this._mode = MODE_REGULAR;
-    var wasRunning = this._running;
-    this._stop();
-    if (wasRunning && 'function' === typeof this.onCancel) {
-      this.onCancel();
-    }
+  Timer.prototype._generateRegularSolve = function() {
+    var time = Math.max(new Date().getTime() - this._startTime, 0);
+    return {
+      date: new Date().getTime(),
+      dnf: false,
+      inspection: 0,
+      memo: 0,
+      notes: '',
+      plus2: false,
+      time: time
+    };
   };
   
   Timer.prototype._isPlus2 = function() {
     return this._mode === MODE_INSPECTION && this._firstPart > 15000;
   };
   
-  Timer.prototype._prepareStart = function() {
-    this._running = true;
+  Timer.prototype._prepareStop = function() {
+    // Compute the result of the timer.
+    var res;
+    if (this._mode === MODE_REGULAR) {
+      res = this._generateRegularSolve();
+    } else if (this._mode === MODE_INSPECTION) {
+      res = this._generateInspectionSolve();
+    } else if (this._mode === MODE_BLD) {
+      res = this._generateBLDSolve();
+    }
+    this._showResult(res);
+    
+    // Reset the timer state.
+    this._firstPart = -1;
+    this._startTime = -1;
+    
+    // Stop the timer interval.
+    if (this._timerInterval === null) {
+      throw new Error('this._timerInterval should not be null');
+    }
+    clearInterval(this._timerInterval);
+    this._timerInterval = null;
+    
+    // When this._up() is called, we should tell the callback about the result.
+    this._upAction = function() {
+      this._started = false;
+      if ('function' === typeof this.onDone) {
+        this.onDone(res);
+      }
+    }.bind(this);
+  };
+  
+  Timer.prototype._ready = function() {
+    this._started = true;
     
     // Tell the callback we've started.
     if ('function' === typeof this.onStart) {
@@ -158,13 +247,47 @@
       if (this._mode == MODE_INSPECTION) {
         this.onUpdateTime('15');
       } else {
-        this.onUpdateTime('0.00');
+        var label = ['0.00', '0', 'Ready'][this._accuracy];
+        this.onUpdateTime(label);
       }
     }
   };
   
-  Timer.prototype._start = function() {
-    this._running = true;
+  Timer.prototype._showResult = function(res) {
+    if ('function' !== typeof this.onUpdateTime) {
+      return;
+    }
+    
+    var timeStr;
+    if (res.plus2) {
+      timeStr = window.app.formatTime(res.time + 2000) + '+';
+    } else {
+      timeStr = window.app.formatTime(res.time);
+    }
+    this.onUpdateTime(timeStr);
+  };
+  
+  Timer.prototype._stackmatCancel = function() {
+    // TODO: this.
+  };
+  
+  Timer.prototype._stackmatDone = function() {
+    // TODO: this.
+  };
+  
+  Timer.prototype._stackmatReady = function() {
+    // TODO: this.
+  };
+  
+  Timer.prototype._stackmatTime = function(millis) {
+    // TODO: this.
+  };
+  
+  Timer.prototype._stackmatWait = function() {
+    // TODO: this.
+  };
+  
+  Timer.prototype._startTimer = function() {
     this._startTime = new Date().getTime();
     this._timerInterval = setInterval(this._update.bind(this), 10);
     if ('function' === typeof this.onStart) {
@@ -172,44 +295,9 @@
     }
   };
   
-  Timer.prototype._stop = function() {
-    if (!this._running) {
-      return;
-    }
-    
-    this._firstPart = -1;
-    this._startTime = -1;
-    this._running = false;
-    this._spaceUpAction = nullAction;
-    
-    // this._timerInterval might be null if this._prepareStart has run but not
-    // this._start.
-    if (this._timerInterval !== null) {
-      clearInterval(this._timerInterval);
-      this._timerInterval = null;
-    }
-  }
-  
-  Timer.prototype._stopBLDSolve = function() {
-    var execution = Math.max(new Date().getTime() - this._startTime, 0);
-    var res = {
-      date: new Date().getTime(),
-      dnf: false,
-      inspection: 0,
-      memo: this._firstPart,
-      notes: '',
-      plus2: false,
-      time: execution + this._firstPart
-    };
-    this._stop();
-    
-    if ('function' === typeof this.onDone) {
-      this.onDone(res);
-    }
-  };
-  
   Timer.prototype._stopInspection = function() {
-    // If inspection was already stopped by external forces, this does nothing.
+    // If inspection was already stopped because they went over 17 seconds, we
+    // should do nothing here.
     if (this._firstPart >= 0) {
       return;
     }
@@ -220,88 +308,125 @@
     this._startTime = timestamp;
   };
   
-  Timer.prototype._stopInspectionSolve = function() {
-    var time = Math.max(new Date().getTime() - this._startTime, 0);
-    var res = {
-      date: new Date().getTime(),
-      dnf: false,
-      inspection: this._firstPart,
-      memo: 0,
-      notes: '',
-      plus2: this._isPlus2(),
-      time: time
-    };
-    this._stop();
-    
-    if ('function' === typeof this.onDone) {
-      this.onDone(res);
-    }
-  };
-  
   Timer.prototype._stopMemo = function() {
     var timestamp = new Date().getTime();
     var duration = Math.max(timestamp - this._startTime, 0);
     this._firstPart = duration;
-    this._startTime = timestamp;
     
     if ('function' === typeof this.onMemo) {
       this.onMemo(window.app.formatTime(duration));
     }
   };
   
-  Timer.prototype._stopRegularSolve = function() {
-    var time = Math.max(new Date().getTime() - this._startTime, 0);
-    var res = {
-      date: new Date().getTime(),
-      dnf: false,
-      inspection: 0,
-      memo: 0,
-      notes: '',
-      plus2: false,
-      time: time
-    };
-    this._stop();
-    
-    if ('function' === typeof this.onDone) {
-      this.onDone(res);
+  Timer.prototype._up = function() {
+    if (this._mode < MODE_REGULAR) {
+      throw new Error('up event in wrong mode: ' + this._mode);
     }
+    this._upAction();
+    this._upAction = nullAction;
   };
   
   Timer.prototype._update = function() {
     var time = Math.max(new Date().getTime() - this._startTime, 0);
-    var showResult = '';
     
-    // NOTE: usually, the effect of this method will be calling 
-    // this.onUpdateTime. However, it *may* call this._stopInspection and return
-    // prematurely.
-    
-    if (this._mode === MODE_BLD && this._firstPart >= 0) {
-      time += this._firstPart;
+    // If they used too much inspection, we will skip to solving.
+    if (this._mode == MODE_INSPECTION && this._firstPart < 0 &&
+        time >= 17000) {
+      this._stopInspection();
+      this._update();
+      return;
     }
     
-    // If this is inspection time, we show them something a bit different.
+    // If there is no this.onUpdateTime, there's nothing to do.
+    if ('function' !== typeof this.onUpdateTime) {
+      return;
+    }
+    
+    // If this is inspection time, we show them the seconds remaining.
     if (this._mode === MODE_INSPECTION && this._firstPart < 0) {
       if (time < 15000) {
-        showResult = '' + Math.ceil(15 - time/1000);
-      } else if (time < 17000) {
-        showResult = '+2';
+        this.onUpdateTime('' + Math.ceil(15 - time/1000));
       } else {
-        // They used too much inspection. Start the timer.
-        this._stopInspection();
-        this._update();
-        return;
+        this.onUpdateTime('+2');
       }
-    } else {
-      if (this._isPlus2()) {
-        showResult = window.app.formatTime(time + 2000) + '+';
-      } else {
-        showResult = window.app.formatTime(time);
-      }
+      return;
     }
     
-    if ('function' === typeof this.onUpdateTime) {
+    // If there is no accuracy, we simply say "Timing".
+    if (this._accuracy === ACCURACY_NONE) {
+      this.onUpdateTime('Timing');
+      return;
+    }
+    
+    // Show the time with an optional "+" after it.
+    var showTime = (this._isPlus2() ? time + 2000 : time);
+    var showResult = '';
+    if (this._accuracy === ACCURACY_SECONDS) {
+      showResult = window.app.formatSeconds(showTime);
+    } else {
+      showResult = window.app.formatTime(showTime);
+    }
+    if (this._isPlus2()) {
+      this.onUpdateTime(showResult + '+');
+    } else {
       this.onUpdateTime(showResult);
     }
+  };
+  
+  function SpaceListener() {
+    this.onCancel = null;
+    this.onDown = null;
+    this.onUp = null;
+    this._enabled = false;
+    
+    window.app.keyboard.push(this);
+  }
+  
+  SpaceListener.prototype.disable = function() {
+    this._enabled = false;
+  };
+  
+  SpaceListener.prototype.enable = function() {
+    this._enabled = true;
+  };
+  
+  SpaceListener.prototype.keydown = function(e) {
+    // The escape key cancels the timer if possible.
+    if (this._enabled && e.which === 0x1b) {
+      if ('function' == typeof this.onCancel) {
+        this.onCancel();
+      }
+      return;
+    }
+    
+    // If we were not waiting for the space bar, we allow the keyboard manager
+    // to propagate the event.
+    if (!this._enabled || e.which !== 0x20) {
+      return true;
+    }
+    
+    // Repeating space events are ignored.
+    if (e.repeat) {
+      return false;
+    }
+    
+    if ('function' === typeof this.onDown) {
+      this.onDown();
+    }
+    return false;
+  };
+  
+  SpaceListener.prototype.keyup = function(e) {
+    // If we were not waiting for the space bar, we allow the keyboard manager
+    // to propagate the event.
+    if (!this._enabled || e.which !== 0x20) {
+      return true;
+    }
+    
+    if ('function' === typeof this.onUp) {
+      this.onUp();
+    }
+    return false;
   };
   
   function nullAction() {
