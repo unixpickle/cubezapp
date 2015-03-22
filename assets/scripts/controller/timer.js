@@ -19,6 +19,10 @@
     // this._accuracy is used to determine how to show the time mid-solve.
     this._accuracy = ACCURACY_CENTISECONDS;
     
+    // this._manualText is used to store the characters that a user type in
+    // manual entry mode.
+    this._manualText = '';
+    
     // this._mode is used to determine the current timer mode.
     this._mode = MODE_DISABLED;
     
@@ -50,6 +54,8 @@
     
     // this.onStart is called in order to (optionally) enter theater mode.
     this.onStart = null;
+    
+    window.app.keyboard.push(this);
   }
   
   Timer.MODE_DISABLED = MODE_DISABLED;
@@ -63,6 +69,45 @@
   Timer.ACCURACY_SECONDS = ACCURACY_SECONDS;
   Timer.ACCURACY_NONE = ACCURACY_NONE;
   
+  // keydown ignores the event.
+  Timer.prototype.keydown = function(e) {
+    return true;
+  };
+  
+  // keypress is used to process typing events for manual entry.
+  Timer.prototype.keypress = function(e) {
+    // If we are not in entry mode, do not accept input.
+    if (this._mode !== MODE_ENTRY) {
+      return true;
+    }
+    
+    if (e.which === 8) {
+      // Backspace.
+      this._manualText = this._manualText.substring(0,
+        this._manualText.length-1);
+    } else if (e.which >= 0x30 && e.which <= 0x39) {
+      // Number.
+      this._manualText = this._manualText + (e.which - 0x30);
+    } else if (e.which === 13) {
+      // Enter.
+      // TODO: add the time here.
+      this._manualText = '';
+    } else {
+      return true;
+    }
+    
+    window.app.view.blinkTime();
+    
+    // TODO: update the text properly.
+    window.app.view.setTime(this._manualText);
+    return false;
+  }
+  
+  // keyup ignores the event.
+  Timer.prototype.keyup = function(e) {
+    return true;
+  };
+  
   // setAccuracy changes the accuracy of the timer.
   Timer.prototype.setAccuracy = function(accuracy) {
     this._accuracy = accuracy;
@@ -71,6 +116,11 @@
   // setMode changes the mode of the timer. This will not interrupt the current
   // time.
   Timer.prototype.setMode = function(mode) {
+    // Setting the mode to the current mode changes nothing.
+    if (this._mode === mode) {
+      return;
+    }
+    
     this._mode = mode;
     
     // If no session is active, we immediately change the input method.
@@ -225,9 +275,17 @@
   // _updateInputMethod enables/disables different input methods to be right for
   // the current mode.
   Timer.prototype._updateInputMethod = function() {
+    if (this._mode === MODE_ENTRY) {
+      window.app.view.setTimeBlinking(true);
+    } else {
+      window.app.view.setTimeBlinking(false);
+    }
+    
     switch (this._mode) {
-    case MODE_DISABLED:
     case MODE_ENTRY:
+      this._manualText = '';
+      window.app.view.setTime('0.00');
+    case MODE_DISABLED:
       this._stackmat.disconnect();
       this._upDown.disable();
       break;

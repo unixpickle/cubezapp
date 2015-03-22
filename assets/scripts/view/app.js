@@ -35,6 +35,10 @@
     this._layout(this._animator.current());
   }
   
+  AppView.prototype.blinkTime = function() {
+    this._middle.blinkTime();
+  };
+  
   AppView.prototype.setTheaterMode = function(on) {
     this._theaterMode = on;
     var oldState = new State(this._state);
@@ -385,7 +389,7 @@
       this._state.scrambleVisible = false;
       this._state.headerVisible = false;
       return;
-    }
+    };
     
     this._state.headerVisible = true;
     

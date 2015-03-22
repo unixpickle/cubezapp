@@ -15,6 +15,10 @@
     this._time = new window.app.Time();
   }
   
+  Middle.prototype.blinkTime = function() {
+    this._time.blink();
+  };
+  
   // computeTimeLayout uses a size and a state to figure out the layout of the
   // view. It returns an object with a "timeY" and "timeSize" attribute. 
   Middle.prototype.computeTimeLayout = function(width, height, pb, scramble,

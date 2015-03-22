@@ -11,6 +11,22 @@
     this._blinkInterval = null;
   }
   
+  Time.prototype.blink = function() {
+    if (this._blinkInterval === null) {
+      throw new Error('cannot call blink() when not blinking');
+    }
+    // Show the blinker.
+    this._showingBlinker = true;
+    this._setBlinkerVisible(true);
+    
+    // Reset the interval.
+    clearInterval(this._blinkInterval);
+    this._blinkInterval = setInterval(function() {
+      this._showingBlinker = !this._showingBlinker;
+      this._setBlinkerVisible(this._showingBlinker);
+    }.bind(this), 500);
+  };
+  
   Time.prototype.layout = function(attrs) {
     if (attrs.timeOpacity === 0) {
       this._element.css({display: 'none'});
