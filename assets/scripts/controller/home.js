@@ -48,15 +48,15 @@
     
     var timer = new window.app.Timer();
     timer.onCancel = function() {
-      //window.app.view.setTheaterMode(false);
+      window.app.view.setTheaterMode(false);
     };
     timer.onDone = function(record) {
-      //window.app.view.setTheaterMode(false);
+      window.app.view.setTheaterMode(false);
       console.log(record);
     };
     timer.onStart = function() {
       window.app.view.setMemo(null);
-      //window.app.view.setTheaterMode(true);
+      window.app.view.setTheaterMode(true);
     };
     timer.setMode(window.app.Timer.MODE_BLD);
     timer.setAccuracy(window.app.Timer.ACCURACY_CENTISECONDS);
