@@ -1,5 +1,6 @@
 (function() {
   
+  // These represent the modes of input that the timer can use.
   var MODE_DISABLED = 0;
   var MODE_ENTRY = 1;
   var MODE_STACKMAT = 2;
@@ -7,6 +8,8 @@
   var MODE_INSPECTION = 4;
   var MODE_BLD = 5;
   
+  // These represent the three different ways of showing user the current time
+  // while timing.
   var ACCURACY_CENTISECONDS = 0;
   var ACCURACY_SECONDS = 1;
   var ACCURACY_NONE = 2;
@@ -76,10 +79,13 @@
   Timer.ACCURACY_SECONDS = ACCURACY_SECONDS;
   Timer.ACCURACY_NONE = ACCURACY_NONE;
   
+  // setAccuracy changes the accuracy of the timer.
   Timer.prototype.setAccuracy = function(accuracy) {
     this._accuracy = accuracy;
   }
   
+  // setMode changes the mode of the timer. This will cancel any current timing
+  // operations.
   Timer.prototype.setMode = function(mode) {
     this._cancel();
     this._mode = mode;
@@ -110,9 +116,13 @@
   }
   
   Timer.prototype._cancel = function() {
-    if (this.mode < MODE_REGULAR) {
-      throw new Error('cancel event in wrong mode: ' + this._mode);
+    if (this._mode === MODE_STACKMAT) {
+      this._stackmatCancel();
+      return;
+    } else if (this._mode < MODE_REGULAR) {
+      return;
     }
+    
     if (this._timerInterval) {
       clearInterval(this._timerInterval);
       this._timerInterval = null;
@@ -268,23 +278,72 @@
   };
   
   Timer.prototype._stackmatCancel = function() {
-    // TODO: this.
+    if (!this._active) {
+      return;
+    }
+    this._active = false;
+    if ('function' === typeof this.onCancel) {
+      this.onCancel();
+    }
   };
   
-  Timer.prototype._stackmatDone = function() {
-    // TODO: this.
+  Timer.prototype._stackmatDone = function(t) {
+    if (!this._active) {
+      return;
+    }
+    this._active = false;
+    if ('function' === typeof this.onDone) {
+      this.onDone({
+        date: new Date().getTime(),
+        dnf: false,
+        inspection: 0,
+        memo: 0,
+        notes: '',
+        plus2: false,
+        time: t
+      });
+    }
   };
   
   Timer.prototype._stackmatReady = function() {
-    // TODO: this.
+    if (!this._active) {
+      return;
+    }
+    if ('function' === typeof this.onUpdateTime) {
+      this.onUpdateTime('Ready');
+    }
   };
   
   Timer.prototype._stackmatTime = function(millis) {
-    // TODO: this.
+    if (!this._active || 'function' !== typeof this.onUpdateTime) {
+      return;
+    }
+    
+    // If there is no accuracy, we simply say "Timing".
+    if (this._accuracy === ACCURACY_NONE) {
+      this.onUpdateTime('Timing');
+      return;
+    }
+    
+    // Show the time with the given accuracy.
+    if (this._accuracy === ACCURACY_SECONDS) {
+      this.onUpdateTime(window.app.formatSeconds(millis));
+    } else {
+      this.onUpdateTime(window.app.formatTime(millis));
+    }
   };
   
   Timer.prototype._stackmatWait = function() {
-    // TODO: this.
+    if (this._active) {
+      return;
+    }
+    this._active = true;
+    if ('function' === typeof this.onStart) {
+      this.onStart();
+    }
+    if ('function' === typeof this.onUpdateTime) {
+      this.onUpdateTime('Wait');
+    }
   };
   
   Timer.prototype._startTimer = function() {
