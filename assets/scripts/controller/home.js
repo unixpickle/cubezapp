@@ -48,21 +48,15 @@
     
     var timer = new window.app.Timer();
     timer.onCancel = function() {
-      window.app.view.setFocusMode(false);
+      //window.app.view.setTheaterMode(false);
     };
     timer.onDone = function(record) {
-      window.app.view.setFocusMode(false);
+      //window.app.view.setTheaterMode(false);
       console.log(record);
-    };
-    timer.onMemo = function(memo) {
-      window.app.view.setMemo(memo);
     };
     timer.onStart = function() {
       window.app.view.setMemo(null);
-      window.app.view.setFocusMode(true);
-    };
-    timer.onUpdateTime = function(t) {
-      window.app.view.setTime(t);
+      //window.app.view.setTheaterMode(true);
     };
     timer.setMode(window.app.Timer.MODE_BLD);
     timer.setAccuracy(window.app.Timer.ACCURACY_CENTISECONDS);

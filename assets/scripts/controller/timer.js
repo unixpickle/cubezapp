@@ -120,6 +120,7 @@
     // Check if there's an existing session.
     if (this._session !== null) {
       this._session.down();
+      return;
     } else if (this._mode < MODE_REGULAR) {
       throw new Error('sessionDown event with invalid mode.');
     }
@@ -140,12 +141,18 @@
       break;
     }
     this._session.onDone = this._sessionDone.bind(this);
+    this._session.begin();
+    
+    if ('function' !== typeof this.onStart) {
+      throw new Error('invalid onStart callback');
+    }
+    this.onStart();
   };
   
   // _sessionUp is called when the space bar is released or the user's finger is
   // lifted from the screen.
   Timer.prototype._sessionUp = function() {
-    if (this._session === null) {
+    if (this._session !== null) {
       this._session.up();
     }
   };
@@ -195,7 +202,7 @@
     // If there is no accuracy, we simply say "Timing".
     if (this._accuracy === ACCURACY_NONE) {
       window.app.view.setTime('Timing');
-    else if (this._accuracy === ACCURACY_SECONDS) {
+    } else if (this._accuracy === ACCURACY_SECONDS) {
       window.app.view.setTime(window.app.formatSeconds(millis));
     } else {
       window.app.view.setTime(window.app.formatTime(millis));
@@ -255,10 +262,16 @@
     switch (this._accuracy) {
     case ACCURACY_CENTISECONDS:
       window.app.view.setTime('0.00');
+      break;
     case ACCURACY_SECONDS:
       window.app.view.setTime('0');
+      break;
     case ACCURACY_NONE:
       window.app.view.setTime('Ready');
+      break;
+    default:
+      throw new Error('unknown accuracy: ' + this._accuracy);
+      break;
     }
   };
   
@@ -308,9 +321,9 @@
   
   Session.prototype.timeString = function(time) {
     if (this._accuracy === ACCURACY_SECONDS) {
-      return window.app.formatSeconds(showTime);
+      return window.app.formatSeconds(time);
     } else {
-      return window.app.formatTime(showTime);
+      return window.app.formatTime(time);
     }
   };
   
@@ -356,11 +369,13 @@
     this._memoTime = null;
   }
   
+  BLDSession.prototype = Object.create(Session.prototype);
+  
   // down either stops the memo time or calls the superclass's down function.
   BLDSession.prototype.down = function() {
     if (this._memoTime === null) {
       this._memoDown = true;
-      this._memoTime = Math.max(this._startTime - new Date().getTime(), 0);
+      this._memoTime = Math.max(new Date().getTime() - this._startTime, 0);
       window.app.view.setMemo(window.app.formatTime(this._memoTime));
     } else {
       Session.prototype.down.call(this);
@@ -394,7 +409,7 @@
     this._inspectionTime = null;
   }
   
-  InspectionSession.prototype = Object.create(Session);
+  InspectionSession.prototype = Object.create(Session.prototype);
   
   // begin shows the "15" text to indicate that inspection time will start.
   InspectionSession.prototype.begin = function() {
@@ -432,19 +447,20 @@
     var res = Session.prototype.generateSolve.call(this);
     res.inspection = this._inspectionTime;
     res.plus2 = (this._inspectionTime > 15000);
+    return res;
   };
   
   // timeString returns the superclass's time string with a possible +2.
   InspectionSession.prototype.timeString = function(time) {
     if (this._inspectionTime > 15000) {
-      return InspectionSession.prototype.timeString.call(this, time + 2000) +
+      return Session.prototype.timeString.call(this, time + 2000) +
         '+';
     }
-    return InspectionSession.prototype.timeString.call(this, time);
+    return Session.prototype.timeString.call(this, time);
   };
   
   InspectionSession.prototype.up = function() {
-    if (this._inspectionTime >= 0) {
+    if (this._inspectionTime !== null) {
       // If the down() event happened during inspection, the up() event should
       // do nothing.
       if (this._downOnInspection) {
@@ -452,7 +468,6 @@
       } else {
         Session.prototype.up.call(this);
       }
-      return;
     } else if (this._inspectionInterval !== null) {
       // Save the inspection time.
       var delay = new Date().getTime() - this._inspectionStart;
@@ -462,17 +477,19 @@
       clearInterval(this._inspectionInterval);
       this._inspectionInterval = null;
       
+      // Reset this state so the next up event gets processed.
+      this._downOnInspection = false;
+      
       // Running Session.prototype.up will start the regular timer.
       Session.prototype.up.call(this);
-      return;
+    } else {
+      // Start inspection time.
+      this._inspectionStart = new Date().getTime();
+      this._inspectionInterval = setInterval(this._interval.bind(this), 10);
     }
-    
-    // Start inspection time.
-    this._inspectionStart = new Date().getTime();
-    this._inspectionInterval = setInterval(this._interval.bind(this), 10);
   };
   
-  InspectionSession.prototype._inspectionInterval = function() {
+  InspectionSession.prototype._interval = function() {
     var time = Math.max(new Date().getTime() - this._inspectionStart, 0);
     if (time > 17000) {
       // Force the timer to start.
@@ -480,7 +497,7 @@
     } else if (time > 15000) {
       window.app.view.setTime('+2');
     } else {
-      window.app.view.setTime('' + Math.ceil(time / 1000));
+      window.app.view.setTime('' + (15 - Math.floor(time / 1000)));
     }
   };
   
