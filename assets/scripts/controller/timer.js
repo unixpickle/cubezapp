@@ -14,6 +14,7 @@
   var ACCURACY_SECONDS = 1;
   var ACCURACY_NONE = 2;
   
+  // Timer is a controller which handles the timer flow.
   function Timer() {
     // this._accuracy is used to determine how to show the time mid-solve.
     this._accuracy = ACCURACY_CENTISECONDS;
@@ -21,38 +22,17 @@
     // this._mode is used to determine the current timer mode.
     this._mode = MODE_DISABLED;
     
-    // this._upAction is a function which is run on the next space-up or
-    // touch-up event for MODE_REGULAR, MODE_INSPECTION, and MODE_BLD.
-    this._upAction = nullAction;
+    // this._session stores the current session if the mode is >= MODE_REGULAR.
+    this._session = null;
     
-    // this._startTime represents the time since the beginning of the solve. In
-    // MODE_REGULAR, this is the time when the user started the timer. In
-    // MODE_INSPECTION, this is either the time when the user started inspection
-    // time or the time when they started the timer. In MODE_BLD, this is the
-    // time they started memo. In all other modes, this is meaningless.
-    this._startTime = -1;
-    
-    // this._firstPart is the amount of time used for the first "part" of the
-    // time. This only has meaning in MODE_INSPECTION and MODE_BLD,
-    // representing inspection time and memo time respectively.
-    this._firstPart = -1;
-    
-    // this._timerInterval is the interval from setInterval() used to update the
-    // timer text.
-    this._timerInterval = null;
-    
-    // this._started is true if this.onStart was called more recently than      
-    // this.onCancel or this.onCancel.
-    this._started = false;
+    // this._stackmatRunning is true if a stackmat time is happening.
+    this._stackmatRunning = false;
     
     // Event sources.
-    this._spaceListener = new SpaceListener();
-    this._spaceListener.onCancel = this._cancel.bind(this);
-    this._spaceListener.onDown = this._down.bind(this);
-    this._spaceListener.onUp = this._up.bind(this);
-    this._touches = new window.app.Touches();
-    this._touches.onDown = this._down.bind(this);
-    this._touches.onUp = this._up.bind(this);
+    this._upDown = new UpDown();
+    this._upDown.onCancel = this._sessionCancel.bind(this);
+    this._upDown.onDown = this._sessionDown.bind(this);
+    this._upDown.onUp = this._sessionUp.bind(this);
     this._stackmat = new window.app.Stackmat();
     this._stackmat.onWait = this._stackmatWait.bind(this);
     this._stackmat.onReady = this._stackmatReady.bind(this);
@@ -60,12 +40,16 @@
     this._stackmat.onDone = this._stackmatDone.bind(this);
     this._stackmat.onCancel = this._stackmatCancel.bind(this);
     
-    // Event handlers.
+    // this.onCancel is called to reset the timer view to the last time.
+    // This should exit theater mode if it was active.
     this.onCancel = null;
+    
+    // this.onDone is called when a new time has been recorded.
+    // This should exit theater mode if it was active.
     this.onDone = null;
-    this.onMemo = null;
+    
+    // this.onStart is called in order to (optionally) enter theater mode.
     this.onStart = null;
-    this.onUpdateTime = null;
   }
   
   Timer.MODE_DISABLED = MODE_DISABLED;
@@ -84,374 +68,452 @@
     this._accuracy = accuracy;
   }
   
-  // setMode changes the mode of the timer. This will cancel any current timing
-  // operations.
+  // setMode changes the mode of the timer. This will not interrupt the current
+  // time.
   Timer.prototype.setMode = function(mode) {
-    this._cancel();
     this._mode = mode;
     
-    // Setup the input method.
-    switch (mode) {
+    // If no session is active, we immediately change the input method.
+    if (this._session === null && !this._stackmatRunning) {
+      this._updateInputMethod();
+    }
+  }
+  
+  // _sessionCancel is called to cancel the current session.
+  Timer.prototype._sessionCancel = function() {
+    // Nullify the session if it exists.
+    if (this._session === null) {
+      return;
+    }
+    this._session = null;
+    
+    if (this._mode < MODE_REGULAR) {
+      // The mode was changed while the session was running.
+      this._updateInputMethod();
+    }
+    
+    if ('function' !== typeof this.onCancel) {
+      throw new Error('invalid onCancel callback');
+    }
+    this.onCancel();
+  };
+  
+  // _sessionDone is used as a callback for when the session completes.
+  Timer.prototype._sessionDone = function(record) {
+    // Nullify the session.
+    this._session = null;
+    
+    if (this._mode < MODE_REGULAR) {
+      // The mode was changed while the session was running.
+      this._updateInputMethod();
+    }
+    
+    if ('function' !== typeof this.onDone) {
+      throw new Error('invalid onDone callback');
+    }
+    this.onDone(record);
+  };
+  
+  // _sessionDown is called when the space bar is pressed or the screen is
+  // touched.
+  Timer.prototype._sessionDown = function() {
+    // Check if there's an existing session.
+    if (this._session !== null) {
+      this._session.down();
+    } else if (this._mode < MODE_REGULAR) {
+      throw new Error('sessionDown event with invalid mode.');
+    }
+    
+    // Start a new session.
+    switch (this._mode) {
+    case MODE_REGULAR:
+      this._session = new Session(this._accuracy);
+      break;
+    case MODE_BLD:
+      this._session = new BLDSession(this._accuracy);
+      break;
+    case MODE_INSPECTION:
+      this._session = new InspectionSession(this._accuracy);
+      break;
+    default:
+      throw new Error('unknown mode: ' + this._mode);
+      break;
+    }
+    this._session.onDone = this._sessionDone.bind(this);
+  };
+  
+  // _sessionUp is called when the space bar is released or the user's finger is
+  // lifted from the screen.
+  Timer.prototype._sessionUp = function() {
+    if (this._session === null) {
+      this._session.up();
+    }
+  };
+  
+  Timer.prototype._stackmatCancel = function() {
+    if (!this._stackmatRunning) {
+      return;
+    }
+    this._stackmatRunning = false;
+    if ('function' !== typeof this.onCancel) {
+      throw new Error('invalid onCancel callback');
+    }
+    this.onCancel();
+  };
+  
+  Timer.prototype._stackmatDone = function(t) {
+    if (!this._stackmatRunning) {
+      return;
+    }
+    this._stackmatRunning = false;
+    if ('function' !== typeof this.onDone) {
+      throw new Error('invalid onDone callback');
+    }
+    this.onDone({
+      date: new Date().getTime(),
+      dnf: false,
+      inspection: 0,
+      memo: 0,
+      notes: '',
+      plus2: false,
+      time: t
+    });
+  };
+  
+  Timer.prototype._stackmatReady = function() {
+    if (!this._stackmatRunning) {
+      return;
+    }
+    window.app.view.setTime('Ready');
+  };
+  
+  Timer.prototype._stackmatTime = function(millis) {
+    if (!this._stackmatRunning) {
+      return;
+    }
+    
+    // If there is no accuracy, we simply say "Timing".
+    if (this._accuracy === ACCURACY_NONE) {
+      window.app.view.setTime('Timing');
+    else if (this._accuracy === ACCURACY_SECONDS) {
+      window.app.view.setTime(window.app.formatSeconds(millis));
+    } else {
+      window.app.view.setTime(window.app.formatTime(millis));
+    }
+  };
+  
+  Timer.prototype._stackmatWait = function() {
+    if (this._stackmatRunning) {
+      return;
+    }
+    this._stackmatRunning = true;
+    if ('function' !== typeof this.onStart) {
+      throw new Error('invalid onStart callback');
+    }
+    this.onStart();
+    window.app.view.setTime('Wait');
+  };
+  
+  // _updateInputMethod enables/disables different input methods to be right for
+  // the current mode.
+  Timer.prototype._updateInputMethod = function() {
+    switch (this._mode) {
     case MODE_DISABLED:
     case MODE_ENTRY:
       this._stackmat.disconnect();
-      this._touches.disable();
-      this._spaceListener.disable();
+      this._upDown.disable();
       break;
     case MODE_STACKMAT:
       this._stackmat.connect();
-      this._touches.disable();
-      this._spaceListener.disable();
+      this._upDown.disable();
       break;
     case MODE_REGULAR:
     case MODE_INSPECTION:
     case MODE_BLD:
       this._stackmat.disconnect();
-      this._touches.enable();
-      this._spaceListener.enable();
+      this._upDown.enable();
       break;
     default:
       break;
     }
+  };
+  
+  // A Session handles the process of recording a time using the space bar
+  // or touchscreen.
+  // This is a base class and can only be used for MODE_REGULAR.
+  function Session(accuracy) {
+    this.onDone = null;
+    this._accuracy = accuracy;
+    this._result = null;
+    this._startTime = null;
+    this._timerInterval = null;
   }
   
-  Timer.prototype._cancel = function() {
-    if (this._mode === MODE_STACKMAT) {
-      this._stackmatCancel();
-      return;
-    } else if (this._mode < MODE_REGULAR) {
-      return;
+  // begin is called right after the object is constructed.
+  Session.prototype.begin = function() {
+    window.app.view.setMemo(null);
+    switch (this._accuracy) {
+    case ACCURACY_CENTISECONDS:
+      window.app.view.setTime('0.00');
+    case ACCURACY_SECONDS:
+      window.app.view.setTime('0');
+    case ACCURACY_NONE:
+      window.app.view.setTime('Ready');
     }
-    
-    if (this._timerInterval) {
+  };
+  
+  // cancel stops the session prematurely.
+  Session.prototype.cancel = function() {
+    if (this._timerInterval !== null) {
       clearInterval(this._timerInterval);
-      this._timerInterval = null;
-    }
-    this._upAction = nullAction;
-    this._startTime = -1;
-    this._firstPart = -1;
-    if (this._started) {
-      this._started = false;
-      if ('function' === typeof this.onCancel) {
-        this.onCancel();
-      }
     }
   };
   
-  Timer.prototype._down = function() {
-    // If they have a touchscreen and a keyboard, it's possible this._down
-    // could be called multiple times before this._up. This is how we check.
-    if (this._upAction !== nullAction) {
-      return;
-    }
-    
-    if (this._mode < MODE_REGULAR) {
-      throw new Error('down event in wrong mode: ' + this._mode);
-    }
-    
-    // If the timer is not started, we prepare the timer.
-    if (!this._started) {
-      this._ready();
-      this._upAction = this._startTimer;
-      return;
-    }
-    
-    // This press may start a new step of the solve.
-    if (this._mode === MODE_INSPECTION && this._firstPart < 0) {
-      this._upAction = this._stopInspection;
-      return;
-    } else if (this._mode == MODE_BLD && this._firstPart < 0) {
-      this._stopMemo();
-      return;
-    }
-    
-    // The time is ending.
-    this._prepareStop();
-  };
-  
-  Timer.prototype._generateBLDSolve = function() {
-    var time = Math.max(new Date().getTime() - this._startTime, 0);
-    return {
-      date: new Date().getTime(),
-      dnf: false,
-      inspection: 0,
-      memo: this._firstPart,
-      notes: '',
-      plus2: false,
-      time: time
-    };
-  };
-  
-  Timer.prototype._generateInspectionSolve = function() {
-    var time = Math.max(new Date().getTime() - this._startTime, 0);
-    return {
-      date: new Date().getTime(),
-      dnf: false,
-      inspection: this._firstPart,
-      memo: 0,
-      notes: '',
-      plus2: this._isPlus2(),
-      time: time
-    };
-  };
-  
-  Timer.prototype._generateRegularSolve = function() {
-    var time = Math.max(new Date().getTime() - this._startTime, 0);
-    return {
-      date: new Date().getTime(),
-      dnf: false,
-      inspection: 0,
-      memo: 0,
-      notes: '',
-      plus2: false,
-      time: time
-    };
-  };
-  
-  Timer.prototype._isPlus2 = function() {
-    return this._mode === MODE_INSPECTION && this._firstPart > 15000;
-  };
-  
-  Timer.prototype._prepareStop = function() {
-    // Compute the result of the timer.
-    var res;
-    if (this._mode === MODE_REGULAR) {
-      res = this._generateRegularSolve();
-    } else if (this._mode === MODE_INSPECTION) {
-      res = this._generateInspectionSolve();
-    } else if (this._mode === MODE_BLD) {
-      res = this._generateBLDSolve();
-    }
-    this._showResult(res);
-    
-    // Reset the timer state.
-    this._firstPart = -1;
-    this._startTime = -1;
-    
-    // Stop the timer interval.
+  // down is called when the user pushes down the space bar or touches the
+  // screen.
+  Session.prototype.down = function() {
     if (this._timerInterval === null) {
-      throw new Error('this._timerInterval should not be null');
+      throw new Error('down event with no timer interval');
     }
+    
+    // Generate the result and stop the timer.
+    this._result = this.generateSolve();
     clearInterval(this._timerInterval);
     this._timerInterval = null;
     
-    // When this._up() is called, we should tell the callback about the result.
-    this._upAction = function() {
-      this._started = false;
-      if ('function' === typeof this.onDone) {
-        this.onDone(res);
-      }
-    }.bind(this);
-  };
-  
-  Timer.prototype._ready = function() {
-    this._started = true;
-    
-    // Tell the callback we've started.
-    if ('function' === typeof this.onStart) {
-      this.onStart();
-    }
-    
-    // Give the callback the initial time.
-    if ('function' === typeof this.onUpdateTime) {
-      if (this._mode == MODE_INSPECTION) {
-        this.onUpdateTime('15');
-      } else {
-        var label = ['0.00', '0', 'Ready'][this._accuracy];
-        this.onUpdateTime(label);
-      }
-    }
-  };
-  
-  Timer.prototype._showResult = function(res) {
-    if ('function' !== typeof this.onUpdateTime) {
-      return;
-    }
-    
+    // Show the result with full accuracy.
     var timeStr;
-    if (res.plus2) {
-      timeStr = window.app.formatTime(res.time + 2000) + '+';
+    if (this._result.plus2) {
+      timeStr = window.app.formatTime(this._result.time + 2000) + '+';
     } else {
-      timeStr = window.app.formatTime(res.time);
+      timeStr = window.app.formatTime(this._result.time);
     }
-    this.onUpdateTime(timeStr);
+    window.app.view.setTime(timeStr);
   };
   
-  Timer.prototype._stackmatCancel = function() {
-    if (!this._active) {
-      return;
-    }
-    this._active = false;
-    if ('function' === typeof this.onCancel) {
-      this.onCancel();
-    }
-  };
-  
-  Timer.prototype._stackmatDone = function(t) {
-    if (!this._active) {
-      return;
-    }
-    this._active = false;
-    if ('function' === typeof this.onDone) {
-      this.onDone({
-        date: new Date().getTime(),
-        dnf: false,
-        inspection: 0,
-        memo: 0,
-        notes: '',
-        plus2: false,
-        time: t
-      });
-    }
-  };
-  
-  Timer.prototype._stackmatReady = function() {
-    if (!this._active) {
-      return;
-    }
-    if ('function' === typeof this.onUpdateTime) {
-      this.onUpdateTime('Ready');
-    }
-  };
-  
-  Timer.prototype._stackmatTime = function(millis) {
-    if (!this._active || 'function' !== typeof this.onUpdateTime) {
-      return;
-    }
-    
-    // If there is no accuracy, we simply say "Timing".
-    if (this._accuracy === ACCURACY_NONE) {
-      this.onUpdateTime('Timing');
-      return;
-    }
-    
-    // Show the time with the given accuracy.
-    if (this._accuracy === ACCURACY_SECONDS) {
-      this.onUpdateTime(window.app.formatSeconds(millis));
-    } else {
-      this.onUpdateTime(window.app.formatTime(millis));
-    }
-  };
-  
-  Timer.prototype._stackmatWait = function() {
-    if (this._active) {
-      return;
-    }
-    this._active = true;
-    if ('function' === typeof this.onStart) {
-      this.onStart();
-    }
-    if ('function' === typeof this.onUpdateTime) {
-      this.onUpdateTime('Wait');
-    }
-  };
-  
-  Timer.prototype._startTimer = function() {
-    this._startTime = new Date().getTime();
-    this._timerInterval = setInterval(this._update.bind(this), 10);
-    if ('function' === typeof this.onStart) {
-      this.onStart();
-    }
-  };
-  
-  Timer.prototype._stopInspection = function() {
-    // If inspection was already stopped because they went over 17 seconds, we
-    // should do nothing here.
-    if (this._firstPart >= 0) {
-      return;
-    }
-    
-    var timestamp = new Date().getTime();
-    var duration = Math.max(timestamp - this._startTime, 0);
-    this._firstPart = duration;
-    this._startTime = timestamp;
-  };
-  
-  Timer.prototype._stopMemo = function() {
-    var timestamp = new Date().getTime();
-    var duration = Math.max(timestamp - this._startTime, 0);
-    this._firstPart = duration;
-    
-    if ('function' === typeof this.onMemo) {
-      this.onMemo(window.app.formatTime(duration));
-    }
-  };
-  
-  Timer.prototype._up = function() {
-    if (this._mode < MODE_REGULAR) {
-      throw new Error('up event in wrong mode: ' + this._mode);
-    }
-    this._upAction();
-    this._upAction = nullAction;
-  };
-  
-  Timer.prototype._update = function() {
+  // generateSolve is called when the timer is stopped in order to get a usable
+  // record to store in a database.
+  Session.prototype.generateSolve = function() {
     var time = Math.max(new Date().getTime() - this._startTime, 0);
+    return {
+      date: new Date().getTime(),
+      dnf: false,
+      inspection: 0,
+      memo: 0,
+      notes: '',
+      plus2: false,
+      time: time
+    };
+  };
+  
+  Session.prototype.timeString = function(time) {
+    if (this._accuracy === ACCURACY_SECONDS) {
+      return window.app.formatSeconds(showTime);
+    } else {
+      return window.app.formatTime(showTime);
+    }
+  };
+  
+  // timerTick is called by this._timerInterval to update the timer text.
+  Session.prototype.timerTick = function() {
+    if (this._startTime === null) {
+      throw new Error('this._startTime is null in timer');
+    }
     
-    // If they used too much inspection, we will skip to solving.
-    if (this._mode == MODE_INSPECTION && this._firstPart < 0 &&
-        time >= 17000) {
-      this._stopInspection();
-      this._update();
+    // With no accuracy, the time is not shown.
+    if (this._accuracy == ACCURACY_NONE) {
+      window.app.view.setTime('Timing');
       return;
     }
     
-    // If there is no this.onUpdateTime, there's nothing to do.
-    if ('function' !== typeof this.onUpdateTime) {
+    // Show the time since the beginning of the solve.
+    var time = Math.max(new Date().getTime() - this._startTime, 0);
+    window.app.view.setTime(this.timeString(time));
+  };
+  
+  // up is called when the user releases the space bar or lifts their finger.
+  Session.prototype.up = function() {
+    if (this._timerInterval === null && this._result === null) {
+      // Start the timer.
+      this._startTime = new Date().getTime();
+      this._timerInterval = setInterval(this.timerTick.bind(this), 10);
+      this.timerTick();
+    } else if (this._result !== null) {
+      // Callback with our result.
+      if ('function' !== typeof this.onDone) {
+        throw new Error('invalid this.onDone function');
+      }
+      this.onDone(this._result);
+    } else {
+      throw new Error('invalid state at this.up');
+    }
+  };
+  
+  // BLDSession is a Session subclass for MODE_BLD.
+  function BLDSession(accuracy) {
+    Session.call(this, accuracy);
+    this._memoDown = false;
+    this._memoTime = null;
+  }
+  
+  // down either stops the memo time or calls the superclass's down function.
+  BLDSession.prototype.down = function() {
+    if (this._memoTime === null) {
+      this._memoDown = true;
+      this._memoTime = Math.max(this._startTime - new Date().getTime(), 0);
+      window.app.view.setMemo(window.app.formatTime(this._memoTime));
+    } else {
+      Session.prototype.down.call(this);
+    }
+  };
+  
+  // generateSolve sets the memo time on the superclass's result.
+  BLDSession.prototype.generateSolve = function() {
+    var res = Session.prototype.generateSolve.call(this);
+    res.memo = this._memoTime;
+    return res;
+  };
+  
+  // up calls the superclass's up function, but will ignore the event if the
+  // corresponding "down" event ended memo time.
+  BLDSession.prototype.up = function() {
+    // If this up() corresponds to the first down(), do nothing.
+    if (this._memoDown) {
+      this._memoDown = false;
+    } else {
+      Session.prototype.up.call(this);
+    }
+  };
+  
+  // InspectionSession is a Session subclass for MODE_INSPECTION.
+  function InspectionSession(accuracy) {
+    Session.call(this, accuracy);
+    this._downOnInspection = false;
+    this._inspectionStart = null;
+    this._inspectionInterval = null;
+    this._inspectionTime = null;
+  }
+  
+  InspectionSession.prototype = Object.create(Session);
+  
+  // begin shows the "15" text to indicate that inspection time will start.
+  InspectionSession.prototype.begin = function() {
+    window.app.view.setMemo(null);
+    window.app.view.setTime('15');
+  }
+  
+  // cancel stops the inspection interval and calls the superclass's cancel
+  // method.
+  InspectionSession.prototype.cancel = function() {
+    if (this._inspectionInterval) {
+      clearInterval(this._inspectionInterval);
+    }
+    Session.prototype.cancel.call(this);
+  };
+  
+  // down will do nothing if inspection is active, or call to the superclass
+  // otherwise.
+  InspectionSession.prototype.down = function() {
+    // If the inspection time is running, we make sure to note that the user hit
+    // space or touched their screen while inspection was running. This way the
+    // corresponding up() event doesn't stop the timer if they exceed inspection
+    // time.
+    if (this._inspectionTime === null) {
+      this._downOnInspection = true;
       return;
     }
     
-    // If this is inspection time, we show them the seconds remaining.
-    if (this._mode === MODE_INSPECTION && this._firstPart < 0) {
-      if (time < 15000) {
-        this.onUpdateTime('' + Math.ceil(15 - time/1000));
+    Session.prototype.down.call(this);
+  };
+  
+  // generateSolve calls the superclass's method and sets the "inspection" and
+  // "plus2" fields on the result.
+  InspectionSession.prototype.generateSolve = function() {
+    var res = Session.prototype.generateSolve.call(this);
+    res.inspection = this._inspectionTime;
+    res.plus2 = (this._inspectionTime > 15000);
+  };
+  
+  // timeString returns the superclass's time string with a possible +2.
+  InspectionSession.prototype.timeString = function(time) {
+    if (this._inspectionTime > 15000) {
+      return InspectionSession.prototype.timeString.call(this, time + 2000) +
+        '+';
+    }
+    return InspectionSession.prototype.timeString.call(this, time);
+  };
+  
+  InspectionSession.prototype.up = function() {
+    if (this._inspectionTime >= 0) {
+      // If the down() event happened during inspection, the up() event should
+      // do nothing.
+      if (this._downOnInspection) {
+        this._downOnInspection = false;
       } else {
-        this.onUpdateTime('+2');
+        Session.prototype.up.call(this);
       }
       return;
-    }
-    
-    // If there is no accuracy, we simply say "Timing".
-    if (this._accuracy === ACCURACY_NONE) {
-      this.onUpdateTime('Timing');
+    } else if (this._inspectionInterval !== null) {
+      // Save the inspection time.
+      var delay = new Date().getTime() - this._inspectionStart;
+      this._inspectionTime = Math.max(delay, 0);
+      
+      // Stop the inspection interval.
+      clearInterval(this._inspectionInterval);
+      this._inspectionInterval = null;
+      
+      // Running Session.prototype.up will start the regular timer.
+      Session.prototype.up.call(this);
       return;
     }
     
-    // Show the time with an optional "+" after it.
-    var showTime = (this._isPlus2() ? time + 2000 : time);
-    var showResult = '';
-    if (this._accuracy === ACCURACY_SECONDS) {
-      showResult = window.app.formatSeconds(showTime);
+    // Start inspection time.
+    this._inspectionStart = new Date().getTime();
+    this._inspectionInterval = setInterval(this._interval.bind(this), 10);
+  };
+  
+  InspectionSession.prototype._inspectionInterval = function() {
+    var time = Math.max(new Date().getTime() - this._inspectionStart, 0);
+    if (time > 17000) {
+      // Force the timer to start.
+      this.up();
+    } else if (time > 15000) {
+      window.app.view.setTime('+2');
     } else {
-      showResult = window.app.formatTime(showTime);
-    }
-    if (this._isPlus2()) {
-      this.onUpdateTime(showResult + '+');
-    } else {
-      this.onUpdateTime(showResult);
+      window.app.view.setTime('' + Math.ceil(time / 1000));
     }
   };
   
-  function SpaceListener() {
+  function UpDown() {
     this.onCancel = null;
     this.onDown = null;
     this.onUp = null;
     this._enabled = false;
+    this._down = false;
     
     window.app.keyboard.push(this);
+    
+    // If the device has a touchscreen, track touch events on the middle
+    // element.
+    if ('ontouchstart' in document) {
+      var element = $('#middle');
+      element.on('touchstart', this._touchDown.bind(this));
+      element.on('touchend', this._touchUp.bind(this));
+    }
   }
   
-  SpaceListener.prototype.disable = function() {
+  UpDown.prototype.disable = function() {
     this._enabled = false;
   };
   
-  SpaceListener.prototype.enable = function() {
+  UpDown.prototype.enable = function() {
     this._enabled = true;
   };
   
-  SpaceListener.prototype.keydown = function(e) {
+  UpDown.prototype.keydown = function(e) {
     // The escape key cancels the timer if possible.
     if (this._enabled && e.which === 0x1b) {
+      this._down = false;
       if ('function' == typeof this.onCancel) {
         this.onCancel();
       }
@@ -464,10 +526,12 @@
       return true;
     }
     
-    // Repeating space events are ignored.
-    if (e.repeat) {
-      return false;
+    // If we were already in the down state (for example, because of the
+    // touchscreen or key repeat) we do nothing.
+    if (this._down) {
+      return;
     }
+    this._down = true;
     
     if ('function' === typeof this.onDown) {
       this.onDown();
@@ -475,12 +539,19 @@
     return false;
   };
   
-  SpaceListener.prototype.keyup = function(e) {
+  UpDown.prototype.keyup = function(e) {
     // If we were not waiting for the space bar, we allow the keyboard manager
     // to propagate the event.
     if (!this._enabled || e.which !== 0x20) {
       return true;
     }
+    
+    // If we were not in the down state (for example, because of the
+    // touchscreen) we do nothing.
+    if (!this._down) {
+      return;
+    }
+    this._down = false;
     
     if ('function' === typeof this.onUp) {
       this.onUp();
@@ -488,8 +559,25 @@
     return false;
   };
   
-  function nullAction() {
-  }
+  UpDown.prototype._touchDown = function() {
+    if (this._down) {
+      return;
+    }
+    this._down = true;
+    if ('function' === typeof this.onDown) {
+      this.onDown();
+    }
+  };
+  
+  UpDown.prototype._touchUp = function() {
+    if (!this._down) {
+      return;
+    }
+    this._down = false;
+    if ('function' === typeof this.onUp) {
+      this.onUp();
+    }
+  };
   
   window.app.Timer = Timer;
   

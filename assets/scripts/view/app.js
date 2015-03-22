@@ -20,7 +20,7 @@
 
     // Initialize state instance variables.
     this._state = null;
-    this._focusMode = false;
+    this._theaterMode = false;
     this._userFooterHeight = parseInt(localStorage.footerHeight || '300');
 
     // Setup event handlers.
@@ -35,8 +35,8 @@
     this._layout(this._animator.current());
   }
   
-  AppView.prototype.setFocusMode = function(on) {
-    this._focusMode = on;
+  AppView.prototype.setTheaterMode = function(on) {
+    this._theaterMode = on;
     var oldState = new State(this._state);
     this._updateState();
     this._animateStateChange(oldState);
@@ -378,8 +378,8 @@
   AppView.prototype._updateState = function() {
     // TODO: if the footer is closed, we may wish to make the scramble visible.
     
-    // Focus mode is completely different.
-    if (this._focusMode) {
+    // Theater mode is completely different.
+    if (this._theaterMode) {
       this._state.pbVisible = false;
       this._state.footerVisible = false;
       this._state.scrambleVisible = false;
