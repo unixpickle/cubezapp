@@ -22,6 +22,7 @@ The global object `window.app.store` has various methods which provide data to t
 The store has the following properties for event handlers:
 
  * `onExternalChange` - the model was changed remotely and all data should be reloaded in the UI.
+ * `onExternalDelete` - the current puzzle was deleted remotely and has been changed locally.
  * `onStatsComputed` - the statistics for the current puzzle were re-computed.
  * `onStatsLoading` - the statistics for the current puzzle are out of date and are being re-computed.
 
@@ -63,5 +64,8 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
 
  * `name` - string - the user-assigned puzzle name
  * `icon` - string - the icon identifier
- * `lastUsed` - int - the UNIX time in milliseconds that the user last modified or switched to this puzzle.
+ * `scrambler` - string - the type of puzzle.js scrambler to use
+ * `scrambleType` - string - the subtype of the scrambler to use
+ * `scrambleLength` - int - the number of moves to use in the scramble if applicable
+ * `lastUsed` - int - the UNIX time in milliseconds that the user last modified or switched to this puzzle
  * `id` - string - the unique identifier of the puzzle. **This field will not be present if the puzzle has not been added to the store.**
