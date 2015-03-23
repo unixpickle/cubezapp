@@ -1,7 +1,19 @@
 (function() {
   
+  function switchPuzzle(puzzle) {
+    // TODO: this.
+  }
+  
+  window.app.switchToPuzzle = switchPuzzle;
+  
   $(function() {
+    window.app.store = new window.app.LocalStore();
     window.app.view = new window.app.AppView();
+    
+    // Setup the current puzzle.
+    var puzzles = window.app.store.getPuzzles().slice(1);
+    window.app.view.setPuzzles(puzzles);
+    window.app.view.setActivePuzzle(window.app.store.getActivePuzzle());
     
     // Create a temporary button that shows a scramble.
     var scrambles = [

@@ -25,6 +25,7 @@
   LocalStore.prototype.addPuzzle = function(puzzle) {
     puzzle.id = window.app.generateId();
     this._puzzles.unshift(puzzle);
+    this._active = puzzle;
     this._save();
   };
   
@@ -150,6 +151,8 @@
   };
   
   LocalStore.prototype._generateDefault = function() {
+    this._puzzles = [];
+    
     // Add cubes.
     var cubes = ['3x3 Cube', '4x4 Cube', '5x5 Cube', '2x2 Cube', 'One Handed'];
     var scramblers = [
@@ -173,6 +176,8 @@
       };
       this.addPuzzle(puzzle);
     }
+    
+    this._save();
   };
   
   LocalStore.prototype._loadData = function() {
@@ -187,7 +192,7 @@
     }
     
     // Load the puzzle data.
-    var data = JSON.parse(localStorage.localDataStore);
+    var data = JSON.parse(localStorage.localStoreData);
     this._puzzles = data.puzzles;
     
     // Find the active puzzle.
@@ -200,7 +205,7 @@
   
   LocalStore.prototype._loadLegacy = function() {
     var puzzles = JSON.parse(localStorage.puzzles);
-    var active = JSON.parse(localStorage.activePuzzle);
+    var active = localStorage.activePuzzle;
     
     // Add the "lastUsed" field to each puzzle.
     for (var i = 0, len = puzzles.length; i < len; ++i) {
@@ -227,7 +232,7 @@
       puzzles: this._puzzles,
       active: this._active.id
     };
-    localStorage.localStoreData = JSON.stringify(newData);
+    localStorage.localStoreData = JSON.stringify(data);
   };
   
   window.app.LocalStore = LocalStore;

@@ -71,14 +71,6 @@
     <!-- The pentagons fill the background of the page -->
     <canvas id="pentagons"></canvas>
     
-    <!-- The header has the current puzzle name and account info -->
-    <div id="header">
-      <label class="name theme-text">Curvy Copter</label>
-    </div>
-    
-    <!-- The puzzles dropdown comes down from the header -->
-    <div id="puzzles"></div>
-    
     <div id="middle">
       <!-- The scramble appears here -->
       <div class="scramble"></div>
@@ -120,5 +112,18 @@
         </div>
       </div>
     </div>
+    
+    <!-- The header has the current puzzle name and account info -->
+    <div id="header">
+      <label class="name theme-text">Curvy Copter</label>
+    </div>
+    
+    <!-- The puzzles dropdown comes down from the header -->
+    <div id="puzzles">
+      <!-- We embed the contents in the element because otherwise a bug in
+           Safari prevents the user from seeing a scrollbar -->
+      <div class="contents"></div>
+    </div>
+    
   </body>
 </html>

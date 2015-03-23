@@ -1,11 +1,19 @@
 (function() {
   
+  var DROPDOWN_HEIGHT = 200;
+  var PUZZLE_WIDTH = 200;
+  var SPACING = 20;
+  
   function Header() {
+    // Setup the UI elements.
     this._element = $('#header');
+    this._nameLabel = this._element.find('.name');
     this._puzzles = new Puzzles();
+    
+    // Dropdown state.
     this._showingDropdown = false;
     
-    this._nameLabel = this._element.find('.name');
+    // Register event handlers.
     this._nameLabel.click(this._toggle.bind(this));
     this._puzzles.onExit = this._toggle.bind(this);
   }
@@ -26,6 +34,14 @@
     }
   };
   
+  Header.prototype.setActivePuzzle = function(puzzle) {
+    this._nameLabel.text(puzzle.name);
+  };
+  
+  Header.prototype.setPuzzles = function(puzzles) {
+    this._puzzles.setPuzzles(puzzles);
+  };
+  
   Header.prototype._toggle = function() {  
     if (this._showingDropdown) {
       // Hide the dropdown.
@@ -38,19 +54,29 @@
   };
   
   function Puzzles() {
+    // Basic UI components.
     this._element = $('#puzzles');
+    this._contents = this._element.find('.contents');
+    
+    // State information.
     this._showing = false;
+    
+    // Event handler for clicking the backdrop to exit.
+    this.onExit = null;
     
     // Setup the shielding.
     this._shielding = $('<div />');
     this._shielding.css({
       position: 'fixed',
-      'z-index': this._element.css('z-index') - 1,
       width: '100%',
       height: '100%',
       display: 'none',
       'background-color': 'rgba(0, 0, 0, 0.5)'
     });
+    
+    // Insert the shielding div underneath the header. We don't use z-index
+    // because it kills animation performance on some browsers.
+    this._shielding.insertBefore($('#header'));
     
     // If they click on the background shield, the puzzles list closes.
     this._shielding.click(function() {
@@ -62,16 +88,13 @@
       }
       this.onExit();
     }.bind(this));
-    
-    $(document.body).append(this._shielding);
-    
-    this.onExit = null;
   }
   
   Puzzles.prototype.hide = function() {
-    // TODO: here, hide the scrollbar.
-    this._element.css({'overflow-x': 'hidden'});
+    // Hide the scrollbar if there was one.
+    this._contents.css({'overflow-x': 'hidden'});
     
+    // Slide away the puzzles dropdown and fade out the shield.
     this._element.stop(true, false);
     this._shielding.stop(true, false);
     this._shielding.fadeOut();
@@ -83,7 +106,46 @@
     this._showing = false;
   };
   
-  Puzzles.prototype.layout = function() {
+  Puzzles.prototype.setPuzzles = function(puzzles) {
+    // Generate the div which will contain the puzzles.
+    var contents = $('<div />');
+    contents.css({
+      height: DROPDOWN_HEIGHT,
+      width: puzzles.length*(PUZZLE_WIDTH+SPACING) + SPACING
+    });
+    
+    var x = SPACING;
+    for (var i = 0, len = puzzles.length; i < len; ++i) {
+      var puzzle = puzzles[i];
+      var element = $('<div class="puzzle" />');
+      var iconFrame = $('<div />', {class: 'img-frame theme-background'});
+      var icon = $('<img />', {
+        src: 'images/puzzles/' + puzzle.icon + '.png'
+      });
+      var label = $('<label />');
+      label.text(puzzle.name);
+      iconFrame.append(icon);
+      element.append(iconFrame);
+      element.append(label);
+      contents.append(element);
+      
+      // Hookup the switch event.
+      element.click(function(id) {
+        if (!this._showing) {
+          return;
+        }
+        
+        // Switch to the puzzle and close the dropdown.
+        window.app.switchToPuzzle(id);
+        if ('function' !== typeof this.onExit) {
+          throw new Error('invalid onExit handler');
+        }
+        this.onExit();
+      }.bind(this, puzzle.id));
+    }
+    
+    this._contents.empty();
+    this._contents.append(contents);
   };
   
   Puzzles.prototype.show = function() {
@@ -91,7 +153,7 @@
     this._shielding.stop(true, false);
     this._element.slideDown({
       complete: function() {
-        this._element.css({'overflow-x': 'scroll'});
+        this._contents.css({'overflow-x': 'scroll'});
         this._resizeForScrollbar();
       }.bind(this)
     });
@@ -104,7 +166,11 @@
   };
   
   Puzzles.prototype._resizeForScrollbar = function() {
-    // TODO: here, increase/decrease the size of the puzzles dropdown.
+    // Make the height of the contents DROPDOWN_HEIGHT.
+    var clientHeight = this._contents[0].clientHeight ||
+      this._contents.height();
+    var difference = this._contents.height() - clientHeight;
+    this._element.height(DROPDOWN_HEIGHT + difference);
   };
   
   window.app.Header = Header;

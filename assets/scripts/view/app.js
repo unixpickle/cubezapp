@@ -39,6 +39,12 @@
     this._middle.blinkTime();
   };
   
+  AppView.prototype.setActivePuzzle = function(puzzle) {
+    this._header.setActivePuzzle(puzzle);
+  };
+  
+  // setTheaterMode enables or disables "theater" mode, in which everything is
+  // hidden but the time.
   AppView.prototype.setTheaterMode = function(on) {
     this._theaterMode = on;
     var oldState = new State(this._state);
@@ -78,6 +84,11 @@
     }
     
     this._animateStateChange(oldState);
+  };
+  
+  // setPuzzles sets the puzzles to show in the puzzles dropdown.
+  AppView.prototype.setPuzzles = function(puzzles) {
+    this._header.setPuzzles(puzzles);
   };
   
   // setScramble sets the scramble. If the scramble is null, the scramble will
