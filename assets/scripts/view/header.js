@@ -69,10 +69,13 @@
   }
   
   Puzzles.prototype.hide = function() {
+    // TODO: here, hide the scrollbar.
+    this._element.css({'overflow-x': 'hidden'});
+    
     this._element.stop(true, false);
     this._shielding.stop(true, false);
-    this._element.slideUp();
     this._shielding.fadeOut();
+    this._element.slideUp();
     
     // Re-enable keyboard events for other things.
     window.app.keyboard.pop();
@@ -86,13 +89,22 @@
   Puzzles.prototype.show = function() {
     this._element.stop(true, false);
     this._shielding.stop(true, false);
-    this._element.slideDown();
+    this._element.slideDown({
+      complete: function() {
+        this._element.css({'overflow-x': 'scroll'});
+        this._resizeForScrollbar();
+      }.bind(this)
+    });
     this._shielding.fadeIn();
     
     // Disable keyboard events from other things.
     window.app.keyboard.push({});
     
     this._showing = true;
+  };
+  
+  Puzzles.prototype._resizeForScrollbar = function() {
+    // TODO: here, increase/decrease the size of the puzzles dropdown.
   };
   
   window.app.Header = Header;
