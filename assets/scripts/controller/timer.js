@@ -56,6 +56,9 @@
     this.onStart = null;
     
     window.app.keyboard.push(this);
+    
+    // Catch external actions and make sure they cancel the timer.
+    $('#header, #footer, #puzzles').click(this._externalAction.bind(this));
   }
   
   Timer.MODE_DISABLED = MODE_DISABLED;
@@ -127,6 +130,13 @@
     if (this._session === null && !this._stackmatRunning) {
       this._updateInputMethod();
     }
+  }
+  
+  // _externalAction should be called whenever the user clicks or does anything
+  // on the site. This way, the timer is cancelled if they do something.
+  Timer.prototype._externalAction = function() {
+    this._sessionCancel();
+    this._stackmatCancel();
   }
   
   // _sessionCancel is called to cancel the current session.

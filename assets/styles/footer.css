@@ -13,6 +13,8 @@
   background-color: #f0f0f0;
   overflow-x: hidden;
   overflow-y: hidden;
+  
+  z-index: 3;
 }
 
 #footer .top {

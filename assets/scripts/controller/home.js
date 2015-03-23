@@ -18,7 +18,7 @@
       }
       window.app.view.setScramble(scrambles[scrambleIdx]);
     });
-    $('#header .top').append(button);
+    $('#footer .bottom .settings-contents').append(button);
     
     // Create temporary button that toggles memo time.
     var hasMemo = false;
@@ -31,7 +31,7 @@
       }
       hasMemo = !hasMemo;
     });
-    $('#header .top').append(button);
+    $('#footer .bottom .settings-contents').append(button);
     
     // Create temporary button that toggles PB text.
     var hasPB = false;
@@ -44,12 +44,12 @@
       }
       hasPB = !hasPB;
     });
-    $('#header .top').append(button);
+    $('#footer .bottom .settings-contents').append(button);
     
     var timer = new window.app.Timer();
     timer.onCancel = function() {
       window.app.view.setMemo(null);
-      window.app.view.setTime('Last time');
+      window.app.view.setTime('23.25');
       window.app.view.setTheaterMode(false);
     };
     timer.onDone = function(record) {

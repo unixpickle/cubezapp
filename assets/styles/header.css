@@ -1,5 +1,9 @@
+#header, #puzzles {
+  z-index: 5;
+}
+
 #header {
-  /* Header should only be displayed once code loads it. */
+  /* The header should only be displayed once code loads it. */
   display: none;
   
   position: fixed;
@@ -14,39 +18,24 @@
   overflow-y: hidden;
 }
 
-#header .top {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-#header .top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 44px;
-  width: 100%;
-}
-
-#header .top .scramble {
-  position: absolute;
-  display: inline-block;
-  left: 0;
-  top: 0;
-  width: 100%;
+#header .name {
+  /* TODO: style this */
   height: 44px;
   line-height: 44px;
-  text-align: center;
+  font-size: 25px;
+  margin-left: 10px;
+  cursor: pointer;
 }
 
-#header .dropdown {
-  position: absolute;
+#puzzles {
+  /* This is shown by the code */
+  display: none;
+  
+  position: fixed;
   top: 44px;
   left: 0;
-  /* The height of the dropdown depends on whether there's a scrollbar. */
   width: 100%;
-  display: none;
+  
+  background-color: #f0f0f0;
+  height: 200px;
 }
