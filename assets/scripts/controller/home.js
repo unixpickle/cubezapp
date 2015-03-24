@@ -16,6 +16,11 @@
     this._configureTimer();
   }
   
+  // deletePuzzle verifies with the user that a puzzle should be deleted, then
+  // deletes it.
+  Home.prototype.deletePuzzle = function(puzzle) {
+  };
+  
   // switchPuzzle requests that the store switch puzzles. Once the store has
   // switched, this updates the UI to reflect the change.
   Home.prototype.switchPuzzle = function(puzzle) {

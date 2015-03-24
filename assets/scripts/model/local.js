@@ -162,7 +162,7 @@
       ['2x2x2', 'State', 0], ['3x3x3', 'Moves', 25]
     ];
     var icons = ['3x3x3', '4x4x4', '5x5x5', '2x2x2', 'OH'];
-    for (var i = cubes.length-1, len = cubes.length; i < len; ++i) {
+    for (var i = cubes.length-1; i >= 0; --i) {
       // Size and name.
       var name = cubes[i];
       var scrambler = scramblers[i];
@@ -219,7 +219,12 @@
       active: active
     };
     
-    localStorage.localStoreData = JSON.stringify(newData);
+    // If they are in some kind of private browsing mode, this may fail.
+    try {
+      localStorage.localStoreData = JSON.stringify(newData);
+    } catch (e) {
+    }
+    
     this._puzzles = puzzles;
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       if (puzzles[i].id === active) {
@@ -234,7 +239,11 @@
       puzzles: this._puzzles,
       active: this._active.id
     };
-    localStorage.localStoreData = JSON.stringify(data);
+    // If they are in some kind of private browsing mode, this may fail.
+    try {
+      localStorage.localStoreData = JSON.stringify(data);
+    } catch (e) {
+    }
   };
   
   window.app.LocalStore = LocalStore;

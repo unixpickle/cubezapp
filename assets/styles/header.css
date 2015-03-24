@@ -15,7 +15,6 @@
 }
 
 #header .name {
-  /* TODO: style this */
   float: left;
   height: 44px;
   line-height: 44px;
@@ -30,37 +29,17 @@
   overflow: hidden;
   height: 44px;
   width: 90px;
+  
+  display: none;
 }
 
 #header .puzzle-actions button {
   width: 26px;
   height: 26px;
-  color: transparent;
-  
-  background-color: #d5d5d5;
-  background-size: 60% 60%;
-  background-position: center;
-  background-repeat: no-repeat;
-  
-  border: none;
-  cursor: pointer;
+  border-radius: 13px;
   
   position: absolute;
   top: 9px;
-  
-  border-radius: 15px;
-  
-  transition: background-color 0.25s ease;
-  -webkit-transition: background-color 0.25s ease;
-  -moz-transition: background-color 0.25s ease;
-}
-
-#header .puzzle-actions button:hover {
-  background-color: #aaaaaa;
-}
-
-#header .puzzle-actions button:focus {
-  outline: 0;
 }
 
 #header .puzzle-actions .add {
@@ -140,9 +119,28 @@
   left: calc(50% - 80px);
   width: 160px;
   height: 160px;
-  border: none;
   border-radius: 80px;
   margin-top: 20px;
+  background-image: url('../images/big_plus.png');
+}
+
+#puzzles .delete {
+  position: absolute;
+  top: 5px;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  border: none;
+  
+  background-color: white;
+  color: transparent;
+  cursor: pointer;
+  
+  box-shadow: -2px 2px 2px rgba(119, 119, 119, 0.3);
+}
+
+.header-button {
+  border: none;
   
   color: transparent;
   cursor: pointer;
@@ -151,17 +149,18 @@
   background-size: 60% 60%;
   background-position: center;
   background-repeat: no-repeat;
-  background-image: url('../images/big_plus.png');
   
   transition: background-color 0.25s ease;
   -webkit-transition: background-color 0.25s ease;
   -moz-transition: background-color 0.25s ease;
+  -ms-transition: background-color 0.25s ease;
 }
 
-#puzzles .big-add:hover {
+.header-button:hover {
   background-color: #aaaaaa;
 }
 
-#puzzles .big-add:focus {
+.header-button:focus {
   outline: 0;
 }
+
