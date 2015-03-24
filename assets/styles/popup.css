@@ -1,0 +1,28 @@
+.popup-hidden {
+  opacity: 0;
+  transform: translateY(-50px);
+  -webkit-transform: translateY(-50px);
+}
+
+.popup {
+  display: block;
+  position: absolute;
+  
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  -webkit-transition: opacity 0.3s ease, -webkit-transform 0.3s ease;
+  transition-delay: 0.1s;
+  -webkit-transition-delay: 0.1s;
+}
+
+.popup-shielding {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  
+  transition: opacity 0.3s ease;
+  -webkit-transition: opacity 0.3s ease;
+}

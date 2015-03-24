@@ -102,7 +102,7 @@
       width: '100%',
       height: '100%',
       display: 'none',
-      'background-color': 'rgba(0, 0, 0, 0.5)'
+      backgroundColor: 'rgba(0, 0, 0, 0.5)'
     });
     
     // Insert the shielding div underneath the header. We don't use z-index
