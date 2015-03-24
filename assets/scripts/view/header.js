@@ -7,6 +7,7 @@
   function Header() {
     // Setup the UI elements.
     this._element = $('#header');
+    this._elementStyler = new window.app.Styler(this._element[0]);
     this._nameLabel = this._element.find('.name');
     this._puzzles = new Puzzles();
     
@@ -24,9 +25,9 @@
   
   Header.prototype.layout = function(attrs) {
     if (attrs.headerOpacity === 0) {
-      this._element.css({display: 'none'});
+      this._elementStyler.css({display: 'none'});
     } else {
-      this._element.css({
+      this._elementStyler.css({
         display: 'block',
         opacity: attrs.headerOpacity,
         top: attrs.headerOffset

@@ -6,6 +6,7 @@
   function Footer() {
     // Get/create views and set them as instance variables.
     this._element = $('#footer');
+    this._elementStyler = new window.app.Styler(this._element[0]);
     this._top = new FooterTop();
     this._bottom = this._element.find('.bottom');
     this.graph = new window.app.Graph();
@@ -18,6 +19,11 @@
     
     // This state is used to know the current page.
     this._currentPage = 0;
+    
+    // This state is used to figure out which subviews to re-layout on a layout
+    // event.
+    this._lastWidth = -1;
+    this._lastHeight = -1;
     
     // Setup events which are triggered by the top bar.
     this._setupResizing();
@@ -34,20 +40,13 @@
   };
   
   Footer.prototype.layout = function(attrs) {
-    if (attrs.opacity === 0) {
-      this._element.css({display: 'none'});
+    if (attrs.footerOpacity === 0) {
+      this._elementStyler.css({display: 'none'});
       return;
     }
     
-    // If the browser width was changed, we may need to re-position the bottom
-    // content.
-    if (this._current === 1) {
-      this._bottom.stop(true, false);
-      this._bottom.css({left: -$(window).width()});
-    }
-    
     // Use the attributes to layout the footer.
-    this._element.css({
+    this._elementStyler.css({
       display: 'block',
       opacity: attrs.footerOpacity,
       height: attrs.footerHeight,
@@ -56,11 +55,27 @@
     });
     this._top.setClosedness(attrs.footerClosedness);
     
-    // Layout all the sub-views.
-    this._top.layout();
-    this.graph.layout();
-    this.timesList.layout();
-    this.stats.layout();
+    // Layout all the sub-views if necessary.
+    if (this._lastWidth !== window.app.windowSize.width) {
+      this._top.layout();
+      
+      // If the browser width was changed, we may need to re-position the bottom
+      // content.
+      if (this._current === 1) {
+        this._bottom.stop(true, false);
+        this._bottom.css({left: -window.app.windowSize.width});
+      }
+    }
+    if (this._lastWidth !== window.app.windowSize.width ||
+        this._lastHeight !== attrs.footerHeight) {
+      this.graph.layout();
+      this.timesList.layout();
+      this.stats.layout();
+      
+      // Update the cached width/height.
+      this._lastWidth = window.app.windowSize.width;
+      this._lastHeight = attrs.footerHeight;
+    }
   };
   
   Footer.prototype._setupResizing = function() {
@@ -73,7 +88,7 @@
       mouseIsDown = true;
       var offset = e.clientY || e.pageY;
       var height = this._element.height();
-      dragOffset = height - ($(window).innerHeight() - offset);
+      dragOffset = height - (window.app.windowSize.height - offset);
       
       // This is necessary to prevent selecting the rest of the page if they try
       // to make the footer too big.
@@ -96,7 +111,8 @@
       
       // Compute the height based on their mouse.
       var offset = e.clientY || e.pageY;
-      var height = Math.round($(window).innerHeight() - offset + dragOffset);
+      var height = Math.round(window.app.windowSize.height - offset +
+        dragOffset);
       this.onResize(height);
       
       // This is necessary to prevent selecting the rest of the page if they try
@@ -113,7 +129,7 @@
     if (page === 0) {
       this._bottom.animate({left: 0});
     } else {
-      this._bottom.animate({left: -$(window).width()});
+      this._bottom.animate({left: -window.app.windowSize.width});
     }
   };
   

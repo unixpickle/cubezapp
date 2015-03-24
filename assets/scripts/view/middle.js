@@ -9,9 +9,13 @@
   
   function Middle() {
     this._element = $('#middle');
+    this._elementStyler = new window.app.Styler(this._element[0]);
     this._memoTime = this._element.find('.memo-time');
+    this._memoTimeStyler = new window.app.Styler(this._memoTime[0]);
     this._pbStatus = this._element.find('.pb-status');
+    this._pbStatusStyler = new window.app.Styler(this._pbStatus[0]);
     this._scramble = this._element.find('.scramble');
+    this._scrambleStyler = new window.app.Styler(this._scramble[0]);
     this._time = new window.app.Time();
   }
   
@@ -118,34 +122,34 @@
   // layout updates attributes of various elements in the middle to reflect a
   // set of supplied animator attributes.
   Middle.prototype.layout = function(attrs) {
-    this._element.css({height: attrs.middleHeight, top: attrs.middleY});
+    this._elementStyler.css({height: attrs.middleHeight, top: attrs.middleY});
     
     // Memo time.
     if (attrs.memoOpacity === 0) {
-      this._memoTime.css({display: 'none'});
+      this._memoTimeStyler.css({display: 'none'});
     } else {
-      this._memoTime.css({opacity: attrs.memoOpacity, display: 'block'});
+      this._memoTimeStyler.css({opacity: attrs.memoOpacity, display: 'block'});
     }
     
     // PB label.
     if (attrs.pbOpacity === 0) {
-      this._pbStatus.css({display: 'none'});
+      this._pbStatusStyler.css({display: 'none'});
     } else {
       var size = attrs.timeSize * PB_SIZE_RATIO;
-      this._pbStatus.css({
+      this._pbStatusStyler.css({
         opacity: attrs.pbOpacity,
         display: 'block',
-        'font-size': size*0.6,
-        'line-height': size + 'px',
+        fontSize: size * 0.6,
+        lineHeight: size,
       });
     }
     
     // Show/hide the scramble without setting display=none. Otherwise, it would
     // not be possible to measure the scramble while it's invisible.
     if (attrs.scrambleOpacity === 0) {
-      this._scramble.css({visibility: 'hidden'});
+      this._scrambleStyler.css({visibility: 'hidden'});
     } else {
-      this._scramble.css({
+      this._scrambleStyler.css({
         opacity: attrs.scrambleOpacity,
         visibility: 'visible'
       });
@@ -156,13 +160,13 @@
     
     // Memo label.
     if (attrs.memoOpacity === 0) {
-      this._memoTime.css({display: 'none'});
+      this._memoTimeStyler.css({display: 'none'});
     } else {
-      this._memoTime.css({
+      this._memoTimeStyler.css({
         top: attrs.timeY + attrs.timeSize,
-        'font-size': attrs.timeSize * MEMO_SIZE_RATIO,
+        fontSize: attrs.timeSize * MEMO_SIZE_RATIO,
         height: attrs.timeSize * MEMO_SIZE_RATIO,
-        'line-height': (attrs.timeSize*MEMO_SIZE_RATIO) + 'px',
+        lineHeight: attrs.timeSize * MEMO_SIZE_RATIO,
         opacity: attrs.memoOpacity
       });
     }

@@ -7,6 +7,7 @@
   window.app.switchToPuzzle = switchPuzzle;
   
   $(function() {
+    window.app.windowSize = new window.app.WindowSize();
     window.app.store = new window.app.LocalStore();
     window.app.view = new window.app.AppView();
     

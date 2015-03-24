@@ -3,8 +3,11 @@
   function Time() {
     // View components.
     this._element = $('#middle .time');
+    this._elementStyler = new window.app.Styler(this._element[0]);
     this._label = this._element.find('label');
+    this._labelStyler = new window.app.Styler(this._label[0]);
     this._blinker = this._element.find('.blinker');
+    this._blinkerStyler = new window.app.Styler(this._blinker[0]);
     
     // This state is used to adjust the font size for different text values.
     this._text = this._label.text();
@@ -35,7 +38,7 @@
     this._requestedFontSize = attrs.timeSize;
     
     if (attrs.timeOpacity === 0) {
-      this._element.css({display: 'none'});
+      this._elementStyler.css({display: 'none'});
       return;
     }
     
@@ -45,24 +48,24 @@
     }
     
     // Layout main scene.
-    this._element.css({
+    this._elementStyler.css({
       display: 'block',
       opacity: attrs.timeOpacity,
       top: attrs.timeY,
       height: attrs.timeSize,
       transform: transform,
-      '-ms-transform': transform,
-      '-webkit-transform': transform
+      msTransform: transform,
+      webkitTransform: transform
     });
-    this._label.css({
+    this._labelStyler.css({
       height: attrs.timeSize,
-      'font-size': this._usableFontSize() + 'px',
-      'line-height': attrs.timeSize + 'px'
+      fontSize: this._usableFontSize() + 'px',
+      lineHeight: attrs.timeSize + 'px'
     });
     
     if (this._showingBlinker) {
       // Layout blinker.
-      this._blinker.css({
+      this._blinkerStyler.css({
         left: this._label.offset().left + this._label.outerWidth()
       });
     }
@@ -91,18 +94,18 @@
   Time.prototype.text = function(text) {
     this._text = text;
     this._label.text(text);
-    this._label.css({'font-size': this._usableFontSize() + 'px'});
+    this._labelStyler.css({'font-size': this._usableFontSize() + 'px'});
     this._setBlinkerVisible(this._showingBlinker);
   };
   
   Time.prototype._setBlinkerVisible = function(flag) {
     if (!flag) {
-      this._blinker.css({display: 'none'});
+      this._blinkerStyler.css({display: 'none'});
       return;
     }
     
     // Layout blinker.
-    this._blinker.css({
+    this._blinkerStyler.css({
       display: 'block',
       left: this._label.offset().left + this._label.outerWidth()
     });

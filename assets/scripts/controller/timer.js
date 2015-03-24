@@ -14,6 +14,9 @@
   var ACCURACY_SECONDS = 1;
   var ACCURACY_NONE = 2;
   
+  // This is the framerate that the timer will update at.
+  var TIME_INTERVAL = Math.ceil(1000/24);
+  
   // Timer is a controller which handles the timer flow.
   function Timer() {
     // this._accuracy is used to determine how to show the time mid-solve.
@@ -418,7 +421,8 @@
     if (this._timerInterval === null && this._result === null) {
       // Start the timer.
       this._startTime = new Date().getTime();
-      this._timerInterval = setInterval(this.timerTick.bind(this), 10);
+      this._timerInterval = setInterval(this.timerTick.bind(this),
+        TIME_INTERVAL);
       this.timerTick();
     } else if (this._result !== null) {
       // Callback with our result.
@@ -554,7 +558,8 @@
     } else {
       // Start inspection time.
       this._inspectionStart = new Date().getTime();
-      this._inspectionInterval = setInterval(this._interval.bind(this), 10);
+      this._inspectionInterval = setInterval(this._interval.bind(this),
+        TIME_INTERVAL);
     }
   };
   

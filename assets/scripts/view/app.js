@@ -24,7 +24,7 @@
     this._userFooterHeight = parseInt(localStorage.footerHeight || '300');
 
     // Setup event handlers.
-    $(window).resize(this._resized.bind(this));
+    window.app.windowSize.addListener(this._resized.bind(this));
     this._footer.onToggle = this._toggleFooter.bind(this);
     this._footer.onResize = this._resizeFooter.bind(this);
     this._animator.onAnimate = this._layout.bind(this);
@@ -164,13 +164,8 @@
   // current state and browser size.
   AppView.prototype._computeMiddleLayout = function() {
     // Figure out the size of everything on-screen for the current state.
-    var windowHeight = $(window).height();
-    var width = $(window).width();
-    if ('number' !== typeof width || 'number' !== typeof windowHeight ||
-        isNaN(width) || isNaN(windowHeight)) {
-      throw new Error('invalid window dimensions: ' + width + ', ' +
-        windowHeight);
-    }
+    var windowHeight = window.app.windowSize.height;
+    var width = window.app.windowSize.width;
     
     // Compute the size taken up by the footer.
     var footerHeight = this._state.footerHeight;
@@ -412,7 +407,7 @@
     
     // Using the constraints, figure out how big the footer can be if all is
     // shown.
-    var available = $(window).height() - this._header.height();
+    var available = window.app.windowSize.height - this._header.height();
     var footerSize = available - constraints.soft;
     
     // If the header size is large enough, everything is visible.
