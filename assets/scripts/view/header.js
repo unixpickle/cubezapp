@@ -1,8 +1,8 @@
 (function() {
   
   var DROPDOWN_HEIGHT = 200;
-  var PUZZLE_WIDTH = 200;
-  var SPACING = 20;
+  var PUZZLE_WIDTH = 180;
+  var SPACING = 18;
   
   function Header() {
     // Setup the UI elements.
@@ -118,14 +118,15 @@
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       var puzzle = puzzles[i];
       var element = $('<div class="puzzle" />');
-      var iconFrame = $('<div />', {class: 'img-frame theme-background'});
-      var icon = $('<img />', {
-        src: 'images/puzzles/' + puzzle.icon + '.png'
-      });
+      
       var label = $('<label />');
       label.text(puzzle.name);
-      iconFrame.append(icon);
-      element.append(iconFrame);
+      
+      var icon = $('<div />', {class: 'icon theme-background'});
+      icon.css({
+        'background-image': 'url(images/puzzles/' + puzzle.icon + '.png)'
+      });
+      element.append(icon);
       element.append(label);
       contents.append(element);
       

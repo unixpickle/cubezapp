@@ -44,32 +44,32 @@
 #puzzles .puzzle {
   position: relative;
   
-  top: 10px;
-  width: 200px;
-  height: 180px;
+  margin-left: 18px;
+  margin-top: 20px;
   
-  margin-left: 20px;
+  width: 180px;
+  height: 160px;
+  
   float: left;
 
   background-color: white;
   cursor: pointer;
+  
+  text-align: center;
 }
 
-#puzzles .puzzle .img-frame {
-  width: 190px;
-  height: 134px;
-  position: absolute;
-  top: 5px;
-  left: 5px;
-}
-
-#puzzles .puzzle img {
-  pointer-events: none;
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  left: 35px;
-  top: 7px;
+#puzzles .puzzle .icon {
+  display: inline-block;
+  
+  width: calc(100% - 12px);
+  height: 114px;
+  margin-top: 6px;
+  
+  background-size: 100px 100px;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  text-align: center;
 }
 
 #puzzles .puzzle label {
