@@ -190,7 +190,7 @@
     }
     if (closedness === 0) {
       this._contentShowing = true;
-      this._element.css({cursor: 'row-resize'});
+      this._element.css({cursor: 'ns-resize'});
     } else {
       this._contentShowing = false;
       this._element.css({cursor: 'pointer'});

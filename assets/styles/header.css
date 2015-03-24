@@ -33,8 +33,8 @@
 }
 
 #header .puzzle-actions button {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   color: transparent;
   
   background-color: #d5d5d5;
@@ -46,7 +46,7 @@
   cursor: pointer;
   
   position: absolute;
-  top: 6px;
+  top: 9px;
   
   border-radius: 15px;
   
@@ -65,12 +65,12 @@
 
 #header .puzzle-actions .add {
   background-image: url('../images/small_plus.png');
-  left: 10px;
+  left: 6px;
 }
 
 #header .puzzle-actions .remove {
   background-image: url('../images/small_minus.png');
-  left: 50px;
+  left: 36px;
 }
 
 #puzzles {
@@ -115,7 +115,7 @@
   height: 114px;
   margin-top: 6px;
   
-  background-size: 100px 100px;
+  background-size: 90% 90%;
   background-position: center;
   background-repeat: no-repeat;
   
