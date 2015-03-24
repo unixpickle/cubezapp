@@ -107,6 +107,14 @@
   };
   
   Puzzles.prototype.setPuzzles = function(puzzles) {
+    if (puzzles.length === 0) {
+      // Show the giant plus button.
+      this._contents.empty();
+      var button = $('<button class="big-add">Add</button>');
+      this._contents.append(button);
+      return;
+    }
+    
     // Generate the div which will contain the puzzles.
     var contents = $('<div />');
     contents.css({

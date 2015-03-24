@@ -16,11 +16,61 @@
 
 #header .name {
   /* TODO: style this */
+  float: left;
   height: 44px;
   line-height: 44px;
   font-size: 25px;
   margin-left: 10px;
   cursor: pointer;
+}
+
+#header .puzzle-actions {
+  position: relative;
+  float: left;
+  overflow: hidden;
+  height: 44px;
+  width: 90px;
+}
+
+#header .puzzle-actions button {
+  width: 30px;
+  height: 30px;
+  color: transparent;
+  
+  background-color: #d5d5d5;
+  background-size: 60% 60%;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  border: none;
+  cursor: pointer;
+  
+  position: absolute;
+  top: 6px;
+  
+  border-radius: 15px;
+  
+  transition: background-color 0.25s ease;
+  -webkit-transition: background-color 0.25s ease;
+  -moz-transition: background-color 0.25s ease;
+}
+
+#header .puzzle-actions button:hover {
+  background-color: #aaaaaa;
+}
+
+#header .puzzle-actions button:focus {
+  outline: 0;
+}
+
+#header .puzzle-actions .add {
+  background-image: url('../images/small_plus.png');
+  left: 10px;
+}
+
+#header .puzzle-actions .remove {
+  background-image: url('../images/small_minus.png');
+  left: 50px;
 }
 
 #puzzles {
@@ -83,4 +133,35 @@
   text-align: center;
   font-size: 20px;
   color: #7e8284;
+}
+
+#puzzles .big-add {
+  position: absolute;
+  left: calc(50% - 80px);
+  width: 160px;
+  height: 160px;
+  border: none;
+  border-radius: 80px;
+  margin-top: 20px;
+  
+  color: transparent;
+  cursor: pointer;
+  
+  background-color: #d5d5d5;
+  background-size: 60% 60%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('../images/big_plus.png');
+  
+  transition: background-color 0.25s ease;
+  -webkit-transition: background-color 0.25s ease;
+  -moz-transition: background-color 0.25s ease;
+}
+
+#puzzles .big-add:hover {
+  background-color: #aaaaaa;
+}
+
+#puzzles .big-add:focus {
+  outline: 0;
 }
