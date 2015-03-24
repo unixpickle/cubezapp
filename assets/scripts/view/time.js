@@ -2,7 +2,7 @@
   
   function Time() {
     // View components.
-    this._element = $('#middle .time');
+    this._element = $('#time');
     this._elementStyler = new window.app.Styler(this._element[0]);
     this._label = this._element.find('label');
     this._labelStyler = new window.app.Styler(this._label[0]);
@@ -51,7 +51,7 @@
     this._elementStyler.css({
       display: 'block',
       opacity: attrs.timeOpacity,
-      top: attrs.timeY,
+      top: attrs.timeY + attrs.middleY,
       height: attrs.timeSize,
       transform: transform,
       msTransform: transform,

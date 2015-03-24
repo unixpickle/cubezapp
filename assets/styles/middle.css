@@ -5,25 +5,29 @@
   text-align: center;
 }
 
-#middle .scramble {
+#scramble-container {
+  position: fixed;
+  left: 0;
+  top: 54px;
+  width: 100%;
+  text-align: center;
+}
+
+#scramble {
   /* Invisible until code loads it. */
   visibility: hidden;
   
   display: inline-block;
   max-width: calc(100% - 100px);
-  margin-top: 10px;
   padding: 5px 10px 5px 10px;
   
   color: white;
-  
   font-size: 20px;
-  background-color: transparent;
   border-radius: 10px;
-  
   border: 3px solid white;
 }
 
-#middle .time {
+#time {
   /* Invisible until code loads it. */
   display: none;
   
@@ -40,11 +44,11 @@
   padding: 0;
 }
 
-#middle .time label {
+#time label {
   display: inline-block;
 }
 
-#middle .time .blinker {
+#time .blinker {
   /* Invisible until code shows it. */
   display: none;
   
@@ -56,7 +60,7 @@
   background-color: white;
 }
 
-#middle .memo-time {
+#memo-time {
   /* Invisible until code loads it. */
   display: none;
   
@@ -67,14 +71,14 @@
   color: white;
 }
 
-#middle .pb-status {
+#pb-status {
   /* Invisible until code loads it. */
   display: none;
   
-  position: absolute;
+  position: fixed;
+  left: 0;
   width: 100%;
   text-align: center;
-  bottom: 0;
   
   color: white;
 }

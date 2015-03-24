@@ -8,13 +8,11 @@
   var SCRAMBLE_PADDING = 10;
   
   function Middle() {
-    this._element = $('#middle');
-    this._elementStyler = new window.app.Styler(this._element[0]);
-    this._memoTime = this._element.find('.memo-time');
+    this._memoTime = $('#memo-time');
     this._memoTimeStyler = new window.app.Styler(this._memoTime[0]);
-    this._pbStatus = this._element.find('.pb-status');
+    this._pbStatus = $('#pb-status');
     this._pbStatusStyler = new window.app.Styler(this._pbStatus[0]);
-    this._scramble = this._element.find('.scramble');
+    this._scramble = $('#scramble');
     this._scrambleStyler = new window.app.Styler(this._scramble[0]);
     this._time = new window.app.Time();
   }
@@ -121,14 +119,19 @@
 
   // layout updates attributes of various elements in the middle to reflect a
   // set of supplied animator attributes.
-  Middle.prototype.layout = function(attrs) {
-    this._elementStyler.css({height: attrs.middleHeight, top: attrs.middleY});
-    
-    // Memo time.
+  Middle.prototype.layout = function(attrs) {    
+    // Memo label.
     if (attrs.memoOpacity === 0) {
       this._memoTimeStyler.css({display: 'none'});
     } else {
-      this._memoTimeStyler.css({opacity: attrs.memoOpacity, display: 'block'});
+      this._memoTimeStyler.css({
+        display: 'block',
+        top: attrs.timeY + attrs.timeSize + attrs.middleY,
+        fontSize: attrs.timeSize * MEMO_SIZE_RATIO,
+        height: attrs.timeSize * MEMO_SIZE_RATIO,
+        lineHeight: attrs.timeSize * MEMO_SIZE_RATIO,
+        opacity: attrs.memoOpacity
+      });
     }
     
     // PB label.
@@ -141,6 +144,8 @@
         display: 'block',
         fontSize: size * 0.6,
         lineHeight: size,
+        bottom: window.app.windowSize.height -
+          (attrs.middleHeight+attrs.middleY)
       });
     }
     
@@ -157,19 +162,6 @@
     
     // Time label.
     this._time.layout(attrs);
-    
-    // Memo label.
-    if (attrs.memoOpacity === 0) {
-      this._memoTimeStyler.css({display: 'none'});
-    } else {
-      this._memoTimeStyler.css({
-        top: attrs.timeY + attrs.timeSize,
-        fontSize: attrs.timeSize * MEMO_SIZE_RATIO,
-        height: attrs.timeSize * MEMO_SIZE_RATIO,
-        lineHeight: attrs.timeSize * MEMO_SIZE_RATIO,
-        opacity: attrs.memoOpacity
-      });
-    }
   };
   
   // scrambleHeight returns the outer height of the scramble.
