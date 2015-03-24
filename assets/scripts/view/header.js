@@ -146,7 +146,7 @@
         }
         
         // Switch to the puzzle and close the dropdown.
-        window.app.switchToPuzzle(id);
+        window.app.home.switchPuzzle(id);
         if ('function' !== typeof this.onExit) {
           throw new Error('invalid onExit handler');
         }

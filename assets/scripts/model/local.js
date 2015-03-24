@@ -117,15 +117,17 @@
   };
   
   LocalStore.prototype.switchPuzzle = function(id, cb) {
-    for (var i = 0, len = this._puzzles; i < len; ++i) {
+    for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       var puzzle = this._puzzles[i];
       if (puzzle.id === id) {
         this._active = puzzle;
+        this._puzzles.splice(i, 1);
+        this._puzzles.unshift(this._active);
         this._save();
-        return;
+        return new window.app.DataTicket(cb, null);
       }
     }
-    throw new Error('puzzle not found: ' + id);
+    return new window.app.ErrorTicket(cb, Error('puzzle not found: ' + id));
   };
   
   LocalStore.prototype._dataChanged = function() {

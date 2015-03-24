@@ -3,7 +3,7 @@
   // A Ticket is an object representing a cancellable async request. Tickets are
   // essential to the entire model.
   function Ticket(callback) {
-    this._callback = null;
+    this._callback = callback || function(){};
     this._cancelled = false;
     this._done = false;
   }
@@ -50,6 +50,8 @@
     }.bind(this), 10);
   }
   
+  DataTicket.prototype = Object.create(Ticket.prototype);
+  
   // An ErrorTicket reports a pre-defined error after a short timeout.
   // This is good for emulating asynchronous behavior for synchronous
   // operations.
@@ -59,6 +61,8 @@
       this.fail(error);
     }.bind(this), 10);
   }
+  
+  ErrorTicket.prototype = Object.create(Ticket.prototype);
   
   window.app.Ticket = Ticket;
   window.app.DataTicket = DataTicket;
