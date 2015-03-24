@@ -150,6 +150,9 @@
     this.onSwitch = null;
     this.onToggle = null;
     
+    // We cache the closedness so we don't repaint every layout().
+    this._lastClosedness = -1;
+    
     // Tab change events.
     this._stats.click(function() {
       this._switchTab(this._stats);
@@ -199,6 +202,11 @@
   };
   
   FooterTop.prototype.setClosedness = function(closedness) {
+    if (closedness === this._lastClosedness) {
+      return;
+    }
+    this._lastClosedness = closedness;
+    
     if (closedness === 1) {
       this._content.css({display: 'none'});
     } else {
