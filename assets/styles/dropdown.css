@@ -1,7 +1,5 @@
 .dropdown {
   display: inline-block;
-  margin-top: 10px;
-  margin-left: 10px;
 }
 
 .dropdown-contents {
@@ -88,7 +86,7 @@
   color: #777;
   
   background-color: white;
-  border-bottom: 1px solid #d5d5d5;
+  border-bottom: 1px solid #f0f0f0;
   
   cursor: pointer;
 }

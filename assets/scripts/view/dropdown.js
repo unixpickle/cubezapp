@@ -44,6 +44,8 @@
     this._contents.click(this._show.bind(this));
   }
   
+  Dropdown.HEIGHT = DROPDOWN_HEIGHT;
+  
   // element gets the element to display on the page.
   Dropdown.prototype.element = function() {
     return this._element;
