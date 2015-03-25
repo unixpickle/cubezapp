@@ -2,25 +2,22 @@
 // rest of the page. Popups can be layered on top of one another.
 (function() {
   
+  var HEADER_HEIGHT = 50;
+  
   // A Popup presents a given element to the user.
-  function Popup(element) {
-    // This is necessary to ensure that the element is styled correctly.
-    element.addClass('popup popup-hidden');
-    
+  function Popup(element, width, height) {
     // This state makes sure the popup isn't shown or closed more than once.
     this._shown = false;
     this._closed = false;
     
-    // Generate UI components.
+    // Save the constructor arguments
     this._element = element;
+    this._width = width;
+    this._height = height;
     
-    // Relative coordinates of the windows.
+    // Relative coordinates of the center of the popup.
     this._x = 0.5;
-    this._y = 0.4;
-    
-    // Cache the size to avoid potential reflows.
-    this._width = element.width();
-    this._height = element.height();
+    this._y = 0.45;
     
     // Generating the shielding element.
     this._shielding = $('<div />', {class: 'popup-shielding'});
@@ -29,6 +26,12 @@
         this.close();
       }
     }.bind(this));
+    
+    // This is necessary to ensure that the element is styled correctly.
+    element.addClass('popup popup-hidden');
+    
+    // Setup user dragging to move the popup.
+    this._setupDragging();
     
     // Setup layout management.
     this._layoutHandler = this._layout.bind(this);
@@ -45,15 +48,15 @@
     }
     this._closed = true;
     
-    this._shielding.css({opacity: 0});
+    this._shielding.css({opacity: 0, pointerEvents: 'none'});
     this._element.addClass('popup-hidden');
     
     // Remove the elements and destroy the popup after a timeout.
     setTimeout(function() {
       this._shielding.remove();
-      this._container.remove();
+      this._element.remove();
       window.app.windowSize.removeListener(this._layoutHandler);
-    }.bind(this), 500);
+    }.bind(this), 400);
   };
   
   // show presents the popup to the user. This may only be called once.
@@ -98,6 +101,48 @@
     this._element.css({
       left: x,
       top: y
+    });
+  };
+  
+  // _setupDragging adds event listeners to allow the user to drag the popup.
+  Popup.prototype._setupDragging = function() {
+    // The user may click on the element itself or on the .title if there is
+    // one.
+    var downPos = null;
+    var initialOffset = null;
+    this._element.mousedown(function(e) {
+      var offset = this._element.offset();
+      if (e.pageY - offset.top > HEADER_HEIGHT) {
+        return;
+      }
+      downPos = [e.pageX, e.pageY];
+      initialOffset = offset;
+    }.bind(this));
+    this._element.find('.title').mousedown(function(e) {
+      downPos = [e.pageX, e.pageY];
+      initialOffset = this._element.offset();
+    }.bind(this));
+    
+    // Once the mouse is down, the user can drag anywhere in the document.
+    $(document).mousemove(function(e) {
+      if (downPos === null) {
+        return;
+      }
+      var newX = e.pageX - downPos[0] + initialOffset.left;
+      var newY = e.pageY - downPos[1] + initialOffset.top;
+      var x = (newX+this._width/2) / window.app.windowSize.width;
+      var y = (newY+this._height/2) / window.app.windowSize.height;
+      this._x = Math.max(Math.min(x, 1), 0);
+      this._y = Math.max(Math.min(y, 1), 0);
+      this._layout();
+    }.bind(this));
+    
+    // When they lift the mouse or leave the page, the dragging stops.
+    $(document).mouseup(function() {
+      downPos = null;
+    });
+    $(document).mouseleave(function() {
+      downPos = null;
     });
   };
   

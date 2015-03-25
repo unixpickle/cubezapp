@@ -1,5 +1,5 @@
-#header .name, #footer .top, #pentagons, #header, #puzzles,
-#middle .time, #middle .memo-time, #middle .pb-status {
+#header .name, #footer .top, #pentagons, #header, #puzzles, #middle .time,
+#middle .memo-time, #middle .pb-status, .popup .title, .add-popup .puzzle {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;

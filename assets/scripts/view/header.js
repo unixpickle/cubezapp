@@ -54,10 +54,9 @@
   };
   
   Header.prototype._add = function() {
-    if (!this._puzzles.showing()) {
-      return;
+    if (this._puzzles.showing()) {
+      showAddPopup();
     }
-    window.alert('TODO: add dialog here.');
   };
   
   Header.prototype._toggle = function() {  
@@ -167,6 +166,7 @@
       this._empty = true;
       this._contents.empty();
       var button = $('<button class="header-button big-add">Add</button>');
+      button.click(this._add.bind(this));
       this._contents.append(button);
       return;
     }
@@ -255,6 +255,12 @@
     return this._showing;
   };
   
+  Puzzles.prototype._add = function() {
+    if (this.showing()) {
+      showAddPopup();
+    }
+  };
+  
   Puzzles.prototype._resizeForScrollbar = function() {
     // Make the height of the contents DROPDOWN_HEIGHT.
     var clientHeight = this._contents[0].clientHeight ||
@@ -262,6 +268,10 @@
     var difference = this._contents.height() - clientHeight;
     this._element.height(DROPDOWN_HEIGHT + difference);
   };
+  
+  function showAddPopup() {
+    new window.app.AddPopup().show();
+  }
   
   window.app.Header = Header;
   
