@@ -27,12 +27,15 @@
   // deletePuzzle verifies with the user that a puzzle should be deleted, then
   // deletes it.
   Home.prototype.deletePuzzle = function(puzzle) {
+    new window.app.DeletePopup(puzzle.name, function() {
+      // TODO: this.
+    }.bind(this)).show();
   };
   
   // switchPuzzle requests that the store switch puzzles. Once the store has
   // switched, this updates the UI to reflect the change.
   Home.prototype.switchPuzzle = function(puzzle) {
-    window.app.store.switchPuzzle(puzzle, function(error) {
+    window.app.store.switchPuzzle(puzzle.id, function(error) {
       if (error !== null) {
         return;
       }

@@ -7,6 +7,7 @@
 .popup {
   display: block;
   position: absolute;
+  background-color: #f0f0f0;
   
   /* Fix a sometimes buggy animation. */
   -webkit-backface-visibility: hidden;
@@ -83,7 +84,7 @@
   height: 60px;
 }
 
-.popup .bottom .done {
+.popup .bottom button.done {
   float: right;
   width: 130px;
   height: 35px;
@@ -94,4 +95,20 @@
   color: white;
   font-size: 20px;
   cursor: pointer;
+}
+
+.popup .bottom button.other {
+  float: right;
+  width: 130px;
+  height: 35px;
+  border: none;
+  
+  margin-top: 12px;
+  margin-right: 10px;
+  
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  
+  background-color: #aaa;
 }

@@ -36,6 +36,9 @@
     // Setup user dragging to move the popup.
     this._setupDragging();
     
+    // Setup close button.
+    element.find('.title > button').one('click', this.close.bind(this));
+    
     // Setup layout management.
     this._layoutHandler = this._layout.bind(this);
     window.app.windowSize.addListener(this._layoutHandler);

@@ -212,27 +212,27 @@
         left: x + PUZZLE_WIDTH - 15,
         display: (this.isDeleting() ? 'block' : 'none')
       });
-      deleteButton.click(function(id) {
+      deleteButton.click(function(puzzle) {
         if (this._showing) {
           this.setDeleting(false);
-          window.app.home.deletePuzzle(id);
+          window.app.home.deletePuzzle(puzzle);
         }
-      }.bind(this, puzzle.id));
+      }.bind(this, puzzle));
       contents.append(deleteButton);
       deleteButtons.push(deleteButton[0]);
       
       // Clicking to the puzzle switches to it.
-      element.click(function(id) {
+      element.click(function(puzzle) {
         // If the dropdown was fading out when the user clicked the puzzle, do
         // nothing.
         if (this._showing) {
-          window.app.home.switchPuzzle(id);
+          window.app.home.switchPuzzle(puzzle);
           if ('function' !== typeof this.onExit) {
             throw new Error('invalid onExit handler');
           }
           this.onExit();
         }
-      }.bind(this, puzzle.id));
+      }.bind(this, puzzle));
       
       // Update the x coordinate for the next puzzle.
       x += SPACING + PUZZLE_WIDTH;

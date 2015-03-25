@@ -38,6 +38,9 @@
     // the subscramble dropdown.
     this._showingSubscramble = false;
     
+    // Create this so our hidden class is complete before we start doing stuff.
+    this._popup = null;
+    
     // Create hidden class with fields.
     this._bldField = null;
     this._iconField = null;
@@ -59,16 +62,13 @@
     // Layout the fields.
     this._initialLayout();
     
+    // Create the actual popup.
     this._popup = new window.app.Popup(this._element, POPUP_WIDTH,
       POPUP_HEIGHT);
     
-    // Setup close button.
-    var closeButton = this._element.find('.title button');
-    closeButton.click(this._popup.close.bind(this._popup));
-    
     // Setup done button.
     var doneButton = this._element.find('.done');
-    doneButton.click(this._done.bind(this));
+    doneButton.one('click', this._done.bind(this));
   }
   
   AddPopup.prototype.show = function() {
