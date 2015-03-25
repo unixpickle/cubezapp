@@ -23,7 +23,7 @@
     
     // TODO: generate fields (which have strange properties) here.
     
-    this._popup = new window.app.Popup(element, 500, 320);
+    this._popup = new window.app.Popup(element, 500, 350);
     
     var closeButton = element.find('.title button');
     closeButton.click(this._popup.close.bind(this._popup));
