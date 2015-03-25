@@ -587,7 +587,7 @@
     // If the device has a touchscreen, track touch events on the middle
     // element.
     if ('ontouchstart' in document) {
-      var element = $('#middle');
+      var element = $(document.body);
       element.on('touchstart', this._touchDown.bind(this));
       element.on('touchend', this._touchUp.bind(this));
     }
@@ -650,7 +650,14 @@
     return false;
   };
   
-  UpDown.prototype._touchDown = function() {
+  UpDown.prototype._touchDown = function(e) {
+    // Only accept touch events from the middle part of the page.
+    var t = e.target;
+    if (t !== document.body && t.id !== 'memo-time' &&
+        t.id !== 'pb-status' && t.id !== 'time') {
+      return;  
+    }
+    
     if (this._down) {
       return;
     }

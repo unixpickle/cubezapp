@@ -205,6 +205,7 @@
     if (closedness === this._lastClosedness) {
       return;
     }
+    var last = this._lastClosedness;
     this._lastClosedness = closedness;
     
     if (closedness === 1) {
@@ -218,6 +219,10 @@
     } else {
       this._contentShowing = false;
       this._element.css({cursor: 'pointer'});
+    }
+    // If this was not visible before, it may need to be laid out.
+    if (last === 1) {
+      this.layout();
     }
   };
   

@@ -47,7 +47,6 @@
   /* This will be resized/moved around by a script */
   top: 40px;
   height: 3px;
-  border-radius: 1.5px;
 }
 
 #footer .top .close {
