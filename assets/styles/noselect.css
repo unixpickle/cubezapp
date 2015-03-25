@@ -1,5 +1,6 @@
 #header .name, #footer .top, #pentagons, #header, #puzzles, #time,
-#memo-time, #pb-status, .popup .title, .add-popup .puzzle {
+#memo-time, #pb-status, .popup .title, .add-popup .puzzle, .dropdown,
+.dropdown-options-container {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
