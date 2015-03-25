@@ -16,16 +16,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <!-- Stylesheets are magical things that make your site beautiful -->
-    <link rel="stylesheet" type="text/css" href="styles/add-popup.css">
+    <link rel="stylesheet" type="text/css" href="styles/app/footer.css">
+    <link rel="stylesheet" type="text/css" href="styles/app/header.css">
+    <link rel="stylesheet" type="text/css" href="styles/app/middle.css">
     <link rel="stylesheet" type="text/css" href="styles/body.css">
-    <link rel="stylesheet" type="text/css" href="styles/delete-popup.css">
     <link rel="stylesheet" type="text/css" href="styles/dropdown.css">
-    <link rel="stylesheet" type="text/css" href="styles/footer.css">
-    <link rel="stylesheet" type="text/css" href="styles/header.css">
-    <link rel="stylesheet" type="text/css" href="styles/middle.css">
     <link rel="stylesheet" type="text/css" href="styles/noselect.css">
     <link rel="stylesheet" type="text/css" href="styles/pentagons.css">
-    <link rel="stylesheet" type="text/css" href="styles/popup.css">
+    <link rel="stylesheet" type="text/css" href="styles/popups/add.css">
+    <link rel="stylesheet" type="text/css" href="styles/popups/delete.css">
+    <link rel="stylesheet" type="text/css" href="styles/popups/popup.css">
     
     <!-- These APIs aren't specific to Cubezapp, but hey, they're nice -->
     <script src="scripts/external/jquery-2.1.3.min.js"></script>
@@ -44,24 +44,24 @@
     <script src="scripts/model/ticket.js"></script>
     
     <!-- View scripts provide the front-end experience -->
-    <script src="scripts/view/add_popup.js"></script>
-    <script src="scripts/view/animator.js"></script>
-    <script src="scripts/view/app.js"></script>
+    <script src="scripts/view/app/animator.js"></script>
+    <script src="scripts/view/app/app.js"></script>
+    <script src="scripts/view/app/footer.js"></script>
+    <script src="scripts/view/app/graph.js"></script>
+    <script src="scripts/view/app/header.js"></script>
+    <script src="scripts/view/app/middle.js"></script>
+    <script src="scripts/view/app/stats.js"></script>
+    <script src="scripts/view/app/time.js"></script>
+    <script src="scripts/view/app/times_list.js"></script>
     <script src="scripts/view/assets.js"></script>
-    <script src="scripts/view/delete_popup.js"></script>
     <script src="scripts/view/dropdown.js"></script>
-    <script src="scripts/view/footer.js"></script>
-    <script src="scripts/view/graph.js"></script>
-    <script src="scripts/view/header.js"></script>
-    <script src="scripts/view/middle.js"></script>
     <script src="scripts/view/pentagons.js"></script>
-    <script src="scripts/view/popup.js"></script>
-    <script src="scripts/view/stats.js"></script>
+    <script src="scripts/view/popups/add.js"></script>
+    <script src="scripts/view/popups/delete.js"></script>
+    <script src="scripts/view/popups/popup.js"></script>
     <script src="scripts/view/styler.js"></script>
-    <script src="scripts/view/time.js"></script>
-    <script src="scripts/view/times_list.js"></script>
     
-    <!-- Controller scripts implement the glue between controllers and views -->
+    <!-- Controller scripts implement the glue between parts of the app -->
     <script src="scripts/controller/home.js"></script>
     <script src="scripts/controller/keyboard.js"></script>
     <script src="scripts/controller/stackmat.js"></script>

@@ -43,12 +43,12 @@
 }
 
 #header .puzzle-actions .add {
-  background-image: url('../images/small_plus.png');
+  background-image: url('../../images/small_plus.png');
   left: 6px;
 }
 
 #header .puzzle-actions .remove {
-  background-image: url('../images/small_minus.png');
+  background-image: url('../../images/small_minus.png');
   left: 36px;
 }
 
@@ -121,7 +121,7 @@
   height: 160px;
   border-radius: 80px;
   margin-top: 20px;
-  background-image: url('../images/big_plus.png');
+  background-image: url('../../images/big_plus.png');
 }
 
 #puzzles .delete {
@@ -136,7 +136,7 @@
   background-size: 50% 50%;
   background-position: center;
   background-repeat: no-repeat;
-  background-image: url('../images/x.png');
+  background-image: url('../../images/x.png');
   
   color: transparent;
   cursor: pointer;
