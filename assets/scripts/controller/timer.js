@@ -77,6 +77,11 @@
   
   // keydown ignores the event.
   Timer.prototype.keydown = function(e) {
+    // Make sure backspace does not navigate back.
+    if (this._mode === MODE_ENTRY && e.which === 8) {
+      this.keypress(e);
+      return false;
+    }
     return true;
   };
   
@@ -88,24 +93,46 @@
     }
     
     if (e.which === 8) {
-      // Backspace.
+      // Remove the last number from the input text.
       this._manualText = this._manualText.substring(0,
         this._manualText.length-1);
     } else if (e.which >= 0x30 && e.which <= 0x39) {
-      // Number.
-      this._manualText = this._manualText + (e.which - 0x30);
+      // Add a number to the input text.
+      if (this._manualText.length < 7) {
+        this._manualText = this._manualText + (e.which - 0x30);
+      }
     } else if (e.which === 13) {
-      // Enter.
-      // TODO: add the time here.
+      // Parse the input and record it as a time.
+      if (this._manualText.length > 0) {
+        var time = parseTimeInput(this._manualText);
+        if ('function' !== typeof this.onDone) {
+          throw new Error('invalid onDone callback');
+        }
+        this.onDone({
+          date: new Date().getTime(),
+          dnf: false,
+          inspection: 0,
+          memo: 0,
+          notes: '',
+          plus2: false,
+          time: time
+        });
+      }
       this._manualText = '';
     } else {
+      // An unknown key was pressed.
       return true;
     }
     
-    window.app.view.blinkTime();
+    // There is no point of typing a leading zero.
+    if (this._manualText === '0') {
+      this._manualText = '';
+    }
     
-    // TODO: update the text properly.
-    window.app.view.setTime(this._manualText);
+    // Set the time and blink the cursor to give the user the authentic
+    // experience of typing.
+    window.app.view.blinkTime();
+    window.app.view.setTime(formatInputTime(this._manualText));
     return false;
   }
   
@@ -676,6 +703,55 @@
       this.onUp();
     }
   };
+  
+  // formatTimeInput returns a time with ':' and '.' inserted at the right
+  // places given a piece of user input.
+  function formatInputTime(raw) {
+    // I know, I know, this looks like it's probably not the best way to format
+    // the time. My response: it works. Who looks like a fool now? Mwahaha.
+    switch (raw.length) {
+    case 0:
+      return '0.00';
+    case 1:
+      return '0.0' + raw;
+    case 2:
+      return '0.' + raw;
+    case 3:
+      return raw[0] + '.' + raw.substring(1);
+    case 4:
+      return raw.substring(0, 2) + '.' + raw.substring(2);
+    case 5:
+      return raw[0] + ':' + raw.substring(1, 3) + '.' + raw.substring(3);
+    case 6:
+      return raw.substring(0, 2) + ':' + raw.substring(2, 4) + '.' +
+      raw.substring(4);
+    case 7:
+      return raw[0] + ':' + raw.substring(1, 3) + ':' + raw.substring(3, 5) +
+        '.' + raw.substring(5);
+    default:
+      return '';
+    }
+  }
+  
+  // parseTimeInput takes the raw user input and turns it into a time in
+  // milliseconds. For example, parseTimeInput('123') yields 1230.
+  function parseTimeInput(raw) {
+    // Pad the time with zeroes so we can use substrings without fear.
+    var toParse = raw;
+    while (toParse.length < 7) {
+      toParse = '0' + toParse;
+    }
+    
+    // Get the time components.
+    var hour = parseInt(toParse[0]);
+    var minute = parseInt(toParse.substring(1, 3));
+    var second = parseInt(toParse.substring(3, 5));
+    var centisecond = parseInt(toParse.substring(5));
+    
+    // Generate milliseconds and cap it at 9:59:59.99
+    var millis = centisecond*10 + second*1000 + minute*60000 + hour*3600000;
+    return Math.min(millis, 35999990);
+  }
   
   window.app.Timer = Timer;
   

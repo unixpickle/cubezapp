@@ -4,6 +4,9 @@
   
   var HEADER_HEIGHT = 50;
   
+  // popupStackCount is used to determine if any popups are currently showing.
+  var popupStackCount = 0;
+  
   // A Popup presents a given element to the user.
   function Popup(element, width, height) {
     // This state makes sure the popup isn't shown or closed more than once.
@@ -51,6 +54,11 @@
     this._shielding.css({opacity: 0, pointerEvents: 'none'});
     this._element.addClass('popup-hidden');
     
+    // Disable scrolling again if this was the last showing popup.
+    if (--popupStackCount === 0) {
+      $('body, html').css({overflow: 'hidden'});
+    }
+    
     // Remove the elements and destroy the popup after a timeout.
     setTimeout(function() {
       this._shielding.remove();
@@ -77,6 +85,11 @@
     // Start the presentation animation.
     this._shielding.css({opacity: 1});
     this._element.removeClass('popup-hidden');
+    
+    // The popup must scroll if it's too large, but the rest of the time the 
+    // site should not be scrollable or else it will bounce on OS X.
+    ++popupStackCount;
+    $('body, html').css({overflow: 'auto'});
   };
   
   // _layout re-positions the popup on the screen.
