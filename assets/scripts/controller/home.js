@@ -16,6 +16,14 @@
     this._configureTimer();
   }
   
+  // addPuzzle adds a puzzle and switches to it.
+  Home.prototype.addPuzzle = function(puzzle) {
+    window.app.store.addPuzzle(puzzle);
+    window.app.view.setPuzzles(window.app.store.getPuzzles().slice(1));
+    window.app.view.setActivePuzzle(window.app.store.getActivePuzzle());
+    this._configureTimer();
+  };
+  
   // deletePuzzle verifies with the user that a puzzle should be deleted, then
   // deletes it.
   Home.prototype.deletePuzzle = function(puzzle) {

@@ -59,6 +59,9 @@
       $('body, html').css({overflow: 'hidden'});
     }
     
+    // Re-enable keyboard events.
+    window.app.keyboard.remove(this);
+    
     // Remove the elements and destroy the popup after a timeout.
     setTimeout(function() {
       this._shielding.remove();
@@ -85,6 +88,9 @@
     // Start the presentation animation.
     this._shielding.css({opacity: 1});
     this._element.removeClass('popup-hidden');
+    
+    // Disable keyboard events while this popup is in front.
+    window.app.keyboard.push(this);
     
     // The popup must scroll if it's too large, but the rest of the time the 
     // site should not be scrollable or else it will bounce on OS X.

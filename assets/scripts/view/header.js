@@ -19,6 +19,12 @@
     this._puzzleActions.find('.remove').click(this._toggleDeleting.bind(this));
   }
 
+  Header.prototype.close = function() {
+    if (this._puzzles.showing()) {
+      this._toggle();
+    }
+  };
+
   Header.prototype.height = function() {
     return 44;
   };
@@ -56,6 +62,9 @@
   Header.prototype._add = function() {
     if (this._puzzles.showing()) {
       showAddPopup();
+      if (this._puzzles.isDeleting) {
+        this._puzzles.setDeleting(false);
+      }
     }
   };
   
@@ -135,7 +144,7 @@
     this._element.slideUp();
     
     // Re-enable keyboard events for other things.
-    window.app.keyboard.pop();
+    window.app.keyboard.remove(this);
     
     this._showing = false;
     this.setDeleting(false);
@@ -246,7 +255,7 @@
     this._shielding.fadeIn();
     
     // Disable keyboard events from other things.
-    window.app.keyboard.push({});
+    window.app.keyboard.push(this);
     
     this._showing = true;
   };

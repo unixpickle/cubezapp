@@ -11,6 +11,9 @@
     this._selected = 0;
     this._optionNames = [];
     
+    // Callback for changes.
+    this.onChange = null;
+    
     // Generate label.
     this._label = $('<label />');    
     this._arrow = $('<div />', {class: 'arrow'});
@@ -51,8 +54,18 @@
     return this._element;
   };
   
+  // selected returns the index of the selected option.
+  Dropdown.prototype.selected = function() {
+    return this._selected;
+  };
+  
   // setOptions sets the options to an array of strings.
   Dropdown.prototype.setOptions = function(options, selected) {
+    // This control does not support zero options.
+    if (options.length === 0) {
+      throw new Error('cannot display empty option list');
+    }
+    
     this._optionNames = options;
     
     // Generate a new <ul>
@@ -83,16 +96,31 @@
     this.setSelected(selected || 0);
   };
   
+  // setSelected selects the option at a given index.
   Dropdown.prototype.setSelected = function(x) {
     this._selected = x;
     this._label.text(this._optionNames[x]);
   };
   
+  // value returns the string value of the selected option.
+  Dropdown.prototype.value = function() {
+    if (this._optionNames.length === 0) {
+      throw new Error('no options');
+    }
+    return this._optionNames[this._selected];
+  };
+  
   // _choose is called when an item is clicked.
   Dropdown.prototype._choose = function(i) {
     this._hide();
+    if (i === this._selected) {
+      return;
+    }
     this._selected = i;
     this._label.text(this._optionNames[i]);
+    if ('function' === typeof this.onChange) {
+      this.onChange();
+    }
   };
   
   // _hide hides the dropdown menu.

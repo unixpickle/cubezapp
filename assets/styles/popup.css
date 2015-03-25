@@ -73,3 +73,25 @@
 .popup .title button:focus {
   outline: 0;
 }
+
+.popup .bottom {
+  position: absolute;
+  bottom: 0;
+  width: calc(100% - 30px);
+  left: 15px;
+  border-top: 2px solid #d5d5d5;
+  height: 60px;
+}
+
+.popup .bottom .done {
+  float: right;
+  width: 130px;
+  height: 35px;
+  border: none;
+  
+  margin-top: 12px;
+  
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}

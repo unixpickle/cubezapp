@@ -1,13 +1,13 @@
 .add-popup {
   width: 500px;
-  height: 350px;
+  height: 344px;
   background-color: #f0f0f0;
 }
 
 .add-popup .middle {
   position: absolute;
   left: 15px;
-  top: 65px;
+  top: 66px;
   width: calc(100% - 30px);
   height: 200px;
 }
@@ -67,8 +67,9 @@
 }
 
 .add-popup .field {
-  margin-bottom: 20px;
+  position: absolute;
   height: 30px;
+  width: 100%;
 }
 
 .add-popup .field > label {
@@ -78,7 +79,7 @@
   width: 85px;
   margin-left: 20px;
   
-  color: #777;
+  color: #999;
   font-size: 20px;
   
   height: 30px;
@@ -98,9 +99,25 @@
   padding: 0 5px 0 5px;
   margin: 0;
   
-  color: #777;
+  color: #999;
   font-size: 20px;
   border: none;
+}
+
+.add-popup .field > .content > input::-webkit-input-placeholder {
+  color: #999;
+}
+
+.add-popup .field > .content > input::-moz-placeholder {
+  color: #999;
+}
+
+.add-popup .field > .content > input:-ms-input-placeholder {
+  color: #999;
+}
+
+.add-popup .field > .content > input:-moz-placeholder {
+  color: #999;
 }
 
 .add-popup .field > .content > input:focus {

@@ -35,8 +35,14 @@
     this._layout(this._animator.current());
   }
   
+  // blinkTime causes the time blinker to blink if the time is in editing mode.
   AppView.prototype.blinkTime = function() {
     this._middle.blinkTime();
+  };
+  
+  // closePuzzles closes the puzzles dropdown if it is open.
+  AppView.prototype.closePuzzles = function() {
+    this._header.close();
   };
   
   AppView.prototype.setActivePuzzle = function(puzzle) {

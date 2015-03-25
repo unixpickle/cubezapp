@@ -4,6 +4,10 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 **CURRENT STATUS**: I have just begun rewriting this webapp to implement the full design and feature list.
 
+# TODO
+
+ * Fix occasional popup jitter in Safari
+
 # License
 
 **cubezapp2** is licensed under the BSD 2-clause license. See [LICENSE](LICENSE).
