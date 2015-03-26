@@ -71,10 +71,19 @@
     }
     
     this._state = STATE_CLOSED;
+    
+    window.app.keyboard.remove(this);
   };
 
   Header.prototype.height = function() {
     return 44;
+  };
+  
+  Header.prototype.keydown = function(e) {
+    if (e.which === 27) {
+      this.close();
+    }
+    return false;
   };
   
   Header.prototype.layout = function(attrs) {
@@ -110,6 +119,8 @@
     }
     
     this._state = STATE_OPEN;
+    
+    window.app.keyboard.push(this);
   };
   
   Header.prototype.removePuzzle = function(puzzle) {
