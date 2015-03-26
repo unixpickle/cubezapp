@@ -64,7 +64,7 @@
   
   AddPopup.prototype._createIconField = function() {
     // Generate the dropdown field.
-    var res = createDropdownField('Scramble', window.app.iconNames,
+    var res = createDropdownField('Icon', window.app.iconNames,
       window.app.iconNames.indexOf('3x3x3'));
     this._iconDropdown = res.dropdown;
     this._iconField = res.field;
