@@ -20,8 +20,79 @@
   // milliseconds.
   var ANIMATION_DURATION = 300;
   
-  // Animation is used internally by a Popup to show or unshow it.
-  function Animation(popup, shielding) {
+  // CSSAnimation is the CSS-based presentation animator. It uses CSS3
+  // transitions to show a popup and its shielding. This works well on Chrome
+  // and Firefox, but has occasional bugs in Safari.
+  function CSSAnimation(popup, shielding) {
+    // Copy the arguments.
+    this._popup = popup;
+    this._shielding = shielding;
+    
+    // This is set when start() was called but the transition hasn't been
+    // started yet.
+    this._startTimeout = null;
+    
+    // Set the transition properties.
+    var shieldingTransition = 'opacity ' + ANIMATION_DURATION/1000 + 's ease';
+    this._shielding.css({
+      opacity: 0,
+      transition: shieldingTransition,
+      msTransition: shieldingTransition,
+      WebkitTransition: shieldingTransition
+    });
+    this._popup.css({
+      opacity: 0,
+      transform: 'translateY(-50px)',
+      msTransform: 'translateY(-50px)',
+      WebkitTransform: 'translateY(-50px)',
+      transition: 'transform 0.3s ease, opacity 0.3s ease',
+      msTransition: '-ms-transform 0.3s ease, opacity 0.3s ease',
+      WebkitTransition: '-webkit-transform 0.3s ease, opacity 0.3s ease',
+    });
+  }
+  
+  // reverse starts hiding the popup.
+  CSSAnimation.prototype.reverse = function() {
+    if (this._startTimeout !== null) {
+      // The animation is starting and this is a race condition, so to speak.
+      clearInterval(this._startTimeout);
+      this._shielding.remove();
+      this._popup.remove();
+      return;
+    }
+    
+    this._shielding.css({opacity: 0, pointerEvents: 'none'});
+    this._popup.css({
+      opacity: 0,
+      pointerEvents: 'none',
+      transform: 'translateY(-50px)',
+      msTransform: 'translateY(-50px)',
+      WebkitTransform: 'translateY(-50px)',
+    });
+    setTimeout(function() {
+      this._shielding.remove();
+      this._popup.remove();
+    }.bind(this), ANIMATION_DURATION);
+  };
+  
+  // start begins showing the popup.
+  CSSAnimation.prototype.start = function() {
+    // We wait on a timeout to make sure there's a reflow.
+    this._startTimeout = setTimeout(function() {
+      this._startTimeout = null;
+      this._shielding.css({opacity: 1});
+      this._popup.css({
+        opacity: 1,
+        transform: 'none',
+        msTransform: 'none',
+        WebkitTransform: 'none'
+      });
+    }.bind(this), 0);
+  };
+  
+  // ScriptAnimation is the script-based presentation animator. It uses no CSS3
+  // transitions or animations.
+  function ScriptAnimation(popup, shielding) {
     // Copy the arguments.
     this._popup = popup;
     this._shielding = shielding;
@@ -56,20 +127,10 @@
     });
   }
   
-  // start runs the animation. This should only be called once.
-  Animation.prototype.start = function() {
-    if (this._running || this._reversed) {
-      throw new Error('cannot re-start animation');
-    }
-    this._running = true;
-    this._startTime = new Date().getTime();
-    this._tick();
-  };
-  
   // reverse runs the animation in reverse. This should only be called once,
   // after start(). This will remove the popup and shielding from the DOM once
   // it completes.
-  Animation.prototype.reverse = function() {
+  ScriptAnimation.prototype.reverse = function() {
     var now = new Date().getTime();
     var sinceStart = now - this._startTime;
     this._reverseJump = Math.max(0, ANIMATION_DURATION - sinceStart);
@@ -83,8 +144,18 @@
     }
   };
   
+  // start runs the animation. This should only be called once.
+  ScriptAnimation.prototype.start = function() {
+    if (this._running || this._reversed) {
+      throw new Error('cannot re-start animation');
+    }
+    this._running = true;
+    this._startTime = new Date().getTime();
+    this._tick();
+  };
+  
   // _showFrame renders a given percentage of the animation.
-  Animation.prototype._showFrame = function(pct) {
+  ScriptAnimation.prototype._showFrame = function(pct) {
     var transform;
     if (pct === 1) {
       transform = 'none';
@@ -102,7 +173,7 @@
   };
   
   // _tick applies a frame of the animation.
-  Animation.prototype._tick = function() {
+  ScriptAnimation.prototype._tick = function() {
     var elapsed = (new Date().getTime() - this._startTime) + this._reverseJump;
     var progress = elapsed / ANIMATION_DURATION;
     if (progress >= 1) {
@@ -130,6 +201,13 @@
       setTimeout(this._tick.bind(this), 1000/60);
     }
   };
+  
+  // Chrome is the only browser that seems to like CSS transitions for this.
+  var Animation = ScriptAnimation;
+  if (navigator.userAgent.indexOf('Chrome') > -1) {
+    Animation = CSSAnimation;
+  }
+  
   
   // A Popup presents an element to the user in the form of a popup.
   function Popup(element, width, height) {
@@ -229,8 +307,8 @@
     if (y + this._height > window.app.windowSize.height) {
       y = window.app.windowSize.height - this._height;
     }
-    x = Math.max(x, 0);
-    y = Math.max(y, 0);
+    x = Math.max(Math.round(x), 0);
+    y = Math.max(Math.round(y), 0);
     
     this._element.css({
       left: x,
