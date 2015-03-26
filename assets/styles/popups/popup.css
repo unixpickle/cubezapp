@@ -13,14 +13,14 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.popup .title {
+.popup-dialog > .title {
   height: 50px;
   margin-left: 15px;
   width: calc(100% - 30px);
   border-bottom: 2px solid #d5d5d5;
 }
 
-.popup .title label {
+.popup-dialog > .title label {
   float: left;
   margin-top: 6px;
   
@@ -30,7 +30,7 @@
   font-size: 25px;
 }
 
-.popup .title button {
+.popup-dialog > .title button {
   float: right;
   width: 16px;
   height: 16px;
@@ -48,11 +48,17 @@
   background-position: center;
 }
 
-.popup .title button:focus {
+.popup-dialog > .title button:focus {
   outline: 0;
 }
 
-.popup .bottom {
+.popup-dialog > .content {
+  position: absolute;
+  top: 65px;
+  left: 15px;
+}
+
+.popup-dialog > .footer {
   position: absolute;
   bottom: 0;
   width: calc(100% - 30px);
@@ -61,7 +67,7 @@
   height: 60px;
 }
 
-.popup .bottom button.done {
+.popup-dialog > .footer button.done {
   float: right;
   width: 130px;
   height: 35px;
@@ -74,7 +80,7 @@
   cursor: pointer;
 }
 
-.popup .bottom button.other {
+.popup-dialog > .footer button.other {
   float: right;
   width: 130px;
   height: 35px;

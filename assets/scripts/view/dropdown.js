@@ -15,12 +15,12 @@
     this.onChange = null;
     
     // Generate label.
-    this._label = $('<label />');    
-    this._arrow = $('<div />', {class: 'arrow'});
+    this._label = $('<label></label>');    
+    this._arrow = $('<div class="arrow"></div>');
     
     // Generate empty options.
-    this._options = $('<div />', {class: 'dropdown-options-container'});
-    this._scroller = $('<div />', {class: 'dropdown-options-scroller'});
+    this._options = $('<div class="dropdown-options-container"></div>');
+    this._scroller = $('<div class="dropdown-options-scroller"></div>');
     this._options.append(this._scroller);
     this._options.css({width: width});
     
@@ -33,12 +33,12 @@
     
     // Generate shielding element for when menu is showing. This prevents the
     // user from clicking elsewhere on the page while viewing the dropdown.
-    this._shielding = $('<div />', {class: 'dropdown-shielding'});
+    this._shielding = $('<div class="dropdown-shielding"></div>');
     this._shielding.click(this._hide.bind(this));
     
     // Generate element.
-    this._element = $('<div />', {class: 'dropdown'});
-    this._contents = $('<div />', {class: 'dropdown-contents'});
+    this._element = $('<div class="dropdown"></div>');
+    this._contents = $('<div class="dropdown-contents"></div>');
     this._contents.append(this._label);
     this._contents.append(this._arrow);
     this._contents.css({width: width});
@@ -69,9 +69,9 @@
     this._optionNames = options;
     
     // Generate a new <ul>
-    var ul = $('<ul />');
+    var ul = $('<ul></ul>');
     for (var i = 0, len = options.length; i < len; ++i) {
-      var li = $('<li />');
+      var li = $('<li></li>');
       li.text(options[i]);
       if (i === len - 1) {
         li.css({

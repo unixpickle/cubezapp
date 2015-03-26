@@ -2,46 +2,26 @@
   
   var FIELD_WIDTH = 120;
   var FIELD_HEIGHT = 30;
-  var MIDDLE_HEIGHT = 200;
-  
-  var POPUP_WIDTH = 500;
-  var POPUP_HEIGHT = 344;
-  
-  // I put this code here because it doesn't really belong in the DOM and I
-  // don't know where else to put it...
-  var popupHTML = '\
-    <div class="add-popup"> \
-      <div class="title"> \
-        <label>New Puzzle</label> \
-        <button>Close</button> \
-      </div> \
-      <div class="middle"> \
-        <div class="puzzle"> \
-          <div class="icon theme-background"></div> \
-          <label>Name</label> \
-        </div> \
-        <div class="separator"></div> \
-        <div class="fields"></div> \
-      </div> \
-      <div class="bottom"> \
-        <button class="done theme-background">Create</button> \
-      </div> \
-    </div>';
+  var CONTENT_HEIGHT = 200;
   
   function AddPopup() {
-    this._element = $(popupHTML);
-    this._fields = this._element.find('.fields');
-    this._puzzleIcon = this._element.find('.puzzle .icon');
-    this._puzzleName = this._element.find('.puzzle label');
+    // Generate the puzzle.
+    var puzzle = $('<div class="puzzle"></div>');
+    puzzle.append();
+    puzzle.append();
+    this._puzzleIcon = $('<div class="icon theme-background"></div>');
+    this._puzzleName = $('<label>Name</label>');
+    puzzle.append([this._puzzleIcon, this._puzzleName]);
+    
+    // Create the fields container.
+    this._fields = $('<div class="fields"></div>');
     
     // This state is used to know whether or not to play an animation to show
     // the subscramble dropdown.
     this._showingSubscramble = false;
     
-    // Create this so our hidden class is complete before we start doing stuff.
-    this._popup = null;
-    
-    // Create hidden class with fields.
+    // Create the rest of the hidden class.
+    this._dialog = null;
     this._bldField = null;
     this._iconField = null;
     this._iconDropdown = null;
@@ -52,7 +32,7 @@
     this._subscrambleField = null;
     this._subscrambleDropdown = null;
     
-    // Generate fields.
+    // Generate the input fields.
     this._createBLDField();
     this._createIconField();
     this._createNameField();
@@ -63,16 +43,15 @@
     this._initialLayout();
     
     // Create the actual popup.
-    this._popup = new window.app.Popup(this._element, POPUP_WIDTH,
-      POPUP_HEIGHT);
-    
-    // Setup done button.
-    var doneButton = this._element.find('.done');
-    doneButton.one('click', this._done.bind(this));
+    var element = $('<div class="add-popup-content"></div>');
+    var separator = $('<div class="separator"></div>');
+    element.append([puzzle, separator, this._fields]);
+    this._dialog = new window.app.Dialog('New Puzzle', element, ['Create']);
+    this._dialog.onAction = this._done.bind(this);
   }
   
   AddPopup.prototype.show = function() {
-    this._popup.show();
+    this._dialog.show();
   };
   
   AddPopup.prototype._createBLDField = function() {
@@ -84,20 +63,15 @@
   };
   
   AddPopup.prototype._createIconField = function() {
-    this._iconDropdown = new window.app.Dropdown(FIELD_WIDTH);
-    this._iconDropdown.setOptions(window.app.iconNames,
+    // Generate the dropdown field.
+    var res = createDropdownField('Scramble', window.app.iconNames,
       window.app.iconNames.indexOf('3x3x3'));
-    this._iconField = $('\
-      <div class="field"> \
-        <label>Icon</label> \
-        <div class="content"></div> \
-      </div> \
-    ');
-    this._iconField.find('.content').append(this._iconDropdown.element());
+    this._iconDropdown = res.dropdown;
+    this._iconField = res.field;
     
     // Changing the icon field changes the icon in the preview.
     this._iconDropdown.onChange = function() {
-      // Get the filename corresponding to the icon name.
+      // Get the filename from the human-readable name.
       var name = window.app.iconFiles[this._iconDropdown.selected()];
       this._puzzleIcon.css({
         backgroundImage: 'url(images/puzzles/' + name + '.png)'
@@ -110,7 +84,7 @@
       <div class="field"> \
         <label>Name</label> \
         <div class="content"> \
-          <input placeholder="Name" /> \
+          <input placeholder="Name"> \
         </div> \
       </div> \
     ');
@@ -129,33 +103,25 @@
   };
   
   AddPopup.prototype._createScrambleField = function() {
+    // Generate the puzzles.
     var puzzles = window.puzzlejs.scrambler.allPuzzles();
     puzzles.unshift('None');
     
-    this._scrambleDropdown = new window.app.Dropdown(FIELD_WIDTH);
-    this._scrambleDropdown.setOptions(puzzles, 0);
-    this._scrambleField = $('\
-      <div class="field"> \
-        <label>Scramble</label> \
-        <div class="content"></div> \
-      </div> \
-    ');
-    var el = this._scrambleDropdown.element();
-    this._scrambleField.find('.content').append(el);
+    // Generate the dropdown field.
+    var res = createDropdownField('Scramble', puzzles, 0);
+    this._scrambleDropdown = res.dropdown;
+    this._scrambleField = res.field;
     
     // When the scramble changes, it changes the subscrambles.
     this._scrambleDropdown.onChange = this._scrambleChanged.bind(this);
   };
   
   AddPopup.prototype._createSubscrambleField = function() {
-    this._subscrambleDropdown = new window.app.Dropdown(FIELD_WIDTH);
-    this._subscrambleField = $('\
-      <div class="field"> \
-        <div class="content"></div> \
-      </div> \
-    ');
-    var el = this._subscrambleDropdown.element();
-    this._subscrambleField.find('.content').append(el);
+    var res = createDropdownField(null, null, 0);
+    this._subscrambleDropdown = res.dropdown;
+    this._subscrambleField = res.field;
+    
+    // By default, this field is invisible.
     this._subscrambleField.css({display: 'none'});
   };
   
@@ -182,7 +148,7 @@
     // TODO: support BLD checkbox.
     
     // Close this popup and the header popup behind it.
-    this._popup.close();
+    this._dialog.close();
     window.app.view.closePuzzles();
     
     // Add the puzzle and switch to it.
@@ -200,7 +166,7 @@
   AddPopup.prototype._fieldPositions = function() {
     if (this._showingSubscramble) {
       var contentHeight = FIELD_HEIGHT * 5;
-      var spacing = (MIDDLE_HEIGHT-contentHeight) / 6;
+      var spacing = (CONTENT_HEIGHT-contentHeight) / 6;
       var tops = [];
       for (var i = 0; i < 5; ++i) {
         if (i !== 3) {
@@ -210,7 +176,7 @@
       return tops;
     } else {
       var contentHeight = FIELD_HEIGHT * 4;
-      var spacing = (MIDDLE_HEIGHT-contentHeight) / 5;
+      var spacing = (CONTENT_HEIGHT-contentHeight) / 5;
       var tops = [];
       for (var i = 0; i < 4; ++i) {
         tops[i] = spacing*(i+1) + FIELD_HEIGHT*i;
@@ -223,7 +189,7 @@
   AddPopup.prototype._initialLayout = function() {
     // Compute the subscramble field's position.
     var contentHeight = FIELD_HEIGHT * 5;
-    var spacing = (MIDDLE_HEIGHT-contentHeight) / 6;
+    var spacing = (CONTENT_HEIGHT-contentHeight) / 6;
     this._subscrambleField.css({top: spacing*4 + FIELD_HEIGHT*3});
     
     // Compute the position for the rest of the fields and append them.
@@ -286,6 +252,27 @@
     }
     return names;
   };
+  
+  function createDropdownField(label, options, selected) {
+    // Create the element.
+    var element = $('<div class="field"></div>');
+    
+    // Create the label.
+    if (label !== null) {
+      element.append($('<label><label>').text(label));
+    }
+    
+    // Create the content.
+    var dropdown = new window.app.Dropdown(FIELD_WIDTH);
+    if (options !== null) {
+      dropdown.setOptions(options, selected);
+    }
+    var content = $('<div class="content"></div>');
+    content.append(dropdown.element());
+    element.append(content);
+    
+    return {field: element, dropdown: dropdown};
+  }
   
   window.app.AddPopup = AddPopup;
   

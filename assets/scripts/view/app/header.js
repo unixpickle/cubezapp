@@ -104,7 +104,7 @@
     this.onExit = null;
     
     // Setup the shielding.
-    this._shielding = $('<div />');
+    this._shielding = $('<div></div>');
     this._shielding.css({
       position: 'fixed',
       width: '100%',
@@ -183,7 +183,7 @@
     this._empty = false;
     
     // Generate the div which will contain the puzzles.
-    var contents = $('<div />');
+    var contents = $('<div></div>');
     contents.css({
       height: DROPDOWN_HEIGHT,
       width: puzzles.length*(PUZZLE_WIDTH+SPACING) + SPACING
@@ -195,10 +195,10 @@
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       // Generate the main puzzle element.
       var puzzle = puzzles[i];
-      var element = $('<div class="puzzle" />');
-      var label = $('<label />');
+      var element = $('<div class="puzzle"></div>');
+      var label = $('<label></label>');
       label.text(puzzle.name);
-      var icon = $('<div />', {class: 'icon theme-background'});
+      var icon = $('<div class="icon theme-background"></div>');
       icon.css({
         'background-image': 'url(images/puzzles/' + puzzle.icon + '.png)'
       });

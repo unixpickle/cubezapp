@@ -1,17 +1,9 @@
-.add-popup {
-  width: 500px;
-  height: 344px;
-}
-
-.add-popup .middle {
-  position: absolute;
-  left: 15px;
-  top: 66px;
-  width: calc(100% - 30px);
+.add-popup-content {
+  width: 470px;
   height: 200px;
 }
 
-.add-popup .puzzle {
+.add-popup-content > .puzzle {
   position: absolute;
   top: calc(50% - 80px);
   left: calc(25% - 90px);
@@ -22,7 +14,7 @@
   text-align: center;
 }
 
-.add-popup .puzzle .icon {
+.add-popup-content > .puzzle .icon {
   display: inline-block;
   
   width: calc(100% - 12px);
@@ -37,7 +29,7 @@
   text-align: center;
 }
 
-.add-popup .puzzle label {
+.add-popup-content > .puzzle label {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -49,7 +41,7 @@
   color: #999999;
 }
 
-.add-popup .separator {
+.add-popup-content > .separator {
   position: absolute;
   left: calc(50% - 1px);
   top: 0;
@@ -58,20 +50,20 @@
   background-color: #d5d5d5;
 }
 
-.add-popup .fields {
+.add-popup-content > .fields {
   position: absolute;
   left: calc(50% + 1px);
   width: calc(50% - 1px);
   height: 100%;
 }
 
-.add-popup .field {
+.add-popup-content > .fields > .field {
   position: absolute;
   height: 30px;
   width: 100%;
 }
 
-.add-popup .field > label {
+.add-popup-content > .fields > .field > label {
   display: inline-block;
   
   float: left;
@@ -85,13 +77,13 @@
   line-height: 30px;
 }
 
-.add-popup .field > .content {
+.add-popup-content > .fields > .field > .content {
   float: right;
   width: 120px;
   height: 30px;
 }
 
-.add-popup .field > .content > input {
+.add-popup-content > .fields > .field > .content > input {
   width: 110px;
   height: 30px;
   
@@ -103,22 +95,23 @@
   border: none;
 }
 
-.add-popup .field > .content > input::-webkit-input-placeholder {
+.add-popup-content > .fields > .field > .content >
+  input::-webkit-input-placeholder {
   color: #999;
 }
 
-.add-popup .field > .content > input::-moz-placeholder {
+.add-popup-content.field > .content > input::-moz-placeholder {
   color: #999;
 }
 
-.add-popup .field > .content > input:-ms-input-placeholder {
+.add-popup-content.field > .content > input:-ms-input-placeholder {
   color: #999;
 }
 
-.add-popup .field > .content > input:-moz-placeholder {
+.add-popup-content.field > .content > input:-moz-placeholder {
   color: #999;
 }
 
-.add-popup .field > .content > input:focus {
+.add-popup-content.field > .content > input:focus {
   outline: 0;
 }

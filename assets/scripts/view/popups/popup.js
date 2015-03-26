@@ -8,6 +8,9 @@
   // TITLE_HEIGHT is the height of every popup's title in pixels.
   var TITLE_HEIGHT = 50;
   
+  // FOOTER_HEIGHT is the height of a standard popup's footer in pixels.
+  var FOOTER_HEIGHT = 60;
+  
   // These are the states the popup could be in.
   var STATE_INITIAL = 0;
   var STATE_SHOWING = 1;
@@ -148,7 +151,7 @@
     this._y = 0.45;
     
     // Generate the semi-opaque shield which goes behind the popup.
-    this._shielding = $('<div />', {class: 'popup-shielding'});
+    this._shielding = $('<div class="popup-shielding"></div>');
     this._shielding.click(this.close.bind(this));
     
     // this._animation controls the visibility of the popup.
@@ -199,8 +202,7 @@
     
     // Append the elements to the body and show them!
     var body = $(document.body);
-    body.append(this._shielding);
-    body.append(this._element);
+    body.append([this._shielding, this._element]);
     this._animation.start();
     
     // The popup must scroll if it's too large, but the rest of the time the 
@@ -276,6 +278,54 @@
     });
   };
   
+  // A Dialog is a popup with a title, some content, and a set of buttons on the
+  // bottom.
+  function Dialog(titleStr, content, buttons) {
+    // Get the dimensions of the popup.
+    content.css({visibility: 'hidden', position: 'fixed'});
+    $(document.body).append(content);
+    var width = content.width() + 30;
+    var height = content.height() + FOOTER_HEIGHT + TITLE_HEIGHT + 30;
+    content.detach();
+    content.css({visibility: 'visible', position: 'absolute'});
+    
+    // Generate title bar.
+    var title = $('<div class="title"></div>');
+    title.append($('<label></label>').text(titleStr));
+    title.append($('<button></button>').click(this.close.bind(this)));
+    
+    // Generate footer.
+    var footer = $('<div class="footer"></div>');
+    for (var i = buttons.length-1; i >= 0; --i) {
+      var button = $('<button></button>').text(buttons[i]).click(function(i) {
+        if ('function' === typeof this.onAction) {
+          this.onAction(i);
+        }
+      }.bind(this, i));
+      if (i === buttons.length-1) {
+        button.addClass('done theme-background');
+      } else {
+        button.addClass('other');
+      }
+      footer.append(button);
+    }
+    
+    // Generate the full element.
+    content.addClass('content');
+    var element = $('<div class="popup-dialog"></div>');
+    element.css({width: width, height: height});
+    element.append([title, content, footer]);
+    
+    // Generate the popup, computing the total height in the process.
+    Popup.call(this, element, width, height);
+    
+    // Event listeners.
+    this.onAction = null;
+  }
+  
+  Dialog.prototype = Object.create(Popup.prototype);
+  
   window.app.Popup = Popup;
+  window.app.Dialog = Dialog;
   
 })();

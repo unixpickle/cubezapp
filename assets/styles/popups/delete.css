@@ -1,15 +1,4 @@
-.delete-popup {
+.delete-popup-content {
   width: 400px;
-}
-
-.delete-popup .middle {
-  position: absolute;
-  left: 15px;
-  top: 62px;
   color: #999;
-}
-
-.delete-popup .middle, .delete-popup-sizer {
-  width: 370px;
-  font-size: 18px;
 }
