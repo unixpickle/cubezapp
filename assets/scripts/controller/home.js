@@ -28,7 +28,10 @@
   // deletes it.
   Home.prototype.deletePuzzle = function(puzzle) {
     new window.app.DeletePopup(puzzle.name, function() {
-      // TODO: this.
+      // TODO: here, we may need to call some different method to animate the
+      // deletion.
+      window.app.store.deletePuzzle(puzzle.id);
+      window.app.view.setPuzzles(window.app.store.getPuzzles().slice(1));
     }.bind(this)).show();
   };
   

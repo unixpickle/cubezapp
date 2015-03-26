@@ -1,10 +1,26 @@
-#header .name, #footer .top, #pentagons, #header, #puzzles, #time,
-#memo-time, #pb-status, .popup .title, .add-popup .puzzle, .add-popup .field, 
-.dropdown, .dropdown-options-container {
+body {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+#scramble {
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+button:focus {
+  outline: none;
+}
+
+input:focus {
+  border: 0;
+  outline: none;
 }

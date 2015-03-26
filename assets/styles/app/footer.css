@@ -38,10 +38,6 @@
   cursor: pointer;
 }
 
-#footer .top .tab:focus, #footer .top .close:focus {
-  outline: 0;
-}
-
 #footer .top .bar {
   position: absolute;
   /* This will be resized/moved around by a script */

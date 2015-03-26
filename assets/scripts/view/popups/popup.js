@@ -297,11 +297,11 @@
     // Generate footer.
     var footer = $('<div class="footer"></div>');
     for (var i = buttons.length-1; i >= 0; --i) {
-      var button = $('<button></button>').text(buttons[i]).click(function(i) {
+      var button = $('<button></button>').text(buttons[i]).click(function(n) {
         if ('function' === typeof this.onAction) {
-          this.onAction(i);
+          this.onAction(n);
         }
-      }.bind(this, i));
+      }.bind(this, buttons[i]));
       if (i === buttons.length-1) {
         button.addClass('done theme-background');
       } else {
@@ -319,11 +319,30 @@
     // Generate the popup, computing the total height in the process.
     Popup.call(this, element, width, height);
     
+    // We need to store this for the enter key.
+    this._mainButton = content[content.length - 1];
+    
     // Event listeners.
     this.onAction = null;
   }
   
   Dialog.prototype = Object.create(Popup.prototype);
+  
+  // keypress allows us to detect the enter key.
+  Dialog.prototype.keypress = function(e) {
+    if (e.which === 13 && 'function' === typeof this.onAction) {
+      // Submit the main button.
+      this.onAction(this._mainButton);
+    }
+  };
+  
+  // keyup allows us to detect the escape key.
+  Dialog.prototype.keyup = function(e) {
+    if (e.which === 27) {
+      this.close();
+    }
+    return false;
+  };
   
   window.app.Popup = Popup;
   window.app.Dialog = Dialog;

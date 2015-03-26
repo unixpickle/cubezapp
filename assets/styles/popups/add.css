@@ -111,7 +111,3 @@
 .add-popup-content.field > .content > input:-moz-placeholder {
   color: #999;
 }
-
-.add-popup-content.field > .content > input:focus {
-  outline: 0;
-}
