@@ -170,7 +170,7 @@
       var tops = [];
       for (var i = 0; i < 5; ++i) {
         if (i !== 3) {
-          tops.push(spacing*(i+1) + FIELD_HEIGHT*i);
+          tops.push(Math.round(spacing*(i+1) + FIELD_HEIGHT*i));
         }
       }
       return tops;
@@ -179,7 +179,7 @@
       var spacing = (CONTENT_HEIGHT-contentHeight) / 5;
       var tops = [];
       for (var i = 0; i < 4; ++i) {
-        tops[i] = spacing*(i+1) + FIELD_HEIGHT*i;
+        tops[i] = Math.round(spacing*(i+1) + FIELD_HEIGHT*i);
       }
       return tops;
     }
@@ -242,8 +242,6 @@
     if (puzzle === 'None') {
       return [];
     }
-    
-    return ['Moves', 'State'];
     
     var names = [];
     var scramblers = window.puzzlejs.scrambler.scramblersForPuzzle(puzzle);

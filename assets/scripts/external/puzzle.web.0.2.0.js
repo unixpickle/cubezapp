@@ -741,6 +741,23 @@
     return res;
   }
   
+  function scrambleMoves(count) {
+    // Faces 1, 3, and 5 are U, F, and R respectively.
+    var moves = [];
+    var lastFace = 0;
+    for (var i = 0; i < count; ++i) {
+      var faces = [1, 3, 5];
+      if (i > 0) {
+        faces.splice(faces.indexOf(lastFace), 1);
+      }
+      var face = faces[Math.floor(Math.random() * faces.length)];
+      var turns = Math.floor(Math.random()*3) || -1;
+      moves.push(new Move(face, turns));
+      lastFace = face;
+    }
+    return moves;
+  }
+  
   // Generate a list of every move, ordered by comfort.
   _allMovesList = parseMoves("R R' L L' U U' D D' R2 L2 U2 D2 F2 B2 F " +
     "F' B B'");
@@ -754,6 +771,7 @@
   exports.movesToString = movesToString;
   exports.parseMove = parseMove;
   exports.parseMoves = parseMoves;
+  exports.scrambleMoves = scrambleMoves;
   var randomPerm = includeAPI('perms').randomPerm;
   
   function randomState() {
@@ -1875,6 +1893,11 @@
     }
   }
   
+  function pocketMoves(count) {
+    var moves = PocketAPI.scrambleMoves(count);
+    return PocketAPI.movesToString(moves);
+  }
+  
   function pocketState() {
     var basis = PocketAPI.basisMoves();
     if (pocketHeuristic === null) {
@@ -1919,6 +1942,11 @@
           f: pocketState,
           moves: false,
           name: "State"
+        },
+        {
+          f: pocketMoves,
+          moves: true,
+          name: "Moves"
         }
       ]
     },
@@ -1950,10 +1978,14 @@
 
 })();
 (function() {
+  
+  // If this is not in the browser, we do nothing.
+  if ('undefined' === typeof window || 'undefined' === typeof document) {
+    return;
+  }
 
   // Uncomment the following line and put in the webworker path if necessary.
   // var workerPath = 'puzzlejs/webscrambler_worker.js';
-  
   var workerPath = null;
 
   var scrambleWorker = null;
@@ -1970,13 +2002,7 @@
       if (scripts.length === 0) {
         throw new Error('unable to find worker path');
       }
-      var scriptPath = scripts[scripts.length-1].src.split('?')[0];
-      var slashIdx = scriptPath.lastIndexOf('/');
-      if (slashIdx >= 0) {
-        workerPath = scriptPath.slice(0, slashIdx) + '/webscrambler_worker.js';
-      } else {
-        workerPath = 'webscrambler_worker.js';
-      }
+      workerPath = scripts[scripts.length-1].src.split('?')[0];
     }
   }
 
@@ -2027,4 +2053,22 @@
   }
   window.puzzlejs.webscrambler.generateScramble = generateScramble;
 
+})();
+(function() {
+  
+  // If this is not a Web Worker, do nothing.
+  if ('undefined' === typeof self) {
+    return;
+  }
+  
+  self.onmessage = function(e) {
+    var m = e.data;
+    var puzzle = m.puzzle;
+    var scrambler = m.scrambler;
+    var moves = m.moves;
+    var scramble = self.puzzlejs.scrambler.generateScramble(puzzle, scrambler,
+      moves);
+    self.postMessage({id: m.id, scramble: scramble});
+  };
+  
 })();
