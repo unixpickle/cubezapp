@@ -31,7 +31,8 @@
       this._down[e.which] = true;
     }
     
-    if ($(document.activeElement).is('input')) {
+    // If the user has an input selected and they typed a letter, do nothing.
+    if ($(document.activeElement).is('input') && isTypedText(e)) {
       return;
     }
     
@@ -51,7 +52,7 @@
   };
   
   Keyboard.prototype._keypress = function(e) {
-    if ($(document.activeElement).is('input')) {
+    if ($(document.activeElement).is('input') && isTypedText(e)) {
       return;
     }
     
@@ -73,7 +74,7 @@
   Keyboard.prototype._keyup = function(e) {
     this._down[e.which] = false;
     
-    if ($(document.activeElement).is('input')) {
+    if ($(document.activeElement).is('input') && isTypedText(e)) {
       return;
     }
     
@@ -91,6 +92,11 @@
       }
     }
   };
+  
+  function isTypedText(e) {
+    // The enter key and the escape key don't count as text.
+    return e.which !== 13 & e.which !== 27;
+  }
   
   window.app.keyboard = new Keyboard();
   

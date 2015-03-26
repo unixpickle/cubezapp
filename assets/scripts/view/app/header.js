@@ -65,6 +65,11 @@
     this._shielding.stop(true, false);
     this._shielding.fadeOut();
     
+    // Fade out the action buttons.
+    if (this._hasPuzzles) {
+      this._puzzleActions.stop(true, false).fadeOut();
+    }
+    
     this._state = STATE_CLOSED;
   };
 
@@ -108,8 +113,19 @@
   };
   
   Header.prototype.removePuzzle = function(puzzle) {
-    // If the header is closed, we change this._updatePuzzles instead.
-    if (this._state === STATE_CLOSED) {
+    // Normal cases.
+    switch (this._state) {
+    case STATE_DELETING:
+      this._puzzles.stopDeleting();
+      this._state = STATE_OPEN;
+    case STATE_OPEN:
+      this._puzzles.removePuzzle(puzzle);
+      this._hasPuzzles = (this._puzzles.puzzles().length > 0);
+      if (!this._hasPuzzles) {
+        this._puzzleActions.fadeOut();
+      }
+      break;
+    case STATE_CLOSED:
       if (this._updatePuzzles === null) {
         this._updatePuzzles = this._puzzles.puzzles().slice();
       }
@@ -117,12 +133,11 @@
       if (idx >= 0) {
         this._updatePuzzles.splice(idx, 1);
       }
-      return;
-    } else if (this._state === STATE_DELETING) {
-      this._puzzles.stopDeleting();
-      this._state = STATE_OPEN;
+      this._hasPuzzles = (this._updatedPuzzles.length > 0);
+      break;
+    default:
+      throw new Error('unknown state: ' + this._state);
     }
-    this._puzzles.removePuzzle(puzzle);
   };
   
   Header.prototype.setActivePuzzle = function(puzzle) {
@@ -169,6 +184,7 @@
     if (this._state === STATE_DELETING) {
       this._puzzles.stopDeleting();
       this._state = STATE_OPEN;
+      return;
     } else if (this._state !== STATE_OPEN) {
       return;
     }
@@ -252,6 +268,21 @@
   
   // removePuzzle animates a puzzle disappearing from the list.
   Puzzles.prototype.removePuzzle = function(puzzle) {
+    // If there was only one puzzle left, fade it out and show the plus button.
+    if (this._puzzles.length === 1) {
+      this._puzzles = [];
+      this._puzzleElements = [];
+      this._deleteButtons = $();
+      
+      this._contents.children('div').fadeOut();
+      var button = $('<button class="header-button big-add">Add</button>');
+      button.css({display: 'none'});
+      button.click(this._add.bind(this));
+      this._contents.append(button);
+      button.fadeIn();
+      return;
+    }
+    
     // Find the index of the puzzle.
     var index = -1;
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
@@ -292,12 +323,12 @@
   
   // startDeleting shows all the delete buttons.
   Puzzles.prototype.startDeleting = function() {
-    this._deleteButtons.fadeIn();
+    this._deleteButtons.stop(true, false).fadeIn();
   };
   
   // stopDeleting hides all the delete buttons.
   Puzzles.prototype.stopDeleting = function() {
-    this._deleteButtons.fadeOut();
+    this._deleteButtons.stop(true, false).fadeOut();
   };
   
   // setPuzzles updates the puzzles in the dropdown without any animation.

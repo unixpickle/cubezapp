@@ -115,10 +115,10 @@
 #puzzles .big-add {
   position: absolute;
   left: calc(50% - 80px);
+  top: 20px;
   width: 160px;
   height: 160px;
   border-radius: 80px;
-  margin-top: 20px;
   background-image: url('../../images/big_plus.png');
 }
 
