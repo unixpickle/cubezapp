@@ -71,11 +71,9 @@
 }
 
 #puzzles .puzzle {
-  position: relative;
-  
-  margin-left: 18px;
-  margin-top: 20px;
-  
+  position: absolute;
+  top: 20px;
+  /* NOTE: the 'left' attribute is set by code */
   width: 180px;
   height: 160px;
   

@@ -45,6 +45,12 @@
     this._header.close();
   };
   
+  // removePuzzle removes a puzzle from the view with a possible animation.
+  AppView.prototype.removePuzzle = function(puzzle) {
+    this._header.removePuzzle(puzzle);
+  };
+  
+  // setActivePuzzle presents a given puzzle as the active puzzle in the view.
   AppView.prototype.setActivePuzzle = function(puzzle) {
     this._header.setActivePuzzle(puzzle);
   };

@@ -6,11 +6,7 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 # TODO
 
- * Different cursor when dragging popup dialogs
- * Re-implement puzzles list with animations
  * Re-implement Dropdown with animations
- * Remove blue border from all buttons & inputs
- * Make popup text unselectable
 
 # License
 
