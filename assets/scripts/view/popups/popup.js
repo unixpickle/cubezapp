@@ -2,103 +2,213 @@
 // rest of the page. Popups can be layered on top of one another.
 (function() {
   
-  var HEADER_HEIGHT = 50;
+  // visiblePopupCount is used to measure the number of active popups.
+  var visiblePopupCount = 0;
   
-  // popupStackCount is used to determine if any popups are currently showing.
-  var popupStackCount = 0;
+  // TITLE_HEIGHT is the height of every popup's title in pixels.
+  var TITLE_HEIGHT = 50;
   
-  // A Popup presents a given element to the user.
-  function Popup(element, width, height) {
-    // This state makes sure the popup isn't shown or closed more than once.
-    this._shown = false;
-    this._closed = false;
+  // These are the states the popup could be in.
+  var STATE_INITIAL = 0;
+  var STATE_SHOWING = 1;
+  var STATE_CLOSED = 2;
+  
+  // ANIMATION_DURATION is the amount of time required to show the popup in
+  // milliseconds.
+  var ANIMATION_DURATION = 300;
+  
+  // Animation is used internally by a Popup to show or unshow it.
+  function Animation(popup, shielding) {
+    // Copy the arguments.
+    this._popup = popup;
+    this._shielding = shielding;
     
-    // Save the constructor arguments
+    // this._running is true if the animation is running forwards or backwards.
+    this._running = false;
+    
+    // this._reversed is false if the animation has not been reversed yet.
+    this._reversed = false;
+    
+    // this._reverseJump stores amount of time that the reversed animation
+    // should effectively "skip". This will be 0 unless the animation was
+    // reversed before it was started.
+    this._reverseJump = 0;
+    
+    // this._startTime is the timestamp when the current animation was started.
+    // When the animation is reversed, this is set to the time it was reversed.
+    this._startTime = new Date().getTime();
+    
+    // this._waitingFrame is true if the Animation is running and is waiting for
+    // a frame update request from an asynchronous source.
+    this._waitingFrame = false;
+    
+    // Setup initial styles.
+    this._shielding.css({opacity: 0});
+    this._popup.css({
+      opacity: 0,
+      transform: 'translateY(-50px)',
+      webkitTransform: 'translateY(-50px)',
+      MozTransform: 'translateY(-50px)',
+      msTransform: 'translateY(-50px)'
+    });
+  }
+  
+  // start runs the animation. This should only be called once.
+  Animation.prototype.start = function() {
+    if (this._running || this._reversed) {
+      throw new Error('cannot re-start animation');
+    }
+    this._running = true;
+    this._startTime = new Date().getTime();
+    this._tick();
+  };
+  
+  // reverse runs the animation in reverse. This should only be called once,
+  // after start(). This will remove the popup and shielding from the DOM once
+  // it completes.
+  Animation.prototype.reverse = function() {
+    var now = new Date().getTime();
+    var sinceStart = now - this._startTime;
+    this._reverseJump = Math.max(0, ANIMATION_DURATION - sinceStart);
+    this._reversed = true;
+    this._startTime = now;
+    
+    // If it's not already animating (i.e. still fading in), we need to restart
+    // the animation process.
+    if (!this._waitingFrame) {
+      this._tick();
+    }
+  };
+  
+  // _showFrame renders a given percentage of the animation.
+  Animation.prototype._showFrame = function(pct) {
+    var transform;
+    if (pct === 1) {
+      transform = 'none';
+    } else {
+      transform = 'translateY(' + ((pct-1)*50) + 'px)';
+    }
+    this._shielding.css({opacity: pct});
+    this._popup.css({
+      opacity: pct,
+      transform: transform,
+      webkitTransform: transform,
+      MozTransform: transform,
+      msTransform: transform
+    });
+  };
+  
+  // _tick applies a frame of the animation.
+  Animation.prototype._tick = function() {
+    var elapsed = (new Date().getTime() - this._startTime) + this._reverseJump;
+    var progress = elapsed / ANIMATION_DURATION;
+    if (progress >= 1) {
+      if (this._reversed) {
+        this._popup.remove();
+        this._shielding.remove();
+      } else {
+        this._showFrame(1);
+      }
+      this._waitingFrame = false;
+      return;
+    }
+    
+    var easedProgress = 3*Math.pow(progress, 2) - 2*Math.pow(progress, 3);
+    if (this._reversed) {
+      this._showFrame(1 - easedProgress);
+    } else {
+      this._showFrame(easedProgress);
+    }
+    
+    this._waitingFrame = true;
+    if ('function' === typeof window.requestAnimationFrame) {
+      window.requestAnimationFrame(this._tick.bind(this));
+    } else {
+      setTimeout(this._tick.bind(this), 1000/60);
+    }
+  };
+  
+  // A Popup presents an element to the user in the form of a popup.
+  function Popup(element, width, height) {
+    // this._state allows us to validate various operations.
+    this._state = STATE_INITIAL;
+    
+    // Save the constructor arguments. Note that the width and height are
+    // static.
     this._element = element;
     this._width = width;
     this._height = height;
     
-    // Relative coordinates of the center of the popup.
+    // Make sure the element has the right class to be treated as a popup.
+    element.addClass('popup');
+    
+    // These coordinates allow us to position the popup relative to the window
+    // size.
     this._x = 0.5;
     this._y = 0.45;
     
-    // Generating the shielding element.
+    // Generate the semi-opaque shield which goes behind the popup.
     this._shielding = $('<div />', {class: 'popup-shielding'});
-    this._shielding.click(function(e) {
-      if (this._shown && !this._closed) {
-        this.close();
-      }
-    }.bind(this));
+    this._shielding.click(this.close.bind(this));
     
-    // This is necessary to ensure that the element is styled correctly.
-    element.addClass('popup popup-hidden');
+    // this._animation controls the visibility of the popup.
+    this._animation = new Animation(this._element, this._shielding);
     
     // Setup user dragging to move the popup.
     this._setupDragging();
     
-    // Setup close button.
-    element.find('.title > button').one('click', this.close.bind(this));
-    
-    // Setup layout management.
+    // this._layoutHandler is a pre-binded callback handler that will later be
+    // used to track window resize events.
     this._layoutHandler = this._layout.bind(this);
-    window.app.windowSize.addListener(this._layoutHandler);
-    this._layout();
   }
   
   // close exits the popup.
   Popup.prototype.close = function() {
-    if (!this._shown) {
-      throw new Error('cannot close a popup that was not shown');
-    } else if (this._closed) {
+    if (this._state !== STATE_SHOWING) {
       return;
     }
-    this._closed = true;
+    this._state = STATE_CLOSED;
     
-    this._shielding.css({opacity: 0, pointerEvents: 'none'});
-    this._element.addClass('popup-hidden');
+    // Hide the popup.
+    this._animation.reverse();
     
     // Disable scrolling again if this was the last showing popup.
-    if (--popupStackCount === 0) {
+    if (--visiblePopupCount === 0) {
       $('body, html').css({overflow: 'hidden'});
     }
     
-    // Re-enable keyboard events.
+    // Stop capturing keyboard events and browser resizes.
     window.app.keyboard.remove(this);
-    
-    // Remove the elements and destroy the popup after a timeout.
-    setTimeout(function() {
-      this._shielding.remove();
-      this._element.remove();
-      window.app.windowSize.removeListener(this._layoutHandler);
-    }.bind(this), 400);
+    window.app.windowSize.removeListener(this._layoutHandler);
   };
   
   // show presents the popup to the user. This may only be called once.
   Popup.prototype.show = function() {
-    if (this._shown) {
-      throw new Error('cannot re-show popup');
+    // Consult this._state to make sure everything works smoothly.
+    if (this._state !== STATE_INITIAL) {
+      return;
     }
-    this._shown = true;
+    this._state = STATE_SHOWING;
     
+    // Handle window resize events and layout the popup.
+    window.app.windowSize.addListener(this._layoutHandler);
+    this._layout();
+    
+    // Capture keyboard events while this popup is in front.
+    window.app.keyboard.push(this);
+    
+    // Append the elements to the body and show them!
     var body = $(document.body);
     body.append(this._shielding);
     body.append(this._element);
-    
-    // Trigger a reflow so that our CSS transitions apply.
-    this._shielding[0].offsetHeight;
-    this._element[0].offsetHeight;
-    
-    // Start the presentation animation.
-    this._shielding.css({opacity: 1});
-    this._element.removeClass('popup-hidden');
-    
-    // Disable keyboard events while this popup is in front.
-    window.app.keyboard.push(this);
+    this._animation.start();
     
     // The popup must scroll if it's too large, but the rest of the time the 
-    // site should not be scrollable or else it will bounce on OS X.
-    ++popupStackCount;
-    $('body, html').css({overflow: 'auto'});
+    // site should not be scrollable or else it will bounce when scrolled on
+    // Mac OS X.
+    if (0 === visiblePopupCount++) {
+      $('body, html').css({overflow: 'auto'});
+    }
   };
   
   // _layout re-positions the popup on the screen.
@@ -128,21 +238,19 @@
   
   // _setupDragging adds event listeners to allow the user to drag the popup.
   Popup.prototype._setupDragging = function() {
-    // The user may click on the element itself or on the .title if there is
-    // one.
+    // This state tracks the initial point where the user clicked and where the
+    // popup was at that time.
     var downPos = null;
     var initialOffset = null;
+    
+    // Handle the mousedown event to know wher they're clicking.
     this._element.mousedown(function(e) {
       var offset = this._element.offset();
-      if (e.pageY - offset.top > HEADER_HEIGHT) {
+      if (e.pageY - offset.top > TITLE_HEIGHT) {
         return;
       }
       downPos = [e.pageX, e.pageY];
       initialOffset = offset;
-    }.bind(this));
-    this._element.find('.title').mousedown(function(e) {
-      downPos = [e.pageX, e.pageY];
-      initialOffset = this._element.offset();
     }.bind(this));
     
     // Once the mouse is down, the user can drag anywhere in the document.
