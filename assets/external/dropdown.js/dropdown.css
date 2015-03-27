@@ -1,0 +1,101 @@
+.dropdownjs-preview {
+  display: inline-block;
+  height: 30px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdownjs-preview-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.dropdownjs-preview-content div {
+  position: absolute;
+  right: 5px;
+  top: 10px;
+  width: 10px;
+  height: 10px;
+  
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('arrow.png');
+  background-size: 100% 100%;
+  
+  /* Allow clicks to hit contents. */
+  pointer-events: none;
+}
+
+.dropdownjs-preview-content label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  color: #999;
+  font-size: 18px;
+  font-weight: lighter;
+  width: calc(100% - 15px);
+  height: 30px;
+  line-height: 30px;
+  padding-left: 7px;
+  
+  /* Allow clicks to hit contents. */
+  pointer-events: none;
+}
+
+.dropdownjs-preview-content:hover label {
+  color: #777;
+}
+
+.dropdownjs-preview-content:hover div {
+  background-image: url('arrow_hover.png');
+}
+
+.dropdownjs-shielding {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.dropdownjs-menu-container {
+  position: absolute;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  text-align: left;
+  background-color: white;
+  box-shadow: 0px 0px 4px 2px rgba(144, 144, 144, 0.5);
+}
+
+ul.dropdownjs-menu {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+ul.dropdownjs-menu li {
+  width: calc(100% - 30px);
+  height: 30px;
+  font-size: 18px;
+  line-height: 30px;
+  list-style-type: none;
+  padding: 0 0 0 30px;
+  margin: 0;
+  
+  color: #777;
+  cursor: pointer;
+}
+
+ul.dropdownjs-menu li.checked {
+  background-image: url('check.png');
+  background-repeat: no-repeat;
+  background-position: left left;
+  background-size: 30px 30px;
+}
+
+ul.dropdownjs-menu li:hover {
+  background-color: #f0f0f0;
+}
