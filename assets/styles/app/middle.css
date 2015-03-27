@@ -47,6 +47,8 @@
 #time label {
   display: inline-block;
   pointer-events: none;
+  
+  font-family: 'Roboto', sans-serif;
 }
 
 #time .blinker {
@@ -72,6 +74,8 @@
   
   text-align: center;
   color: white;
+  
+  font-family: 'Roboto', sans-serif;
 }
 
 #pb-status {

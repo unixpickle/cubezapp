@@ -261,7 +261,7 @@
     }
     
     // Create the content.
-    var dropdown = new window.app.Dropdown(FIELD_WIDTH);
+    var dropdown = new window.dropdownjs.Dropdown(FIELD_WIDTH);
     if (options !== null) {
       dropdown.setOptions(options, selected);
     }

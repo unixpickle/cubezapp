@@ -75,6 +75,8 @@
   
   height: 30px;
   line-height: 30px;
+  
+  font-weight: lighter;
 }
 
 .add-popup-content > .fields > .field > .content {
