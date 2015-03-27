@@ -15,8 +15,8 @@
 
 .popup-dialog > .title {
   height: 50px;
-  margin-left: 15px;
-  width: calc(100% - 30px);
+  margin-left: 20px;
+  width: calc(100% - 40px);
   border-bottom: 2px solid #d5d5d5;
 }
 
@@ -48,21 +48,21 @@
   background-position: center;
 }
 
-.popup-dialog > .title button:focus {
-  outline: 0;
+.popup-dialog > .title button:hover {
+  background-image: url('../../images/x_hover.png');
 }
 
 .popup-dialog > .content {
   position: absolute;
   top: 65px;
-  left: 15px;
+  left: 20px;
 }
 
 .popup-dialog > .footer {
   position: absolute;
   bottom: 0;
-  width: calc(100% - 30px);
-  left: 15px;
+  width: calc(100% - 40px);
+  left: 20px;
   border-top: 2px solid #d5d5d5;
   height: 60px;
 }

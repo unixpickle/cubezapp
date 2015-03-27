@@ -6,8 +6,9 @@
   ];
   
   window.app.iconNames = [
-    '2x2x2', '3x3x3', '4x4x4', '5x5x5', '6x6x6', '7x7x7', 'BLD', 'Clock',
-    'Feet', 'Fox', 'Megaminx', 'OH', 'Pyraminx', 'Skewb', 'Square-1'
+    '2x2x2', '3x3x3', '4x4x4', '5x5x5', '6x6x6', '7x7x7', 'BLD',
+    "Rubik's Clock", 'Feet', 'Fox', 'Megaminx', 'OH', 'Pyraminx', 'Skewb',
+    'Square-1'
   ];
   
 })();

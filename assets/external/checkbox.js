@@ -120,7 +120,9 @@
     var size = this._canvas.width;
     var context = this._canvas.getContext('2d');
     
-    context.clearRect(0, 0, size, size);
+    //context.clearRect(0, 0, size, size);
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, size, size);
     
     // Calculate the percentage of the current animation.
     var amountChecked = this._state.checked ? 1 : 0;
@@ -150,13 +152,12 @@
     }
     
     // Draw the bounding rectangle.
-    var boxThickness = Math.floor(size/20);
-    context.strokeStyle = this._state.pressed ? '#777777' : '#999999';
-    context.lineWidth = boxThickness;
-    if (1 || amountChecked) {
-      context.strokeRect(boxThickness, boxThickness, size-boxThickness*2,
-        size-boxThickness*2);
-    }
+    var boxThickness = Math.ceil(size/20);
+    context.fillStyle = this._state.pressed ? '#aaaaaa' : '#d5d5d5';
+    context.fillRect(0, 0, size, 2);
+    context.fillRect(0, size-2, size, 2);
+    context.fillRect(0, 0, 2, size);
+    context.fillRect(size-2, 0, 2, size);
     
     context.strokeStyle = 'rgba(' + Math.floor(color[0]*255) + ', ' +
       Math.floor(color[1]*255) + ', ' + Math.floor(color[2]*255) + ', 1.0)';

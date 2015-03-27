@@ -1,12 +1,12 @@
 .add-popup-content {
-  width: 470px;
+  width: 540px;
   height: 200px;
 }
 
 .add-popup-content > .puzzle {
   position: absolute;
   top: calc(50% - 80px);
-  left: calc(25% - 90px);
+  left: 0;
   
   width: 180px;
   height: 160px;
@@ -43,7 +43,7 @@
 
 .add-popup-content > .separator {
   position: absolute;
-  left: calc(50% - 1px);
+  left: 220px;
   top: 0;
   height: 100%;
   width: 2px;
@@ -52,8 +52,8 @@
 
 .add-popup-content > .fields {
   position: absolute;
-  left: calc(50% + 1px);
-  width: calc(50% - 1px);
+  left: 260px;
+  width: 280px;
   height: 100%;
 }
 
@@ -68,32 +68,30 @@
   
   float: left;
   width: 85px;
-  margin-left: 20px;
   
   color: #999;
   font-size: 20px;
   
   height: 30px;
   line-height: 30px;
-  
-  font-weight: lighter;
 }
 
 .add-popup-content > .fields > .field > .content {
   float: right;
-  width: 120px;
+  width: 170px;
   height: 30px;
+  text-align: right;
 }
 
 .add-popup-content > .fields > .field > .content > input {
-  width: 110px;
+  width: calc(100% - 10px);
   height: 30px;
   
   padding: 0 5px 0 5px;
   margin: 0;
   
   color: #999;
-  font-size: 20px;
+  font-size: 18px;
   border: none;
 }
 

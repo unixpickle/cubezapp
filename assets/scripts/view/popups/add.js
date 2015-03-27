@@ -1,6 +1,6 @@
 (function() {
   
-  var FIELD_WIDTH = 120;
+  var FIELD_WIDTH = 170;
   var FIELD_HEIGHT = 30;
   var CONTENT_HEIGHT = 200;
   
@@ -23,6 +23,7 @@
     // Create the rest of the hidden class.
     this._dialog = null;
     this._bldField = null;
+    this._bldCheck = null;
     this._iconField = null;
     this._iconDropdown = null;
     this._nameField = null;
@@ -58,8 +59,13 @@
     this._bldField = $('\
       <div class="field"> \
         <label>BLD</label> \
+        <div class="content"></div> \
       </div> \
     ');
+    var content = this._bldField.find('.content');
+    this._bldCheck = new window.checkboxjs.Checkbox(20, [0x65/255, 0xbc/255,
+      0xd4/255]);
+    content.append(this._bldCheck.element());
   };
   
   AddPopup.prototype._createIconField = function() {
@@ -145,8 +151,6 @@
       subscrambler = this._subscrambleDropdown.value();
     }
     
-    // TODO: support BLD checkbox.
-    
     // Close this popup and the header popup behind it.
     this._dialog.close();
     window.app.view.closePuzzles();
@@ -158,6 +162,7 @@
       scrambler: scrambler,
       scrambleType: subscrambler,
       scrambleLength: 0,
+      blindfolded: this._bldCheck.checked(),
       lastUsed: new Date().getTime()
     });
   };

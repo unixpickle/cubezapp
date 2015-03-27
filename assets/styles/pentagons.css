@@ -7,7 +7,7 @@
   
   pointer-events: none;
   
-  /* Transitions for page load animation */
+  /*
   -webkit-transition: -webkit-transform 0.7s, opacity 0.7s;
   transition: transform 0.7s, opacity 0.7s;
   -ms-transition: -ms-transform 0.7s, opacity 0.7s;
@@ -15,9 +15,9 @@
   transition-delay: 0.1s;
   -ms-transition-delay: 0.1s;
 
-  /* Initial properties before load */
   opacity: 0;
   -ms-transform: scale(1.2, 1.2);
   -webkit-transform: scale(1.2, 1.2);
   transform: scale(1.2, 1.2);
+  */
 }

@@ -191,14 +191,14 @@
     $(window).resize(resizeFunc);
     resizeFunc();
     
-    setTimeout(function() {
+    /*setTimeout(function() {
       $('#pentagons').css({
         opacity: 1,
         '-ms-transform': 'none',
         '-webkit-transform': 'none',
         transform: 'none'
       });
-    }, 10);
+    }, 10);*/
   });
   
 })();

@@ -35,7 +35,6 @@
   
   color: #999;
   font-size: 18px;
-  font-weight: lighter;
   width: calc(100% - 15px);
   height: 30px;
   line-height: 30px;
@@ -77,16 +76,20 @@ ul.dropdownjs-menu {
 }
 
 ul.dropdownjs-menu li {
-  width: calc(100% - 30px);
+  width: calc(100% - 40px);
   height: 30px;
   font-size: 18px;
   line-height: 30px;
   list-style-type: none;
-  padding: 0 0 0 30px;
+  padding: 0 10px 0 30px;
   margin: 0;
   
   color: #777;
   cursor: pointer;
+  
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 ul.dropdownjs-menu li.checked {

@@ -11,6 +11,13 @@
   // FOOTER_HEIGHT is the height of a standard popup's footer in pixels.
   var FOOTER_HEIGHT = 60;
   
+  // SIDE_PADDING is the space on the left and right of a dialog.
+  var SIDE_PADDING = 20;
+  
+  // Middle_PADDING is the space on the top and bottom of the content of a
+  // dialog.
+  var MIDDLE_PADDING = 15;
+  
   // These are the states the popup could be in.
   var STATE_INITIAL = 0;
   var STATE_SHOWING = 1;
@@ -202,11 +209,11 @@
     }
   };
   
-  // Chrome is the only browser that seems to like CSS transitions for this.
+  // For now, CSS animations have problems in all major browsers.
   var Animation = ScriptAnimation;
-  if (navigator.userAgent.indexOf('Chrome') > -1) {
+  /*if (navigator.userAgent.indexOf('Chrome') > -1) {
     Animation = CSSAnimation;
-  }
+  }*/
   
   
   // A Popup presents an element to the user in the form of a popup.
@@ -362,8 +369,9 @@
     // Get the dimensions of the popup.
     content.css({visibility: 'hidden', position: 'fixed'});
     $(document.body).append(content);
-    var width = content.width() + 30;
-    var height = content.height() + FOOTER_HEIGHT + TITLE_HEIGHT + 30;
+    var width = content.width() + SIDE_PADDING*2;
+    var height = content.height() + FOOTER_HEIGHT + TITLE_HEIGHT +
+      MIDDLE_PADDING*2;
     content.detach();
     content.css({visibility: 'visible', position: 'absolute'});
     

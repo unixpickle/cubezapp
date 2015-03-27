@@ -225,6 +225,32 @@
   // _initializeAnimator runs the page load animation and syncs the animator up
   // with the initial state.
   AppView.prototype._initializeAnimator = function() {
+    // Show everything to the user right away.
+    var middleLayout = this._computeMiddleLayout();
+    this._animator.setAttributes({
+      // Footer attributes
+      footerClosedness: (this._state.footerOpen ? 0 : 1),
+      footerHeight: this._state.footerHeight,
+      footerOffset: 0,
+      footerOpacity: this._state.footerVisible ? 1 : 0,
+      // Header attributes
+      headerOffset: 0,
+      headerOpacity: 1,
+      // Middle attributes
+      middleHeight: middleLayout.height,
+      middleY: middleLayout.y,
+      // Miscellaneous attributes
+      memoOpacity: 0,
+      pbOpacity: 0,
+      scrambleOpacity: 0,
+      // Time attributes
+      timeOpacity: 1,
+      timeScale: 1,
+      timeSize: middleLayout.timeSize,
+      timeY: middleLayout.timeY
+    });
+    
+    /*
     // Poise the page for the on-load animation.
     var middleLayout = this._computeMiddleLayout();
     this._animator.setAttributes({
@@ -259,6 +285,7 @@
     this._animator.animateAttribute('headerOpacity', 1, 0.3);
     this._animator.animateAttribute('timeOpacity', 1, 0.25, 0.1);
     this._animator.animateAttribute('timeScale', 1, 0.25, 0.1);
+    */
   };
 
   // _initializeState generates this._state.
