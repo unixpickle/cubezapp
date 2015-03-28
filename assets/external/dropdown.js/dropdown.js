@@ -31,11 +31,11 @@
     var content = $('<div class="dropdownjs-preview-content"></div>');
     content.append([this._label, this._arrow]);
     this._preview.append(content);
-    this._preview.click(this._show.bind(this));
+    this._preview.click(this.show.bind(this));
     
     // Generate the shielding element.
     this._shielding = $('<div class="dropdownjs-shielding"></div>');
-    this._shielding.click(this._hide.bind(this));
+    this._shielding.click(this.hide.bind(this));
     
     // Generate the menu which will popup.
     this._menuContainer = $('<div class="dropdownjs-menu-container"></div>');
@@ -47,6 +47,19 @@
   // element returns an HTML element which can be displayed for the dropdown.
   Dropdown.prototype.element = function() {
     return this._preview[0];
+  };
+  
+  // hide closes the dropdown if it was open.
+  Dropdown.prototype.hide = function() {
+    if (!this.isOpen()) {
+      return;
+    }
+    
+    this._metrics = null;
+    this._shielding.detach();
+    this._menuContainer.detach();
+    
+    $(window).off('resize', this._resizeCallback);
   };
   
   // isOpen returns true if the dropdown is open.
@@ -82,7 +95,7 @@
       this._menu.append(element);
       element.click(function(idx) {
         if (this.isOpen()) {
-          this._hide();
+          this.hide();
           this.setSelected(idx);
           if ('function' === typeof this.onChange) {
             this.onChange();
@@ -117,37 +130,8 @@
     }
   };
   
-  // value returns the name of the selected element.
-  Dropdown.prototype.value = function() {
-    if (this._optionNames.length === 0) {
-      return '';
-    }
-    return this._optionNames[this._selected];
-  };
-  
-  Dropdown.prototype._hide = function() {
-    if (!this.isOpen()) {
-      return;
-    }
-    
-    this._metrics = null;
-    this._shielding.detach();
-    this._menuContainer.detach();
-    
-    $(window).off('resize', this._resizeCallback);
-  };
-  
-  Dropdown.prototype._resize = function() {
-    this._metrics.resized();
-    this._menuContainer.css({
-      left: this._metrics.left,
-      top: this._metrics.top,
-      width: this._metrics.width,
-      height: this._metrics.viewHeight
-    });
-  };
-  
-  Dropdown.prototype._show = function() {
+  // show opens the dropdown if it was not already open.
+  Dropdown.prototype.show = function() {
     if (this.isOpen() || this._optionNames.length === 0) {
       return;
     }
@@ -167,6 +151,24 @@
     
     // Setup resizing events.
     $(window).resize(this._resizeCallback);
+  };
+  
+  // value returns the name of the selected element.
+  Dropdown.prototype.value = function() {
+    if (this._optionNames.length === 0) {
+      return '';
+    }
+    return this._optionNames[this._selected];
+  };
+  
+  Dropdown.prototype._resize = function() {
+    this._metrics.resized();
+    this._menuContainer.css({
+      left: this._metrics.left,
+      top: this._metrics.top,
+      width: this._metrics.width,
+      height: this._metrics.viewHeight
+    });
   };
   
   // Metrics manages the layout of a dropdown menu.

@@ -20,6 +20,10 @@
     // the subscramble dropdown.
     this._showingSubscramble = false;
     
+    // These keep track of which field the user has explicitly set.
+    this._userChangedIcon = false;
+    this._userChangedScramble = false;
+    
     // Create the rest of the hidden class.
     this._dialog = null;
     this._bldField = null;
@@ -49,10 +53,83 @@
     element.append([puzzle, separator, this._fields]);
     this._dialog = new window.app.Dialog('New Puzzle', element, ['Create']);
     this._dialog.onAction = this._done.bind(this);
+    this._dialog.onClose = this._handleClose.bind(this);
   }
   
   AddPopup.prototype.show = function() {
     this._dialog.show();
+  };
+  
+  AddPopup.prototype._changedIcon = function() {
+    this._userChangedIcon = true;
+    
+    // Get the filename from the human-readable name.
+    var name = window.app.iconFiles[this._iconDropdown.selected()];
+    this._puzzleIcon.css({
+      backgroundImage: 'url(images/puzzles/' + name + '.png)'
+    });
+    
+    // If we can change the scramble, try it. There's no harm in it.
+    if (!this._userChangedScramble) {
+      var iconName = this._iconDropdown.value();
+      var lastIdx = this._scrambleDropdown.selected();
+      this._scrambleDropdown.setSelectedValue(iconName);
+      if (this._scrambleDropdown.selected() !== lastIdx) {
+        this._changedScramble();
+        this._userChangedScramble = false;
+      }
+    }
+  };
+  
+  AddPopup.prototype._changedName = function() {
+    this._puzzleName.text(this._nameInput.val() || 'Name');
+    if (!this._userChangedIcon) {
+      this._iconDropdown.setSelectedValue(this._nameInput.val());
+      if (this._iconDropdown.value() === this._nameInput.val()) {
+        this._changedIcon();
+        this._userChangedIcon = false;
+      }
+    }
+  };
+  
+  AddPopup.prototype._changedScramble = function() {
+    this._userChangedScramble = true;
+    
+    var subScramblers = this._subscramblers();
+    var showSub = (subScramblers.length > 1);
+    
+    // Update the subscramblers in the dropdown if possible.
+    if (showSub) {
+      this._subscrambleDropdown.setOptions(subScramblers, 0);
+    }
+    
+    // If the subscramble visibility did not change, no animation or relayout is
+    // needed.
+    if (showSub === this._showingSubscramble) {
+      return;
+    }
+    
+    this._showingSubscramble = showSub;
+    
+    // Animate all elements to their new positions.
+    var positions = this._fieldPositions();
+    var fields = [this._nameField, this._iconField, this._scrambleField,
+      this._bldField];
+    for (var i = 0; i < 4; ++i) {
+      var y = positions[i];
+      fields[i].animate({top: y});
+    }
+    
+    // Fade in/out the subscramble field.
+    if (showSub) {
+      this._subscrambleField.fadeIn();
+    } else {
+      this._subscrambleField.fadeOut();
+    }
+  };
+  
+  AddPopup.prototype._changedSubscramble = function() {
+    this._userChangedScramble = true;
   };
   
   AddPopup.prototype._createBLDField = function() {
@@ -76,13 +153,7 @@
     this._iconField = res.field;
     
     // Changing the icon field changes the icon in the preview.
-    this._iconDropdown.onChange = function() {
-      // Get the filename from the human-readable name.
-      var name = window.app.iconFiles[this._iconDropdown.selected()];
-      this._puzzleIcon.css({
-        backgroundImage: 'url(images/puzzles/' + name + '.png)'
-      });
-    }.bind(this);
+    this._iconDropdown.onChange = this._changedIcon.bind(this);
   };
   
   AddPopup.prototype._createNameField = function() {
@@ -100,12 +171,10 @@
     this._nameInput.keydown(function() {
       // The text isn't changed by the keydown, so we wait 10ms.
       setTimeout(function() {
-        this._puzzleName.text(this._nameInput.val() || 'Name');
+        this._changedName();
       }.bind(this), 10);
     }.bind(this));
-    this._nameInput.change(function() {
-      this._puzzleName.text(this._nameInput.val() || 'Name');
-    }.bind(this));
+    this._nameInput.change(this._changedName.bind(this));
   };
   
   AddPopup.prototype._createScrambleField = function() {
@@ -119,7 +188,7 @@
     this._scrambleField = res.field;
     
     // When the scramble changes, it changes the subscrambles.
-    this._scrambleDropdown.onChange = this._scrambleChanged.bind(this);
+    this._scrambleDropdown.onChange = this._changedScramble.bind(this);
   };
   
   AddPopup.prototype._createSubscrambleField = function() {
@@ -129,6 +198,7 @@
     
     // By default, this field is invisible.
     this._subscrambleField.css({display: 'none'});
+    this._subscrambleDropdown.onChange = this._changedSubscramble.bind(this);
   };
   
   // _done process the user's input and creates a puzzle.
@@ -190,6 +260,13 @@
     }
   };
   
+  // _handleClose makes sure no dropdowns are open.
+  AddPopup.prototype._handleClose = function() {
+    this._iconDropdown.hide();
+    this._scrambleDropdown.hide();
+    this._subscrambleDropdown.hide();
+  };
+  
   // _initialLayout puts the fields in their respective places.
   AddPopup.prototype._initialLayout = function() {
     // Compute the subscramble field's position.
@@ -206,40 +283,6 @@
       this._fields.append(fields[i]);
     }
     this._fields.append(this._subscrambleField);
-  };
-  
-  AddPopup.prototype._scrambleChanged = function() {
-    var subScramblers = this._subscramblers();
-    var showSub = (subScramblers.length > 1);
-    
-    // Update the subscramblers in the dropdown if possible.
-    if (showSub) {
-      this._subscrambleDropdown.setOptions(subScramblers, 0);
-    }
-    
-    // If the subscramble visibility did not change, no animation or relayout is
-    // needed.
-    if (showSub === this._showingSubscramble) {
-      return;
-    }
-    
-    this._showingSubscramble = showSub;
-    
-    // Animate all elements to their new positions.
-    var positions = this._fieldPositions();
-    var fields = [this._nameField, this._iconField, this._scrambleField,
-      this._bldField];
-    for (var i = 0; i < 4; ++i) {
-      var y = positions[i];
-      fields[i].animate({top: y});
-    }
-    
-    // Fade in/out the subscramble field.
-    if (showSub) {
-      this._subscrambleField.fadeIn();
-    } else {
-      this._subscrambleField.fadeOut();
-    }
   };
   
   AddPopup.prototype._subscramblers = function() {

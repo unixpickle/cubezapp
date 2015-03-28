@@ -150,8 +150,6 @@
     var amountChecked = s.amountChecked;
     var color = s.color;
     
-    console.log(s);
-    
     if (amountChecked === 0) {
       // There is nothing to draw.
       return;

@@ -252,6 +252,10 @@
     // this._layoutHandler is a pre-binded callback handler that will later be
     // used to track window resize events.
     this._layoutHandler = this._layout.bind(this);
+    
+    // this.onClose is called once the popup is closing. This is called
+    // regardless of how the close was triggered.
+    this.onClose = null;
   }
   
   // close exits the popup.
@@ -272,6 +276,10 @@
     // Stop capturing keyboard events and browser resizes.
     window.app.keyboard.remove(this);
     window.app.windowSize.removeListener(this._layoutHandler);
+    
+    if ('function' === typeof this.onClose) {
+      this.onClose();
+    }
   };
   
   // show presents the popup to the user. This may only be called once.
