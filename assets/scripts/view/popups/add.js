@@ -205,8 +205,8 @@
   AddPopup.prototype._done = function() {
     var name = this._nameInput.val();
     if (name === '') {
-      // TODO: make the field shake.
       this._nameInput.focus();
+      this._shakeName();
       return;
     }
     
@@ -283,6 +283,27 @@
       this._fields.append(fields[i]);
     }
     this._fields.append(this._subscrambleField);
+  };
+  
+  AddPopup.prototype._shakeName = function() {
+    var prefixes = ['webkitAnimation', 'animation'];
+    var element = this._nameInput[0];
+    for (var i = 0; i < 2; ++i) {
+      var prefix = prefixes[i];
+      element.style[prefix + 'Name'] = 'shake';
+      element.style[prefix + 'Duration'] = '0.5s';
+      element.style[prefix + 'Direction'] = 'normal';
+      element.style[prefix + 'Delay'] = '0s';
+      element.style[prefix + 'FillMode'] = 'none';
+    }
+    element.addEventListener('animationend', function() {
+      element.style.animationName = 'none';
+      element.style.webkitAnimationName = 'none';
+    });
+    element.addEventListener('webkitAnimationEnd', function() {
+      element.style.animationName = 'none';
+      element.style.webkitAnimationName = 'none';
+    });
   };
   
   AddPopup.prototype._subscramblers = function() {
