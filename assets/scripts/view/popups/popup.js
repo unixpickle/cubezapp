@@ -37,7 +37,7 @@
     
     // This is set when start() was called but the transition hasn't been
     // started yet.
-    this._startTimeout = null;
+    this._startRequest = null;
     
     // Set the transition properties.
     var shieldingTransition = 'opacity ' + ANIMATION_DURATION/1000 + 's ease';
@@ -60,9 +60,9 @@
   
   // reverse starts hiding the popup.
   CSSAnimation.prototype.reverse = function() {
-    if (this._startTimeout !== null) {
+    if (this._startRequest !== null) {
       // The animation is starting and this is a race condition, so to speak.
-      clearInterval(this._startTimeout);
+      window.cancelAnimationFrame(this._startRequest);
       this._shielding.remove();
       this._popup.remove();
       return;
@@ -84,17 +84,20 @@
   
   // start begins showing the popup.
   CSSAnimation.prototype.start = function() {
-    // We wait on a timeout to make sure there's a reflow.
-    this._startTimeout = setTimeout(function() {
-      this._startTimeout = null;
-      this._shielding.css({opacity: 1});
-      this._popup.css({
-        opacity: 1,
-        transform: 'none',
-        msTransform: 'none',
-        WebkitTransform: 'none'
-      });
-    }.bind(this), 0);
+    // window.requestAnimationFrame calls a function right before a repaint, so
+    // doing it twice ensures that the second one is called after a repaint.
+    this._startRequest = window.requestAnimationFrame(function() {
+      this._startRequest = window.requestAnimationFrame(function() {
+        this._startRequest = null;
+        this._shielding.css({opacity: 1});
+        this._popup.css({
+          opacity: 1,
+          transform: 'none',
+          msTransform: 'none',
+          WebkitTransform: 'none'
+        });
+      }.bind(this));
+    }.bind(this));
   };
   
   // ScriptAnimation is the script-based presentation animator. It uses no CSS3
@@ -209,11 +212,13 @@
     }
   };
   
-  // For now, CSS animations have problems in all major browsers.
+  // CSS animations work if we *know* we can trigger a reflow, and even then
+  // some browsers have animation glitches. Thus, we use ScriptAnimation for
+  // now.
   var Animation = ScriptAnimation;
-  /*if (navigator.userAgent.indexOf('Chrome') > -1) {
-    Animation = CSSAnimation;
-  }*/
+  //if ('function' === typeof window.requestAnimationFrame) {
+  //  Animation = CSSAnimation;
+  //}
   
   // A Popup presents an element to the user in the form of a popup.
   function Popup(element, width, height) {
