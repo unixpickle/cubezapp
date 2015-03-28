@@ -8,7 +8,6 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
  * Figure out a way to optimize popup animation
  * Re-implement Dropdown with animations
- * Take initial memo time as initializer argument for AppView
 
 # License
 

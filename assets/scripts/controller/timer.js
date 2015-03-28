@@ -112,7 +112,7 @@
           date: new Date().getTime(),
           dnf: false,
           inspection: 0,
-          memo: 0,
+          memo: -1,
           notes: '',
           plus2: false,
           time: time
@@ -271,7 +271,7 @@
       date: new Date().getTime(),
       dnf: false,
       inspection: 0,
-      memo: 0,
+      memo: -1,
       notes: '',
       plus2: false,
       time: t
@@ -411,7 +411,7 @@
       date: new Date().getTime(),
       dnf: false,
       inspection: 0,
-      memo: 0,
+      memo: -1,
       notes: '',
       plus2: false,
       time: time

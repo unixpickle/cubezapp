@@ -11,7 +11,7 @@
   var MIN_FOOTER_SIZE = 250;
   var MAX_FOOTER_SIZE = 400;
   
-  function AppView() {
+  function AppView(record) {
     // Initialize UI components and the animator.
     this._animator = new window.app.Animator();
     this._footer = new window.app.Footer();
@@ -30,10 +30,18 @@
     this._footer.onResize = this._resizeFooter.bind(this);
     this._animator.onAnimate = this._layout.bind(this);
     
+    // Show the initial time and memo time.
+    if (record) {
+      this._middle.setTime(window.app.formatTime(record.time));
+      if (record.memo >= 0) {
+        this._middle.setMemo(window.app.formatTime(record.memo));
+      }
+    }
+    
     // Compute the initial state and lay it out.
-    this._initializeState();
+    this._initializeState('object' === typeof record && record.memo >= 0);
     this._initializeAnimator();
-    this._loadAnimation();
+    this._loadAnimation(record);
     this._layout(this._animator.current());
   }
   
@@ -248,7 +256,7 @@
       middleHeight: middleLayout.height,
       middleY: middleLayout.y,
       // Miscellaneous attributes
-      memoOpacity: 0,
+      memoOpacity: this._state.memoVisible ? 1 : 0,
       pbOpacity: 0,
       scrambleOpacity: 0,
       // Time attributes
@@ -259,7 +267,7 @@
 
   // _initializeState generates this._state.
   // This loads the footerOpen setting.
-  AppView.prototype._initializeState = function() {
+  AppView.prototype._initializeState = function(memoVisible) {
     // Create the initial state without any input from the UI.
     // We do this mainly so that this._updateState() can work.
     this._state = new State({
@@ -267,7 +275,7 @@
       footerOpen: localStorage.footerOpen !== 'false',
       footerVisible: false,
       headerVisible: true,
-      memoVisible: false,
+      memoVisible: memoVisible,
       pbAvailable: false,
       pbVisible: false,
       scrambleAvailable: false,
@@ -286,7 +294,7 @@
   };
   
   // _loadAnimation runs the load animation.
-  AppView.prototype._loadAnimation = function() {
+  AppView.prototype._loadAnimation = function(record) {
     $('body').css({pointerEvents: 'none'});
     
     // These are animations which will definitely happen.
@@ -298,6 +306,13 @@
     if (this._state.footerVisible) {
       elements.push('footer');
       animations.push('risefade');
+      delays.push('0s');
+    }
+    
+    // If the memo time is visible, animate it in.
+    if (this._state.memoVisible) {
+      elements.push('memo-time');
+      animations.push('fadein');
       delays.push('0s');
     }
     
@@ -317,6 +332,9 @@
       var cb = function(element) {
         if (element.id === 'pentagons') {
           element.style.opacity = 1;
+        } else if (element.id === 'memo-time') {
+          element.style.opacity = 1;
+          this._animator.setAttribute('memoOpacity', 1);
         }
         element.style.animationName = 'none';
         element.style.webkitAnimationName = 'none';
