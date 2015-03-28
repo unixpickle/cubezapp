@@ -12,8 +12,7 @@
     window.app.view.setPuzzles(puzzles);
     window.app.view.setActivePuzzle(window.app.store.getActivePuzzle());
     
-    // Make sure that the timer is set to the correct setting for this puzzle.
-    this._configureTimer();
+    // NOTE: we do not configure the timer until the page finishes loading.
   }
   
   // addPuzzle adds a puzzle and switches to it.
@@ -44,6 +43,12 @@
       window.app.view.setActivePuzzle(window.app.store.getActivePuzzle());
       this._configureTimer();
     }.bind(this));
+  };
+  
+  // viewLoaded is called by the app view once it's loaded.
+  Home.prototype.viewLoaded = function() {
+    // Make sure that the timer is set to the correct setting for this puzzle.
+    this._configureTimer();
   };
   
   Home.prototype._configureTimer = function() {

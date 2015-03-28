@@ -287,6 +287,8 @@
   
   // _loadAnimation runs the load animation.
   AppView.prototype._loadAnimation = function() {
+    $('body').css({pointerEvents: 'none'});
+    
     // These are animations which will definitely happen.
     var elements = ['header', 'time', 'pentagons'];
     var animations = ['sinkfade', 'shrinkfade', 'shrinkfade'];
@@ -318,7 +320,10 @@
         }
         element.style.animationName = 'none';
         element.style.webkitAnimationName = 'none';
-        this._numLoadingAnimations--;
+        if (--this._numLoadingAnimations === 0) {
+          $('body').css({pointerEvents: 'auto'});
+          window.app.home.viewLoaded();
+        }
       }.bind(this, element);
       element.addEventListener('animationend', cb);
       element.addEventListener('webkitAnimationEnd', cb);
