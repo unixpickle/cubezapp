@@ -9,7 +9,7 @@
     'middleHeight', 'middleY',
     'pbOpacity',
     'scrambleOpacity',
-    'timeOpacity', 'timeScale', 'timeSize', 'timeY'
+    'timeSize', 'timeY'
   ];
   
   // An Animation performs a curve-based animation of a numeric value.

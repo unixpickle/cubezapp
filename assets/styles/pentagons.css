@@ -7,17 +7,6 @@
   
   pointer-events: none;
   
-  /*
-  -webkit-transition: -webkit-transform 0.7s, opacity 0.7s;
-  transition: transform 0.7s, opacity 0.7s;
-  -ms-transition: -ms-transform 0.7s, opacity 0.7s;
-  -webkit-transition-delay: 0.2s;
-  transition-delay: 0.1s;
-  -ms-transition-delay: 0.1s;
-
+  /* The pentagons are hidden until they are shown by a CSS animation */
   opacity: 0;
-  -ms-transform: scale(1.2, 1.2);
-  -webkit-transform: scale(1.2, 1.2);
-  transform: scale(1.2, 1.2);
-  */
 }

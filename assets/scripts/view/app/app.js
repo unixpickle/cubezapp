@@ -22,6 +22,7 @@
     this._state = null;
     this._theaterMode = false;
     this._userFooterHeight = parseInt(localStorage.footerHeight || '300');
+    this._numLoadingAnimations = 0;
 
     // Setup event handlers.
     window.app.windowSize.addListener(this._resized.bind(this));
@@ -32,6 +33,7 @@
     // Compute the initial state and lay it out.
     this._initializeState();
     this._initializeAnimator();
+    this._loadAnimation();
     this._layout(this._animator.current());
   }
   
@@ -43,6 +45,12 @@
   // closePuzzles closes the puzzles dropdown if it is open.
   AppView.prototype.closePuzzles = function() {
     this._header.close();
+  };
+  
+  // loading returns true if the app is still loading and should not be updated
+  // significantly.
+  AppView.prototype.loading = function() {
+    return this._numLoadingAnimations > 0;
   };
   
   // removePuzzle removes a puzzle from the view with a possible animation.
@@ -222,8 +230,8 @@
     return middleLayout;
   };
 
-  // _initializeAnimator runs the page load animation and syncs the animator up
-  // with the initial state.
+  // _initializeAnimator generates an animator with the initial state of the
+  // page.
   AppView.prototype._initializeAnimator = function() {
     // Show everything to the user right away.
     var middleLayout = this._computeMiddleLayout();
@@ -244,48 +252,9 @@
       pbOpacity: 0,
       scrambleOpacity: 0,
       // Time attributes
-      timeOpacity: 1,
-      timeScale: 1,
       timeSize: middleLayout.timeSize,
       timeY: middleLayout.timeY
     });
-    
-    /*
-    // Poise the page for the on-load animation.
-    var middleLayout = this._computeMiddleLayout();
-    this._animator.setAttributes({
-      // Footer attributes
-      footerClosedness: (this._state.footerOpen ? 0 : 1),
-      footerHeight: this._state.footerHeight,
-      footerOffset: 20,
-      footerOpacity: 0,
-      // Header attributes
-      headerOffset: -20,
-      headerOpacity: 0,
-      // Middle attributes
-      middleHeight: middleLayout.height,
-      middleY: middleLayout.y,
-      // Miscellaneous attributes
-      memoOpacity: 0,
-      pbOpacity: 0,
-      scrambleOpacity: 0,
-      // Time attributes
-      timeOpacity: 0,
-      timeScale: 1.2,
-      timeSize: middleLayout.timeSize,
-      timeY: middleLayout.timeY
-    });
-    
-    // Run the page-load animation.
-    this._animator.animateAttribute('footerOffset', 0, 0.3);
-    if (this._state.footerVisible) {
-      this._animator.animateAttribute('footerOpacity', 1, 0.3);
-    }
-    this._animator.animateAttribute('headerOffset', 0, 0.3);
-    this._animator.animateAttribute('headerOpacity', 1, 0.3);
-    this._animator.animateAttribute('timeOpacity', 1, 0.25, 0.1);
-    this._animator.animateAttribute('timeScale', 1, 0.25, 0.1);
-    */
   };
 
   // _initializeState generates this._state.
@@ -314,6 +283,46 @@
     this._footer.layout(attrs);
     this._header.layout(attrs);
     this._middle.layout(attrs);
+  };
+  
+  // _loadAnimation runs the load animation.
+  AppView.prototype._loadAnimation = function() {
+    // These are animations which will definitely happen.
+    var elements = ['header', 'time', 'pentagons'];
+    var animations = ['sinkfade', 'shrinkfade', 'shrinkfade'];
+    var delays = ['0s', '0s', '0.15s'];
+    
+    // If the footer is visible, animate it in.
+    if (this._state.footerVisible) {
+      elements.push('footer');
+      animations.push('risefade');
+      delays.push('0s');
+    }
+    
+    // Run the animations.
+    this._numLoadingAnimations = elements.length;
+    for (var j = 0, len = elements.length; j < len; ++j) {
+      var element = document.getElementById(elements[j]);
+      var prefixes = ['webkitAnimation', 'animation'];
+      for (var i = 0; i < 2; ++i) {
+        var prefix = prefixes[i];
+        element.style[prefix + 'Name'] = animations[j];
+        element.style[prefix + 'Duration'] = '0.7s';
+        element.style[prefix + 'Direction'] = 'normal';
+        element.style[prefix + 'Delay'] = delays[j];
+        element.style[prefix + 'FillMode'] = 'none';
+      }
+      var cb = function(element) {
+        if (element.id === 'pentagons') {
+          element.style.opacity = 1;
+        }
+        element.style.animationName = 'none';
+        element.style.webkitAnimationName = 'none';
+        this._numLoadingAnimations--;
+      }.bind(this, element);
+      element.addEventListener('animationend', cb);
+      element.addEventListener('webkitAnimationEnd', cb);
+    }
   };
   
   // _resizeFooter updates the height of the footer given a user-requested size.

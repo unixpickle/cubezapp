@@ -215,7 +215,6 @@
     Animation = CSSAnimation;
   }*/
   
-  
   // A Popup presents an element to the user in the form of a popup.
   function Popup(element, width, height) {
     // this._state allows us to validate various operations.

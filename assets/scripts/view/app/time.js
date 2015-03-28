@@ -42,20 +42,12 @@
       return;
     }
     
-    var transform = 'none';
-    if (attrs.timeScale) {
-      transform = 'scale(' + attrs.timeScale + ', ' + attrs.timeScale + ')';
-    }
-    
     // Layout main scene.
     this._elementStyler.css({
       display: 'block',
       opacity: attrs.timeOpacity,
       top: attrs.timeY + attrs.middleY,
-      height: attrs.timeSize,
-      transform: transform,
-      msTransform: transform,
-      webkitTransform: transform
+      height: attrs.timeSize
     });
     this._labelStyler.css({
       height: attrs.timeSize,

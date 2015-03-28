@@ -24,7 +24,9 @@
   
   Keyboard.prototype._keydown = function(e) {
     // If the key is already down, it's repeated.
-    if (this._down[e.which]) {
+    if (isLoading()) {
+      return;
+    } else if (this._down[e.which]) {
       e.repeat = true;
     } else {
       e.repeat = false;
@@ -52,7 +54,9 @@
   };
   
   Keyboard.prototype._keypress = function(e) {
-    if ($(document.activeElement).is('input') && isTypedText(e)) {
+    if (isLoading()) {
+      return;
+    } else if ($(document.activeElement).is('input') && isTypedText(e)) {
       return;
     }
     
@@ -72,6 +76,10 @@
   };
   
   Keyboard.prototype._keyup = function(e) {
+    if (isLoading()) {
+      return;
+    }
+    
     this._down[e.which] = false;
     
     if ($(document.activeElement).is('input') && isTypedText(e)) {
@@ -92,6 +100,10 @@
       }
     }
   };
+  
+  function isLoading() {
+    return 'undefined' === typeof window.app.view || window.app.view.loading();
+  }
   
   function isTypedText(e) {
     // The enter key and the escape key don't count as text.
