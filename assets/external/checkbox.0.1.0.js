@@ -1,47 +1,70 @@
 (function() {
   
+  // ANIMATION_DURATION is the amount of time it takes for the checkbox to fill
+  // in.
   var ANIMATION_DURATION = 150;
   
+  // CHECKBOX_SIZE is the width/height of the checkbox canvas in pixels.
+  var CHECKBOX_SIZE = 18;
+  
+  // BORDER_COLOR is the color of the border when the checkbox is not clicked.
+  var BORDER_COLOR = '#d5d5d5';
+  
+  // PRESSED_BORDER is the color of the border when the checkbox is pressed.
+  var PRESSED_BORDER = '#aaaaaa';
+  
+  // BORDER_THICKNESS is the number of pixels the border should be.
+  var BORDER_THICKNESS = 2;
+  
   // This is the leftmost point of the checkmark.
-  var P1 = [0.2, 0.5];
+  var P1 = [2, 10];
   
   // This is the elbow of the checkmark.
-  var P2 = [0.4, 0.7];
+  var P2 = [7, 15];
   
   // This is the rightmost tip of the checkmark
-  var P3 = [0.85, 0.25];
+  var P3 = [16, 4];
   
-  function Checkbox(size, color, checked) {
+  function Checkbox(color, checked) {
     this._color = color;
-    this._size = size;
     this._canvas = document.createElement('canvas');
     this._element = document.createElement('div');
     this._element.appendChild(this._canvas);
-    this._element.style.width = size + 'px';
-    this._element.style.height = size + 'px';
+    this._element.style.width = CHECKBOX_SIZE + 'px';
+    this._element.style.height = CHECKBOX_SIZE + 'px';
+    this._element.style.border = BORDER_THICKNESS + 'px solid ' + BORDER_COLOR;
+    this._element.style.backgroundColor = 'white';
     this._element.style.display = 'inline-block';
+    
+    // Clicking changes the checkbox.
     this._element.onclick = function() {
       this.setChecked(!this.checked());
       if ('function' === this.onChange) {
         this.onChange();
       }
     }.bind(this);
+    
+    // Change the border color when clicked.
     this._element.onmousedown = function() {
-      this._state.pressed = true;
-      this._draw();
+      this._element.style.border = BORDER_THICKNESS + 'px solid ' +
+        PRESSED_BORDER;
     }.bind(this);
     this._element.onmouseup = function() {
-      this._state.pressed = false;
-      this._draw();
+      this._element.style.border = BORDER_THICKNESS + 'px solid ' +
+        BORDER_COLOR;
+    }.bind(this);
+    this._element.onmouseleave = function() {
+      this._element.style.border = BORDER_THICKNESS + 'px solid ' +
+        BORDER_COLOR;
     }.bind(this);
     
+    // Make sure the canvas fills the element no matter what the pixel ratio is.
     this._canvas.style.width = '100%';
     this._canvas.style.height = '100%';
     
-    // The state helps us with animating changes.
+    // The state helps us animate changes.
     this._state = new State({
       checked: checked || false,
-      pressed: false,
       animatingCheck: false,
       animatingColor: false,
       colorStart: null,
@@ -120,11 +143,51 @@
     var size = this._canvas.width;
     var context = this._canvas.getContext('2d');
     
-    //context.clearRect(0, 0, size, size);
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, size, size);
+    context.clearRect(0, 0, size, size);
     
     // Calculate the percentage of the current animation.
+    var s = this._drawState();
+    var amountChecked = s.amountChecked;
+    var color = s.color;
+    
+    console.log(s);
+    
+    if (amountChecked === 0) {
+      // There is nothing to draw.
+      return;
+    }
+    
+    // Setup drawing for the check mark.
+    context.strokeStyle = 'rgba(' + Math.floor(color[0]*255) + ', ' +
+      Math.floor(color[1]*255) + ', ' + Math.floor(color[2]*255) + ', 1.0)';
+    context.lineWidth = 2;
+    
+    // Clip to the region of the checkmark that's complete.
+    if (amountChecked !== 1) {
+      context.save();
+      context.beginPath();
+      context.rect(0, 0, size*amountChecked, size);
+      context.clip();
+    }
+    
+    // Draw the checkmark as much as it's been completed.
+    var scale = size/CHECKBOX_SIZE;
+    context.beginPath();
+    context.moveTo(P1[0]*scale, P1[1]*scale);
+    context.lineTo(P2[0]*scale, P2[1]*scale);
+    context.lineTo(P3[0]*scale, P3[1]*scale);
+    context.stroke();
+    context.closePath();
+    
+    if (amountChecked !== 1) {
+      context.restore();
+    }
+  };
+  
+  // _drawState computes the current state to draw, taking animations into
+  // account. This will request another animation frame if an animation is not
+  // complete.
+  Checkbox.prototype._drawState = function() {
     var amountChecked = this._state.checked ? 1 : 0;
     var color = this._color;
     if (this._state.animatingCheck || this._state.animatingColor) {
@@ -150,44 +213,7 @@
         this._state.animatingColor = false;
       }
     }
-    
-    // Draw the bounding rectangle.
-    var boxThickness = Math.ceil(size/20);
-    context.fillStyle = this._state.pressed ? '#aaaaaa' : '#d5d5d5';
-    context.fillRect(0, 0, size, 2);
-    context.fillRect(0, size-2, size, 2);
-    context.fillRect(0, 0, 2, size);
-    context.fillRect(size-2, 0, 2, size);
-    
-    context.strokeStyle = 'rgba(' + Math.floor(color[0]*255) + ', ' +
-      Math.floor(color[1]*255) + ', ' + Math.floor(color[2]*255) + ', 1.0)';
-    context.lineWidth = size/10;
-    
-    // Draw the percentage of the checkbox that's done.
-    var firstLength = P2[0] - P1[0];
-    var secondLength = P3[0] - P2[0];
-    var lengthCovered = amountChecked * (firstLength+secondLength);
-    if (amountChecked === 1 || lengthCovered >= firstLength) {
-      // Completely draw the first line.
-      context.beginPath();
-      context.moveTo(P1[0]*size, P1[1]*size);
-      context.lineTo(P2[0]*size, P2[1]*size);
-      if (amountChecked === 1 || lengthCovered > firstLength) {
-        // At least partially draw the second line.
-        var pct = (lengthCovered-firstLength)/secondLength;
-        context.lineTo((P2[0] + (P3[0]-P2[0])*pct)*size,
-          (P2[1] + (P3[1]-P2[1])*pct)*size);
-      }
-      context.stroke();
-    } else if (lengthCovered > 0) {
-      // Partially draw the first line.
-      context.beginPath();
-      var pct = lengthCovered/firstLength;
-      context.moveTo(P1[0]*size, P1[1]*size);
-      context.lineTo((P1[0] + (P2[0]-P1[0])*pct)*size,
-        (P1[1] + (P2[1]-P1[1])*pct)*size);
-      context.stroke();
-    }
+    return {amountChecked: amountChecked, color: color};
   };
   
   Checkbox.prototype._requestFrame = function() {
@@ -232,14 +258,13 @@
   
   Checkbox.prototype._updateResolution = function() {
     var ratio = window.crystal.getRatio();
-    this._canvas.width = Math.round(ratio * this._size);
-    this._canvas.height = Math.round(ratio * this._size)
+    this._canvas.width = Math.round(ratio * CHECKBOX_SIZE);
+    this._canvas.height = Math.round(ratio * CHECKBOX_SIZE)
     this._draw();
     this._checkForRemoval();
   };
   
   function State(attrs) {
-    this.pressed = attrs.pressed;
     this.checked = attrs.checked;
     this.animatingCheck = attrs.animatingCheck;
     this.animatingColor = attrs.animatingColor;

@@ -63,7 +63,7 @@
       </div> \
     ');
     var content = this._bldField.find('.content');
-    this._bldCheck = new window.checkboxjs.Checkbox(20, [0x65/255, 0xbc/255,
+    this._bldCheck = new window.checkboxjs.Checkbox([0x65/255, 0xbc/255,
       0xd4/255]);
     content.append(this._bldCheck.element());
   };

@@ -181,34 +181,34 @@
     var docHeight = $(document.body).height();
     this.requestedHeight = dropdown._optionNames.length * ITEM_HEIGHT;
     
-    // Compute the direction, height, and scrollability of the dropdown.
+    // This is the ideal positioning for the dropdown.
     this.down = true;
     this.viewHeight = this.requestedHeight;
     this.scrolls = false;
-    if (offset.top + this.requestedHeight > docHeight - PAGE_MARGIN) {
-      if (offset.bottom > docHeight - offset.top) {
-        // Go up instead of down. 
-        this.down = false;
-        if (this.requestedHeight > offset.bottom) {
-          this.scrolls = true;
-          this.viewHeight = offset.bottom - PAGE_MARGIN;
-        } else {
-          this.viewHeight = this.requestedHeight - PAGE_MARGIN;
-        }
-      } else {
-        // Go down but scroll
-        this.viewHeight = docHeight - offset.top - PAGE_MARGIN;
+    
+    // Restrict the dropdown's size and possibly change the direction.
+    var allowedHeight = docHeight - PAGE_MARGIN - offset.top;
+    if (offset.bottom > docHeight-offset.top && allowedHeight < ITEM_HEIGHT*4) {
+      this.down = false;
+      if (this.requestedHeight > offset.bottom) {
         this.scrolls = true;
+        this.viewHeight = offset.bottom - PAGE_MARGIN;
+      } else {
+        this.viewHeight = this.requestedHeight - PAGE_MARGIN;
       }
+    } else if (offset.top+this.requestedHeight > docHeight-PAGE_MARGIN) {
+      this.viewHeight = docHeight - offset.top - PAGE_MARGIN;
+      this.scrolls = true;
     } else {
       this.viewHeight = this.requestedHeight;
     }
     
     // Compute the width of the dropdown.
-    this.width = dropdown._preview.width() + scrollbarWidth();
-    
-    // TODO: translate the view to the left if the scrollbar goes over the side
-    // of the body.
+    var extraWidth = scrollbarWidth();
+    this.width = dropdown._preview.width() + extraWidth;
+    if (this.width + offset.left > $(document.body).width()) {
+      offset.left -= extraWidth;
+    }
     
     // Compute the coordinates of the dropdown.
     this.left = offset.left;
