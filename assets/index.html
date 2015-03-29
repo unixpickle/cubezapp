@@ -69,6 +69,7 @@
     <script src="scripts/view/styler.js"></script>
     
     <!-- Controller scripts implement the glue between parts of the app -->
+    <script src="scripts/controller/flavors.js"></script>
     <script src="scripts/controller/home.js"></script>
     <script src="scripts/controller/keyboard.js"></script>
     <script src="scripts/controller/stackmat.js"></script>
@@ -76,7 +77,7 @@
     <script src="scripts/controller/window_size.js"></script>
     
     <!-- This style will be modified by JavaScript code -->
-    <style type="text/css" id="theme-style">
+    <style type="text/css" id="flavor-style">
     .theme-background {
       background-color: #65bcd4;
     }
@@ -88,7 +89,7 @@
     }
     </style>
   </head>
-  <body class="theme-background">
+  <body>
     <!-- The pentagons fill the background of the page -->
     <canvas id="pentagons"></canvas>
     

@@ -4,6 +4,7 @@
     // Setup the global objects.
     window.app.windowSize = new window.app.WindowSize();
     window.app.store = new window.app.LocalStore();
+    window.app.flavors = new window.app.Flavors();
     window.app.view = new window.app.AppView();
     window.app.timer = new window.app.Timer();
     
