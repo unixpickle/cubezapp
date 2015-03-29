@@ -438,7 +438,7 @@
     var element = $('<div class="puzzle"></div>');
     var label = $('<label></label>');
     label.text(puzzle.name);
-    var icon = $('<div class="icon theme-background"></div>');
+    var icon = $('<div class="icon flavor-background"></div>');
     icon.css({
       'background-image': 'url(images/puzzles/' + puzzle.icon + '.png)'
     });

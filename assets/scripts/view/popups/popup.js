@@ -401,7 +401,7 @@
         }
       }.bind(this, buttons[i]));
       if (i === buttons.length-1) {
-        button.addClass('done theme-background');
+        button.addClass('done flavor-background');
       } else {
         button.addClass('other');
       }

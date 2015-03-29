@@ -9,7 +9,7 @@
     var puzzle = $('<div class="puzzle"></div>');
     puzzle.append();
     puzzle.append();
-    this._puzzleIcon = $('<div class="icon theme-background"></div>');
+    this._puzzleIcon = $('<div class="icon flavor-background"></div>');
     this._puzzleName = $('<label>Name</label>');
     puzzle.append([this._puzzleIcon, this._puzzleName]);
     
