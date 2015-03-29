@@ -69,6 +69,7 @@
   // setActivePuzzle presents a given puzzle as the active puzzle in the view.
   AppView.prototype.setActivePuzzle = function(puzzle) {
     this._header.setActivePuzzle(puzzle);
+    this._footer.settings.setPuzzle(puzzle);
   };
   
   // setTheaterMode enables or disables "theater" mode, in which everything is

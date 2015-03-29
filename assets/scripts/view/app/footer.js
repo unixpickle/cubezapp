@@ -12,6 +12,7 @@
     this.graph = new window.app.Graph();
     this.stats = new window.app.Stats();
     this.timesList = new window.app.TimesList();
+    this.settings = new window.app.Settings();
     
     // Blank event handlers.
     this.onResize = null;
@@ -71,6 +72,7 @@
       this.graph.layout();
       this.timesList.layout();
       this.stats.layout();
+      this.settings.layout(attrs.footerHeight - 43);
       
       // Update the cached width/height.
       this._lastWidth = window.app.windowSize.width;
