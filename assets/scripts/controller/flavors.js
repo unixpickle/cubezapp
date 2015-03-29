@@ -8,11 +8,26 @@
     Blueberry: {
       color: [0x65, 0xbc, 0xd4]
     },
-    Banana: {
-      color: [0xcc, 0xcc, 0x00]
-    },
     Grape: {
-      color: [0x5e, 0x17, 0x78]
+      color: [0xad, 0x75, 0xc5]
+    },
+    Cherry: {
+      color: [0xb9, 0x4e, 0x4e]
+    },
+    Peach: {
+      color: [0xf1, 0x9e, 0x4d]
+    },
+    Pineapple: {
+      color: [0xd9, 0xa9, 0x17]
+    },
+    Kiwi: {
+      color: [0x27, 0xba, 0x92]
+    },
+    Oreo: {
+      color: [0x1c, 0x1c, 0x1c]
+    },
+    Chocolate: {
+      color: [0x81, 0x49, 0x38]
     }
   };
   
@@ -52,12 +67,12 @@
     // If the animation is done, set everything to the new color and return.
     if (pct >= 1) {
       var color = hexForColor(this._newColor);
-      this._updateColors.css({color: color});
-      this._updateBg.css({backgroundColor: color});
       if ('function' !== typeof this.onDone) {
         throw new Error('invalid onDone callback');
       }
       this.onDone();
+      this._updateColors.css({color: ''});
+      this._updateBg.css({backgroundColor: ''});
       return;
     }
     
@@ -158,6 +173,39 @@
   
   function setFlavorStyle(color, hover) {
     // TODO: if we can, use document.styleSheets for this.
+    if (document.styleSheets) {
+      var rulesLeft = 3;
+      for (var i = document.styleSheets.length-1; i >= 0; --i) {
+        var sheet = document.styleSheets[i];
+        
+        // Get the rule for the given sheet.
+        var rules;
+        if (sheet.cssRules) {
+          rules = sheet.cssRules;
+        } else {
+          rules = sheet.rules;
+        }
+        
+        // Loop through the rules and check if they are what we want.
+        for (var j = 0, len = rules.length; j < len; j++) {
+          var rule = rules[j];
+          var selector = rule.selectorText.toLowerCase();
+          if (selector === '.flavor-background') {
+            rule.style.setProperty('background-color', color);
+            --rulesLeft;
+          } else if (selector == '.flavor-text') {
+            rule.style.setProperty('color', color);
+            --rulesLeft;
+          } else if (selector == 'button.flavor-background:hover') {
+            rule.style.setProperty('background-color', hover);
+            --rulesLeft;
+          }
+          if (rulesLeft === 0) {
+            return;
+          }
+        }
+      }
+    }
     
     var obj = document.getElementById('flavor-style');
     if (!obj) {
