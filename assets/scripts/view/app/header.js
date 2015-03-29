@@ -29,7 +29,8 @@
       width: '100%',
       height: '100%',
       display: 'none',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)'
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      webkitBackfaceVisibility: 'hidden'
     });
     this._shielding.insertBefore(this._element);
     this._shielding.click(this.close.bind(this));
