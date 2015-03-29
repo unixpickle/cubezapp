@@ -72,15 +72,14 @@
     });
     this._waitingUpdate = false;
     
-    // This stuff is used to support crystal.
+    // This is used to support crystal.
     this._crystalCb = this._updateResolution.bind(this);
-    this._removedInterval = null;
-    
-    // Make sure the resolution is accurate and then draw the initial state.
-    this._updateResolution();
+    this._visible = false;
     
     // Callback event.
     this.onChange = null;
+    
+    this._updateResolution();
   }
   
   // checked returns the checked state of the checkbox.
@@ -88,12 +87,8 @@
     return this._state.checked;
   };
   
-  // element returns an element for the checkbox. You must call this every time
-  // you add the checkbox to the DOM. You should add the returned element to the
-  // DOM immediately after calling element() or else it may not be updated for
-  // the DPI correctly.
+  // element returns an element for the checkbox.
   Checkbox.prototype.element = function() {
-    this._startListening();
     return this._element;
   };
   
@@ -131,12 +126,19 @@
     this._draw();
   };
   
-  // _checkForRemoval unsubscribes to crystal if the element is not in the DOM.
-  Checkbox.prototype._checkForRemoval = function() {
-    if (this._removedInterval !== null && !document.contains(this._element)) {
-      this._stopListening();
+  // setVisible sets whether the checkbox should check for crystal updates.
+  Checkbox.prototype.setVisible = function(flag) {
+    if (flag === this._visible) {
+      return;
     }
-  };
+    this._visible = flag;
+    if (flag) {
+      this._updateResolution();
+      window.crystal.addListener(this._crystalCb);
+    } else {
+      window.crystal.removeListener(this._crystalCb);
+    }
+  }
   
   // _draw re-draws the checkbox in it's current state.
   Checkbox.prototype._draw = function() {
@@ -158,7 +160,7 @@
     // Setup drawing for the check mark.
     context.strokeStyle = 'rgba(' + Math.floor(color[0]*255) + ', ' +
       Math.floor(color[1]*255) + ', ' + Math.floor(color[2]*255) + ', 1.0)';
-    context.lineWidth = 2;
+    context.lineWidth = 2 * size/CHECKBOX_SIZE;
     
     // Clip to the region of the checkmark that's complete.
     if (amountChecked !== 1) {
@@ -234,32 +236,11 @@
     }
   };
   
-  Checkbox.prototype._startListening = function() {
-    if (this._removedInterval !== null) {
-      return;
-    }
-    // Every 10 seconds, see if the element was removed from the DOM. If it was,
-    // stop listening for crystal changes.
-    this._removedInterval = setInterval(this._checkForRemoval.bind(this),
-      10000);
-    window.crystal.addListener(this._crystalCb);
-  };
-  
-  Checkbox.prototype._stopListening = function() {
-    if (this._removedInterval === null) {
-      return;
-    }
-    window.crystal.removeListener(this._crystalCb);
-    clearInterval(this._removedInterval);
-    this._removedInterval = null;
-  };
-  
   Checkbox.prototype._updateResolution = function() {
     var ratio = window.crystal.getRatio();
     this._canvas.width = Math.round(ratio * CHECKBOX_SIZE);
     this._canvas.height = Math.round(ratio * CHECKBOX_SIZE)
     this._draw();
-    this._checkForRemoval();
   };
   
   function State(attrs) {

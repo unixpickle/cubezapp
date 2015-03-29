@@ -140,8 +140,7 @@
       </div> \
     ');
     var content = this._bldField.find('.content');
-    this._bldCheck = new window.checkboxjs.Checkbox([0x65/255, 0xbc/255,
-      0xd4/255]);
+    this._bldCheck = window.app.flavors.makeCheckbox();
     content.append(this._bldCheck.element());
   };
   
@@ -265,6 +264,7 @@
     this._iconDropdown.hide();
     this._scrambleDropdown.hide();
     this._subscrambleDropdown.hide();
+    window.app.flavors.removeCheckbox(this._bldCheck);
   };
   
   // _initialLayout puts the fields in their respective places.

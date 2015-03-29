@@ -94,5 +94,9 @@
   font-size: 20px;
   cursor: pointer;
   
-  background-color: #aaa;
+  background-color: #aaaaaa;
+}
+
+.popup-dialog > .footer button.other:hover {
+  background-color: #888888;
 }
