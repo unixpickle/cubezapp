@@ -207,13 +207,14 @@
     ];
     
     this._nameInput = this._fields[0].input();
-    
+    this._contents = $('<div class="settings-contents-contents"></div>');
     this._element = $('#footer .settings-contents');
     this._puzzle = $('<div class="puzzle"></div>');
     this._puzzleIcon = $('<div class="icon flavor-background"></div>');
     this._puzzleLabel = $('<label></label>');
     this._puzzle.append([this._puzzleIcon, this._puzzleLabel]);
-    this._element.append(this._puzzle);
+    this._contents.append(this._puzzle);
+    this._element.append(this._contents);
   }
   
   Settings.prototype.layout = function(h) {
@@ -290,9 +291,11 @@
         left: x,
         top: Math.floor(y)
       });
-      this._element.append(element);
+      this._contents.append(element);
       y += spacing + column[i].height();
     }
+    
+    this._contents.css({width: x+width+10});
   };
   
   window.app.Settings = Settings;

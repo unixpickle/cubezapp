@@ -3,7 +3,15 @@
   overflow-y: hidden;
 }
 
-#footer .settings-contents > .puzzle {  
+#footer .settings-contents-contents {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 100%;
+  /* The width is set dynamically */
+}
+
+#footer .settings-contents-contents > .puzzle {  
   position: absolute;
   top: calc(50% - 80px);
   left: 20px;
@@ -18,7 +26,7 @@
   text-align: center;
 }
 
-#footer .settings-contents > .puzzle .icon {
+#footer .settings-contents-contents > .puzzle .icon {
   display: inline-block;
 
   width: calc(100% - 12px);
@@ -32,7 +40,7 @@
   text-align: center;
 }
 
-#footer .settings-contents > .puzzle label {
+#footer .settings-contents-contents > .puzzle label {
   display: block;
   pointer-events: none;
   position: absolute;
@@ -50,18 +58,18 @@
   white-space: nowrap;
 }
 
-#footer .settings-contents > .field {
+#footer .settings-contents-contents > .field {
   position: absolute;
 }
 
-#footer .settings-contents > .field > label {
+#footer .settings-contents-contents > .field > label {
   float: left;
   color: #999;
   height: 30px;
   line-height: 30px;
 }
 
-#footer .settings-contents > .input-field > input {
+#footer .settings-contents-contents > .input-field > input {
   float: right;
   width: 166px;
   height: 26px;
@@ -73,20 +81,20 @@
   font-size: 18px;
 }
 
-#footer .settings-contents > .dropdown-field > div {
+#footer .settings-contents-contents > .dropdown-field > div {
   float: right;
 }
 
-#footer .settings-contents > .check-field > div {
+#footer .settings-contents-contents > .check-field > div {
   float: right;
   margin-top: 5px;
 }
 
-#footer .settings-contents > .button-field {
+#footer .settings-contents-contents > .button-field {
   text-align: center;
 }
 
-#footer .settings-contents > .button-field > button {
+#footer .settings-contents-contents > .button-field > button {
   border: none;
   cursor: pointer;
   color: white;
