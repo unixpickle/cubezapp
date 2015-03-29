@@ -1,7 +1,16 @@
 // The "flavor" manages the color of pretty much everything.
 (function() {
   
+  // ANIMATION_DURATION is the duration of the flavor-change animation in
+  // milliseconds.
   var ANIMATION_DURATION = 400;
+  
+  // ALTERNATION_PERIOD is the amount of time between flavor changes in the
+  // alternating flavor.
+  var ALTERNATION_PERIOD = 1000*60*60;
+  
+  // ALTERNATION_FLAVOR is the name of the flavor which alternates periodically.
+  var ALTERNATION_FLAVOR = 'Fruit Salad';
   
   // FLAVORS will be used to associate colors with flavor names.
   var FLAVORS = {
@@ -30,6 +39,13 @@
       color: [0x81, 0x49, 0x38]
     }
   };
+  
+  var FLAVOR_NAMES = [];
+  for (var key in FLAVORS) {
+    if (FLAVORS.hasOwnProperty(key)) {
+      FLAVOR_NAMES.push(key);
+    }
+  }
   
   // An Animation animates the color change of every themed element.
   function Animation(oldColor, newColor) {
@@ -100,8 +116,13 @@
     // this._current stores the current flavor information.
     this._current = null;
     
+    // this._alternationInterval is null unless the flavor is currently
+    // ALTERNATION_FLAVOR.
+    this._alternationInterval = null;
+    
     // TODO: here, use the user-selected flavor.
-    this._initializeFlavor('Blueberry');
+    this._startAlternating();
+    //this._initializeFlavor(ALTERNATION_FLAVOR);
     
     // Now that the flavor style is set correctly, we can set the body's
     // background color.
@@ -128,11 +149,25 @@
   };
   
   Flavors.prototype.switchToFlavor = function(name) {
+    if (name === ALTERNATION_FLAVOR) {
+      this._startAlternating();
+    } else {
+      this._animateToFlavor(name);
+    }
+  };
+  
+  Flavors.prototype._animateToFlavor = function(name) {
     if (this._animation) {
       this._animation.cancel();
     }
     
     // Start an animation to the new color.
+    if (this._current === null) {
+      this._initializeFlavor(name);
+      return;
+    }
+    
+    // Animate the text and background color change.
     var color = FLAVORS[name].color;
     this._animation = new Animation(this._current.color, color);
     this._animation.onDone = function() {
@@ -158,6 +193,25 @@
     setFlavorStyle(hex, pressedHex);
     this._current = FLAVORS[name];
   }
+  
+  Flavors.prototype._startAlternating = function(alternating) {
+    if (this._alternationInterval !== null) {
+      clearInterval(this._alternationInterval);
+    }
+    var idx = Math.floor(Math.random() * FLAVOR_NAMES.length);
+    this._alternationInterval = setInterval(function() {
+      idx = (idx + 1) % FLAVOR_NAMES.length;
+      this._animateToFlavor(FLAVOR_NAMES[idx]);
+    }.bind(this), ALTERNATION_PERIOD);
+    this._animateToFlavor(FLAVOR_NAMES[idx]);
+  };
+  
+  Flavors.prototype._stopAlternating = function() {
+    if (this._alternationInterval !== null) {
+      clearInterval(this._alternationInterval);
+      this._alternationInterval = null;
+    }
+  };
   
   function hexForColor(color) {
     var hexCode = '#';
