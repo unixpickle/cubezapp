@@ -11,7 +11,7 @@
   var BORDER_COLOR = '#d5d5d5';
   
   // PRESSED_BORDER is the color of the border when the checkbox is pressed.
-  var PRESSED_BORDER = '#aaaaaa';
+  var PRESSED_BORDER = '#d5d5d5';
   
   // BORDER_THICKNESS is the number of pixels the border should be.
   var BORDER_THICKNESS = 2;
