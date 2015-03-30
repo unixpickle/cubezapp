@@ -1292,11 +1292,27 @@
     return moves;
   }
   
+  function scrambleMoves(len) {
+    var moves = [];
+    var lastAxis = -1;
+    for (var i = 0; i < len; ++i) {
+      var faces = [0, 1, 2, 3];
+      if (i !== 0) {
+        faces.splice(lastAxis, 1);
+      }
+      var idx = Math.floor(Math.random() * faces.length);
+      lastAxis = faces[idx];
+      moves.push(new Move(lastAxis, Math.random() < 0.5));
+    }
+    return moves;
+  }
+  
   exports.Move = Move;
   exports.allMoves = allMoves;
   exports.movesToString = movesToString;
   exports.parseMove = parseMove;
   exports.parseMoves = parseMoves;
+  exports.scrambleMoves = scrambleMoves;
   var randomPermParity = includeAPI('perms').randomPermParity;
   
   // Generate this using encodeCornerCases(findCornerCases()).
@@ -1928,6 +1944,11 @@
     throw new Error('unknown puzzle: ' + puzzle);
   }
   
+  function skewbMoves(count) {
+    var moves = SkewbAPI.scrambleMoves(count);
+    return SkewbAPI.movesToString(moves);
+  }
+  
   function skewbState() {
     var state = SkewbAPI.randomState();
     var solution = SkewbAPI.solve(state);
@@ -1967,6 +1988,11 @@
           f: skewbState,
           moves: false,
           name: "State"
+        },
+        {
+          f: skewbMoves,
+          moves: true,
+          name: "Moves"
         }
       ]
     }
