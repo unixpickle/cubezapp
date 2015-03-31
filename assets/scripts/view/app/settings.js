@@ -218,6 +218,7 @@
     // Setup the icon dropdown.
     this._iconDropdown = this._fields[1].dropdown();
     this._iconDropdown.setOptions(window.app.iconNames);
+    this._iconDropdown.onChange = this._changedIcon.bind(this);
 
     // Setup the flavor dropdown.
     this._flavorDropdown = this._fields[10].dropdown();
@@ -235,6 +236,7 @@
     // Setup the subscramble dropdown.
     this._subscrambleDropdown = this._fields[3].dropdown();
     this._subscrambleField = this._fields[3];
+    this._subscrambleField.onChange = this._changedSubscramble.bind(this);
 
     this._contents = $('<div class="settings-contents-contents"></div>');
     this._element = $('#footer .settings-contents');
@@ -308,7 +310,11 @@
       backgroundImage: 'url(images/puzzles/' + puzzle.icon + '.png)'
     });
     this._nameInput.val(puzzle.name);
-    this._iconDropdown.setSelectedValue(puzzle.icon);
+
+    var iconFile = puzzle.icon;
+    var iconName = window.app.iconNames[window.app.iconFiles.indexOf(iconFile)];
+    this._iconDropdown.setSelectedValue(iconName);
+
     this._scrambleDropdown.setSelectedValue(puzzle.scrambler);
     this._popuplateSubscramble();
 
@@ -322,11 +328,25 @@
 
   Settings.prototype._changedFlavor = function() {
     window.app.flavors.switchToFlavor(this._flavorDropdown.value());
+    // TODO: save new flavor
+  };
+
+  Settings.prototype._changedIcon = function() {
+    var iconFile = window.app.iconFiles[this._iconDropdown.selected()];
+    this._puzzleIcon.css({
+      backgroundImage: 'url(images/puzzles/' + iconFile + '.png)'
+    });
+    // TODO: save new icon
   };
 
   Settings.prototype._changedScramble = function() {
     this._popuplateSubscramble();
     this.layout();
+    // TODO: save new scramble
+  };
+
+  Settings.prototype._changedSubscramble = function() {
+    // TODO: save new subscramble
   };
   
   Settings.prototype._layoutColumn = function(column, x, width, height) {
