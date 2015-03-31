@@ -19,12 +19,12 @@ type ImageSetting struct {
 
 func main() {
 	settings := []ImageSetting{
-		ImageSetting{2, 20.0/505.0, 8.0/505.0, 20.0/505.0, "2x2x2"},
-		ImageSetting{3, 20.0/505.0, 8.0/505.0, 20.0/505.0, "3x3x3"},
-		ImageSetting{4, 20.0/505.0, 8.0/505.0, 15.0/505.0, "4x4x4"},
-		ImageSetting{5, 15.0/505.0, 8.0/505.0, 15.0/505.0, "5x5x5"},
-		ImageSetting{6, 10.0/505.0, 5.0/505.0, 10.0/505.0, "6x6x6"},
-		ImageSetting{7, 10.0/505.0, 5.0/505.0, 10.0/505.0, "7x7x7"},
+		ImageSetting{2, 0, 0, 20.0/505.0, "2x2x2"},
+		ImageSetting{3, 0, 0, 20.0/505.0, "3x3x3"},
+		ImageSetting{4, 0, 0, 15.0/505.0, "4x4x4"},
+		ImageSetting{5, 0, 0, 15.0/505.0, "5x5x5"},
+		ImageSetting{6, 0, 0, 10.0/505.0, "6x6x6"},
+		ImageSetting{7, 0, 0, 10.0/505.0, "7x7x7"},
 	}
 	for _, s := range settings {
 		runSetting(s)
