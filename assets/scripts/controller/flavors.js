@@ -299,7 +299,7 @@
   }
   
   window.app.Flavors = Flavors;
-  window.app.flavorNames = FLAVOR_NAMES.slice(0);
+  window.app.flavorNames = FLAVOR_NAMES.slice();
   window.app.flavorNames.push(ALTERNATION_FLAVOR);
   
 })();

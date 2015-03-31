@@ -35,9 +35,11 @@ Here are the methods which the store provides:
  * `deletePuzzle(id)` - delete a puzzle (besides the current puzzle) given its identifier.
  * `deleteSolve(id)` - delete a solve from the current puzzle. While this is a synchronous operation, it may still fail. If the delete operation fails, it will be as if the puzzle was deleted (upon the `deleteSolve` call) and then re-added externally (once the request failed).
  * `getActivePuzzle()` - get the current [Puzzle](#puzzle-object).
+ * `getGlobalSettings()` - get the current [Global Settings](#global-settings-object).
  * `getPuzzles()` - get the ordered list of [Puzzle](#puzzle-object) objects.
  * `getSolveCount(cb)` - get the number of [Solve](#solve-object) objects for the current puzzle.
  * `getSolves(start, count, cb)` - get a list of [Solve](#solve-object) objects asynchronously.
+ * `modifyGlobalSettings(attrs)` - modify attributes of the global settings.
  * `modifyPuzzle(attrs)` - modify attributes of the current puzzle. Provide a dictionary of attributes to set on the current puzzle.
  * `modifySolve(id, attrs)` - modify attributes of a solve in the current puzzle. Provide a solve id and an object containing attributes to set.
  * `switchPuzzle(id, cb)` - switch to a new puzzle. If this fails, the active puzzle is not changed.
@@ -69,3 +71,12 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
  * `scrambleLength` - int - the number of moves to use in the scramble if applicable
  * `lastUsed` - int - the UNIX time in milliseconds that the user last modified or switched to this puzzle
  * `id` - string - the unique identifier of the puzzle. **This field will not be present if the puzzle has not been added to the store.**
+
+<a name="global-settings-object" />
+## Global Settings
+
+The **Global Settings** object stores the user's global settings. Here are the fields it contains and their defaults:
+
+ * `flavor` - string - the name of the flavor the user has set. **Default:** "Blueberry"
+ * `righty` - bool - true if the user is right handed. **Default:** true
+

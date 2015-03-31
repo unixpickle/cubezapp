@@ -201,6 +201,7 @@
       new InputField('Name'),
       new DropdownField('Icon'),
       new DropdownField('Scramble'),
+      new DropdownField(''),
       new CheckField('BLD'),
       new CheckField('Inspection'),
       new DropdownField('Timer Input'),
@@ -211,18 +212,28 @@
       new ButtonField('Configure Cube')
     ];
     
-    // Get access to the inputs themselves.
+    // Setup the name input.
     this._nameInput = this._fields[0].input();
-    this._iconDropdown = this._fields[1].dropdown();
-    this._flavorDropdown = this._fields[9].dropdown();
 
     // Setup the icon dropdown.
+    this._iconDropdown = this._fields[1].dropdown();
     this._iconDropdown.setOptions(window.app.iconNames);
 
     // Setup the flavor dropdown.
+    this._flavorDropdown = this._fields[10].dropdown();
     this._flavorDropdown.setOptions(window.app.flavorNames);
     this._flavorDropdown.setSelectedValue(window.app.flavors.current());
     this._flavorDropdown.onChange = this._changedFlavor.bind(this);
+
+    // Setup the scramble dropdown.
+    this._scrambleDropdown = this._fields[2].dropdown();
+    var scrambles = window.puzzlejs.scrambler.allPuzzles().slice();
+    scrambles.unshift('None');
+    this._scrambleDropdown.setOptions(scrambles);
+
+    // Setup the subscramble dropdown.
+    this._subscrambleDropdown = this._fields[3].dropdown();
+    this._subscrambleField = this._fields[3];
 
     this._contents = $('<div class="settings-contents-contents"></div>');
     this._element = $('#footer .settings-contents');
@@ -233,6 +244,14 @@
     this._contents.append(this._puzzle);
     this._element.append(this._contents);
   }
+
+  // hideDropdowns is called so that any open dropdowns can be closed.
+  Settings.prototype.hideDropdowns = function() {
+    this._flavorDropdown.hide();
+    this._iconDropdown.hide();
+    this._scrambleDropdown.hide();
+    this._subscrambleDropdown.hide();
+  };
   
   Settings.prototype.layout = function(h) {
     var height = this._element[0].clientHeight || h;
@@ -289,6 +308,9 @@
     });
     this._nameInput.val(puzzle.name);
     this._iconDropdown.setSelectedValue(puzzle.icon);
+    this._scrambleDropdown.setSelectedValue(puzzle.scrambler);
+    this._popuplateSubscramble();
+    this.layout(this._element.height());
   };
 
   Settings.prototype._changedFlavor = function() {
@@ -318,6 +340,26 @@
     }
     
     this._contents.css({width: x+width+10});
+  };
+
+  Settings.prototype._popuplateSubscramble = function() {
+    var options = this._subscramblers();
+    this._subscrambleDropdown.setOptions(options);
+    this._subscrambleField.visible = (options.length > 1);
+  };
+
+  Settings.prototype._subscramblers = function() {
+    var puzzle = this._scrambleDropdown.value();
+    if (puzzle === 'None') {
+      return [];
+    }
+    
+    var names = [];
+    var scramblers = window.puzzlejs.scrambler.scramblersForPuzzle(puzzle);
+    for (var i = 0, len = scramblers.length; i < len; ++i) {
+      names[i] = scramblers[i].name;
+    }
+    return names;
   };
   
   window.app.Settings = Settings;

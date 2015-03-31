@@ -196,7 +196,7 @@
         this.scrolls = true;
         this.viewHeight = offset.bottom - PAGE_MARGIN;
       } else {
-        this.viewHeight = this.requestedHeight - PAGE_MARGIN;
+        this.viewHeight = this.requestedHeight;
       }
     } else if (offset.top+this.requestedHeight > docHeight-PAGE_MARGIN) {
       this.viewHeight = docHeight - offset.top - PAGE_MARGIN;
