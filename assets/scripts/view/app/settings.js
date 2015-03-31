@@ -142,6 +142,11 @@
     this._element.append(LabelField.prototype.element.call(this));
     this._element.append(this._dropdown.element());
   }
+
+  // dropdown returns the dropdown in the field.
+  DropdownField.prototype.dropdown = function() {
+    return this._dropdown;
+  };
   
   // element returns an element containing the dropdown and the label.
   DropdownField.prototype.element = function() {
@@ -206,7 +211,13 @@
       new ButtonField('Configure Cube')
     ];
     
+    // Get access to the inputs themselves.
     this._nameInput = this._fields[0].input();
+    this._iconDropdown = this._fields[1].dropdown();
+
+    // Setup options that are always the same.
+    this._iconDropdown.setOptions(window.app.iconNames);
+
     this._contents = $('<div class="settings-contents-contents"></div>');
     this._element = $('#footer .settings-contents');
     this._puzzle = $('<div class="puzzle"></div>');
