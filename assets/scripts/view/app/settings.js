@@ -311,8 +311,7 @@
     });
     this._nameInput.val(puzzle.name);
 
-    var iconFile = puzzle.icon;
-    var iconName = window.app.iconNames[window.app.iconFiles.indexOf(iconFile)];
+    var iconName = window.app.iconFilesToNames[puzzle.icon];
     this._iconDropdown.setSelectedValue(iconName);
 
     this._scrambleDropdown.setSelectedValue(puzzle.scrambler);

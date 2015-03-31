@@ -10,5 +10,14 @@
     "Rubik's Clock", 'Feet', 'Fox', 'Megaminx', 'OH', 'Pyraminx', 'Skewb',
     'Square-1'
   ];
+
+  window.app.iconFilesToNames = {
+  };
+
+  for (var i = 0, len = window.app.iconFiles.length; i < len; ++i) {
+    var file = window.app.iconFiles[i];
+    var name = window.app.iconNames[i];
+    window.app.iconFilesToNames[file] = name;
+  }
   
 })();
