@@ -201,7 +201,7 @@
       new InputField('Name'),
       new DropdownField('Icon'),
       new DropdownField('Scramble'),
-      new DropdownField(''),
+      new DropdownField('Scramble Type'),
       new CheckField('BLD'),
       new CheckField('Inspection'),
       new DropdownField('Timer Input'),
@@ -230,6 +230,7 @@
     var scrambles = window.puzzlejs.scrambler.allPuzzles().slice();
     scrambles.unshift('None');
     this._scrambleDropdown.setOptions(scrambles);
+    this._scrambleDropdown.onChange = this._changedScramble.bind(this);
 
     // Setup the subscramble dropdown.
     this._subscrambleDropdown = this._fields[3].dropdown();
@@ -253,8 +254,8 @@
     this._subscrambleDropdown.hide();
   };
   
-  Settings.prototype.layout = function(h) {
-    var height = this._element[0].clientHeight || h;
+  Settings.prototype.layout = function() {
+    var height = this._element[0].clientHeight || this._element.height();
     
     // columnX is the x coordinate of the current column.
     var columnX = 220;
@@ -296,8 +297,8 @@
     // If the clientHeight is smaller than it was before (i.e. a scrollbar was
     // added), then layout again. This is not a perfect technique, but it's good
     // enough.
-    if ((this._element[0].clientHeight || h) < height) {
-      this.layout(h);
+    if ((this._element[0].clientHeight || this._element.height()) < height) {
+      this.layout();
     }
   };
   
@@ -310,11 +311,22 @@
     this._iconDropdown.setSelectedValue(puzzle.icon);
     this._scrambleDropdown.setSelectedValue(puzzle.scrambler);
     this._popuplateSubscramble();
-    this.layout(this._element.height());
+
+    // We may need to re-layout because a field may have been shown or hidden.
+    this.layout();
+
+    // We should deselect dropdowns because a dropdown may have been open if
+    // setPuzzle() was called because of a remote change.
+    this.hideDropdowns();
   };
 
   Settings.prototype._changedFlavor = function() {
     window.app.flavors.switchToFlavor(this._flavorDropdown.value());
+  };
+
+  Settings.prototype._changedScramble = function() {
+    this._popuplateSubscramble();
+    this.layout();
   };
   
   Settings.prototype._layoutColumn = function(column, x, width, height) {

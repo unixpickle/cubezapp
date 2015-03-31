@@ -73,7 +73,7 @@
       this.graph.layout();
       this.timesList.layout();
       this.stats.layout();
-      this.settings.layout(attrs.footerHeight - 43);
+      this.settings.layout();
       
       // Update the cached width/height.
       this._lastWidth = window.app.windowSize.width;
