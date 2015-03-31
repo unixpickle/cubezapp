@@ -44,6 +44,7 @@
   for (var key in FLAVORS) {
     if (FLAVORS.hasOwnProperty(key)) {
       FLAVOR_NAMES.push(key);
+      FLAVORS[key].name = key;
     }
   }
   
@@ -128,7 +129,17 @@
     // background color.
     document.body.className = 'flavor-background';
   }
+
+  // current returns the name of the current flavor.
+  Flavors.prototype.current = function() {
+    if (this._alternationInterval !== null) {
+      return ALTERNATION_FLAVOR;
+    } else {
+      return this._current.name;
+    }
+  };
   
+  // makeCheckbox generates a checkbox that follows the theme color.
   Flavors.prototype.makeCheckbox = function() {
     var rgbColor = [];
     for (var i = 0; i < 3; ++i) {
@@ -140,6 +151,7 @@
     return result;
   };
   
+  // removeCheckbox stops updating the color of a given checkbox.
   Flavors.prototype.removeCheckbox = function(box) {
     var idx = this._checkboxes.indexOf(box);
     if (idx < 0) {
@@ -148,6 +160,7 @@
     this._checkboxes.splice(idx, 1);
   };
   
+  // switchToFlavor animates to a new flavor.
   Flavors.prototype.switchToFlavor = function(name) {
     if (name === ALTERNATION_FLAVOR) {
       this._startAlternating();
@@ -156,6 +169,8 @@
     }
   };
   
+  // _animateToFlavor animates to a new flavor that's not the alternation
+  // flavor.
   Flavors.prototype._animateToFlavor = function(name) {
     if (this._animation) {
       this._animation.cancel();
@@ -185,6 +200,7 @@
     }
   };
   
+  // _initializeFlavor sets a flavor instantly without an animation.
   Flavors.prototype._initializeFlavor = function(name) {
     var color = FLAVORS[name].color;
     var hex = hexForColor(color);
@@ -194,6 +210,7 @@
     this._current = FLAVORS[name];
   }
   
+  // _startAlternation begins the flavor alternation process.
   Flavors.prototype._startAlternating = function(alternating) {
     if (this._alternationInterval !== null) {
       clearInterval(this._alternationInterval);
@@ -206,6 +223,7 @@
     this._animateToFlavor(FLAVOR_NAMES[idx]);
   };
   
+  // _stopAlternation stops the alternation process.
   Flavors.prototype._stopAlternating = function() {
     if (this._alternationInterval !== null) {
       clearInterval(this._alternationInterval);
@@ -281,5 +299,7 @@
   }
   
   window.app.Flavors = Flavors;
+  window.app.flavorNames = FLAVOR_NAMES.slice(0);
+  window.app.flavorNames.push(ALTERNATION_FLAVOR);
   
 })();

@@ -46,7 +46,7 @@
     button.css({visibility: 'hidden', position: 'fixed'});
     $(document.body).append(button);
     this._width = button.outerWidth();
-    button.remove();
+    button.detach();
     button.css({visibility: '', position: ''});
     
     this._element = $('<div class="field button-field"></div>');
@@ -85,7 +85,7 @@
     $(document.body).append(this._label);
     this._labelHeight = this._label.outerWidth();
     this._labelWidth = this._label.outerWidth();
-    this._label.remove();
+    this._label.detach();
     this._label.css({visibility: '', position: ''});
   }
   
@@ -214,9 +214,15 @@
     // Get access to the inputs themselves.
     this._nameInput = this._fields[0].input();
     this._iconDropdown = this._fields[1].dropdown();
+    this._flavorDropdown = this._fields[9].dropdown();
 
-    // Setup options that are always the same.
+    // Setup the icon dropdown.
     this._iconDropdown.setOptions(window.app.iconNames);
+
+    // Setup the flavor dropdown.
+    this._flavorDropdown.setOptions(window.app.flavorNames);
+    this._flavorDropdown.setSelectedValue(window.app.flavors.current());
+    this._flavorDropdown.onChange = this._changedFlavor.bind(this);
 
     this._contents = $('<div class="settings-contents-contents"></div>');
     this._element = $('#footer .settings-contents');
@@ -245,7 +251,7 @@
     
     for (var i = 0, len = this._fields.length; i < len; ++i) {
       var field = this._fields[i];
-      field.element().remove();
+      field.element().detach();
       if (!field.visible) {
         continue;
       }
@@ -282,6 +288,11 @@
       backgroundImage: 'url(images/puzzles/' + puzzle.icon + '.png)'
     });
     this._nameInput.val(puzzle.name);
+    this._iconDropdown.setSelectedValue(puzzle.icon);
+  };
+
+  Settings.prototype._changedFlavor = function() {
+    window.app.flavors.switchToFlavor(this._flavorDropdown.value());
   };
   
   Settings.prototype._layoutColumn = function(column, x, width, height) {
