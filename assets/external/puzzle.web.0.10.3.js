@@ -3685,31 +3685,8 @@
   exports.p2CornerSymmetryPermute = p2CornerSymmetryPermute;
   exports.p2EdgeSymmetryConj = p2EdgeSymmetryConj;
   exports.p2EdgeSymmetryPermute = p2EdgeSymmetryPermute;
-  function randomCOLL() {
-    var result = new Cube();
-    
-    // Generate random corners using pocketcube.
-    result.corners = pocketcube.randomLastLayer();
-    
-    // Compute the corner parity.
-    var cornerPerm = [];
-    for (var i = 0; i < 8; ++i) {
-      cornerPerm[i] = result.corners.corners[i].piece;
-    }
-    var cornerParity = perms.parity(cornerPerm);
-    
-    // Generate the edge permutation.
-    var edgePerm = perms.randomPermParity(4, cornerParity);
-    var topEdges = [0, 4, 5, 6];
-    for (var i = 0; i < 4; ++i) {
-      result.edges.edges[topEdges[i]].piece = topEdges[edgePerm[i]];
-    }
-    
-    return result;
-  }
-  
   function randomLastLayer() {
-    var result = randomCOLL();
+    var result = randomZBLL();
     
     // Generate the edge orientations.
     var topEdges = [0, 4, 5, 6];
@@ -3797,9 +3774,32 @@
     return result;
   }
   
-  exports.randomCOLL = randomCOLL;
+  function randomZBLL() {
+    var result = new Cube();
+    
+    // Generate random corners using pocketcube.
+    result.corners = pocketcube.randomLastLayer();
+    
+    // Compute the corner parity.
+    var cornerPerm = [];
+    for (var i = 0; i < 8; ++i) {
+      cornerPerm[i] = result.corners.corners[i].piece;
+    }
+    var cornerParity = perms.parity(cornerPerm);
+    
+    // Generate the edge permutation.
+    var edgePerm = perms.randomPermParity(4, cornerParity);
+    var topEdges = [0, 4, 5, 6];
+    for (var i = 0; i < 4; ++i) {
+      result.edges.edges[topEdges[i]].piece = topEdges[edgePerm[i]];
+    }
+    
+    return result;
+  }
+  
   exports.randomLastLayer = randomLastLayer;
-  exports.randomState = randomState;// SHORT_LENGTH is a "good" length for a solution. A solution of SHORT_LENGTH
+  exports.randomState = randomState;
+  exports.randomZBLL = randomZBLL;// SHORT_LENGTH is a "good" length for a solution. A solution of SHORT_LENGTH
   // should be relatively easy to find and also relatively quick to apply to a
   // cube.
   var SHORT_LENGTH = 21;
@@ -4591,8 +4591,8 @@
   }var rubikTables = null;
   var rubikTimeouts = null;
   
-  function rubikCOLL() {
-    return solveRubikState(rubik.randomCOLL());
+  function rubikZBLL() {
+    return solveRubikState(rubik.randomZBLL());
   }
   
   function rubikLastLayer() {
@@ -4672,9 +4672,9 @@
             name: "Moves"
           },
           {
-            f: rubikCOLL,
+            f: rubikZBLL,
             moves: false,
-            name: "COLL"
+            name: "ZBLL"
           },
           {
             f: rubikLastLayer,
