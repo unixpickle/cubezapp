@@ -2,30 +2,20 @@
 // easy-to-use interface for changing both global and puzzle settings.
 (function() {
   
-  var BUTTON_FONT_SIZE = 17;
+  // These constants determine the sizes of various things.
+  var FONT_SIZE = 17;
+  var RECTANGULAR_FIELD_HEIGHT = 30;
+  var RECTANGULAR_FIELD_WIDTH = 160;
   var BUTTON_HEIGHT = 35;
   
-  // COLUMN_SPACE is the number of pixels between columns.
+  // These constants determine how spaced out things can get.
+  var MINIMUM_ROW_SPACE = 10;
+  var MAXIMUM_ROW_SPACE = 20;
   var COLUMN_SPACE = 30;
-  
-  var DROPDOWN_FONT_SIZE = 17;
-  var DROPDOWN_HEIGHT = 30;
-  var DROPDOWN_WIDTH = 160;
-  
-  var INPUT_HEIGHT = 30;
-  var INPUT_WIDTH = 160;
-  
-  var LABEL_FONT_SIZE = 17;
   
   // LABEL_PADDING is the minimum space between a label and its corresponding
   // input.
   var LABEL_PADDING = 10;
-  
-  // MINIMUM_SAPCE is the minimum number of pixels between fields.
-  var MINIMUM_SPACE = 10;
-  
-  // MAXIMUM_SPACE is the maximum number of pixels between fields.
-  var MAXIMUM_SPACE = 20;
   
   // A ButtonField implements the field interface for a custom button.
   function ButtonField(title) {
@@ -33,7 +23,7 @@
     
     var button = $('<button class="flavor-background"></button>');
     button.css({
-      fontSize: BUTTON_FONT_SIZE + 'px',
+      fontSize: FONT_SIZE + 'px',
       height: BUTTON_HEIGHT,
       padding: '0 20px 0 20px'
     });
@@ -60,10 +50,15 @@
     return BUTTON_HEIGHT;
   };
   
+  // maxHeight returns this.height().
+  ButtonField.prototype.maxHeight = function() {
+    return this.height();
+  };
+  
   // width returns the width of the button.
   ButtonField.prototype.width = function() {
     return this._width;
-  }
+  };
   
   // A LabelField is a field which contains a label and nothing else.
   function LabelField(name) {
@@ -73,7 +68,9 @@
     this._label = $('<label></label>');
     this._label.text(name);
     this._label.css({
-      fontSize: LABEL_FONT_SIZE + 'px',
+      fontSize: FONT_SIZE + 'px',
+      lineHeight: RECTANGULAR_FIELD_HEIGHT + 'px',
+      height: RECTANGULAR_FIELD_HEIGHT + 'px',
       visibility: 'hidden',
       position: 'fixed'
     });
@@ -94,6 +91,11 @@
   // height returns the label's height.
   LabelField.prototype.height = function() {
     return this._labelHeight;
+  };
+  
+  // maxHeight returns this.height().
+  LabelField.prototype.maxHeight = function() {
+    return this.height();
   };
   
   // width returns the label's width.
@@ -118,7 +120,12 @@
   
   // height returns INPUT_HEIGHT
   CheckField.prototype.height = function() {
-    return INPUT_HEIGHT;
+    return RECTANGULAR_FIELD_HEIGHT;
+  };
+  
+  // maxHeight returns this.height().
+  CheckField.prototype.maxHeight = function() {
+    return this.height();
   };
   
   // width returns the minimum width of the field.
@@ -131,8 +138,8 @@
     LabelField.call(this, name);
     
     // Create the dropdown element.
-    this._dropdown = new window.dropdownjs.Dropdown(DROPDOWN_WIDTH, [0xf0/0xff,
-      0xf0/0xff, 0xf0/0xff], DROPDOWN_HEIGHT, DROPDOWN_FONT_SIZE);
+    this._dropdown = new window.dropdownjs.Dropdown(RECTANGULAR_FIELD_WIDTH,
+      [0xf0/0xff, 0xf0/0xff, 0xf0/0xff], RECTANGULAR_FIELD_HEIGHT, FONT_SIZE);
     
     // Create the field element.
     this._element = $('<div class="field dropdown-field"></div>');
@@ -152,12 +159,18 @@
   
   // height returns the height of the element.
   DropdownField.prototype.height = function() {
-    return INPUT_HEIGHT;
+    return RECTANGULAR_FIELD_HEIGHT;
+  };
+  
+  // maxHeight returns this.height().
+  DropdownField.prototype.maxHeight = function() {
+    return this.height();
   };
   
   // width returns the minimum width of the element.
   DropdownField.prototype.width = function() {
-    return LabelField.prototype.width.call(this) + LABEL_PADDING + INPUT_WIDTH;
+    return LabelField.prototype.width.call(this) + LABEL_PADDING +
+      RECTANGULAR_FIELD_WIDTH;
   };
   
   // An InputField is a field which contains a label and a textbox.
@@ -165,7 +178,11 @@
     LabelField.call(this, name);
     
     // Create the input element.
-    this._input = $('<input></input>');
+    this._input = $('<input></input>').css({
+      width: RECTANGULAR_FIELD_WIDTH - 14,
+      height: RECTANGULAR_FIELD_HEIGHT - 4,
+      fontSize: FONT_SIZE + 'px'
+    });
     
     // Create the field element.
     this._element = $('<div class="field input-field"></div>');
@@ -180,7 +197,7 @@
   
   // height returns the height of the element.
   InputField.prototype.height = function() {
-    return INPUT_HEIGHT;
+    return RECTANGULAR_FIELD_HEIGHT;
   };
   
   // input returns the input.
@@ -188,9 +205,15 @@
     return this._input;
   };
   
+  // maxHeight returns this.height().
+  InputField.prototype.maxHeight = function() {
+    return this.height();
+  };
+  
   // width returns the minimum width of the element.
   InputField.prototype.width = function() {
-    return LabelField.prototype.width.call(this) + LABEL_PADDING + INPUT_WIDTH;
+    return LabelField.prototype.width.call(this) + LABEL_PADDING +
+      RECTANGULAR_FIELD_WIDTH;
   };
   
   function Settings() {
@@ -263,7 +286,7 @@
     var currentColumn = [];
     
     // columnHeight represents the minimum height of the current column.
-    var columnHeight = MINIMUM_SPACE;
+    var columnHeight = MINIMUM_ROW_SPACE;
     
     // columnWidth is the width needed to fit every field in the current column.
     var columnWidth = 0;
@@ -275,15 +298,15 @@
         continue;
       }
       // Either start a new column or add this field to the current one.
-      if (columnHeight + field.height() + MINIMUM_SPACE > height) {
+      if (columnHeight + field.height() + MINIMUM_ROW_SPACE > height) {
         this._layoutColumn(currentColumn, columnX, columnWidth, height);
         columnX += columnWidth + COLUMN_SPACE;
         currentColumn = [field];
-        columnHeight = MINIMUM_SPACE*2 + field.height();
+        columnHeight = MINIMUM_ROW_SPACE*2 + field.height();
         columnWidth = field.width();
       } else {
         currentColumn.push(field);
-        columnHeight += MINIMUM_SPACE + field.height();
+        columnHeight += MINIMUM_ROW_SPACE + field.height();
         columnWidth = Math.max(field.width(), columnWidth);
       }
     }
@@ -354,7 +377,7 @@
     
     // Compute the spacing.
     var spacing = Math.min((height-rawHeight) / (column.length+1),
-      MAXIMUM_SPACE);
+      MAXIMUM_ROW_SPACE);
     var y = (height - rawHeight - spacing*(column.length-1))/2;
     for (var i = 0, len = column.length; i < len; ++i) {
       var element = column[i].element();

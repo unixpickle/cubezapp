@@ -65,20 +65,15 @@
 #footer .settings-contents-contents > .field > label {
   float: left;
   color: #999;
-  height: 30px;
-  line-height: 30px;
 }
 
 #footer .settings-contents-contents > .input-field > input {
   float: right;
-  width: 146px;
-  height: 26px;
   
   padding: 0 5px 0 5px;
   border: 2px solid #d5d5d5;
   
   color: #999;
-  font-size: 17px;
 }
 
 #footer .settings-contents-contents > .dropdown-field > div {
