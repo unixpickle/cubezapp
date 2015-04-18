@@ -94,3 +94,7 @@
   cursor: pointer;
   color: white;
 }
+
+#footer .settings-contents-contents > .scramble-field > div {
+  float: right;
+}

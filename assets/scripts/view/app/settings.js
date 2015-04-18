@@ -17,9 +17,43 @@
   // input.
   var LABEL_PADDING = 10;
   
+  // A Field is an abstract row in the settings tab.
+  function Field() {
+    this.showing = false;
+    this.visible = true;
+  }
+  
+  Field.prototype.element = function() {
+    throw new Error('abstract method');
+  };
+  
+  Field.prototype.height = function() {
+    throw new Error('abstract method');
+  };
+  
+  Field.prototype.updateShowing = function(animate) {
+    if (this.visible === this.showing) {
+      return;
+    }
+    if (this.visible) {
+      if (animate) {
+        this.element().fadeIn();
+      } else {
+        this.element().css({display: 'block', opacity: 1});
+      }
+    } else {
+      if (animate) {
+        this.element().fadeOut();
+      } else {
+        this.element().css({display: 'none'});
+      }
+    }
+    this.showing = this.visible;
+  };
+  
   // A ButtonField implements the field interface for a custom button.
   function ButtonField(title) {
-    this.visible = true;
+    Field.call(this);
     
     var button = $('<button class="flavor-background"></button>');
     button.css({
@@ -40,6 +74,8 @@
     this._element.append(button);
   }
   
+  ButtonField.prototype = Object.create(Field.prototype);
+  
   // element returns the field's element.
   ButtonField.prototype.element = function() {
     return this._element;
@@ -50,11 +86,6 @@
     return BUTTON_HEIGHT;
   };
   
-  // maxHeight returns this.height().
-  ButtonField.prototype.maxHeight = function() {
-    return this.height();
-  };
-  
   // width returns the width of the button.
   ButtonField.prototype.width = function() {
     return this._width;
@@ -62,7 +93,7 @@
   
   // A LabelField is a field which contains a label and nothing else.
   function LabelField(name) {
-    this.visible = true;
+    Field.call(this);
     
     // Create the label element.
     this._label = $('<label></label>');
@@ -83,6 +114,8 @@
     this._label.css({visibility: '', position: ''});
   }
   
+  LabelField.prototype = Object.create(Field.prototype);
+  
   // element returns the label.
   LabelField.prototype.element = function() {
     return this._label;
@@ -91,11 +124,6 @@
   // height returns the label's height.
   LabelField.prototype.height = function() {
     return this._labelHeight;
-  };
-  
-  // maxHeight returns this.height().
-  LabelField.prototype.maxHeight = function() {
-    return this.height();
   };
   
   // width returns the label's width.
@@ -113,6 +141,8 @@
     this._element.append(this._checkbox.element());
   }
   
+  CheckField.prototype = Object.create(LabelField.prototype);
+  
   // element returns the element containing both the label and the checkbox.
   CheckField.prototype.element = function() {
     return this._element;
@@ -121,11 +151,6 @@
   // height returns INPUT_HEIGHT
   CheckField.prototype.height = function() {
     return RECTANGULAR_FIELD_HEIGHT;
-  };
-  
-  // maxHeight returns this.height().
-  CheckField.prototype.maxHeight = function() {
-    return this.height();
   };
   
   // width returns the minimum width of the field.
@@ -146,6 +171,8 @@
     this._element.append(LabelField.prototype.element.call(this));
     this._element.append(this._dropdown.element());
   }
+  
+  DropdownField.prototype = Object.create(LabelField.prototype);
 
   // dropdown returns the dropdown in the field.
   DropdownField.prototype.dropdown = function() {
@@ -160,11 +187,6 @@
   // height returns the height of the element.
   DropdownField.prototype.height = function() {
     return RECTANGULAR_FIELD_HEIGHT;
-  };
-  
-  // maxHeight returns this.height().
-  DropdownField.prototype.maxHeight = function() {
-    return this.height();
   };
   
   // width returns the minimum width of the element.
@@ -190,6 +212,8 @@
     this._element.append(this._input);
   }
   
+  InputField.prototype = Object.create(LabelField.prototype);
+  
   // element returns an element containing the field and the label.
   InputField.prototype.element = function() {
     return this._element;
@@ -205,11 +229,6 @@
     return this._input;
   };
   
-  // maxHeight returns this.height().
-  InputField.prototype.maxHeight = function() {
-    return this.height();
-  };
-  
   // width returns the minimum width of the element.
   InputField.prototype.width = function() {
     return LabelField.prototype.width.call(this) + LABEL_PADDING +
@@ -221,7 +240,7 @@
       new InputField('Name'),
       new DropdownField('Icon'),
       new DropdownField('Scramble'),
-      new DropdownField('Scramble Type'),
+      new DropdownField(''),
       new CheckField('BLD'),
       new CheckField('Inspection'),
       new DropdownField('Timer Input'),
@@ -247,16 +266,17 @@
     this._flavorDropdown.onChange = this._changedFlavor.bind(this);
 
     // Setup the scramble dropdown.
-    this._scrambleDropdown = this._fields[2].dropdown();
+    this._scrambleField = this._fields[2];
+    this._scrambleDropdown = this._scrambleField.dropdown();
     var scrambles = window.puzzlejs.scrambler.allPuzzles().slice();
     scrambles.unshift('None');
     this._scrambleDropdown.setOptions(scrambles);
     this._scrambleDropdown.onChange = this._changedScramble.bind(this);
 
     // Setup the subscramble dropdown.
-    this._subscrambleDropdown = this._fields[3].dropdown();
     this._subscrambleField = this._fields[3];
-    this._subscrambleField.onChange = this._changedSubscramble.bind(this);
+    this._subscrambleDropdown = this._subscrambleField.dropdown();
+    this._subscrambleDropdown.onChange = this._changedSubscramble.bind(this);
 
     this._contents = $('<div class="settings-contents-contents"></div>');
     this._element = $('#footer .settings-contents');
@@ -266,6 +286,11 @@
     this._puzzle.append([this._puzzleIcon, this._puzzleLabel]);
     this._contents.append(this._puzzle);
     this._element.append(this._contents);
+    
+    for (var i = 0, len = this._fields.length; i < len; ++i) {
+      this._fields[i].element().css({display: 'none'});
+      this._contents.append(this._fields[i].element());
+    }
   }
 
   // hideDropdowns is called so that any open dropdowns can be closed.
@@ -276,7 +301,7 @@
     this._subscrambleDropdown.hide();
   };
   
-  Settings.prototype.layout = function() {
+  Settings.prototype.layout = function(animate) {
     var height = this._element[0].clientHeight || this._element.height();
     
     // columnX is the x coordinate of the current column.
@@ -293,27 +318,39 @@
     
     for (var i = 0, len = this._fields.length; i < len; ++i) {
       var field = this._fields[i];
-      field.element().detach();
+      
       if (!field.visible) {
+        field.updateShowing(animate);
         continue;
       }
+      
+      var requiredHeight = field.height();
+      var addHeight = field.height();
+      if (field === this._scrambleField) {
+        requiredHeight += MINIMUM_ROW_SPACE + this._subscrambleField.height();
+        if (!this._subscrambleField.visible) {
+          addHeight = requiredHeight;
+        }
+      }
+      
       // Either start a new column or add this field to the current one.
-      if (columnHeight + field.height() + MINIMUM_ROW_SPACE > height) {
-        this._layoutColumn(currentColumn, columnX, columnWidth, height);
+      if (columnHeight + requiredHeight + MINIMUM_ROW_SPACE > height) {
+        this._layoutColumn(currentColumn, columnX, columnWidth, height,
+          animate);
         columnX += columnWidth + COLUMN_SPACE;
         currentColumn = [field];
-        columnHeight = MINIMUM_ROW_SPACE*2 + field.height();
+        columnHeight = MINIMUM_ROW_SPACE*2 + addHeight;
         columnWidth = field.width();
       } else {
         currentColumn.push(field);
-        columnHeight += MINIMUM_ROW_SPACE + field.height();
+        columnHeight += MINIMUM_ROW_SPACE + addHeight;
         columnWidth = Math.max(field.width(), columnWidth);
       }
     }
     
     // The last column may need to be added.
     if (currentColumn.length > 0) {
-      this._layoutColumn(currentColumn, columnX, columnWidth, height);
+      this._layoutColumn(currentColumn, columnX, columnWidth, height, animate);
     }
     
     // If the clientHeight is smaller than it was before (i.e. a scrollbar was
@@ -360,7 +397,7 @@
 
   Settings.prototype._changedScramble = function() {
     this._popuplateSubscramble();
-    this.layout();
+    this.layout(true);
     // TODO: save new scramble
   };
 
@@ -368,7 +405,8 @@
     // TODO: save new subscramble
   };
   
-  Settings.prototype._layoutColumn = function(column, x, width, height) {
+  Settings.prototype._layoutColumn = function(column, x, width, height,
+    animate) {
     // Find the raw height of all the elements without any spacing.
     var rawHeight = 0;
     for (var i = 0, len = column.length; i < len; ++i) {
@@ -380,14 +418,23 @@
       MAXIMUM_ROW_SPACE);
     var y = (height - rawHeight - spacing*(column.length-1))/2;
     for (var i = 0, len = column.length; i < len; ++i) {
-      var element = column[i].element();
-      element.css({
-        width: width,
-        left: x,
-        top: Math.floor(y)
-      });
-      this._contents.append(element);
+      var field = column[i];
+      var element = field.element();
+      if (animate && field.showing) {
+        element.animate({
+          width: width,
+          left: x,
+          top: Math.floor(y)
+        }, {queue: false});
+      } else {
+        element.css({
+          width: width,
+          left: x,
+          top: Math.floor(y)
+        });
+      }
       y += spacing + column[i].height();
+      field.updateShowing(animate);
     }
     
     this._contents.css({width: x+width+10});
@@ -395,8 +442,10 @@
 
   Settings.prototype._popuplateSubscramble = function() {
     var options = this._subscramblers();
-    this._subscrambleDropdown.setOptions(options);
     this._subscrambleField.visible = (options.length > 1);
+    if (options.length > 1) {
+      this._subscrambleDropdown.setOptions(options);
+    }
   };
 
   Settings.prototype._subscramblers = function() {
