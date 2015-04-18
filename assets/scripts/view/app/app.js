@@ -156,6 +156,13 @@
     this._middle.setTimeBlinking(flag);
   }
   
+  // timeAdded is called to update the view for a new time.
+  AppView.prototype.timeAdded = function(record) {
+    // For now, just show the footer contents. In the future, we will really
+    // update the UI.
+    this._footer.stats.setShowingStats(true, !this._theaterMode);
+  };
+  
   // _animateStateChange animates the transition between an old state and the
   // current state.
   AppView.prototype._animateStateChange = function(oldState) {

@@ -122,6 +122,17 @@
   height: 50%;
 }
 
+#footer .stats-not-empty > div {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-color: white;
+}
+
+#footer .stats-not-empty > .averages {
+  right: 0;
+}
+
 #footer .settings-contents {
   position: absolute;
   top: 0;

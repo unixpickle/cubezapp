@@ -67,6 +67,7 @@
       window.app.view.setTheaterMode(false);
     };
     timer.onDone = function(record) {
+      window.app.view.timeAdded(record);
       window.app.view.setTheaterMode(false);
       console.log(record);
     };
