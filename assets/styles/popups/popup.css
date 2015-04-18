@@ -47,6 +47,8 @@
   background-size: 12px 12px;
   background-repeat: no-repeat;
   background-position: center;
+  
+  font-size: 17px;
 }
 
 .popup-dialog > .title button:hover {

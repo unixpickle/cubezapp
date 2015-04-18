@@ -70,11 +70,17 @@
     button.detach();
     button.css({visibility: '', position: ''});
     
+    this._button = button;
     this._element = $('<div class="field button-field"></div>');
     this._element.append(button);
   }
   
   ButtonField.prototype = Object.create(Field.prototype);
+  
+  // button returns the field's button.
+  ButtonField.prototype.button = function() {
+    return this._button;
+  };
   
   // element returns the field's element.
   ButtonField.prototype.element = function() {
@@ -250,38 +256,39 @@
       new ButtonField('Configure Cube'),
       new ButtonField('Change Name')
     ];
-
-    // Setup the icon dropdown.
+    
+    var renameField = this._fields[this._fields.length - 1];
+    renameField.button().click(this._changeName.bind(this));
+    
     this._iconDropdown = this._fields[0].dropdown();
     this._iconDropdown.setOptions(window.app.iconNames);
     this._iconDropdown.onChange = this._changedIcon.bind(this);
-
-    // Setup the flavor dropdown.
+    
     this._flavorDropdown = this._fields[9].dropdown();
     this._flavorDropdown.setOptions(window.app.flavorNames);
     this._flavorDropdown.setSelectedValue(window.app.flavors.current());
     this._flavorDropdown.onChange = this._changedFlavor.bind(this);
-
-    // Setup the scramble dropdown.
+    
     this._scrambleField = this._fields[1];
     this._scrambleDropdown = this._scrambleField.dropdown();
     var scrambles = window.puzzlejs.scrambler.allPuzzles().slice();
     scrambles.unshift('None');
     this._scrambleDropdown.setOptions(scrambles);
     this._scrambleDropdown.onChange = this._changedScramble.bind(this);
-
-    // Setup the subscramble dropdown.
+    
     this._subscrambleField = this._fields[2];
     this._subscrambleDropdown = this._subscrambleField.dropdown();
     this._subscrambleDropdown.onChange = this._changedSubscramble.bind(this);
-
-    this._contents = $('<div class="settings-contents-contents"></div>');
-    this._element = $('#footer .settings-contents');
+    
     this._puzzle = $('<div class="puzzle"></div>');
     this._puzzleIcon = $('<div class="icon flavor-background"></div>');
     this._puzzleLabel = $('<label></label>');
     this._puzzle.append([this._puzzleIcon, this._puzzleLabel]);
+    
+    this._contents = $('<div class="settings-contents-contents"></div>');
     this._contents.append(this._puzzle);
+    
+    this._element = $('#footer .settings-contents');
     this._element.append(this._contents);
     
     for (var i = 0, len = this._fields.length; i < len; ++i) {
@@ -381,6 +388,10 @@
   
   Settings.prototype.setPuzzleName = function(name) {
     this._puzzleLabel.text(name);
+  };
+  
+  Settings.prototype._changeName = function() {
+    new window.app.RenamePopup().show();
   };
 
   Settings.prototype._changedFlavor = function() {

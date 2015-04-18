@@ -1,7 +1,5 @@
 (function() {
   
-  var POPUP_WIDTH = 400;
-  
   function DeletePopup(name, cb) {
     var msg = 'Are you sure you would like to delete "' + name +
       '"? This action cannot be undone.';
