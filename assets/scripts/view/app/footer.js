@@ -81,6 +81,10 @@
     }
   };
   
+  Footer.prototype.setPuzzleName = function(name) {
+    this.settings.setPuzzleName(name);
+  };
+  
   Footer.prototype._setupResizing = function() {
     // This state is used to know what's going on in mouse events.
     var mouseIsDown = false;

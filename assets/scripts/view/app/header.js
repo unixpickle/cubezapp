@@ -153,7 +153,11 @@
   };
   
   Header.prototype.setActivePuzzle = function(puzzle) {
-    this._puzzleName.text(puzzle.name);
+    this.setPuzzleName(puzzle.name);
+  };
+  
+  Header.prototype.setPuzzleName = function(name) {
+    this._puzzleName.text(name);
   };
   
   Header.prototype.setPuzzles = function(puzzles) {

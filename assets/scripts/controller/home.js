@@ -33,6 +33,13 @@
     }.bind(this)).show();
   };
   
+  // renamePuzzle requests that the puzzle change names and that the name be
+  // updated in the UI.
+  Home.prototype.renamePuzzle = function(name) {
+    window.app.store.modifyPuzzle({name: name});
+    window.app.view.setPuzzleName(name);
+  };
+  
   // switchPuzzle requests that the store switch puzzles. Once the store has
   // switched, this updates the UI to reflect the change.
   Home.prototype.switchPuzzle = function(puzzle) {

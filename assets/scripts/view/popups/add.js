@@ -160,7 +160,7 @@
       <div class="field"> \
         <label>Name</label> \
         <div class="content"> \
-          <input placeholder="Name"> \
+          <input placeholder="Name" maxlength="19"> \
         </div> \
       </div> \
     ');

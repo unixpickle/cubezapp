@@ -72,6 +72,12 @@
     this._footer.settings.setPuzzle(puzzle);
   };
   
+  // setPuzzleName updates the puzzle name through the view.
+  AppView.prototype.setPuzzleName = function(name) {
+    this._header.setPuzzleName(name);
+    this._footer.setPuzzleName(name);
+  };
+  
   // setTheaterMode enables or disables "theater" mode, in which everything is
   // hidden but the time.
   AppView.prototype.setTheaterMode = function(on) {

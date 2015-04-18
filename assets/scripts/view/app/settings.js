@@ -253,6 +253,13 @@
     
     // Setup the name input.
     this._nameInput = this._fields[0].input();
+    this._nameInput.attr('maxlength', 19);
+    this._nameInput.change(this._changedName.bind(this));
+    this._nameInput.keydown(function() {
+      setTimeout(function() {
+        this._changedName();
+      }.bind(this), 10);
+    }.bind(this));
 
     // Setup the icon dropdown.
     this._iconDropdown = this._fields[1].dropdown();
@@ -362,7 +369,7 @@
   };
   
   Settings.prototype.setPuzzle = function(puzzle) {
-    this._puzzleLabel.text(puzzle.name);
+    this.setPuzzleName(puzzle.name);
     this._puzzleIcon.css({
       backgroundImage: 'url(images/puzzles/' + puzzle.icon + '.png)'
     });
@@ -373,6 +380,7 @@
 
     this._scrambleDropdown.setSelectedValue(puzzle.scrambler);
     this._popuplateSubscramble();
+    this._subscrambleDropdown.setSelectedValue(puzzle.scrambleType);
 
     // We may need to re-layout because a field may have been shown or hidden.
     this.layout();
@@ -380,6 +388,10 @@
     // We should deselect dropdowns because a dropdown may have been open if
     // setPuzzle() was called because of a remote change.
     this.hideDropdowns();
+  };
+  
+  Settings.prototype.setPuzzleName = function(name) {
+    this._puzzleLabel.text(name);
   };
 
   Settings.prototype._changedFlavor = function() {
@@ -392,17 +404,31 @@
     this._puzzleIcon.css({
       backgroundImage: 'url(images/puzzles/' + iconFile + '.png)'
     });
-    // TODO: save new icon
+    window.app.store.modifyPuzzle({icon: iconFile});
+  };
+  
+  Settings.prototype._changedName = function() {
+    window.app.home.renamePuzzle(this._nameInput.val());
   };
 
   Settings.prototype._changedScramble = function() {
     this._popuplateSubscramble();
     this.layout(true);
-    // TODO: save new scramble
+    window.app.store.modifyPuzzle({
+      scrambler: this._scrambleDropdown.value(),
+      scrambleType: this._subscramblers()[0] || 'None'
+    });
   };
 
   Settings.prototype._changedSubscramble = function() {
-    // TODO: save new subscramble
+    // They could have changed the subscramble really fast while it was fading
+    // out.
+    if (!this._subscrambleField.visible) {
+      return;
+    }
+    window.app.store.modifyPuzzle({
+      scrambleType: this._subscrambleDropdown.value()
+    });
   };
   
   Settings.prototype._layoutColumn = function(column, x, width, height,
