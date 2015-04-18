@@ -418,7 +418,7 @@
     Popup.call(this, element, width, height);
     
     // We need to store this for the enter key.
-    this._mainButton = content[content.length - 1];
+    this._mainButton = buttons[buttons.length - 1];
     
     // Event listeners.
     this.onAction = null;

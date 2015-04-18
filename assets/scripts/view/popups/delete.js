@@ -7,7 +7,7 @@
       '"? This action cannot be undone.';
     var content = $('<div class="delete-popup-content"></div>').text(msg);
     this._dialog = new window.app.Dialog('Are you sure?', content,
-      ['Delete', 'Cancel']);
+      ['Cancel', 'Delete']);
     this._dialog.onAction = this._action.bind(this);
     this._callback = cb;
   }
