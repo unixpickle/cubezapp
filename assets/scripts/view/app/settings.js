@@ -237,7 +237,6 @@
   
   function Settings() {
     this._fields = [
-      new InputField('Name'),
       new DropdownField('Icon'),
       new DropdownField('Scramble'),
       new DropdownField(''),
@@ -248,32 +247,23 @@
       new CheckField('Right Handed'),
       new CheckField('Theater Mode'),
       new DropdownField('Flavor'),
-      new ButtonField('Configure Cube')
+      new ButtonField('Configure Cube'),
+      new ButtonField('Change Name')
     ];
-    
-    // Setup the name input.
-    this._nameInput = this._fields[0].input();
-    this._nameInput.attr('maxlength', 19);
-    this._nameInput.change(this._changedName.bind(this));
-    this._nameInput.keydown(function() {
-      setTimeout(function() {
-        this._changedName();
-      }.bind(this), 10);
-    }.bind(this));
 
     // Setup the icon dropdown.
-    this._iconDropdown = this._fields[1].dropdown();
+    this._iconDropdown = this._fields[0].dropdown();
     this._iconDropdown.setOptions(window.app.iconNames);
     this._iconDropdown.onChange = this._changedIcon.bind(this);
 
     // Setup the flavor dropdown.
-    this._flavorDropdown = this._fields[10].dropdown();
+    this._flavorDropdown = this._fields[9].dropdown();
     this._flavorDropdown.setOptions(window.app.flavorNames);
     this._flavorDropdown.setSelectedValue(window.app.flavors.current());
     this._flavorDropdown.onChange = this._changedFlavor.bind(this);
 
     // Setup the scramble dropdown.
-    this._scrambleField = this._fields[2];
+    this._scrambleField = this._fields[1];
     this._scrambleDropdown = this._scrambleField.dropdown();
     var scrambles = window.puzzlejs.scrambler.allPuzzles().slice();
     scrambles.unshift('None');
@@ -281,7 +271,7 @@
     this._scrambleDropdown.onChange = this._changedScramble.bind(this);
 
     // Setup the subscramble dropdown.
-    this._subscrambleField = this._fields[3];
+    this._subscrambleField = this._fields[2];
     this._subscrambleDropdown = this._subscrambleField.dropdown();
     this._subscrambleDropdown.onChange = this._changedSubscramble.bind(this);
 
@@ -373,7 +363,6 @@
     this._puzzleIcon.css({
       backgroundImage: 'url(images/puzzles/' + puzzle.icon + '.png)'
     });
-    this._nameInput.val(puzzle.name);
 
     var iconName = window.app.iconFilesToNames[puzzle.icon];
     this._iconDropdown.setSelectedValue(iconName);
@@ -405,10 +394,6 @@
       backgroundImage: 'url(images/puzzles/' + iconFile + '.png)'
     });
     window.app.store.modifyPuzzle({icon: iconFile});
-  };
-  
-  Settings.prototype._changedName = function() {
-    window.app.home.renamePuzzle(this._nameInput.val());
   };
 
   Settings.prototype._changedScramble = function() {

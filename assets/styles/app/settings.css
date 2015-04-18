@@ -45,9 +45,9 @@
   pointer-events: none;
   position: absolute;
   bottom: 0;
-  left: 0;
+  left: 6px;
   height: 40px;
-  width: 100%;
+  width: calc(100% - 12px);
   line-height: 40px;
   text-align: center;
   font-size: 20px;
