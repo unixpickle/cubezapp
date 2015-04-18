@@ -57,6 +57,7 @@
     <!-- View scripts provide the front-end experience -->
     <script src="scripts/view/app/animator.js"></script>
     <script src="scripts/view/app/app.js"></script>
+    <script src="scripts/view/app/averages.js"></script>
     <script src="scripts/view/app/footer.js"></script>
     <script src="scripts/view/app/graph.js"></script>
     <script src="scripts/view/app/header.js"></script>
@@ -131,9 +132,17 @@
       <div class="bottom">
         <!-- This constitutes the "Stats" tab -->
         <div class="stats-contents">
-          <div class="times"></div>
-          <div class="graph"></div>
-          <div class="stats"></div>
+          <div class="stats-moving-pane">
+            <div class="stats-empty">
+              <div class="gray-icon"></div>
+              <label>No Solves</label>
+            </div>
+            <div class="stats-not-empty">
+              <div class="times"></div>
+              <div class="graph"></div>
+              <div class="averages"></div>
+            </div>
+          </div>
         </div>
         
         <!-- This constitutes the "Settings" tab -->

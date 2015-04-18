@@ -70,6 +70,7 @@
   AppView.prototype.setActivePuzzle = function(puzzle) {
     this._header.setActivePuzzle(puzzle);
     this._footer.settings.setPuzzle(puzzle);
+    this._footer.stats.setPuzzle(puzzle);
   };
   
   // setPuzzleName updates the puzzle name through the view.

@@ -9,9 +9,7 @@
     this._elementStyler = new window.app.Styler(this._element[0]);
     this._top = new FooterTop();
     this._bottom = this._element.find('.bottom');
-    this.graph = new window.app.Graph();
     this.stats = new window.app.Stats();
-    this.timesList = new window.app.TimesList();
     this.settings = new window.app.Settings();
     
     // Blank event handlers.
@@ -43,7 +41,8 @@
   Footer.prototype.layout = function(attrs) {
     if (attrs.footerOpacity === 0) {
       this._elementStyler.css({display: 'none'});
-      this.settings.hideDropdowns();
+      this.settings.containerHidden();
+      this.stats.containerHidden();
       return;
     }
     
@@ -70,8 +69,6 @@
     }
     if (this._lastWidth !== window.app.windowSize.width ||
         this._lastHeight !== attrs.footerHeight) {
-      this.graph.layout();
-      this.timesList.layout();
       this.stats.layout();
       this.settings.layout();
       

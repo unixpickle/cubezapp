@@ -297,12 +297,10 @@
     }
   }
 
-  // hideDropdowns is called so that any open dropdowns can be closed.
-  Settings.prototype.hideDropdowns = function() {
-    this._flavorDropdown.hide();
-    this._iconDropdown.hide();
-    this._scrambleDropdown.hide();
-    this._subscrambleDropdown.hide();
+  // containerHidden is called so that any open dropdowns or context menus can
+  // be closed when the footer is hidden.
+  Settings.prototype.containerHidden = function() {
+    this._hideDropdowns();
   };
   
   Settings.prototype.layout = function(animate) {
@@ -383,7 +381,7 @@
 
     // We should deselect dropdowns because a dropdown may have been open if
     // setPuzzle() was called because of a remote change.
-    this.hideDropdowns();
+    this._hideDropdowns();
   };
   
   Settings.prototype.setPuzzleName = function(name) {
@@ -427,6 +425,13 @@
     window.app.store.modifyPuzzle({
       scrambleType: this._subscrambleDropdown.value()
     });
+  };
+  
+  Settings.prototype._hideDropdowns = function() {
+    this._flavorDropdown.hide();
+    this._iconDropdown.hide();
+    this._scrambleDropdown.hide();
+    this._subscrambleDropdown.hide();
   };
   
   Settings.prototype._layoutColumn = function(column, x, width, height,
