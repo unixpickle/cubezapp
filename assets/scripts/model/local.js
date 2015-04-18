@@ -1,8 +1,14 @@
 (function() {
   
+  var DEFAULT_SETTINGS = {
+    flavor: 'Blueberry',
+    righty: true
+  };
+  
   function LocalStore() {
     this._active = null;
     this._puzzles = null;
+    this._globalSettings = null;
     
     // Register change events.
     this._changeListener = this._dataChanged.bind(this);
@@ -73,6 +79,10 @@
     return this._active;
   };
   
+  LocalStore.prototype.getGlobalSettings = function() {
+    return this._globalSettings;
+  };
+    
   LocalStore.prototype.getPuzzles = function() {
     return this._puzzles;
   };
@@ -84,6 +94,16 @@
   LocalStore.prototype.getSolves = function(start, count, cb) {
     var list = this._active.solves.slice(start, start+count);
     return new window.app.DataTicket(cb, list);
+  };
+  
+  LocalStore.prototype.modifyGlobalSettings = function(attrs) {
+    for (var key in attrs) {
+      if (!attrs.hasOwnProperty(key)) {
+        continue;
+      }
+      this._globalSettings[key] = attrs[key];
+    }
+    this._save();
   };
   
   LocalStore.prototype.modifyPuzzle = function(attrs) {
@@ -196,6 +216,7 @@
     // Load the puzzle data.
     var data = JSON.parse(localStorage.localStoreData);
     this._puzzles = data.puzzles;
+    this._globalSettings = data.globalSettings || DEFAULT_SETTINGS;
     
     // Find the active puzzle.
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
@@ -216,7 +237,8 @@
     
     var newData = {
       puzzles: puzzles,
-      active: active
+      active: active,
+      globalSettings: DEFAULT_SETTINGS
     };
     
     // If they are in some kind of private browsing mode, this may fail.
@@ -237,7 +259,8 @@
     this._active.lastUsed = new Date().getTime();
     var data = {
       puzzles: this._puzzles,
-      active: this._active.id
+      active: this._active.id,
+      globalSettings: this._globalSettings
     };
     // If they are in some kind of private browsing mode, this may fail.
     try {

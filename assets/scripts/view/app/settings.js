@@ -385,7 +385,9 @@
 
   Settings.prototype._changedFlavor = function() {
     window.app.flavors.switchToFlavor(this._flavorDropdown.value());
-    // TODO: save new flavor
+    window.app.store.modifyGlobalSettings({
+      flavor: this._flavorDropdown.value()
+    });
   };
 
   Settings.prototype._changedIcon = function() {

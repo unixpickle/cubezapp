@@ -121,9 +121,12 @@
     // ALTERNATION_FLAVOR.
     this._alternationInterval = null;
     
-    // TODO: here, use the user-selected flavor.
-    this._startAlternating();
-    //this._initializeFlavor(ALTERNATION_FLAVOR);
+    var flavor = window.app.store.getGlobalSettings().flavor;
+    if (flavor === ALTERNATION_FLAVOR) {
+      this._startAlternating();
+    } else {
+      this._initializeFlavor(flavor);
+    }
     
     // Now that the flavor style is set correctly, we can set the body's
     // background color.
