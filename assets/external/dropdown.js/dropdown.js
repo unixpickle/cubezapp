@@ -1,16 +1,19 @@
 (function() {
   
-  var DROPDOWN_HEIGHT = 30;
-  var ITEM_HEIGHT = 30;
+  var DEFAULT_DROPDOWN_HEIGHT = 30;
+  var DEFAULT_FONT_HEIGHT_RATIO = 18/30;
   var PAGE_MARGIN = 10;
   
   // A Dropdown generates and controls the elements involved with a dropdown.
-  function Dropdown(width, bgcolor) {
+  function Dropdown(width, bgcolor, height, fontSize) {
     // This information can be changed as elements are modified or selected.
     this._optionNames = [];
     this._selected = 0;
     this._width = width;
     this._bgColor = bgcolor || [1, 1, 1];
+    this._height = height || DEFAULT_DROPDOWN_HEIGHT;
+    this._fontSize = fontSize || Math.round(DEFAULT_FONT_HEIGHT_RATIO *
+      this._height);
     
     // Event handler for change events.
     this.onChange = null;
@@ -22,10 +25,15 @@
     this._resizeCallback = this._resize.bind(this);
     
     // Generate the preview element to show to the user before they click.
-    this._label = $('<label></label>');
+    this._label = $('<label></label>').css({
+      height: this._height,
+      fontSize: this._fontSize + 'px',
+      lineHeight: this._height + 'px'
+    });
     this._arrow = $('<div></div>');
     this._preview = $('<div class="dropdownjs-preview"></div>').css({
       width: width,
+      height: this._height,
       backgroundColor: colorToHTML(this._bgColor)
     });
     var content = $('<div class="dropdownjs-preview-content"></div>');
@@ -89,8 +97,12 @@
     this._menu.empty();
     this._options = $();
     for (var i = 0, len = list.length; i < len; ++i) {
-      var element = $('<li></li>');
-      element.text(list[i]);
+      var element = $('<li></li>').css({
+        height: this._height,
+        lineHeight: this._height + 'px',
+        fontSize: this._fontSize + 'px',
+        backgroundSize: this._height + 'px ' + this._height + 'px'
+      }).text(list[i]);
       this._options = this._options.add(element);
       this._menu.append(element);
       element.click(function(idx) {
@@ -175,13 +187,15 @@
   function Metrics(dropdown) {
     this.dropdown = dropdown;
     
+    var itemHeight = dropdown._height;
+    
     // Compute the position of the dropdown preview.
     var offset = dropdown._preview.offset();
-    offset.bottom = offset.top + DROPDOWN_HEIGHT;
+    offset.bottom = offset.top + dropdown._height;
     
     // Compute the height of the document and the menu content.
     var docHeight = $(document.body).height();
-    this.requestedHeight = dropdown._optionNames.length * ITEM_HEIGHT;
+    this.requestedHeight = dropdown._optionNames.length * itemHeight;
     
     // This is the ideal positioning for the dropdown.
     this.down = true;
@@ -190,7 +204,7 @@
     
     // Restrict the dropdown's size and possibly change the direction.
     var allowedHeight = docHeight - PAGE_MARGIN - offset.top;
-    if (offset.bottom > docHeight-offset.top && allowedHeight < ITEM_HEIGHT*4) {
+    if (offset.bottom > docHeight-offset.top && allowedHeight < itemHeight*4) {
       this.down = false;
       if (this.requestedHeight > offset.bottom) {
         this.scrolls = true;
@@ -227,7 +241,7 @@
     
     // Compute the position of the dropdown preview.
     var offset = this.dropdown._preview.offset();
-    offset.bottom = offset.top + DROPDOWN_HEIGHT;
+    offset.bottom = offset.top + this.dropdown._height;
     
     // Compute the new height.
     if (this.down) {
@@ -237,7 +251,7 @@
       this.viewHeight = Math.min(offset.bottom - PAGE_MARGIN,
         this.requestedHeight);
     }
-    this.viewHeight = Math.max(this.viewHeight, ITEM_HEIGHT*2);
+    this.viewHeight = Math.max(this.viewHeight, this.dropdown._height*2);
     
     // Compute the coordinates of the dropdown.
     this.left = offset.left;

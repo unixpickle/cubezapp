@@ -2,23 +2,20 @@
 // easy-to-use interface for changing both global and puzzle settings.
 (function() {
   
-  // BUTTON_FONT_SIZE is the font size of buttons in the settings tab.
-  var BUTTON_FONT_SIZE = 20;
-  
-  // BUTTON_HEIGHT is the height of buttons in the settings tab.
-  var BUTTON_HEIGHT = 40;
+  var BUTTON_FONT_SIZE = 17;
+  var BUTTON_HEIGHT = 35;
   
   // COLUMN_SPACE is the number of pixels between columns.
   var COLUMN_SPACE = 30;
   
-  // INPUT_HEIGHT is the height of all dropdowns and input boxes.
+  var DROPDOWN_FONT_SIZE = 17;
+  var DROPDOWN_HEIGHT = 30;
+  var DROPDOWN_WIDTH = 160;
+  
   var INPUT_HEIGHT = 30;
+  var INPUT_WIDTH = 160;
   
-  // INPUT_WIDTH is the width of all the dropdowns and input boxes.
-  var INPUT_WIDTH = 180;
-  
-  // LABEL_FONT_SIZE is the font size of labels.
-  var LABEL_FONT_SIZE = 20;
+  var LABEL_FONT_SIZE = 17;
   
   // LABEL_PADDING is the minimum space between a label and its corresponding
   // input.
@@ -134,8 +131,8 @@
     LabelField.call(this, name);
     
     // Create the dropdown element.
-    this._dropdown = new window.dropdownjs.Dropdown(INPUT_WIDTH, [0xf0/0xff,
-      0xf0/0xff, 0xf0/0xff]);
+    this._dropdown = new window.dropdownjs.Dropdown(DROPDOWN_WIDTH, [0xf0/0xff,
+      0xf0/0xff, 0xf0/0xff], DROPDOWN_HEIGHT, DROPDOWN_FONT_SIZE);
     
     // Create the field element.
     this._element = $('<div class="field dropdown-field"></div>');

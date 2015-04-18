@@ -14,7 +14,7 @@
 .dropdownjs-preview-content div {
   position: absolute;
   right: 5px;
-  top: 10px;
+  top: calc(50% - 5px);
   width: 10px;
   height: 10px;
   
@@ -34,10 +34,7 @@
   white-space: nowrap;
   
   color: #999;
-  font-size: 18px;
   width: calc(100% - 22px);
-  height: 30px;
-  line-height: 30px;
   padding-left: 7px;
   
   /* Allow clicks to hit contents. */
@@ -77,9 +74,6 @@ ul.dropdownjs-menu {
 
 ul.dropdownjs-menu li {
   width: calc(100% - 40px);
-  height: 30px;
-  font-size: 18px;
-  line-height: 30px;
   list-style-type: none;
   padding: 0 10px 0 30px;
   margin: 0;
@@ -96,7 +90,6 @@ ul.dropdownjs-menu li.checked {
   background-image: url('check.png');
   background-repeat: no-repeat;
   background-position: left left;
-  background-size: 30px 30px;
 }
 
 ul.dropdownjs-menu li:hover {

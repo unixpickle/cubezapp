@@ -71,14 +71,14 @@
 
 #footer .settings-contents-contents > .input-field > input {
   float: right;
-  width: 166px;
+  width: 146px;
   height: 26px;
   
   padding: 0 5px 0 5px;
   border: 2px solid #d5d5d5;
   
   color: #999;
-  font-size: 18px;
+  font-size: 17px;
 }
 
 #footer .settings-contents-contents > .dropdown-field > div {
