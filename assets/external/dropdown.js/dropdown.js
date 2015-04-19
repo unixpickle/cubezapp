@@ -95,7 +95,8 @@
     if (this._optionNames === 0) {
       return;
     }
-    this._handleSelectionChange(idx);
+    this._label.text(this._optionNames[idx]);
+    this._selected = idx;
     this._menu.setSelected(idx);
   };
   
@@ -131,6 +132,9 @@
   Dropdown.prototype._handleSelectionChange = function(idx) {
     this._label.text(this._optionNames[idx]);
     this._selected = idx;
+    if ('function' === typeof this.onChange) {
+      this.onChange(idx);
+    }
   };
   
   function Menu(dropdown) {
