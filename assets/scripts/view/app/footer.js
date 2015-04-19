@@ -41,8 +41,6 @@
   Footer.prototype.layout = function(attrs) {
     if (attrs.footerOpacity === 0) {
       this._elementStyler.css({display: 'none'});
-      this.settings.containerHidden();
-      this.stats.containerHidden();
       return;
     }
     

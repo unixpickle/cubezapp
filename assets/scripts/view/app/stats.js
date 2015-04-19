@@ -20,10 +20,6 @@
     this._showingStats = false;
   }
   
-  Stats.prototype.containerHidden = function() {
-    // Close dropdowns here, etc.
-  };
-  
   Stats.prototype.layout = function() {
     this._layoutContent();
     

@@ -296,12 +296,6 @@
       this._contents.append(this._fields[i].element());
     }
   }
-
-  // containerHidden is called so that any open dropdowns or context menus can
-  // be closed when the footer is hidden.
-  Settings.prototype.containerHidden = function() {
-    this._hideDropdowns();
-  };
   
   Settings.prototype.layout = function(animate) {
     var height = this._element[0].clientHeight || this._element.height();
@@ -364,6 +358,10 @@
   };
   
   Settings.prototype.setPuzzle = function(puzzle) {
+    // We should deselect dropdowns because a dropdown may have been open if
+    // setPuzzle() was called due to a remote change.
+    this._hideDropdowns();
+    
     this.setPuzzleName(puzzle.name);
     this._puzzleIcon.css({
       backgroundImage: 'url(images/puzzles/' + puzzle.icon + '.png)'
@@ -378,10 +376,6 @@
 
     // We may need to re-layout because a field may have been shown or hidden.
     this.layout();
-
-    // We should deselect dropdowns because a dropdown may have been open if
-    // setPuzzle() was called because of a remote change.
-    this._hideDropdowns();
   };
   
   Settings.prototype.setPuzzleName = function(name) {

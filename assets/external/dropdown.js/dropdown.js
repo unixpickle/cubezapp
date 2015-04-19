@@ -1,55 +1,45 @@
 (function() {
   
+  var DEFAULT_BG_COLOR = [1, 1, 1];
   var DEFAULT_DROPDOWN_HEIGHT = 30;
   var DEFAULT_FONT_HEIGHT_RATIO = 18/30;
+  var DOWN_MINIMUM_ITEMS = 4;
+  var MINIMUM_MENU_HEIGHT = 60;
   var PAGE_MARGIN = 10;
   
   // A Dropdown generates and controls the elements involved with a dropdown.
   function Dropdown(width, bgcolor, height, fontSize) {
-    // This information can be changed as elements are modified or selected.
+    bgcolor = bgcolor || DEFAULT_BG_COLOR;
+    
+    // This state can be changed later.
     this._optionNames = [];
     this._selected = 0;
+    
     this._width = width;
-    this._bgColor = bgcolor || [1, 1, 1];
     this._height = height || DEFAULT_DROPDOWN_HEIGHT;
     this._fontSize = fontSize || Math.round(DEFAULT_FONT_HEIGHT_RATIO *
       this._height);
     
-    // Event handler for change events.
     this.onChange = null;
     
-    // This is used to layout the dropdown.
-    this._metrics = null;
-    
-    // This callback is used while the dropdown is showing.
-    this._resizeCallback = this._resize.bind(this);
-    
-    // Generate the preview element to show to the user before they click.
     this._label = $('<label></label>').css({
       height: this._height,
       fontSize: this._fontSize + 'px',
       lineHeight: this._height + 'px'
     });
-    this._arrow = $('<div></div>');
+    var arrow = $('<div class="arrow"></div>').css({
+      marginTop: Math.ceil((this._height - 10) / 2),
+    });
     this._preview = $('<div class="dropdownjs-preview"></div>').css({
       width: width,
       height: this._height,
-      backgroundColor: colorToHTML(this._bgColor)
+      backgroundColor: colorToHTML(bgcolor)
     });
-    var content = $('<div class="dropdownjs-preview-content"></div>');
-    content.append([this._label, this._arrow]);
-    this._preview.append(content);
+    this._preview.append([this._label, arrow]);
     this._preview.click(this.show.bind(this));
     
-    // Generate the shielding element.
-    this._shielding = $('<div class="dropdownjs-shielding"></div>');
-    this._shielding.click(this.hide.bind(this));
-    
-    // Generate the menu which will popup.
-    this._menuContainer = $('<div class="dropdownjs-menu-container"></div>');
-    this._menu = $('<ul class="dropdownjs-menu"></ul>');
-    this._options = $();
-    this._menuContainer.append(this._menu);
+    this._menu = new Menu(this);
+    this._menu.onChange = this._handleSelectionChange.bind(this);
   }
   
   // element returns an HTML element which can be displayed for the dropdown.
@@ -57,22 +47,24 @@
     return this._preview[0];
   };
   
+  // fontSize returns the font size used by the dropdown.
+  Dropdown.prototype.fontSize = function() {
+    return this._fontSize
+  };
+  
+  // height returns the height of the dropdown.
+  Dropdown.prototype.height = function() {
+    return this._height;
+  };
+  
   // hide closes the dropdown if it was open.
   Dropdown.prototype.hide = function() {
-    if (!this.isOpen()) {
-      return;
-    }
-    
-    this._metrics = null;
-    this._shielding.detach();
-    this._menuContainer.detach();
-    
-    $(window).off('resize', this._resizeCallback);
+    this._menu.hide();
   };
   
   // isOpen returns true if the dropdown is open.
   Dropdown.prototype.isOpen = function() {
-    return this._metrics !== null;
+    return this._menu.isShowing();
   };
   
   // selected returns the selected index.
@@ -93,50 +85,23 @@
       return;
     }
     
-    // Generate list elements.
-    this._menu.empty();
-    this._options = $();
-    for (var i = 0, len = list.length; i < len; ++i) {
-      var element = $('<li></li>').css({
-        height: this._height,
-        lineHeight: this._height + 'px',
-        fontSize: this._fontSize + 'px',
-        backgroundSize: this._height + 'px ' + this._height + 'px'
-      }).text(list[i]);
-      this._options = this._options.add(element);
-      this._menu.append(element);
-      element.click(function(idx) {
-        if (this.isOpen()) {
-          this.hide();
-          this.setSelected(idx);
-          if ('function' === typeof this.onChange) {
-            this.onChange();
-          }
-        }
-      }.bind(this, i));
-    }
-    
+    this._menu.setOptions(list);
     this._optionNames = list.slice();
     this.setSelected(selected || 0);
   };
   
   // setSelected selects an index in the dropdown.
-  Dropdown.prototype.setSelected = function(selected) {
+  Dropdown.prototype.setSelected = function(idx) {
     if (this._optionNames === 0) {
       return;
     }
-    
-    this._label.text(this._optionNames[selected]);
-    this._selected = selected;
-    
-    // Change the classes of all the options.
-    this._options.removeClass('checked');
-    this._options.eq(this._selected).addClass('checked');
+    this._handleSelectionChange(idx);
+    this._menu.setSelected(idx);
   };
   
   // setSelectedValue selects an index in the dropdown given its name.
-  Dropdown.prototype.setSelectedValue = function(v) {
-    var idx = this._optionNames.indexOf(v);
+  Dropdown.prototype.setSelectedValue = function(value) {
+    var idx = this._optionNames.indexOf(value);
     if (idx >= 0) {
       this.setSelected(idx);
     }
@@ -144,25 +109,10 @@
   
   // show opens the dropdown if it was not already open.
   Dropdown.prototype.show = function() {
-    if (this.isOpen() || this._optionNames.length === 0) {
+    if (this._optionNames.length === 0) {
       return;
     }
-    
-    // Setup the new state.
-    this._metrics = new Metrics(this);
-    this._menuContainer.css({
-      left: this._metrics.left,
-      top: this._metrics.top,
-      width: this._metrics.width,
-      height: this._metrics.viewHeight
-    });
-    
-    // Add the elements to the DOM.
-    $(document.body).append(this._shielding);
-    $(document.body).append(this._menuContainer);
-    
-    // Setup resizing events.
-    $(window).resize(this._resizeCallback);
+    this._menu.show();
   };
   
   // value returns the name of the selected element.
@@ -173,93 +123,254 @@
     return this._optionNames[this._selected];
   };
   
-  Dropdown.prototype._resize = function() {
-    this._metrics.resized();
-    this._menuContainer.css({
-      left: this._metrics.left,
-      top: this._metrics.top,
-      width: this._metrics.width,
-      height: this._metrics.viewHeight
+  // width returns the width of the dropdown.
+  Dropdown.prototype.width = function() {
+    return this._width;
+  };
+  
+  Dropdown.prototype._handleSelectionChange = function(idx) {
+    this._label.text(this._optionNames[idx]);
+    this._selected = idx;
+  };
+  
+  function Menu(dropdown) {
+    this._dropdown = dropdown;
+    
+    this._showing = false;
+    this._down = false;
+    this._changeTracker = null;
+    
+    this._shielding = $('<div></div>').css({
+      position: 'fixed',
+      left: 0,
+      top: 0,
+      width: '100%',
+      height: '100%'
+    });
+    this._shielding.click(this.hide.bind(this));
+    
+    this._options = $();
+    this._menu = $('<ul class="dropdownjs-menu"></ul>');
+    this._container = $('<div class="dropdownjs-menu-container"></div>');
+    this._container.append(this._menu);
+    
+    this.onChosen = null;
+  }
+  
+  Menu.prototype.hide = function() {
+    if (!this._showing) {
+      return;
+    }
+    this._showing = false;
+    
+    this._changeTracker.stop();
+    this._changeTracker = null;
+    
+    this._shielding.detach();
+    this._container.detach();
+  };
+  
+  Menu.prototype.isShowing = function() {
+    return this._showing;
+  };
+  
+  Menu.prototype.setOptions = function(list) {
+    this._menu.empty();
+    this._options = $();
+    var rowHeight = this._dropdown.height();
+    for (var i = 0, len = list.length; i < len; ++i) {
+      var optionElement = $('<li></li>').css({
+        height: rowHeight,
+        lineHeight: rowHeight + 'px',
+        fontSize: this._dropdown.fontSize() + 'px',
+        backgroundSize: rowHeight + 'px ' + rowHeight + 'px'
+      }).text(list[i]);
+      this._options = this._options.add(optionElement);
+      this._menu.append(optionElement);
+      optionElement.click(function(idx) {
+        if (!this._showing) {
+          return;
+        }
+        this.hide();
+        this.setSelected(idx);
+        this.onChange(idx);
+      }.bind(this, i));
+    }
+  };
+  
+  Menu.prototype.setSelected = function(idx) {
+    this._options.removeClass('checked');
+    this._options.eq(idx).addClass('checked');
+  };
+  
+  Menu.prototype.show = function() {
+    if (this._showing) {
+      return;
+    }
+    this._showing = true;
+    
+    this._changeTracker = new ChangeTracker(this._dropdown.element(),
+      this._relayout.bind(this));
+    this._layout();
+    
+    // Add the elements to the DOM.
+    $(document.body).append(this._shielding);
+    $(document.body).append(this._container);
+  };
+  
+  Menu.prototype._layout = function() {
+    this._down = this._shouldOpenDown();
+    this._relayout();
+  };
+  
+  Menu.prototype._relayout = function() {
+    var state = this._changeTracker.getState();
+    
+    if (!state.elementVisible) {
+      this.hide();
+      return;
+    }
+    
+    var extraWidth = scrollbarWidth();
+    
+    var left = state.elementLeft;
+    var top = 0;
+    var width = this._dropdown.width() + extraWidth;
+    var height = 0;
+    var contentHeight = this._options.length * this._dropdown.height();
+    
+    if (width + left > state.bodyWidth) {
+      left -= extraWidth;
+    }
+    
+    if (this._down) {
+      height = Math.min(state.bodyHeight - state.elementTop - PAGE_MARGIN,
+        contentHeight);
+      top = state.elementTop;
+    } else {
+      height = Math.min(contentHeight, this._dropdown.height() +
+        state.elementTop - PAGE_MARGIN);
+      top = state.elementTop + this._dropdown.height() - height;
+    }
+    
+    this._container.css({
+      left: left,
+      top: top,
+      width: width,
+      height: Math.max(height, MINIMUM_MENU_HEIGHT)
     });
   };
   
-  // Metrics manages the layout of a dropdown menu.
-  function Metrics(dropdown) {
-    this.dropdown = dropdown;
+  Menu.prototype._shouldOpenDown = function() {
+    var dropdownHeight = this._dropdown.height();
     
-    var itemHeight = dropdown._height;
+    var state = this._changeTracker.getState();
+    var minimumDownHeight = DOWN_MINIMUM_ITEMS*this._dropdown.height();
     
-    // Compute the position of the dropdown preview.
-    var offset = dropdown._preview.offset();
-    offset.bottom = offset.top + dropdown._height;
+    var upwardsSpace = state.elementTop + this._dropdown.height();
+    var downwardsSpace = state.bodyHeight - state.elementTop;
     
-    // Compute the height of the document and the menu content.
-    var docHeight = $(document.body).height();
-    this.requestedHeight = dropdown._optionNames.length * itemHeight;
-    
-    // This is the ideal positioning for the dropdown.
-    this.down = true;
-    this.viewHeight = this.requestedHeight;
-    this.scrolls = false;
-    
-    // Restrict the dropdown's size and possibly change the direction.
-    var allowedHeight = docHeight - PAGE_MARGIN - offset.top;
-    if (offset.bottom > docHeight-offset.top && allowedHeight < itemHeight*4) {
-      this.down = false;
-      if (this.requestedHeight > offset.bottom) {
-        this.scrolls = true;
-        this.viewHeight = offset.bottom - PAGE_MARGIN;
-      } else {
-        this.viewHeight = this.requestedHeight;
-      }
-    } else if (offset.top+this.requestedHeight > docHeight-PAGE_MARGIN) {
-      this.viewHeight = docHeight - offset.top - PAGE_MARGIN;
-      this.scrolls = true;
-    } else {
-      this.viewHeight = this.requestedHeight;
-    }
-    
-    // Compute the width of the dropdown.
-    var extraWidth = scrollbarWidth();
-    this.width = dropdown._preview.width() + extraWidth;
-    if (this.width + offset.left > $(document.body).width()) {
-      offset.left -= extraWidth;
-    }
-    
-    // Compute the coordinates of the dropdown.
-    this.left = offset.left;
-    if (this.down) {
-      this.top = offset.top;
-    } else {
-      this.top = offset.bottom - this.viewHeight;
-    }
+    return downwardsSpace - PAGE_MARGIN >= minimumDownHeight ||
+        downwardsSpace > upwardsSpace;
   }
   
-  Metrics.prototype.resized = function() {
-    // Compute the height of the document and the menu content.
-    var docHeight = $(document.body).height();
+  // A ChangeTracker listens for changes in an element's visibility or position
+  // or in the window's size.
+  function ChangeTracker(element, callback) {
+    this._element = $(element);
+    this._callback = callback;
     
-    // Compute the position of the dropdown preview.
-    var offset = this.dropdown._preview.offset();
-    offset.bottom = offset.top + this.dropdown._height;
+    this._lastAction = new Date().getTime();
+    this._lastState = this._computeState();
+    this._goingFast = true;
     
-    // Compute the new height.
-    if (this.down) {
-      this.viewHeight = Math.min(docHeight - offset.top - PAGE_MARGIN,
-        this.requestedHeight);
-    } else {
-      this.viewHeight = Math.min(offset.bottom - PAGE_MARGIN,
-        this.requestedHeight);
+    this._checkInterval = setInterval(this._check.bind(this),
+      ChangeTracker.FAST_INTERVAL);
+    
+    this._actionCallback = this._externalAction.bind(this);
+    $(window).resize(this._actionCallback);
+  }
+  
+  ChangeTracker.SLOW_INTERVAL = 250;
+  ChangeTracker.FAST_DURATION = 1000;
+  ChangeTracker.FAST_INTERVAL = 100;
+  
+  ChangeTracker.prototype.getState = function() {
+    return this._lastState;
+  };
+  
+  ChangeTracker.prototype.stop = function() {
+    clearInterval(this._checkInterval);
+    $(window).off('resize', this._actionCallback);
+  };
+  
+  ChangeTracker.prototype._check = function() {
+    var newState = this._computeState();
+    var keys = ['elementVisible', 'elementTop', 'elementLeft',
+      'bodyWidth', 'bodyHeight'];
+    var changed = false;
+    for (var keyIdx = 0; keyIdx < keys.length; ++keyIdx) {
+      var key = keys[keyIdx];
+      if (newState[key] !== this._lastState[key]) {
+        changed = true;
+        break;
+      }
     }
-    this.viewHeight = Math.max(this.viewHeight, this.dropdown._height*2);
     
-    // Compute the coordinates of the dropdown.
-    this.left = offset.left;
-    if (this.down) {
-      this.top = offset.top;
-    } else {
-      this.top = offset.bottom - this.viewHeight;
+    if (changed) {
+      this._lastState = newState;
+      this._externalAction();
+      this._callback();
+    } else if (this._goingFast) {
+      var timeSinceAction = new Date().getTime() - this._lastAction;
+      if (timeSinceAction > ChangeTracker.FAST_DURATION) {
+        this._slowDown();
+      }
     }
+  };
+  
+  ChangeTracker.prototype._computeState = function() {
+    var elementOffset = this._element.offset();
+    return {
+      elementVisible: this._isElementVisible(),
+      elementTop: elementOffset.top,
+      elementLeft: elementOffset.left,
+      bodyWidth: $(document.body).width(),
+      bodyHeight: $(document.body).height()
+    };
+  };
+  
+  ChangeTracker.prototype._externalAction = function() {
+    if (!this._goingFast) {
+      this._goingFast = true;
+      clearInterval(this._checkInterval);
+      this._checkInterval = setInterval(this._check.bind(this),
+        ChangeTracker.FAST_INTERVAL);
+    }
+    this._lastAction = new Date().getTime();
+    this._check();
+  };
+  
+  ChangeTracker.prototype._isElementVisible = function() {
+    var rawElement = this._element[0];
+    var visible = false;
+    while (rawElement !== null) {
+      if (rawElement.style.display === 'none' ||
+          rawElement.style.opacity === '0') {
+        return false;
+      } else if (rawElement === document.body) {
+        return true;
+      }
+      rawElement = rawElement.parentNode;
+    }
+    return false;
+  };
+  
+  ChangeTracker.prototype._slowDown = function() {
+    this._goingFast = false;
+    clearInterval(this._checkInterval);
+    this._checkInterval = setInterval(this._check.bind(this),
+      ChangeTracker.SLOW_INTERVAL);
   };
   
   function colorToHTML(color) {
