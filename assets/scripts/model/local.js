@@ -20,7 +20,6 @@
       window.attachEvent('onstorage', this._changeListener);
     }
     
-    // Load the data.
     this._loadData();
   }
   
