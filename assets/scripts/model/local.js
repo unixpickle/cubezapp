@@ -6,6 +6,8 @@
   };
   
   function LocalStore() {
+    window.app.EventEmitter.call(this);
+    
     this._active = null;
     this._puzzles = null;
     this._globalSettings = null;
@@ -18,27 +20,25 @@
       window.attachEvent('onstorage', this._changeListener);
     }
     
-    // Setup unregistered event listeners.
-    this.onExternalChange = null;
-    this.onExternalDelete = null;
-    this.onStatsComputed = null;
-    this.onStatsLoading = null;
-    
     // Load the data.
     this._loadData();
   }
+  
+  LocalStore.prototype = Object.create(window.app.EventEmitter.prototype);
   
   LocalStore.prototype.addPuzzle = function(puzzle) {
     puzzle.id = window.app.generateId();
     this._puzzles.unshift(puzzle);
     this._active = puzzle;
     this._save();
+    this.emit('addedPuzzle', puzzle);
   };
   
   LocalStore.prototype.addSolve = function(solve) {
     solve.id = window.app.generateId();
     this._active.solves.push(solve);
     this._save();
+    this.emit('addedSolve', solve);
   };
   
   LocalStore.prototype.deletePuzzle = function(id) {
@@ -49,6 +49,7 @@
       if (this._puzzles[i].id === id) {
         this._puzzles.splice(i, 1);
         this._save();
+        this.emit('deletedPuzzle', id);
         return;
       }
     }
@@ -61,6 +62,7 @@
       if (solves[i].id === id) {
         solves.splice(i, 1);
         this._save();
+        this.emit('deletedSolve', id);
         return;
       }
     }
@@ -104,6 +106,7 @@
       this._globalSettings[key] = attrs[key];
     }
     this._save();
+    this.emit('modifiedGlobalSettings', attrs);
   };
   
   LocalStore.prototype.modifyPuzzle = function(attrs) {
@@ -114,6 +117,7 @@
       this._active[key] = attrs[key];
     }
     this._save();
+    this.emit('modifiedPuzzle', attrs);
   };
   
   LocalStore.prototype.modifySolve = function(id, attrs) {
@@ -134,6 +138,7 @@
       }
     }
     this._save();
+    this.emit('modifiedSolve', id, attrs);
   };
   
   LocalStore.prototype.switchPuzzle = function(id, cb) {
@@ -144,32 +149,28 @@
         this._puzzles.splice(i, 1);
         this._puzzles.unshift(this._active);
         this._save();
+        this.emit('switchedPuzzle');
         return new window.app.DataTicket(cb, null);
       }
     }
-    return new window.app.ErrorTicket(cb, Error('puzzle not found: ' + id));
+    var err = new Error('puzzle not found: ' + id);
+    this.emit('switchPuzzleError', err);
+    return new window.app.ErrorTicket(cb, err);
   };
   
   LocalStore.prototype._dataChanged = function() {
-    // Save the currently active puzzle, then reload everything.
     var oldActive = this._active.id;
     this._loadData();
     
-    // Find the old active puzzle.
+    // Find the old active puzzle by its id.
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       if (this._puzzles[i].id === oldActive) {
         this._active = this._puzzles[i];
-        if ('function' === typeof this.onExternalChange) {
-          this.onExternalChange();
-        }
-        return;
+        break;
       }
     }
     
-    // No active puzzle was found, so we notify the delegate of said fact.
-    if ('function' === typeof this.onExternalDelete) {
-      this.onExternalDelete();
-    }
+    this.emit('remoteChange');
   };
   
   LocalStore.prototype._generateDefault = function() {
