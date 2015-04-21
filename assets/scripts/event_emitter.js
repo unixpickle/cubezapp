@@ -15,7 +15,7 @@
 
   EventEmitter.prototype.emit = function(name) {
     var listeners = this.listeners(name);
-    var eventArgs = arguments.slice(1);
+    var eventArgs = Array.prototype.slice.call(arguments, 1);
     for (var i = 0, len = listeners.length; i < len; ++i) {
       listeners[i].apply(null, eventArgs);
     }
