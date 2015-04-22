@@ -30,10 +30,10 @@
   // CSSAnimation is the CSS-based presentation animator. It uses CSS3
   // transitions to show a popup and its shielding. This works well on Chrome
   // and Firefox, but has occasional bugs in Safari.
-  function CSSAnimation(popup, shielding) {
+  function CSSAnimation($popup, $shielding) {
     // Copy the arguments.
-    this._popup = popup;
-    this._shielding = shielding;
+    this._$popup = $popup;
+    this._$shielding = $shielding;
     
     // This is set when start() was called but the transition hasn't been
     // started yet.
@@ -41,13 +41,13 @@
     
     // Set the transition properties.
     var shieldingTransition = 'opacity ' + ANIMATION_DURATION/1000 + 's ease';
-    this._shielding.css({
+    this._$shielding.css({
       opacity: 0,
       transition: shieldingTransition,
       msTransition: shieldingTransition,
       WebkitTransition: shieldingTransition
     });
-    this._popup.css({
+    this._$popup.css({
       opacity: 0,
       transform: 'translateY(-50px)',
       msTransform: 'translateY(-50px)',
@@ -63,13 +63,13 @@
     if (this._startRequest !== null) {
       // The animation is starting and this is a race condition, so to speak.
       window.cancelAnimationFrame(this._startRequest);
-      this._shielding.remove();
-      this._popup.remove();
+      this._$shielding.remove();
+      this._$popup.remove();
       return;
     }
     
-    this._shielding.css({opacity: 0, pointerEvents: 'none'});
-    this._popup.css({
+    this._$shielding.css({opacity: 0, pointerEvents: 'none'});
+    this._$popup.css({
       opacity: 0,
       pointerEvents: 'none',
       transform: 'translateY(-50px)',
@@ -77,8 +77,8 @@
       WebkitTransform: 'translateY(-50px)',
     });
     setTimeout(function() {
-      this._shielding.remove();
-      this._popup.remove();
+      this._$shielding.remove();
+      this._$popup.remove();
     }.bind(this), ANIMATION_DURATION);
   };
   
@@ -89,8 +89,8 @@
     this._startRequest = window.requestAnimationFrame(function() {
       this._startRequest = window.requestAnimationFrame(function() {
         this._startRequest = null;
-        this._shielding.css({opacity: 1});
-        this._popup.css({
+        this._$shielding.css({opacity: 1});
+        this._$popup.css({
           opacity: 1,
           transform: 'none',
           msTransform: 'none',
@@ -102,10 +102,10 @@
   
   // ScriptAnimation is the script-based presentation animator. It uses no CSS3
   // transitions or animations.
-  function ScriptAnimation(popup, shielding) {
+  function ScriptAnimation($popup, $shielding) {
     // Copy the arguments.
-    this._popup = popup;
-    this._shielding = shielding;
+    this._$popup = $popup;
+    this._$shielding = $shielding;
     
     // this._running is true if the animation is running forwards or backwards.
     this._running = false;
@@ -127,8 +127,8 @@
     this._waitingFrame = false;
     
     // Setup initial styles.
-    this._shielding.css({opacity: 0});
-    this._popup.css({
+    this._$shielding.css({opacity: 0});
+    this._$popup.css({
       opacity: 0,
       transform: 'translateY(-50px)',
       webkitTransform: 'translateY(-50px)',
@@ -172,8 +172,8 @@
     } else {
       transform = 'translateY(' + ((pct-1)*50) + 'px)';
     }
-    this._shielding.css({opacity: pct});
-    this._popup.css({
+    this._$shielding.css({opacity: pct});
+    this._$popup.css({
       opacity: pct,
       transform: transform,
       webkitTransform: transform,
@@ -188,8 +188,8 @@
     var progress = elapsed / ANIMATION_DURATION;
     if (progress >= 1) {
       if (this._reversed) {
-        this._popup.remove();
-        this._shielding.remove();
+        this._$popup.remove();
+        this._$shielding.remove();
       } else {
         this._showFrame(1);
       }
@@ -197,6 +197,7 @@
       return;
     }
     
+    // TODO: use a better easing function here.
     var easedProgress = 3*Math.pow(progress, 2) - 2*Math.pow(progress, 3);
     if (this._reversed) {
       this._showFrame(1 - easedProgress);

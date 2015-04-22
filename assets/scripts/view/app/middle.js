@@ -8,12 +8,12 @@
   var SCRAMBLE_PADDING = 10;
   
   function Middle() {
-    this._memoTime = $('#memo-time');
-    this._memoTimeStyler = new window.app.Styler(this._memoTime[0]);
-    this._pbStatus = $('#pb-status');
-    this._pbStatusStyler = new window.app.Styler(this._pbStatus[0]);
-    this._scramble = $('#scramble');
-    this._scrambleStyler = new window.app.Styler(this._scramble[0]);
+    this._$memoTime = $('#memo-time');
+    this._memoTimeStyler = new window.app.Styler(this._$memoTime[0]);
+    this._$pbStatus = $('#pb-status');
+    this._pbStatusStyler = new window.app.Styler(this._$pbStatus[0]);
+    this._$scramble = $('#scramble');
+    this._scrambleStyler = new window.app.Styler(this._$scramble[0]);
     this._time = new window.app.Time();
   }
   
@@ -166,7 +166,7 @@
   
   // scrambleHeight returns the outer height of the scramble.
   Middle.prototype.scrambleHeight = function() {
-    var height = this._scramble.outerHeight();
+    var height = this._$scramble.outerHeight();
     if ('number' !== typeof height || isNaN(height)) {
       throw new Error('invalid scrambleHeight: ' + height);
     }
@@ -175,17 +175,17 @@
 
   // setMemo sets the memo time's text contents.
   Middle.prototype.setMemo = function(memo) {
-    this._memoTime.text(memo || '');
+    this._$memoTime.text(memo || '');
   };
 
   // setPB sets the PB's text contents.
   Middle.prototype.setPB = function(pb) {
-    this._pbStatus.text(pb || '');
+    this._$pbStatus.text(pb || '');
   }
 
   // setScramble sets the scramble's text contents.
   Middle.prototype.setScramble = function(text) {
-    this._scramble.text(text || '');
+    this._$scramble.text(text || '');
   };
 
   // setTime sets the time's text contents.

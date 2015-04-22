@@ -10,8 +10,6 @@
     
     // Setup the current puzzle.
     var puzzles = window.app.store.getPuzzles().slice(1);
-    window.app.view.setPuzzles(puzzles);
-    window.app.view.setActivePuzzle(window.app.store.getActivePuzzle());
     
     // NOTE: we do not configure the timer until the page finishes loading.
   }
@@ -19,8 +17,6 @@
   // addPuzzle adds a puzzle and switches to it.
   Home.prototype.addPuzzle = function(puzzle) {
     window.app.store.addPuzzle(puzzle);
-    window.app.view.setPuzzles(window.app.store.getPuzzles().slice(1));
-    window.app.view.setActivePuzzle(window.app.store.getActivePuzzle());
     this._configureTimer();
   };
   
@@ -29,7 +25,6 @@
   Home.prototype.deletePuzzle = function(puzzle) {
     new window.app.DeletePopup(puzzle.name, function() {
       window.app.store.deletePuzzle(puzzle.id);
-      window.app.view.removePuzzle(puzzle);
     }.bind(this)).show();
   };
   
@@ -37,7 +32,6 @@
   // updated in the UI.
   Home.prototype.renamePuzzle = function(name) {
     window.app.store.modifyPuzzle({name: name});
-    window.app.view.setPuzzleName(name);
   };
   
   // switchPuzzle requests that the store switch puzzles. Once the store has
@@ -47,8 +41,6 @@
       if (error !== null) {
         return;
       }
-      window.app.view.setPuzzles(window.app.store.getPuzzles().slice(1));
-      window.app.view.setActivePuzzle(window.app.store.getActivePuzzle());
       this._configureTimer();
     }.bind(this));
   };
@@ -67,7 +59,7 @@
       window.app.view.setTheaterMode(false);
     };
     timer.onDone = function(record) {
-      window.app.view.timeAdded(record);
+      //window.app.view.timeAdded(record);
       window.app.view.setTheaterMode(false);
       console.log(record);
     };

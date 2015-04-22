@@ -2,15 +2,15 @@
   
   function Time() {
     // View components.
-    this._element = $('#time');
-    this._elementStyler = new window.app.Styler(this._element[0]);
-    this._label = this._element.find('label');
-    this._labelStyler = new window.app.Styler(this._label[0]);
-    this._blinker = this._element.find('.blinker');
-    this._blinkerStyler = new window.app.Styler(this._blinker[0]);
+    this._$element = $('#time');
+    this._elementStyler = new window.app.Styler(this._$element[0]);
+    this._$label = this._$element.find('label');
+    this._labelStyler = new window.app.Styler(this._$label[0]);
+    this._$blinker = this._$element.find('.blinker');
+    this._blinkerStyler = new window.app.Styler(this._$blinker[0]);
     
     // This state is used to adjust the font size for different text values.
-    this._text = this._label.text();
+    this._text = this._$label.text();
     this._requestedFontSize = 0;
     
     // Blinker state.
@@ -58,7 +58,7 @@
     if (this._showingBlinker) {
       // Layout blinker.
       this._blinkerStyler.css({
-        left: this._label.offset().left + this._label.outerWidth()
+        left: this._$label.offset().left + this._$label.outerWidth()
       });
     }
   };
@@ -85,7 +85,7 @@
   
   Time.prototype.text = function(text) {
     this._text = text;
-    this._label.text(text);
+    this._$label.text(text);
     this._labelStyler.css({'font-size': this._usableFontSize() + 'px'});
     this._setBlinkerVisible(this._showingBlinker);
   };
@@ -99,7 +99,7 @@
     // Layout blinker.
     this._blinkerStyler.css({
       display: 'block',
-      left: this._label.offset().left + this._label.outerWidth()
+      left: this._$label.offset().left + this._$label.outerWidth()
     });
   };
   
