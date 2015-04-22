@@ -48,6 +48,153 @@
     }
   }
   
+  // Flavors is the flavor manager. It must be created after the data store is
+  // available.
+  function Flavors() {
+    // this._animation is the current change animation.
+    this._animation = null;
+    
+    // this._checkboxes is used to update the flavor of checkboxes.
+    this._checkboxes = [];
+    
+    // this._current stores the current flavor information.
+    this._current = null;
+    
+    // this._alternationInterval is null unless the flavor is currently
+    // ALTERNATION_FLAVOR.
+    this._alternationInterval = null;
+    
+    var flavor = window.app.store.getGlobalSettings().flavor;
+    if (flavor === ALTERNATION_FLAVOR) {
+      this._startAlternating();
+    } else {
+      this._initializeFlavor(flavor);
+    }
+    
+    this._registerModelEvents();
+    
+    // Now that the flavor style is set correctly, we can set the body's
+    // background color.
+    document.body.className = 'flavor-background';
+  }
+
+  // current returns the name of the current flavor.
+  Flavors.prototype.current = function() {
+    if (this._alternationInterval !== null) {
+      return ALTERNATION_FLAVOR;
+    } else {
+      return this._current.name;
+    }
+  };
+  
+  // makeCheckbox generates a checkbox that follows the theme color.
+  Flavors.prototype.makeCheckbox = function() {
+    var rgbColor = [];
+    for (var i = 0; i < 3; ++i) {
+      rgbColor[i] = this._current.color[i]/0xff;
+    }
+    var result = new window.checkboxjs.Checkbox(rgbColor);
+    result.setVisible(true);
+    this._checkboxes.push(result);
+    return result;
+  };
+  
+  // removeCheckbox stops updating the color of a given checkbox.
+  Flavors.prototype.removeCheckbox = function(box) {
+    var idx = this._checkboxes.indexOf(box);
+    if (idx < 0) {
+      throw new Error('checkbox not found');
+    }
+    this._checkboxes.splice(idx, 1);
+  };
+  
+  // _animateToFlavor animates to a new flavor that's not the alternation
+  // flavor.
+  Flavors.prototype._animateToFlavor = function(name) {
+    if (this._animation) {
+      this._animation.cancel();
+    }
+    
+    // Start an animation to the new color.
+    if (this._current === null) {
+      this._initializeFlavor(name);
+      return;
+    }
+    
+    // Animate the text and background color change.
+    var color = FLAVORS[name].color;
+    this._animation = new Animation(this._current.color, color);
+    this._animation.onDone = function() {
+      this._animation = null;
+      this._initializeFlavor(name);
+    }.bind(this);
+    
+    // Set colors of checkboxes.
+    var rgbColor = [];
+    for (var i = 0; i < 3; ++i) {
+      rgbColor[i] = color[i]/0xff;
+    }
+    for (var i = 0, len = this._checkboxes.length; i < len; ++i) {
+      this._checkboxes[i].setColor(rgbColor);
+    }
+  };
+  
+  // _initializeFlavor sets a flavor instantly without an animation.
+  Flavors.prototype._initializeFlavor = function(name) {
+    var color = FLAVORS[name].color;
+    var hex = hexForColor(color);
+    var pressed = [color[0]*0.8, color[1]*0.8, color[2]*0.8];
+    var pressedHex = hexForColor(pressed);
+    setFlavorStyle(hex, pressedHex);
+    this._current = FLAVORS[name];
+  };
+  
+  // _registerModelEvents listens to flavor change events from the model.
+  Flavors.prototype._registerModelEvents = function() {
+    window.app.store.on('modifiedGlobalSettings', function(attrs) {
+      if (attrs.flavor) {
+        this._switchToFlavor(attrs.flavor);
+      }
+    }.bind(this));
+    window.app.store.on('remoteChange', function() {
+      var newFlavor = window.app.store.getGlobalSettings().flavor;
+      if (newFlavor !== this.current()) {
+        this._switchToFlavor(newFlavor);
+      }
+    }.bind(this));
+  };
+  
+  // _startAlternation begins the flavor alternation process.
+  Flavors.prototype._startAlternating = function(alternating) {
+    if (this._alternationInterval !== null) {
+      clearInterval(this._alternationInterval);
+    }
+    var idx = Math.floor(Math.random() * FLAVOR_NAMES.length);
+    this._alternationInterval = setInterval(function() {
+      idx = (idx + 1) % FLAVOR_NAMES.length;
+      this._animateToFlavor(FLAVOR_NAMES[idx]);
+    }.bind(this), ALTERNATION_PERIOD);
+    this._animateToFlavor(FLAVOR_NAMES[idx]);
+  };
+  
+  // _stopAlternation stops the alternation process.
+  Flavors.prototype._stopAlternating = function() {
+    if (this._alternationInterval !== null) {
+      clearInterval(this._alternationInterval);
+      this._alternationInterval = null;
+    }
+  };
+  
+  // _switchToFlavor animates to a new flavor which may be the alternation
+  // flavor.
+  Flavors.prototype._switchToFlavor = function(name) {
+    if (name === ALTERNATION_FLAVOR) {
+      this._startAlternating();
+    } else {
+      this._animateToFlavor(name);
+    }
+  };
+  
   // An Animation animates the color change of every themed element.
   function Animation(oldColor, newColor) {
     this._updateColors = $('.flavor-text');
@@ -105,135 +252,6 @@
     this._requestFrame();
   };
   
-  // Flavors is the flavor manager. It must be created after the data store is
-  // available.
-  function Flavors() {
-    // this._animation is the current change animation.
-    this._animation = null;
-    
-    // this._checkboxes is used to update the flavor of checkboxes.
-    this._checkboxes = [];
-    
-    // this._current stores the current flavor information.
-    this._current = null;
-    
-    // this._alternationInterval is null unless the flavor is currently
-    // ALTERNATION_FLAVOR.
-    this._alternationInterval = null;
-    
-    var flavor = window.app.store.getGlobalSettings().flavor;
-    if (flavor === ALTERNATION_FLAVOR) {
-      this._startAlternating();
-    } else {
-      this._initializeFlavor(flavor);
-    }
-    
-    // Now that the flavor style is set correctly, we can set the body's
-    // background color.
-    document.body.className = 'flavor-background';
-  }
-
-  // current returns the name of the current flavor.
-  Flavors.prototype.current = function() {
-    if (this._alternationInterval !== null) {
-      return ALTERNATION_FLAVOR;
-    } else {
-      return this._current.name;
-    }
-  };
-  
-  // makeCheckbox generates a checkbox that follows the theme color.
-  Flavors.prototype.makeCheckbox = function() {
-    var rgbColor = [];
-    for (var i = 0; i < 3; ++i) {
-      rgbColor[i] = this._current.color[i]/0xff;
-    }
-    var result = new window.checkboxjs.Checkbox(rgbColor);
-    result.setVisible(true);
-    this._checkboxes.push(result);
-    return result;
-  };
-  
-  // removeCheckbox stops updating the color of a given checkbox.
-  Flavors.prototype.removeCheckbox = function(box) {
-    var idx = this._checkboxes.indexOf(box);
-    if (idx < 0) {
-      throw new Error('checkbox not found');
-    }
-    this._checkboxes.splice(idx, 1);
-  };
-  
-  // switchToFlavor animates to a new flavor.
-  Flavors.prototype.switchToFlavor = function(name) {
-    if (name === ALTERNATION_FLAVOR) {
-      this._startAlternating();
-    } else {
-      this._animateToFlavor(name);
-    }
-  };
-  
-  // _animateToFlavor animates to a new flavor that's not the alternation
-  // flavor.
-  Flavors.prototype._animateToFlavor = function(name) {
-    if (this._animation) {
-      this._animation.cancel();
-    }
-    
-    // Start an animation to the new color.
-    if (this._current === null) {
-      this._initializeFlavor(name);
-      return;
-    }
-    
-    // Animate the text and background color change.
-    var color = FLAVORS[name].color;
-    this._animation = new Animation(this._current.color, color);
-    this._animation.onDone = function() {
-      this._animation = null;
-      this._initializeFlavor(name);
-    }.bind(this);
-    
-    // Set colors of checkboxes.
-    var rgbColor = [];
-    for (var i = 0; i < 3; ++i) {
-      rgbColor[i] = color[i]/0xff;
-    }
-    for (var i = 0, len = this._checkboxes.length; i < len; ++i) {
-      this._checkboxes[i].setColor(rgbColor);
-    }
-  };
-  
-  // _initializeFlavor sets a flavor instantly without an animation.
-  Flavors.prototype._initializeFlavor = function(name) {
-    var color = FLAVORS[name].color;
-    var hex = hexForColor(color);
-    var pressed = [color[0]*0.8, color[1]*0.8, color[2]*0.8];
-    var pressedHex = hexForColor(pressed);
-    setFlavorStyle(hex, pressedHex);
-    this._current = FLAVORS[name];
-  }
-  
-  // _startAlternation begins the flavor alternation process.
-  Flavors.prototype._startAlternating = function(alternating) {
-    if (this._alternationInterval !== null) {
-      clearInterval(this._alternationInterval);
-    }
-    var idx = Math.floor(Math.random() * FLAVOR_NAMES.length);
-    this._alternationInterval = setInterval(function() {
-      idx = (idx + 1) % FLAVOR_NAMES.length;
-      this._animateToFlavor(FLAVOR_NAMES[idx]);
-    }.bind(this), ALTERNATION_PERIOD);
-    this._animateToFlavor(FLAVOR_NAMES[idx]);
-  };
-  
-  // _stopAlternation stops the alternation process.
-  Flavors.prototype._stopAlternating = function() {
-    if (this._alternationInterval !== null) {
-      clearInterval(this._alternationInterval);
-      this._alternationInterval = null;
-    }
-  };
-  
   function hexForColor(color) {
     var hexCode = '#';
     for (var i = 0; i < 3; ++i) {
@@ -247,7 +265,6 @@
   }
   
   function setFlavorStyle(color, hover) {
-    // TODO: if we can, use document.styleSheets for this.
     if (document.styleSheets) {
       var rulesLeft = 3;
       for (var i = document.styleSheets.length-1; i >= 0; --i) {
