@@ -242,6 +242,8 @@
   };
   
   function Settings() {
+    window.app.EventEmitter.call(this);
+
     this._fields = [
       new DropdownField('Icon'),
       new DropdownField('Scramble'),
@@ -266,7 +268,6 @@
     
     this._flavorDropdown = this._fields[9].dropdown();
     this._flavorDropdown.setOptions(window.app.flavorNames);
-    this._flavorDropdown.setSelectedValue(window.app.flavors.current());
     this._flavorDropdown.onChange = this._changedFlavor.bind(this);
     
     this._scrambleField = this._fields[1];
@@ -295,7 +296,17 @@
       this._fields[i].element().css({display: 'none'});
       this._contents.append(this._fields[i].element());
     }
+
+    this._updateAll(false);
+    var updateHandler = this._updateAll.bind(this, true);
+    var updateEvents = ['modifiedGlobalSettings', 'modifiedPuzzle',
+      'remoteChanged', 'switchedPuzzle'];
+    for (var i = 0; i < updateEvents.length; ++i) {
+      window.app.store.on(updateEvents[i], updateHandler);
+    }
   }
+
+  Settings.prototype = Object.create(window.app.EventEmitter.prototype);
   
   Settings.prototype.layout = function(animate) {
     var height = this._element[0].clientHeight || this._element.height();
@@ -357,68 +368,31 @@
     }
   };
   
-  Settings.prototype.setPuzzle = function(puzzle) {
-    // We should deselect dropdowns because a dropdown may have been open if
-    // setPuzzle() was called due to a remote change.
-    this._hideDropdowns();
-    
-    this.setPuzzleName(puzzle.name);
-    this._puzzleIcon.css({
-      backgroundImage: 'url(images/puzzles/' + puzzle.icon + '.png)'
-    });
-
-    var iconName = window.app.iconFilesToNames[puzzle.icon];
-    this._iconDropdown.setSelectedValue(iconName);
-
-    this._scrambleDropdown.setSelectedValue(puzzle.scrambler);
-    this._popuplateSubscramble();
-    this._subscrambleDropdown.setSelectedValue(puzzle.scrambleType);
-
-    // We may need to re-layout because a field may have been shown or hidden.
-    this.layout();
-  };
-  
-  Settings.prototype.setPuzzleName = function(name) {
-    this._puzzleLabel.text(name);
-  };
-  
   Settings.prototype._changeName = function() {
+    // TODO: fire an event for this...
     new window.app.RenamePopup().show();
   };
 
   Settings.prototype._changedFlavor = function() {
-    window.app.flavors.switchToFlavor(this._flavorDropdown.value());
-    window.app.store.modifyGlobalSettings({
-      flavor: this._flavorDropdown.value()
-    });
+    this.emit('flavorChanged', this._flavorDropdown.value());
   };
 
   Settings.prototype._changedIcon = function() {
     var iconFile = window.app.iconFiles[this._iconDropdown.selected()];
-    this._puzzleIcon.css({
-      backgroundImage: 'url(images/puzzles/' + iconFile + '.png)'
-    });
-    window.app.store.modifyPuzzle({icon: iconFile});
+    this.emit('iconChanged', iconFile);
   };
 
   Settings.prototype._changedScramble = function() {
-    this._popuplateSubscramble();
-    this.layout(true);
-    window.app.store.modifyPuzzle({
-      scrambler: this._scrambleDropdown.value(),
-      scrambleType: this._subscramblers()[0] || 'None'
-    });
+    this.emit('scramblerChanged', this._scrambleDropdown.value(),
+      this._subscramblers()[0] || 'None');
   };
 
   Settings.prototype._changedSubscramble = function() {
-    // They could have changed the subscramble really fast while it was fading
-    // out.
-    if (!this._subscrambleField.visible) {
-      return;
+    // They could have changed the subscramble while it was fading out.
+    if (this._subscrambleField.visible) {
+      this.emit('scramblerChanged', this._scrambleDropdown.value(),
+        this._subscramblers()[0] || 'None');
     }
-    window.app.store.modifyPuzzle({
-      scrambleType: this._subscrambleDropdown.value()
-    });
   };
   
   Settings.prototype._hideDropdowns = function() {
@@ -483,6 +457,31 @@
       names[i] = scramblers[i].name;
     }
     return names;
+  };
+
+  Settings.prototype._updateAll = function(animate) {
+    var puzzle = window.app.store.getActivePuzzle();
+
+    // We should deselect dropdowns because remote changes can trigger updates.
+    this._hideDropdowns();
+    
+    this._puzzleLabel.text(puzzle.name);
+    this._puzzleIcon.css({
+      backgroundImage: 'url(images/puzzles/' + puzzle.icon + '.png)'
+    });
+
+    var iconName = window.app.iconFilesToNames[puzzle.icon];
+    this._iconDropdown.setSelectedValue(iconName);
+
+    this._scrambleDropdown.setSelectedValue(puzzle.scrambler);
+    this._popuplateSubscramble();
+    this._subscrambleDropdown.setSelectedValue(puzzle.scrambleType);
+
+    var flavor = window.app.store.getGlobalSettings().flavor;
+    this._flavorDropdown.setSelectedValue(flavor);
+
+    // We may need to re-layout because a field may have been shown or hidden.
+    this.layout(animate || false);
   };
   
   window.app.Settings = Settings;
