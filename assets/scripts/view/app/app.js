@@ -4,7 +4,7 @@
 //
 // The AppView manages these interacting UI components. It does so by receiving
 // callbacks from its subviews and from the DOM.
-
+//
 // In essence, the AppView is a magical genie in a bottle.
 (function() {
 
@@ -59,23 +59,6 @@
   // significantly.
   AppView.prototype.loading = function() {
     return this._numLoadingAnimations > 0;
-  };
-  
-  // removePuzzle removes a puzzle from the view with a possible animation.
-  AppView.prototype.removePuzzle = function(puzzle) {
-    this._header.removePuzzle(puzzle);
-  };
-  
-  // setActivePuzzle presents a given puzzle as the active puzzle in the view.
-  AppView.prototype.setActivePuzzle = function(puzzle) {
-    this._header.setActivePuzzle(puzzle);
-    this._footer.stats.setPuzzle(puzzle);
-  };
-  
-  // setPuzzleName updates the puzzle name through the view.
-  AppView.prototype.setPuzzleName = function(name) {
-    this._header.setPuzzleName(name);
-    this._footer.setPuzzleName(name);
   };
   
   // setTheaterMode enables or disables "theater" mode, in which everything is
@@ -154,13 +137,6 @@
   AppView.prototype.setTimeBlinking = function(flag) {
     this._middle.setTimeBlinking(flag);
   }
-  
-  // timeAdded is called to update the view for a new time.
-  AppView.prototype.timeAdded = function(record) {
-    // For now, just show the footer contents. In the future, we will really
-    // update the UI.
-    this._footer.stats.setShowingStats(true, !this._theaterMode);
-  };
   
   // _animateStateChange animates the transition between an old state and the
   // current state.
