@@ -14,20 +14,20 @@
   function AppView(record) {
     // Initialize UI components and the animator.
     this._animator = new window.app.Animator();
-    this._footer = new window.app.Footer();
-    this._header = new window.app.Header();
+    this.footer = new window.app.Footer();
+    this.header = new window.app.Header();
     this._middle = new window.app.Middle();
-
+    
     // Initialize state instance variables.
     this._state = null;
     this._theaterMode = false;
     this._userFooterHeight = parseInt(localStorage.footerHeight || '300');
     this._numLoadingAnimations = 0;
-
+    
     // Setup event handlers.
     window.app.windowSize.addListener(this._resized.bind(this));
-    this._footer.onToggle = this._toggleFooter.bind(this);
-    this._footer.onResize = this._resizeFooter.bind(this);
+    this.footer.onToggle = this._toggleFooter.bind(this);
+    this.footer.onResize = this._resizeFooter.bind(this);
     this._animator.onAnimate = this._layout.bind(this);
     
     // Show the initial time and memo time.
@@ -48,11 +48,6 @@
   // blinkTime causes the time blinker to blink if the time is in editing mode.
   AppView.prototype.blinkTime = function() {
     this._middle.blinkTime();
-  };
-  
-  // closePuzzles closes the puzzles dropdown if it is open.
-  AppView.prototype.closePuzzles = function() {
-    this._header.close();
   };
   
   // loading returns true if the app is still loading and should not be updated
@@ -102,11 +97,6 @@
     }
     
     this._animateStateChange(oldState);
-  };
-  
-  // setPuzzles sets the puzzles to show in the puzzles dropdown.
-  AppView.prototype.setPuzzles = function(puzzles) {
-    this._header.setPuzzles(puzzles);
   };
   
   // setScramble sets the scramble. If the scramble is null, the scramble will
@@ -188,7 +178,7 @@
     // Compute the size taken up by the footer.
     var footerHeight = this._state.footerHeight;
     if (!this._state.footerOpen) {
-      footerHeight = this._footer.closedHeight();
+      footerHeight = this.footer.closedHeight();
     }
     if (!this._state.footerVisible) {
       footerHeight = 0;
@@ -200,7 +190,7 @@
     // Compute the size taken up by the header.
     var headerHeight = 0;
     if (this._state.headerVisible) {
-      headerHeight = this._header.height();
+      headerHeight = this.header.height();
     }
     if ('number' !== typeof headerHeight || isNaN(headerHeight)) {
       throw new Error('invalid headerHeight: ' + headerHeight);
@@ -278,8 +268,8 @@
   
   // _layout applies animator attributes to the app view.
   AppView.prototype._layout = function(attrs) {
-    this._footer.layout(attrs);
-    this._header.layout(attrs);
+    this.footer.layout(attrs);
+    this.header.layout(attrs);
     this._middle.layout(attrs);
   };
   
@@ -468,7 +458,7 @@
     
     // Using the constraints, figure out how big the footer can be if all is
     // shown.
-    var available = window.app.windowSize.height - this._header.height();
+    var available = window.app.windowSize.height - this.header.height();
     var footerSize = available - constraints.soft;
     
     // If the header size is large enough, everything is visible.

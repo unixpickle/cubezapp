@@ -8,8 +8,8 @@
     this._$element = $('#footer');
     this._top = new FooterTop();
     this._$bottom = this._$element.find('.bottom');
-    this.stats = new window.app.Stats();
     this.settings = new window.app.Settings();
+    this.stats = new window.app.Stats();
     
     // Blank event handlers.
     this.onResize = null;
@@ -73,10 +73,6 @@
       this._lastWidth = window.app.windowSize.width;
       this._lastHeight = attrs.footerHeight;
     }
-  };
-  
-  Footer.prototype.setPuzzleName = function(name) {
-    this.settings.setPuzzleName(name);
   };
   
   Footer.prototype._setupResizing = function() {
