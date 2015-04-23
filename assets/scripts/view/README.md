@@ -6,7 +6,7 @@ The view takes data from the model and presents it to the user. Views emit event
 
 The [app](app) directory contains the source code for the main application views. This includes the header, the footer, and the timer. It does not include popups or general UI elements.
 
-The class corresponding to the app view is `window.app.AppView`. Its implementation can be found in [app/app.js](app/app.js). There should never be more than one instance of AppView!
+The class corresponding to the app view is `window.app.AppView`. Its implementation can be found in [app/app_view.js](app/app_view.js). There should never be more than one instance of AppView!
 
 The AppView has the following properties:
 
