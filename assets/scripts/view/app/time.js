@@ -3,11 +3,8 @@
   function Time() {
     // View components.
     this._$element = $('#time');
-    this._elementStyler = new window.app.Styler(this._$element[0]);
     this._$label = this._$element.find('label');
-    this._labelStyler = new window.app.Styler(this._$label[0]);
     this._$blinker = this._$element.find('.blinker');
-    this._blinkerStyler = new window.app.Styler(this._$blinker[0]);
     
     // This state is used to adjust the font size for different text values.
     this._text = this._$label.text();
@@ -38,18 +35,18 @@
     this._requestedFontSize = attrs.timeSize;
     
     if (attrs.timeOpacity === 0) {
-      this._elementStyler.css({display: 'none'});
+      this._$element.css({display: 'none'});
       return;
     }
     
     // Layout main scene.
-    this._elementStyler.css({
+    this._$element.css({
       display: 'block',
       opacity: attrs.timeOpacity,
       top: attrs.timeY + attrs.middleY,
       height: attrs.timeSize
     });
-    this._labelStyler.css({
+    this._$label.css({
       height: attrs.timeSize,
       fontSize: this._usableFontSize() + 'px',
       lineHeight: attrs.timeSize + 'px'
@@ -57,7 +54,7 @@
     
     if (this._showingBlinker) {
       // Layout blinker.
-      this._blinkerStyler.css({
+      this._$blinker.css({
         left: this._$label.offset().left + this._$label.outerWidth()
       });
     }
@@ -86,18 +83,18 @@
   Time.prototype.text = function(text) {
     this._text = text;
     this._$label.text(text);
-    this._labelStyler.css({'font-size': this._usableFontSize() + 'px'});
+    this._$label.css({'font-size': this._usableFontSize() + 'px'});
     this._setBlinkerVisible(this._showingBlinker);
   };
   
   Time.prototype._setBlinkerVisible = function(flag) {
     if (!flag) {
-      this._blinkerStyler.css({display: 'none'});
+      this._$blinker.css({display: 'none'});
       return;
     }
     
     // Layout blinker.
-    this._blinkerStyler.css({
+    this._$blinker.css({
       display: 'block',
       left: this._$label.offset().left + this._$label.outerWidth()
     });

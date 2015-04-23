@@ -6,7 +6,6 @@
   function Footer() {
     // Get/create views and set them as instance variables.
     this._$element = $('#footer');
-    this._$elementStyler = new window.app.Styler(this._$element[0]);
     this._top = new FooterTop();
     this._$bottom = this._$element.find('.bottom');
     this.stats = new window.app.Stats();
@@ -40,12 +39,12 @@
   
   Footer.prototype.layout = function(attrs) {
     if (attrs.footerOpacity === 0) {
-      this._$elementStyler.css({display: 'none'});
+      this._$element.css({display: 'none'});
       return;
     }
     
     // Use the attributes to layout the footer.
-    this._$elementStyler.css({
+    this._$element.css({
       display: 'block',
       opacity: attrs.footerOpacity,
       height: attrs.footerHeight,

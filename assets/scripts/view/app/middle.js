@@ -9,11 +9,8 @@
   
   function Middle() {
     this._$memoTime = $('#memo-time');
-    this._memoTimeStyler = new window.app.Styler(this._$memoTime[0]);
     this._$pbStatus = $('#pb-status');
-    this._pbStatusStyler = new window.app.Styler(this._$pbStatus[0]);
     this._$scramble = $('#scramble');
-    this._scrambleStyler = new window.app.Styler(this._$scramble[0]);
     this._time = new window.app.Time();
   }
   
@@ -122,28 +119,28 @@
   Middle.prototype.layout = function(attrs) {    
     // Memo label.
     if (attrs.memoOpacity === 0) {
-      this._memoTimeStyler.css({display: 'none'});
+      this._$memoTime.css({display: 'none'});
     } else {
-      this._memoTimeStyler.css({
+      this._$memoTime.css({
         display: 'block',
         top: attrs.timeY + attrs.timeSize + attrs.middleY,
-        fontSize: attrs.timeSize * MEMO_SIZE_RATIO,
+        fontSize: (attrs.timeSize * MEMO_SIZE_RATIO) + 'px',
         height: attrs.timeSize * MEMO_SIZE_RATIO,
-        lineHeight: attrs.timeSize * MEMO_SIZE_RATIO,
+        lineHeight: (attrs.timeSize * MEMO_SIZE_RATIO) + 'px',
         opacity: attrs.memoOpacity
       });
     }
     
     // PB label.
     if (attrs.pbOpacity === 0) {
-      this._pbStatusStyler.css({display: 'none'});
+      this._$pbStatus.css({display: 'none'});
     } else {
       var size = attrs.timeSize * PB_SIZE_RATIO;
-      this._pbStatusStyler.css({
+      this._$pbStatus.css({
         opacity: attrs.pbOpacity,
         display: 'block',
-        fontSize: size * 0.6,
-        lineHeight: size,
+        fontSize: (size * 0.6) + 'px',
+        lineHeight: size + 'px',
         bottom: window.app.windowSize.height -
           (attrs.middleHeight+attrs.middleY)
       });
@@ -152,9 +149,9 @@
     // Show/hide the scramble without setting display=none. Otherwise, it would
     // not be possible to measure the scramble while it's invisible.
     if (attrs.scrambleOpacity === 0) {
-      this._scrambleStyler.css({visibility: 'hidden'});
+      this._$scramble.css({visibility: 'hidden'});
     } else {
-      this._scrambleStyler.css({
+      this._$scramble.css({
         opacity: attrs.scrambleOpacity,
         visibility: 'visible'
       });
