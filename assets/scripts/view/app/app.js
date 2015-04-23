@@ -11,37 +11,27 @@
   var MIN_FOOTER_SIZE = 250;
   var MAX_FOOTER_SIZE = 400;
   
-  function AppView(record) {
-    // Initialize UI components and the animator.
+  function AppView(latestRecord) {
     this._animator = new window.app.Animator();
     this.footer = new window.app.Footer();
     this.header = new window.app.Header();
     this._middle = new window.app.Middle();
     
-    // Initialize state instance variables.
-    this._state = null;
-    this._theaterMode = false;
-    this._userFooterHeight = parseInt(localStorage.footerHeight || '300');
-    this._numLoadingAnimations = 0;
+    this._setupStateProperties();
+    this._setupEventHandlers();
     
-    // Setup event handlers.
-    window.app.windowSize.addListener(this._resized.bind(this));
-    this.footer.onToggle = this._toggleFooter.bind(this);
-    this.footer.onResize = this._resizeFooter.bind(this);
-    this._animator.onAnimate = this._layout.bind(this);
-    
-    // Show the initial time and memo time.
-    if (record) {
-      this._middle.setTime(window.app.formatTime(record.time));
-      if (record.memo >= 0) {
-        this._middle.setMemo(window.app.formatTime(record.memo));
+    if (latestRecord) {
+      this._middle.setTime(window.app.formatTime(latestRecord.time));
+      if (latestRecord.memo >= 0) {
+        this._middle.setMemo(window.app.formatTime(latestRecord.memo));
       }
     }
     
-    // Compute the initial state and lay it out.
-    this._initializeState('object' === typeof record && record.memo >= 0);
+    var memoVisible = 'object' === typeof latestRecord &&
+      latestRecord.memo >= 0;
+    this._initializeState(memoVisible);
     this._initializeAnimator();
-    this._loadAnimation(record);
+    this._loadAnimation();
     this._layout(this._animator.current());
   }
   
@@ -274,7 +264,7 @@
   };
   
   // _loadAnimation runs the load animation.
-  AppView.prototype._loadAnimation = function(record) {
+  AppView.prototype._loadAnimation = function() {
     $('body').css({pointerEvents: 'none'});
     
     // These are animations which will definitely happen.
@@ -419,6 +409,20 @@
       localStorage.footerOpen = this._state.footerOpen;
     } catch (e) {
     }
+  };
+  
+  AppView.prototype._setupEventHandlers = function() {
+    window.app.windowSize.addListener(this._resized.bind(this));
+    this.footer.onToggle = this._toggleFooter.bind(this);
+    this.footer.onResize = this._resizeFooter.bind(this);
+    this._animator.onAnimate = this._layout.bind(this);
+  };
+  
+  AppView.prototype._setupStateProperties = function() {
+    this._state = null;
+    this._theaterMode = false;
+    this._userFooterHeight = parseInt(localStorage.footerHeight || '300');
+    this._numLoadingAnimations = 0;
   };
 
   AppView.prototype._toggleFooter = function() {
