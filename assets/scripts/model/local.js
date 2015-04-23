@@ -175,6 +175,7 @@
   
   LocalStore.prototype._generateDefault = function() {
     this._puzzles = [];
+    this._globalSettings = DEFAULT_SETTINGS;
     
     // Add cubes.
     var cubes = ['3x3 Cube', '4x4 Cube', '5x5 Cube', '2x2 Cube', 'One Handed'];
