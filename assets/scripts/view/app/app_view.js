@@ -12,6 +12,8 @@
   var MAX_FOOTER_SIZE = 400;
   
   function AppView(latestRecord) {
+    window.app.EventEmitter.call(this);
+    
     this._animator = new window.app.Animator();
     this.footer = new window.app.Footer();
     this.header = new window.app.Header();
@@ -20,11 +22,15 @@
     this._setupStateProperties();
     this._setupEventHandlers();
     
+    // We need to show (or not show) the memo time before running the load
+    // animation.
     if (latestRecord) {
-      this._middle.setTime(window.app.formatTime(latestRecord.time));
+      this.setTime(window.app.formatTime(latestRecord.time));
       if (latestRecord.memo >= 0) {
         this._middle.setMemo(window.app.formatTime(latestRecord.memo));
       }
+    } else {
+      this.setTime(null);
     }
     
     var memoVisible = 'object' === typeof latestRecord &&
@@ -34,6 +40,8 @@
     this._loadAnimation();
     this._layout(this._animator.current());
   }
+  
+  AppView.prototype = Object.create(window.app.EventEmitter.prototype);
   
   // blinkTime causes the time blinker to blink if the time is in editing mode.
   AppView.prototype.blinkTime = function() {
@@ -110,7 +118,8 @@
   
   // setTime sets the time's text contents.
   AppView.prototype.setTime = function(time) {
-    this._middle.setTime(time || '');
+    // TODO: say "Tap Screen" if this is a mobile device.
+    this._middle.setTime(time || 'Hit Space');
   };
   
   // setTimeBlinking sets whether the time blinker is blinking.
@@ -310,7 +319,7 @@
         element.style.webkitAnimationName = 'none';
         if (--this._numLoadingAnimations === 0) {
           $('body').css({pointerEvents: 'auto'});
-          window.app.home.viewLoaded();
+          this.emit('load');
         }
       }.bind(this, element);
       element.addEventListener('animationend', cb);

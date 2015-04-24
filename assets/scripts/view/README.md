@@ -8,6 +8,10 @@ The [app](app) directory contains the source code for the main application views
 
 The class corresponding to the app view is `window.app.AppView`. Its implementation can be found in [app/app_view.js](app/app_view.js). There should never be more than one instance of AppView!
 
+The AppView implements the [EventEmitter interface](../event_emitter.md) and fires the following events:
+
+ * **load**() - the load animation has finished playing.
+
 The AppView has the following properties:
 
  * **footer** - the [Footer](#footer-object) instance

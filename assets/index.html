@@ -67,6 +67,7 @@
     <script src="scripts/view/app/settings.js"></script>
     <script src="scripts/view/app/stats.js"></script>
     <script src="scripts/view/app/time.js"></script>
+    <script src="scripts/view/app/timer.js"></script>
     <script src="scripts/view/app/times_list.js"></script>
     <script src="scripts/view/assets.js"></script>
     <script src="scripts/view/flavors.js"></script>
@@ -78,11 +79,11 @@
     <script src="scripts/view/popups/rename.js"></script>
     <script src="scripts/view/window_size.js"></script>
     
-    <!-- Controller scripts implement the glue between parts of the app -->
-    <script src="scripts/controller/home.js"></script>
+    <!-- Controller scripts handle events from the view -->
     <script src="scripts/controller/keyboard.js"></script>
     <script src="scripts/controller/stackmat.js"></script>
-    <script src="scripts/controller/timer.js"></script>
+    
+    <script src="scripts/init.js"></script>
     
     <!-- This style will be modified by JavaScript code -->
     <style type="text/css" id="flavor-style">
@@ -107,7 +108,7 @@
   
     <!-- The time field shows the current time -->
     <div id="time">
-      <label>Hit Space</label>
+      <label></label>
       <div class="blinker"></div>
     </div>
     <div id="memo-time"></div>

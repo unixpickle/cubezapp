@@ -3,7 +3,8 @@
   var DEFAULT_SETTINGS = {
     flavor: 'Blueberry',
     righty: true,
-    timerAccuracy: 0
+    timerAccuracy: 0,
+    theaterMode: true
   };
   
   function LocalStore() {
