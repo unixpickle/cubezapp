@@ -8,7 +8,9 @@
   }
   
   function initializeController() {
-    // TODO: implement controllers!
+    window.app.view.on('load', function() {
+      window.app.timerController = new window.app.TimerController();
+    });
   }
   
   function initializeModel(cb) {

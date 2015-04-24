@@ -174,6 +174,8 @@
     this.emit('remoteChange');
   };
   
+  // _fillInMissingSettings makes it easier to add new global settings in the
+  // future.
   LocalStore.prototype._fillInMissingSettings = function() {
     var keys = Object.keys(DEFAULT_SETTINGS);
     for (var i = 0, len = keys.length; i < len; ++i) {
@@ -184,37 +186,52 @@
     }
   };
   
+  // _fillInMissingPuzzleFields makes it easier to add new puzzle fields in the
+  // future.
+  LocalStore.prototype._fillInMissingPuzzleFields = function() {
+    var defaults = {
+      scrambler: 'None',
+      scrambleType: 'None',
+      scrambleLength: 0,
+      lastUsed: new Date().getTime(),
+      timerInput: 0
+    };
+    var keys = Object.keys(defaults);
+    for (var i = 0, len = this._puzzles.length; i < len; ++i) {
+      var puzzle = this._puzzles[i];
+      for (var j = 0, len1 = keys.length; j < len1; ++j) {
+        var key = keys[j]
+        if (!puzzle.hasOwnProperty(key)) {
+          puzzle[key] = defaults[key];
+        }
+      }
+    }
+  };
+  
   LocalStore.prototype._generateDefault = function() {
     this._puzzles = [];
     
     this._globalSettings = {};
     this._fillInMissingSettings();
     
-    // Add cubes.
-    var cubes = ['3x3 Cube', '4x4 Cube', '5x5 Cube', '2x2 Cube', 'One Handed'];
+    var names = ['3x3 Cube', '4x4 Cube', '5x5 Cube', '2x2 Cube', 'One Handed'];
     var scramblers = [
-      ['3x3x3', 'Moves', 25], ['None', 'None', 0], ['None', 'None', 0],
-      ['2x2x2', 'State', 0], ['3x3x3', 'Moves', 25]
+      ['3x3x3', 'State', 0], ['None', 'None', 0], ['None', 'None', 0],
+      ['2x2x2', 'State', 0], ['3x3x3', 'State', 0]
     ];
     var icons = ['3x3x3', '4x4x4', '5x5x5', '2x2x2', 'OH'];
-    for (var i = cubes.length-1; i >= 0; --i) {
-      // Size and name.
-      var name = cubes[i];
+    for (var i = names.length-1; i >= 0; --i) {
       var scrambler = scramblers[i];
-      var icon = icons[i];
-      
-      var puzzle = {
-        name: name,
-        icon: icon,
+      this.addPuzzle({
+        name: names[i],
+        icon: icons[i],
         scrambler: scrambler[0],
         scrambleType: scrambler[1],
         scrambleLength: scrambler[2],
-        lastUsed: new Date().getTime(),
-      };
-      this.addPuzzle(puzzle);
+        timerInput: 0,
+        lastUsed: new Date().getTime()
+      });
     }
-    
-    this._save();
   };
   
   LocalStore.prototype._loadData = function() {
@@ -228,11 +245,12 @@
       return;
     }
     
-    // Load the puzzle data.
     var data = JSON.parse(localStorage.localStoreData);
-    this._puzzles = data.puzzles;
     
-    this._globalSettings = data.globalSettings || {};
+    this._puzzles = data.puzzles;
+    this._fillInMissingPuzzleFields();
+    
+    this._globalSettings = (data.globalSettings || {});
     this._fillInMissingSettings();
     
     // Find the active puzzle.
@@ -244,34 +262,20 @@
   };
   
   LocalStore.prototype._loadLegacy = function() {
-    var puzzles = JSON.parse(localStorage.puzzles);
-    var active = localStorage.activePuzzle;
+    this._puzzles = JSON.parse(localStorage.puzzles);
+    this._fillInMissingPuzzleFields();
     
-    // Add the "lastUsed" field to each puzzle.
-    for (var i = 0, len = puzzles.length; i < len; ++i) {
-      puzzles[i].lastUsed = new Date().getTime();
-    }
-    
-    var newData = {
-      puzzles: puzzles,
-      active: active,
-      globalSettings: DEFAULT_SETTINGS
-    };
-    
-    // If they are in some kind of private browsing mode, this may fail.
-    try {
-      localStorage.localStoreData = JSON.stringify(newData);
-    } catch (e) {
-    }
-    
-    this._puzzles = puzzles;
     this._globalSettings = {};
     this._fillInMissingSettings();
+    
+    var active = localStorage.activePuzzle;
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       if (puzzles[i].id === active) {
         this._active = puzzles[i];
       }
     }
+    
+    this._save();
   };
   
   LocalStore.prototype._save = function() {

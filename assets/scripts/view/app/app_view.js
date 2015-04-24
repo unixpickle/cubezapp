@@ -17,6 +17,7 @@
     this._animator = new window.app.Animator();
     this.footer = new window.app.Footer();
     this.header = new window.app.Header();
+    this.timer = new window.app.TimerView();
     this._middle = new window.app.Middle();
     
     this._setupStateProperties();
@@ -24,7 +25,9 @@
     
     // We need to show (or not show) the memo time before running the load
     // animation.
-    if (latestRecord) {
+    if (usingInputEntry()) {
+      this.setTime('0.00');
+    } else if (latestRecord) {
       this.setTime(window.app.formatTime(latestRecord.time));
       if (latestRecord.memo >= 0) {
         this._middle.setMemo(window.app.formatTime(latestRecord.memo));
@@ -33,8 +36,8 @@
       this.setTime(null);
     }
     
-    var memoVisible = 'object' === typeof latestRecord &&
-      latestRecord.memo >= 0;
+    var memoVisible = ('object' === typeof latestRecord &&
+      latestRecord.memo >= 0);
     this._initializeState(memoVisible);
     this._initializeAnimator();
     this._loadAnimation();
@@ -530,6 +533,11 @@
     } else if ('boolean' !== typeof this.scrambleVisible) {
       throw new TypeError('invalid type for scrambleVisible');
     }
+  }
+  
+  function usingInputEntry() {
+    var timerInput = window.app.store.getActivePuzzle().timerInput;
+    return timerInput === window.app.TimerController.INPUT_ENTRY;
   }
   
   window.app.AppView = AppView;

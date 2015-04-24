@@ -78,6 +78,7 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
  * **scrambleType** - string - the subtype of the scrambler to use
  * **scrambleLength** - int - the number of moves to use in the scramble if applicable
  * **lastUsed** - int - the UNIX time in milliseconds that the user last modified or switched to this puzzle
+ * **timerInput** - int - an enum for the input method. The values of this setting are given meaning by the view and controller.
  * **id** - string - the unique identifier of the puzzle. **This field will not be present if the puzzle has not been added to the store.**
 
 <a name="global-settings-object"></a>

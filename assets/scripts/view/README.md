@@ -16,6 +16,7 @@ The AppView has the following properties:
 
  * **footer** - the [Footer](#footer-object) instance
  * **header** - the [Header](#header-object) instance
+ * **timer** - the [TimerView](#timer-view-object) instance
 
 AppView implements the following methods:
 
@@ -59,6 +60,22 @@ Remember that none of these events indicate whether or not the model has been mo
 ### Stats
 
 This tab will allow the user to do a number of things. However, it is not implemented yet.
+
+<a name="timer-view-object"></a>
+## TimerView
+
+The TimerView presents the user's current time. It is responsible for entering and leaving theater mode and for formatting times according to the user's update setting.
+
+The TimerView class has the following methods:
+
+ * **start**() - the user has initiated a solve.
+ * **stop**() - the user has fully completed a solve.
+ * **update**(millis, addTwo) - show the user a given number of milliseconds, optionally adding a +2.
+ * **updateDone**(millis, addTwo) - show the user their time after they have finished timing themselves but before they have stopped the solve (i.e. before they have released the space bar). This may be different than *update* because it provides full accuracy.
+ * **updateInspection**(millis) - show the user that they have been inspecting for a given number of milliseconds.
+ * **updateMemo**(millis) - show the user their memo time.
+
+Note that the update methods should only be called while the user is doing a solve (i.e. when start() has been called more recently than stop()).
 
 <a name="header-object"></a>
 ## Header
