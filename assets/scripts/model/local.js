@@ -2,7 +2,8 @@
   
   var DEFAULT_SETTINGS = {
     flavor: 'Blueberry',
-    righty: true
+    righty: true,
+    timerAccuracy: 0
   };
   
   function LocalStore() {
@@ -172,9 +173,21 @@
     this.emit('remoteChange');
   };
   
+  LocalStore.prototype._fillInMissingSettings = function() {
+    var keys = Object.keys(DEFAULT_SETTINGS);
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
+      if (!this._globalSettings.hasOwnProperty(key)) {
+        this._globalSettings[key] = DEFAULT_SETTINGS[key];
+      }
+    }
+  };
+  
   LocalStore.prototype._generateDefault = function() {
     this._puzzles = [];
-    this._globalSettings = DEFAULT_SETTINGS;
+    
+    this._globalSettings = {};
+    this._fillInMissingSettings();
     
     // Add cubes.
     var cubes = ['3x3 Cube', '4x4 Cube', '5x5 Cube', '2x2 Cube', 'One Handed'];
@@ -217,7 +230,9 @@
     // Load the puzzle data.
     var data = JSON.parse(localStorage.localStoreData);
     this._puzzles = data.puzzles;
-    this._globalSettings = data.globalSettings || DEFAULT_SETTINGS;
+    
+    this._globalSettings = data.globalSettings || {};
+    this._fillInMissingSettings();
     
     // Find the active puzzle.
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
@@ -249,6 +264,8 @@
     }
     
     this._puzzles = puzzles;
+    this._globalSettings = {};
+    this._fillInMissingSettings();
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       if (puzzles[i].id === active) {
         this._active = puzzles[i];

@@ -87,4 +87,4 @@ The **Global Settings** object stores the user's global settings. Here are the f
 
  * **flavor** - string - the name of the flavor the user has set. **Default:** "Blueberry"
  * **righty** - bool - true if the user is right handed. **Default:** true
-
+ * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller.
