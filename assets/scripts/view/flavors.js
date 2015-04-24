@@ -1,17 +1,17 @@
 // The "flavor" manages the color of pretty much everything.
 (function() {
-  
+
   // ALTERNATION_FLAVOR is the name of the flavor which alternates periodically.
   var ALTERNATION_FLAVOR = 'Fruit Salad';
-  
+
   // ALTERNATION_PERIOD is the number of milliseconds between flavor changes for
   // the alternating flavor.
   var ALTERNATION_PERIOD = 1000*60*60;
-  
+
   // TRANSITION_DURATION is the number of milliseconds to spend fading from one
   // color to another.
   var TRANSITION_DURATION = 400;
-  
+
   // COLOR_FLAVORS contains a key for every solid color flavor.
   var COLOR_FLAVORS = {
     Blueberry: {
@@ -39,7 +39,7 @@
       color: [0x81, 0x49, 0x38]
     }
   };
-  
+
   // NOTE: do not use Object.keys() here because it is not guaranteed to
   // preserve the proper order.
   var COLOR_FLAVOR_NAMES = [
@@ -52,42 +52,42 @@
     'Oreo',
     'Chocolate'
   ];
-  
+
   // Flavors is the flavor manager. It must be created after the model is
   // loaded.
   function Flavors() {
     // this._alternationIndex is used to make sure that alternation does not
     // repeat itself.
     this._alternationIndex = 0;
-    
+
     // this._alternationInterval is null unless the flavor is
     // ALTERNATION_FLAVOR, in which case it is the result of a setInterval()
     // call.
     this._alternationInterval = null;
-    
+
     // this._checkboxes is used to update the flavor of checkboxes.
     this._checkboxes = [];
-    
+
     // this._currentColorFlavor stores an object from COLOR_FLAVORS.
     this._currentColorFlavor = null;
-    
+
     // this._currentName stores the name of the current flavor. This will be
     // ALTERNATION_FLAVOR if the flavor is alternating.
     this._currentName = null;
-    
+
     // this._transition is the current Transition object.
     this._transition = null;
-    
+
     var flavor = window.app.store.getGlobalSettings().flavor;
     this._initializeFlavor(flavor);
-    
+
     this._registerModelEvents();
-    
+
     // Now that the flavor style is set correctly, we can set the body's
     // background color.
     document.body.className = 'flavor-background';
   }
-  
+
   // makeCheckbox generates a checkbox that follows the theme color.
   Flavors.prototype.makeCheckbox = function() {
     var rgbColor = [];
@@ -99,7 +99,7 @@
     this._checkboxes.push(result);
     return result;
   };
-  
+
   // removeCheckbox stops updating the color of a given checkbox.
   Flavors.prototype.removeCheckbox = function(box) {
     var idx = this._checkboxes.indexOf(box);
@@ -108,7 +108,7 @@
     }
     this._checkboxes.splice(idx, 1);
   };
-  
+
   // _alternate is called periodically when using ALTERNATION_FLAVOR to change
   // the color flavor.
   Flavors.prototype._alternate = function() {
@@ -116,7 +116,7 @@
       COLOR_FLAVOR_NAMES.length;
     this._transitionToColorFlavor(COLOR_FLAVOR_NAMES[this._alternationIndex]);
   };
-  
+
   Flavors.prototype._initializeFlavor = function(name) {
     this._currentName = name;
     if (name === ALTERNATION_FLAVOR) {
@@ -126,12 +126,12 @@
       this._updateCSS();
     }
   };
-  
+
   Flavors.prototype._modelFlavorChanged = function(name) {
     this._currentName = name;
     this._transitionToFlavor(name);
   };
-  
+
   Flavors.prototype._registerModelEvents = function() {
     window.app.store.on('modifiedGlobalSettings', function(attrs) {
       if (attrs.flavor) {
@@ -145,17 +145,17 @@
       }
     }.bind(this));
   };
-  
+
   Flavors.prototype._startAlternating = function(alternating) {
     if (this._alternationInterval !== null) {
       clearInterval(this._alternationInterval);
     }
-    
+
     this._alternationInterval = setInterval(this._alternate.bind(this),
       ALTERNATION_PERIOD);
     this._alternationIndex = Math.floor(COLOR_FLAVOR_NAMES.length *
       Math.random());
-    
+
     var newColorFlavorName = COLOR_FLAVOR_NAMES[this._alternationIndex];
     var newColorFlavor = COLOR_FLAVORS[newColorFlavorName];
     if (newColorFlavor === this._currentColorFlavor) {
@@ -167,42 +167,42 @@
       this._transitionToColorFlavor(newColorFlavorName);
     }
   };
-  
+
   Flavors.prototype._stopAlternating = function() {
     if (this._alternationInterval !== null) {
       clearInterval(this._alternationInterval);
       this._alternationInterval = null;
     }
   };
-  
+
   Flavors.prototype._transitionToFlavor = function(name) {
     if (name === ALTERNATION_FLAVOR) {
       this._startAlternating();
       return;
     }
-    
+
     this._stopAlternating();
     this._transitionToColorFlavor(name);
   };
-  
+
   Flavors.prototype._transitionToColorFlavor = function(name) {
     if (this._transition) {
       this._transition.cancel();
     }
-    
+
     var lastColor = this._currentColorFlavor.color;
     this._currentColorFlavor = COLOR_FLAVORS[name];
-    
+
     var newColor = this._currentColorFlavor.color;
     this._transition = new Transition(lastColor, newColor);
     this._transition.onDone = function() {
       this._transition = null;
       this._updateCSS();
     }.bind(this);
-    
+
     this._updateCheckboxColors();
   };
-  
+
   Flavors.prototype._updateCSS = function() {
     var color = this._currentColorFlavor.color;
     var hex = hexForColor(color);
@@ -210,7 +210,7 @@
     var pressedHex = hexForColor(pressed);
     setFlavorStyle(hex, pressedHex);
   };
-  
+
   Flavors.prototype._updateCheckboxColors = function() {
     var colorComponents = [];
     for (var i = 0; i < 3; ++i) {
@@ -220,7 +220,7 @@
       this._checkboxes[i].setColor(colorComponents);
     }
   };
-  
+
   // A Transition animates every themed element from one color to another.
   function Transition(oldColor, newColor) {
     this._updateColors = $('.flavor-text');
@@ -232,11 +232,11 @@
     this._start = new Date().getTime();
     this._tick();
   }
-  
+
   Transition.prototype.cancel = function() {
     this._cancelled = true;
   };
-  
+
   Transition.prototype._intermediateColor = function(percent) {
     var components = [];
     for (var i = 0; i < 3; ++i) {
@@ -245,12 +245,12 @@
     }
     return hexForColor(components);
   };
-  
+
   Transition.prototype._percentCompleted = function() {
     var elapsed = Math.max(new Date().getTime() - this._start, 0);
     return elapsed / TRANSITION_DURATION;
   };
-  
+
   Transition.prototype._requestFrame = function() {
     if ('function' === typeof window.requestAnimationFrame) {
       window.requestAnimationFrame(this._tick.bind(this));
@@ -258,14 +258,14 @@
       setTimeout(this._tick.bind(this), 1000/60);
     }
   };
-  
+
   Transition.prototype._tick = function() {
     if (this._cancelled) {
       return;
     }
-    
+
     var percent = this._percentCompleted();
-    
+
     if (percent >= 1) {
       var color = hexForColor(this._newColor);
       if ('function' !== typeof this.onDone) {
@@ -276,14 +276,14 @@
       this._updateBg.css({backgroundColor: ''});
       return;
     }
-    
+
     var color = this._intermediateColor(percent);
     this._updateColors.css({color: color});
     this._updateBg.css({backgroundColor: color});
-    
+
     this._requestFrame();
   };
-  
+
   function hexForColor(color) {
     var hexCode = '#';
     for (var i = 0; i < 3; ++i) {
@@ -295,13 +295,13 @@
     }
     return hexCode;
   }
-  
+
   function setFlavorStyle(color, hover) {
     if (document.styleSheets) {
       var rulesLeft = 3;
       for (var i = document.styleSheets.length-1; i >= 0; --i) {
         var sheet = document.styleSheets[i];
-        
+
         // Get the rule for the given sheet.
         var rules;
         if (sheet.cssRules) {
@@ -309,7 +309,7 @@
         } else {
           rules = sheet.rules;
         }
-        
+
         // Loop through the rules and check if they are what we want.
         for (var j = 0, len = rules.length; j < len; j++) {
           var rule = rules[j];
@@ -330,13 +330,13 @@
         }
       }
     }
-    
+
     var obj = document.getElementById('flavor-style');
     if (!obj) {
       // If the stylesheet can't be identified, give up.
       return;
     }
-    
+
     // Create the new flavor stylesheet.
     obj.innerHTML = '\
       .flavor-background { \n\
@@ -349,9 +349,9 @@
         background-color: ' + hover + '; \n\
       }';
   }
-  
+
   window.app.Flavors = Flavors;
   window.app.flavorNames = COLOR_FLAVOR_NAMES.slice();
   window.app.flavorNames.push(ALTERNATION_FLAVOR);
-  
+
 })();

@@ -1,5 +1,5 @@
 (function() {
-  
+
   function DeletePopup(name, cb) {
     var msg = 'Are you sure you would like to delete "' + name +
       '"? This action cannot be undone.';
@@ -9,18 +9,18 @@
     this._dialog.onAction = this._action.bind(this);
     this._callback = cb;
   }
-  
+
   DeletePopup.prototype.show = function() {
     this._dialog.show();
   };
-  
+
   DeletePopup.prototype._action = function(name) {
     if (name === 'Delete') {
       this._callback();
     }
     this._dialog.close();
   };
-  
+
   window.app.DeletePopup = DeletePopup;
-  
+
 })();

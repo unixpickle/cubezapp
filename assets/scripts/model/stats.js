@@ -4,7 +4,7 @@
 // and worst times before computing the mean. I know this is wrong, but I am a
 // simple minion who has no free will nor wishes to have it.
 (function() {
-  
+
   function bestAverage(times, count) {
     var best = -1;
     for (var i = 0, len = times.length-count; i <= len; ++i) {
@@ -17,7 +17,7 @@
     }
     return best;
   }
-  
+
   function bestMean(times, count) {
     var best = -1;
     for (var i = 0, len = times.length-(count-1); i < len; ++i) {
@@ -29,7 +29,7 @@
     }
     return best;
   }
-  
+
   function bestTime(times) {
     var best = -1;
     for (var i = 0, len = times.length; i < len; ++i) {
@@ -39,7 +39,7 @@
     }
     return best;
   }
-  
+
   function computeStatistics(times) {
     // Compute the general statistics.
     var average = NaN;
@@ -57,7 +57,7 @@
     }
     var res = {average: average, best: best, count: count, worst: worst,
       averages: []};
-    
+
     // Compute the averages table
     if (times.length > 2) {
       res.averages.push(["mo3", lastMean(times, 3), bestMean(times, 3)]);
@@ -73,7 +73,7 @@
     }
     return res;
   }
-  
+
   function lastAverage(times, count) {
     if (times.length < count) {
       return NaN;
@@ -82,7 +82,7 @@
     removeBestWorst(subList);
     return mean(subList);
   }
-  
+
   function lastMean(times, count) {
     if (times.length < count) {
       return NaN;
@@ -90,7 +90,7 @@
     var subList = times.slice(0, count);
     return mean(subList);
   }
-  
+
   function mean(times) {
     var sum = 0;
     for (var i = 0, len = times.length; i < len; ++i) {
@@ -98,12 +98,12 @@
     }
     return sum / times.length;
   }
-  
+
   function removeBestWorst(times) {
     if (times.length === 0) {
       return;
     }
-    
+
     // In O(n), find the max and min values.
     var max = 0;
     var maxIdx = -1;
@@ -120,7 +120,7 @@
         minIdx = i;
       }
     }
-    
+
     // Remove the max and min values.
     times.splice(maxIdx, 1);
     if (minIdx < maxIdx) {
@@ -129,7 +129,7 @@
       times.splice(minIdx-1, 1);
     }
   }
-  
+
   function statsForSolves(solves) {
     var times = [];
     for (var i = 0, len = solves.length; i < len; ++i) {
@@ -137,7 +137,7 @@
     }
     return computeStatistics(times);
   }
-  
+
   function worstTime(times) {
     var worst = -1;
     for (var i = 0, len = times.length; i < len; ++i) {
@@ -147,8 +147,8 @@
     }
     return worst;
   }
-  
+
   window.app.computeStatistics = computeStatistics;
   window.app.statsForSolves = statsForSolves;
-  
+
 })();

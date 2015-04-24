@@ -1,27 +1,27 @@
 (function() {
-  
+
   // This is the height of the dropdown contents.
   var DROPDOWN_HEIGHT = 200;
 
   // This is the width of each puzzle in the dropdown.
   var PUZZLE_WIDTH = 180;
-  
+
   // This is the number of pixels between each puzzle in the dropdown.
   var SPACING = 18;
-  
+
   // These values represent different states of the header.
   var STATE_CLOSED = 0;
   var STATE_OPEN = 1;
   var STATE_DELETING = 2;
-  
+
   function Header() {
     window.app.EventEmitter.call(this);
-    
+
     this._$element = $('#header');
     this._$puzzleActions = this._$element.find('.puzzle-actions');
     this._$puzzleName = this._$element.find('.name');
     this._dropdown = new Dropdown();
-    
+
     // Setup the shielding for when the dropdown is down.
     this._$shielding = $('<div></div>');
     this._$shielding.css({
@@ -34,14 +34,14 @@
     });
     this._$shielding.insertBefore(this._$element);
     this._$shielding.click(this.close.bind(this));
-    
+
     this._state = STATE_CLOSED;
     this._empty = (window.app.store.getPuzzles().length <= 1);
-    
+
     this._registerUIEvents();
     this._registerModelEvents();
   }
-  
+
   Header.prototype = Object.create(window.app.EventEmitter.prototype);
 
   Header.prototype.close = function() {
@@ -50,32 +50,32 @@
     } else if (this._state === STATE_DELETING) {
       this._dropdown.hideDeleteButtons();
     }
-    
+
     this._dropdown.close();
-    
+
     this._$shielding.stop(true, false);
     this._$shielding.fadeOut();
-    
+
     if (!this._empty) {
       this._$puzzleActions.stop(true, false).fadeOut();
     }
-    
+
     this._state = STATE_CLOSED;
-    
+
     window.app.keyboard.remove(this);
   };
 
   Header.prototype.height = function() {
     return 44;
   };
-  
+
   Header.prototype.keydown = function(e) {
     if (e.which === 27) {
       this.close();
     }
     return false;
   };
-  
+
   Header.prototype.layout = function(attrs) {
     if (attrs.headerOpacity === 0) {
       this._$element.css({display: 'none'});
@@ -87,24 +87,24 @@
       });
     }
   };
-  
+
   Header.prototype.open = function() {
     if (this._state !== STATE_CLOSED) {
       return;
     }
-    
+
     this._dropdown.open();
-    
+
     this._$shielding.stop(true, false).fadeIn();
     if (!this._empty) {
       this._$puzzleActions.stop(true, false).fadeIn();
     }
-    
+
     this._state = STATE_OPEN;
-    
+
     window.app.keyboard.push(this);
   };
-  
+
   Header.prototype._deleteClicked = function() {
     if (this._state === STATE_DELETING) {
       this._dropdown.hideDeleteButtons();
@@ -114,29 +114,29 @@
       this._state = STATE_DELETING;
     }
   };
-  
+
   Header.prototype._handleDataChange = function() {
     var wasEmpty = this._empty;
     this._empty = (window.app.store.getPuzzles().length <= 1);
-    
+
     if (this._state === STATE_CLOSED || this._empty === wasEmpty) {
       return;
     }
-    
+
     // This can only happen if a remote client deletes all the puzzles except
     // one while this client is in delete mode.
     if (this._state === STATE_DELETING) {
       this._dropdown.hideDeleteButtons();
       this._state = STATE_OPEN;
     }
-    
+
     if (this._empty) {
       this._$puzzleActions.stop(true, false).fadeOut();
     } else {
       this._$puzzleActions.stop(true, false).fadeIn();
     }
   };
-  
+
   Header.prototype._registerModelEvents = function() {
     var events = ['addedPuzzle', 'deletedPuzzle', 'remoteChange'];
     var bound = this._handleDataChange.bind(this);
@@ -144,7 +144,7 @@
       window.app.store.on(events[i], bound);
     }
   };
-  
+
   Header.prototype._registerUIEvents = function() {
     this._$puzzleName.click(this._toggle.bind(this));
     this._dropdown.onAdd = this.emit.bind(this, 'addPuzzle');
@@ -153,7 +153,7 @@
     this._$puzzleActions.find('.add').click(this.emit.bind(this, 'addPuzzle'));
     this._$puzzleActions.find('.remove').click(this._deleteClicked.bind(this));
   };
-  
+
   Header.prototype._toggle = function() {
     switch (this._state) {
     case STATE_DELETING:
@@ -167,7 +167,7 @@
       throw new Error('unknown state: ' + this._state);
     }
   };
-  
+
   // Dropdown manages the puzzles dropdown.
   function Dropdown() {
     this._$element = $('#puzzles');
@@ -175,7 +175,7 @@
     this._$deleteButtons = $();
     this._puzzleElements = [];
     this._puzzleIdToElement = {};
-    
+
     // This pre-bound handler is used to capture browser resize events for the
     // scrollbar.
     this._scrollHandler = this._resizeForScrollbar.bind(this);
@@ -183,15 +183,15 @@
     this._isDeleting = false;
     this._isOpen = false;
     this._updateOnOpen = false;
-    
+
     this.onAdd = null;
     this.onDelete = null;
     this.onSwitch = null;
-    
+
     this._generateContents();
     this._registerModelEvents();
   }
-  
+
   Dropdown.prototype.close = function() {
     this._isOpen = false;
     this._$contents.css({'overflow-x': 'hidden'});
@@ -199,12 +199,12 @@
     this._$element.slideUp();
     window.app.windowSize.removeListener(this._scrollHandler);
   };
-  
+
   Dropdown.prototype.hideDeleteButtons = function() {
     this._$deleteButtons.stop(true, false).fadeOut();
     this._isDeleting = false;
   };
-  
+
   Dropdown.prototype.open = function() {
     this._isOpen = true;
     if (this._updateOnOpen) {
@@ -214,24 +214,24 @@
     this._$element.stop(true, false);
     this._$element.slideDown({complete: this._enableScrolling.bind(this)});
   };
-  
+
   Dropdown.prototype.showDeleteButtons = function() {
     this._$deleteButtons.stop(true, false).fadeIn();
     this._isDeleting = true;
   };
-  
+
   Dropdown.prototype._deletePuzzleFromDOM = function($deleteElement) {
     var idx = this._puzzleElements.indexOf($deleteElement);
     var $deleteButton = this._$deleteButtons.eq(idx);
-    
+
     this._puzzleElements.splice(idx, 1);
     this._$deleteButtons = this._$deleteButtons.not($deleteButton);
-    
+
     $([$deleteElement[0], $deleteButton[0]]).fadeOut(function() {
       $(this).remove();
     });
   };
-  
+
   Dropdown.prototype._enableScrolling = function() {
     this._$contents.css({'overflow-x': 'auto'});
     this._resizeForScrollbar();
@@ -263,7 +263,7 @@
       height: DROPDOWN_HEIGHT,
       width: puzzles.length*(PUZZLE_WIDTH+SPACING) + SPACING
     });
-    
+
     var puzzleLeft = SPACING;
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       var puzzle = puzzles[i];
@@ -275,7 +275,7 @@
       $contents.append($element);
       this._puzzleIdToElement[puzzle.id] = $element;
       this._puzzleElements.push($element);
-      
+
       var $deleteButton = $('<button class="delete">Delete</button>');
       $deleteButton.css({
         left: puzzleLeft + PUZZLE_WIDTH - 15,
@@ -285,10 +285,10 @@
       }.bind(this, puzzle.id));
       $contents.append($deleteButton);
       this._$deleteButtons = this._$deleteButtons.add($deleteButton);
-      
+
       puzzleLeft += SPACING + PUZZLE_WIDTH;
     }
-    
+
     this._$contents.append($contents);
   };
 
@@ -297,7 +297,7 @@
       this._transitionToEmpty();
       return;
     }
-    
+
     this._deletePuzzleFromDOM(this._puzzleIdToElement[puzzleId]);
     this._repositionPuzzles();
   };
@@ -312,7 +312,7 @@
     window.app.store.on('remoteChange', this._generateContents.bind(this));
     window.app.store.on('deletedPuzzle', this._puzzleDeleted.bind(this));
   };
-  
+
   Dropdown.prototype._repositionPuzzles = function() {
     var puzzleLeft = SPACING;
     for (var i = 0, len = this._puzzleElements.length; i < len; ++i) {
@@ -323,26 +323,26 @@
       puzzleLeft += SPACING + PUZZLE_WIDTH;
     }
   };
-  
+
   Dropdown.prototype._resizeForScrollbar = function() {
     // Figure out how much space the scrollbar is taking.
     var clientHeight = this._$contents[0].clientHeight ||
       this._$contents.height();
     var difference = this._$contents.height() - clientHeight;
-    
+
     // Compute the new height and set it if needed.
     var newHeight = DROPDOWN_HEIGHT + difference;
     if (newHeight != this._$element.height()) {
       this._$element.height(newHeight);
     }
   };
-  
+
   Dropdown.prototype._transitionToEmpty = function() {
     this._empty = true;
     this._puzzleElements = [];
     this._$deleteButtons = $();
     this._puzzleIdToElement = {};
-    
+
     this._$contents.children('div').fadeOut(function() {
       $(this).remove();
     });
@@ -354,7 +354,7 @@
     this._$contents.append(button);
     button.fadeIn();
   };
-  
+
   function generatePuzzleElement(puzzle) {
     var element = $('<div class="puzzle"></div>');
     var label = $('<label></label>');
@@ -367,7 +367,7 @@
     element.append(label);
     return element;
   }
-  
+
   window.app.Header = Header;
-  
+
 })();

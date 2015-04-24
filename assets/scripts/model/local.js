@@ -1,19 +1,19 @@
 (function() {
-  
+
   var DEFAULT_SETTINGS = {
     flavor: 'Blueberry',
     righty: true,
     timerAccuracy: 0,
     theaterMode: true
   };
-  
+
   function LocalStore() {
     window.app.EventEmitter.call(this);
-    
+
     this._active = null;
     this._puzzles = null;
     this._globalSettings = null;
-    
+
     // Register change events.
     this._changeListener = this._dataChanged.bind(this);
     if (window.addEventListener) {
@@ -21,12 +21,12 @@
     } else {
       window.attachEvent('onstorage', this._changeListener);
     }
-    
+
     this._loadData();
   }
-  
+
   LocalStore.prototype = Object.create(window.app.EventEmitter.prototype);
-  
+
   LocalStore.prototype.addPuzzle = function(puzzle) {
     puzzle.id = window.app.generateId();
     this._puzzles.unshift(puzzle);
@@ -34,14 +34,14 @@
     this._save();
     this.emit('addedPuzzle', puzzle);
   };
-  
+
   LocalStore.prototype.addSolve = function(solve) {
     solve.id = window.app.generateId();
     this._active.solves.push(solve);
     this._save();
     this.emit('addedSolve', solve);
   };
-  
+
   LocalStore.prototype.deletePuzzle = function(id) {
     if (id === this._active.id) {
       throw new Error('deleting current puzzle: ' + id);
@@ -56,7 +56,7 @@
     }
     throw new Error('puzzle not found: ' + id);
   };
-  
+
   LocalStore.prototype.deleteSolve = function(id) {
     var solves = this._active.solves;
     for (var i = solves.length-1; i >= 0; --i) {
@@ -69,7 +69,7 @@
     }
     throw new Error('solve not found: ' + id);
   };
-  
+
   LocalStore.prototype.detach = function() {
     if (window.removeEventListener) {
       window.removeEventListener('storage', this._changeListener, false);
@@ -77,28 +77,28 @@
       window.detachEvent('onstorage', this._changeListener);
     }
   };
-  
+
   LocalStore.prototype.getActivePuzzle = function() {
     return this._active;
   };
-  
+
   LocalStore.prototype.getGlobalSettings = function() {
     return this._globalSettings;
   };
-    
+
   LocalStore.prototype.getPuzzles = function() {
     return this._puzzles;
   };
-  
+
   LocalStore.prototype.getSolveCount = function(cb) {
     return new window.app.DataTicket(cb, this.getActivePuzzle)
   };
-  
+
   LocalStore.prototype.getSolves = function(start, count, cb) {
     var list = this._active.solves.slice(start, start+count);
     return new window.app.DataTicket(cb, list);
   };
-  
+
   LocalStore.prototype.modifyGlobalSettings = function(attrs) {
     for (var key in attrs) {
       if (!attrs.hasOwnProperty(key)) {
@@ -109,7 +109,7 @@
     this._save();
     this.emit('modifiedGlobalSettings', attrs);
   };
-  
+
   LocalStore.prototype.modifyPuzzle = function(attrs) {
     for (var key in attrs) {
       if (!attrs.hasOwnProperty(key)) {
@@ -120,7 +120,7 @@
     this._save();
     this.emit('modifiedPuzzle', attrs);
   };
-  
+
   LocalStore.prototype.modifySolve = function(id, attrs) {
     var solves = this._active.solves;
     var solve = null;
@@ -141,7 +141,7 @@
     this._save();
     this.emit('modifiedSolve', id, attrs);
   };
-  
+
   LocalStore.prototype.switchPuzzle = function(id, cb) {
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       var puzzle = this._puzzles[i];
@@ -158,11 +158,11 @@
     this.emit('switchPuzzleError', err);
     return new window.app.ErrorTicket(cb, err);
   };
-  
+
   LocalStore.prototype._dataChanged = function() {
     var oldActive = this._active.id;
     this._loadData();
-    
+
     // Find the old active puzzle by its id.
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       if (this._puzzles[i].id === oldActive) {
@@ -170,10 +170,10 @@
         break;
       }
     }
-    
+
     this.emit('remoteChange');
   };
-  
+
   // _fillInMissingSettings makes it easier to add new global settings in the
   // future.
   LocalStore.prototype._fillInMissingSettings = function() {
@@ -185,7 +185,7 @@
       }
     }
   };
-  
+
   // _fillInMissingPuzzleFields makes it easier to add new puzzle fields in the
   // future.
   LocalStore.prototype._fillInMissingPuzzleFields = function() {
@@ -207,13 +207,13 @@
       }
     }
   };
-  
+
   LocalStore.prototype._generateDefault = function() {
     this._puzzles = [];
-    
+
     this._globalSettings = {};
     this._fillInMissingSettings();
-    
+
     var names = ['3x3 Cube', '4x4 Cube', '5x5 Cube', '2x2 Cube', 'One Handed'];
     var scramblers = [
       ['3x3x3', 'State', 0], ['None', 'None', 0], ['None', 'None', 0],
@@ -233,7 +233,7 @@
       });
     }
   };
-  
+
   LocalStore.prototype._loadData = function() {
     if ('undefined' === typeof localStorage.localStoreData) {
       // Load the legacy local data if available, or create new data otherwise.
@@ -244,15 +244,15 @@
       }
       return;
     }
-    
+
     var data = JSON.parse(localStorage.localStoreData);
-    
+
     this._puzzles = data.puzzles;
     this._fillInMissingPuzzleFields();
-    
+
     this._globalSettings = (data.globalSettings || {});
     this._fillInMissingSettings();
-    
+
     // Find the active puzzle.
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       if (this._puzzles[i].id === data.active) {
@@ -260,24 +260,24 @@
       }
     }
   };
-  
+
   LocalStore.prototype._loadLegacy = function() {
     this._puzzles = JSON.parse(localStorage.puzzles);
     this._fillInMissingPuzzleFields();
-    
+
     this._globalSettings = {};
     this._fillInMissingSettings();
-    
+
     var active = localStorage.activePuzzle;
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       if (puzzles[i].id === active) {
         this._active = puzzles[i];
       }
     }
-    
+
     this._save();
   };
-  
+
   LocalStore.prototype._save = function() {
     this._active.lastUsed = new Date().getTime();
     var data = {
@@ -291,7 +291,7 @@
     } catch (e) {
     }
   };
-  
+
   window.app.LocalStore = LocalStore;
-  
+
 })();
