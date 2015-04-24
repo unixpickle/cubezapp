@@ -66,8 +66,13 @@ This tab will allow the user to do a number of things. However, it is not implem
 
 The TimerView presents the user's current time. It is responsible for entering and leaving theater mode and for formatting times according to the user's update setting.
 
+The TimerView class has the following properties:
+
+ * **controls** - the [Controls](#timer-controls-object) instance
+
 The TimerView class has the following methods:
 
+ * **cancel**() - the user has cancelled the solve.
  * **start**() - the user has initiated a solve.
  * **stop**() - the user has fully completed a solve.
  * **update**(millis, addTwo) - show the user a given number of milliseconds, optionally adding a +2.
@@ -76,6 +81,24 @@ The TimerView class has the following methods:
  * **updateMemo**(millis) - show the user their memo time.
 
 Note that the update methods should only be called while the user is doing a solve (i.e. when start() has been called more recently than stop()).
+
+<a name="timer-controls-object"></a>
+### Timer Controls
+
+The user can control the timer using the space bar (or by tapping their screen, if they have a touchscreen). The controls object manages this interaction.
+
+By default, the controls are disabled. This means that the space bar will do nothing (as will the touchscreen).
+
+Controls implements the [EventEmitter interface](../event_emitter.md) and fires the following events:
+
+ * **cancel**() - the user has cancelled the time (i.e. hit the escape key).
+ * **down**() - the user has pressed the space bar or tapped the screen.
+ * **up**() - the user has released the space bar or lifted their finger.
+
+Controls implements the following methods:
+
+ * **disable**() - disable the user's timer controls
+ * **enable**() - enable the user's timer controls
 
 <a name="header-object"></a>
 ## Header

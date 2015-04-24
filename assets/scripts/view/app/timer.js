@@ -1,12 +1,16 @@
 (function() {
   
+  var ESCAPE_KEY = 0x1b;
+  var SPACE_KEY = 0x20;
+  
   // The TimerView is responsible for presenting the timer to the user.
   function TimerView(appView) {
     this._appView = appView;
-    this._timerRunning = false;
-    this._settingsChangedWhileRunning = false;
-    
     this._manualEntry = false;
+    this._settingsChangedWhileRunning = false;
+    this._timerRunning = false;
+    
+    this.controls = new Controls();
     
     // Setup the hidden class before running this._updateSettings().
     this._theaterMode = false;
@@ -22,6 +26,11 @@
   TimerView.ACCURACY_CENTISECONDS = 0;
   TimerView.ACCURACY_SECONDS = 1;
   TimerView.ACCURACY_NONE = 2;
+  
+  TimerView.prototype.cancel = function() {
+    this._showLatestTime();
+    this.stop();
+  };
   
   TimerView.prototype.setManualEntry = function(flag) {
     this._manualEntry = flag;
@@ -160,6 +169,99 @@
     var settings = window.app.store.getGlobalSettings();
     this._theaterMode = settings.theaterMode;
     this._accuracy = settings.timerAccuracy;
+  };
+  
+  // Controls handles keyboard and/or touchscreen events for starting and
+  // stopping the timer.
+  function Controls() {
+    window.app.EventEmitter.call(this);
+    this._enabled = false;
+    this._down = false;
+    
+    window.app.keyboard.push(this);
+  
+    // If the device has a touchscreen, track touch events on the middle
+    // element.
+    if ('ontouchstart' in document) {
+      var $body = $(document.body);
+      $body.on('touchstart', this._touchDown.bind(this));
+      $body.on('touchend', this._touchUp.bind(this));
+    }
+  }
+  
+  Controls.prototype = Object.create(window.app.EventEmitter.prototype);
+  
+  Controls.prototype.disable = function() {
+    this._enabled = false;
+  };
+  
+  Controls.prototype.enable = function() {
+    this._enabled = true;
+  };
+  
+  Controls.prototype.keydown = function(e) {
+    if (this._enabled && e.which === ESCAPE_KEY) {
+      this._down = false;
+      this.emit('cancel');
+      return false;
+    }
+    
+    if (!this._enabled || e.which !== SPACE_KEY) {
+      // Allow the keyboard manager to propagate the event.
+      return true;
+    }
+    
+    // We could already be in the down state if they also have a touchscreen.
+    if (!this._down) {
+      this._down = true;
+      this.emit('down');
+    }
+    return false;
+  };
+  
+  Controls.prototype.keyup = function(e) {
+    if (!this._enabled || e.which !== SPACE_KEY) {
+      // Allow the keyboard manager to propagate the event.
+      return true;
+    }
+    
+    // We could be in the up state if they also have a touchscreen.
+    if (this._down) {
+      this._down = false;
+      this.emit('up');
+    }
+    return false;
+  };
+  
+  Controls.prototype._touchDown = function(e) {
+    if (!this._enabled) {
+      return;
+    }
+    
+    // Only accept touch events from the middle part of the page.
+    var t = e.target;
+    if (t !== document.body && t.id !== 'memo-time' &&
+        t.id !== 'pb-status' && t.id !== 'time') {
+      return;
+    }
+    
+    // We could be in the down state if they have multitouch or a keyboard.
+    if (!this._down) {
+      this._down = true;
+      this.emit('down');
+    }
+  };
+  
+  Controls.prototype._touchUp = function() {
+    if (!this._enabled) {
+      return;
+    }
+    
+    // We could be in the up state if they have multitouch or a keyboard.
+    if (this._down) {
+      this._down = false;
+      this.emit('up');
+    }
   };
   
   window.app.TimerView = TimerView;
