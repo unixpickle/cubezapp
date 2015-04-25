@@ -16,6 +16,7 @@ The AppView has the following properties:
 
  * **footer** - the [Footer](#footer-object) instance
  * **header** - the [Header](#header-object) instance
+ * **scrambler** - the [Scrambler](#scrambler-object) instance
  * **timer** - the [TimerView](#timer-view-object) instance
 
 AppView implements the following methods:
@@ -99,6 +100,17 @@ Controls implements the following methods:
 
  * **disable**() - disable the user's timer controls
  * **enable**() - enable the user's timer controls
+
+<a name="scrambler-object"></a>
+## Scrambler
+
+The scrambler is responsible for showing the user scrambles of their chosen type. It implements the following methods:
+
+ * **current**() - returns the scramble which is being presented to the user. This is `null` if no scramble is showing.
+ * **hideScramble**() - call this when the user is timing themselves.
+ * **showScramble**() - call this when the user stops timing themselves.
+
+By default, the scramble will be hidden. The *showScramble* method must be called once in order to show it.
 
 <a name="header-object"></a>
 ## Header
