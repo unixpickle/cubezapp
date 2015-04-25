@@ -192,7 +192,6 @@
     var defaults = {
       scrambler: 'None',
       scrambleType: 'None',
-      scrambleLength: 0,
       lastUsed: new Date().getTime(),
       timerInput: 0
     };
@@ -216,8 +215,8 @@
 
     var names = ['3x3 Cube', '4x4 Cube', '5x5 Cube', '2x2 Cube', 'One Handed'];
     var scramblers = [
-      ['3x3x3', 'State', 0], ['None', 'None', 0], ['None', 'None', 0],
-      ['2x2x2', 'State', 0], ['3x3x3', 'State', 0]
+      ['3x3x3', 'State'], ['None', 'None'], ['None', 'None'],
+      ['2x2x2', 'State'], ['3x3x3', 'State']
     ];
     var icons = ['3x3x3', '4x4x4', '5x5x5', '2x2x2', 'OH'];
     for (var i = names.length-1; i >= 0; --i) {
@@ -227,7 +226,6 @@
         icon: icons[i],
         scrambler: scrambler[0],
         scrambleType: scrambler[1],
-        scrambleLength: scrambler[2],
         timerInput: 0,
         lastUsed: new Date().getTime()
       });

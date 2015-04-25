@@ -1,7 +1,15 @@
 (function() {
 
   function TimerController() {
+    this._inputMode = window.app.store.getActivePuzzle().timerInput;
+    this._manualText = '';
+    this._session = null;
+    this._stackmatRunning = false;
 
+    this._settingsChangedWhileRunning = false;
+    
+    // TODO: the rest of this code.
+    window.app.view.scrambler.showScramble();
   }
 
   TimerController.INPUT_REGULAR = 0;
