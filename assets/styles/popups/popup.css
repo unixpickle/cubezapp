@@ -24,7 +24,7 @@
 .popup-dialog > .title label {
   float: left;
   margin-top: 6px;
-  
+
   color: #999999;
   height: 44px;
   line-height: 44px;
@@ -35,11 +35,11 @@
   float: right;
   width: 16px;
   height: 16px;
-  
+
   margin-top: 20px;
-  
+
   cursor: pointer;
-  
+
   color: transparent;
   border: none;
   background-color: transparent;
@@ -47,7 +47,7 @@
   background-size: 12px 12px;
   background-repeat: no-repeat;
   background-position: center;
-  
+
   font-size: 17px;
 }
 
@@ -75,9 +75,9 @@
   width: 130px;
   height: 35px;
   border: none;
-  
+
   margin-top: 12px;
-  
+
   color: white;
   font-size: 20px;
   cursor: pointer;
@@ -88,14 +88,14 @@
   width: 130px;
   height: 35px;
   border: none;
-  
+
   margin-top: 12px;
   margin-right: 10px;
-  
+
   color: white;
   font-size: 20px;
   cursor: pointer;
-  
+
   background-color: #aaaaaa;
 }
 

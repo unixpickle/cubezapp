@@ -150,10 +150,9 @@
     var setting = this._setting;
     this._loadingTimeout = setTimeout(function() {
       this._loadingTimeout = null;
-      if (this._state !== STATE_LOADING || !this._setting.equals(setting)) {
-        return;
+      if (this._state === STATE_LOADING && this._setting.equals(setting)) {
+        this._showScramble('Loading...');
       }
-      this._showScramble('Loading...');
     }.bind(this), LOADING_LABEL_TIMEOUT);
   };
 
@@ -165,8 +164,8 @@
   };
 
   Scrambler.prototype._waitingForScramble = function() {
-    return this._state === STATE_LOADING ||
-      this._state === STATE_OLD || this._state === STATE_REQUESTED;
+    return this._state === STATE_REQUESTED ||
+      this._state === STATE_OLD || this._state === STATE_LOADING;
   };
 
   function ScrambleSetting(name, type) {

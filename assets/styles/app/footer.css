@@ -1,15 +1,15 @@
 #footer {
   /* Footer should only be displayed once code loads it. */
   display: none;
-  
+
   position: fixed;
   bottom: 0;
   left: 0;
-  
+
   /* NOTE: the height is changed by code. */
   height: 300px;
   width: 100%;
-  
+
   background-color: #f0f0f0;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -21,20 +21,20 @@
   left: 0;
   height: 40px;
   width: 100%;
-  
+
   background-color: white;
   text-align: center;
 }
 
 #footer .top .tab {
   height: 40px;
-  
+
   color: #999999;
   background-color: transparent;
   border: none;
   font-size: 20px;
   line-height: 40px;
-  
+
   cursor: pointer;
 }
 
@@ -51,10 +51,10 @@
   right: 0;
   height: 40px;
   width: 40px;
-  
+
   border: none;
   cursor: pointer;
-  
+
   background-color: transparent;
   background-image: url('../../images/x.png');
   background-size: 18px 18px;
@@ -139,6 +139,6 @@
   left: 50%;
   height: 100%;
   width: 50%;
-  
+
   background-color: white;
 }
