@@ -204,6 +204,9 @@
           puzzle[key] = defaults[key];
         }
       }
+      if (!puzzle.hasOwnProperty('solves')) {
+        puzzle.solves = [];
+      }
     }
   };
 
