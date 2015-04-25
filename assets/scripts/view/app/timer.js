@@ -126,11 +126,9 @@
   };
 
   TimerView.prototype._handleTimesChanged = function() {
-    // If the timer is running we do not show the latest time.
-    if (this._timerRunning) {
-      return;
+    if (!this._timerRunning) {
+      this._showLatestTime();
     }
-    this._showLatestTime();
   };
 
   TimerView.prototype._registerModelEvents = function() {
@@ -143,7 +141,8 @@
       timesHandler();
     });
 
-    var timesEvents = ['modifiedSolve', 'addedSolve', 'deletedSolve'];
+    var timesEvents = ['modifiedSolve', 'addedSolve', 'deletedSolve',
+      'switchedPuzzle'];
     for (var i = 0; i < timesEvents.length; ++i) {
       window.app.store.on(timesEvents[i], timesHandler);
     }

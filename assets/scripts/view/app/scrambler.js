@@ -1,6 +1,6 @@
 (function() {
 
-  var LOADING_LABEL_TIMEOUT = 500;
+  var LOADING_LABEL_TIMEOUT = 300;
   var SCRAMBLE_LENGTHS = {
     '3x3x3  Moves': 25,
     '2x2x2  Moves': 25,
@@ -75,6 +75,8 @@
     if (this._setting.isNone()) {
       if (this._state === STATE_LOADING) {
         this._state = STATE_SHOWING;
+      } else if (this._state === STATE_HIDDEN_LOADING) {
+        this._state = STATE_HIDDEN;
       }
       this._showScramble(null);
       return;
