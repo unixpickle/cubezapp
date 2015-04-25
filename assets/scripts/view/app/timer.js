@@ -9,6 +9,15 @@
     this._manualEntry = false;
     this._settingsChangedWhileRunning = false;
     this._timerRunning = false;
+    
+    this._scrambleQueue = new window.app.ScrambleQueue();
+    this._currentScramble = null;
+    
+    this._scrambleQueue.on('softTimeout',
+      this._showScramble.bind(this, 'Loading...'));
+    this._scrambleQueue.on('scramble', this._showScramble.bind(this));
+    this._scrambleQueue.on('scramblerChanged',
+      this._scramblerChanged.bind(this));
 
     this.controls = new Controls();
 
@@ -18,6 +27,8 @@
     this._updateSettings();
 
     this._registerModelEvents();
+    
+    appView.on('load', this._scrambleQueue.request.bind(this._scrambleQueue));
 
     // NOTE: we do not run this._showLatestTime() here because the AppView does
     // that as part of the loading process.
@@ -30,6 +41,10 @@
   TimerView.prototype.cancel = function() {
     this._showLatestTime();
     this.stop();
+  };
+  
+  TimerView.prototype.currentScramble = function() {
+    return this._currentScramble;
   };
 
   TimerView.prototype.setManualEntry = function(flag) {
@@ -59,10 +74,13 @@
     } else {
       this._appView.setTime('0.00');
     }
+    this._scrambleQueue.requestInBackground();
+    this._showScramble(null);
   };
 
   TimerView.prototype.stop = function() {
     this._assertRunning();
+    this._scrambleQueue.request();
     if (this._theaterMode) {
       this._appView.setTheaterMode(false);
     }
@@ -147,6 +165,12 @@
       window.app.store.on(timesEvents[i], timesHandler);
     }
   };
+  
+  TimerView.prototype._scramblerChanged = function() {
+    if (!this._timerRunning) {
+      this._scrambleQueue.request();
+    }
+  };
 
   TimerView.prototype._showLatestTime = function() {
     window.app.store.getSolves(0, 1, function(err, solves) {
@@ -162,6 +186,15 @@
         this._appView.setMemo(null);
       }
     }.bind(this));
+  };
+  
+  TimerView.prototype._showScramble = function(scramble) {
+    this._appView.setScramble(scramble);
+    if (scramble ===  'Loading...' || scramble === null) {
+      this._currentScramble = null;
+    } else {
+      this._currentScramble = scramble;
+    }
   };
 
   TimerView.prototype._updateSettings = function() {

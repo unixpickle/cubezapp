@@ -18,7 +18,6 @@
     this.footer = new window.app.Footer();
     this.header = new window.app.Header();
     this.timer = new window.app.TimerView(this);
-    this.scrambler = new window.app.Scrambler();
     this._middle = new window.app.Middle();
 
     this._setupStateProperties();

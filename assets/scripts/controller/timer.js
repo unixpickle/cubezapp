@@ -7,9 +7,6 @@
     this._stackmatRunning = false;
 
     this._settingsChangedWhileRunning = false;
-    
-    // TODO: the rest of this code.
-    window.app.view.scrambler.showScramble();
   }
 
   TimerController.INPUT_REGULAR = 0;
