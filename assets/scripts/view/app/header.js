@@ -37,7 +37,7 @@
 
     this._state = STATE_CLOSED;
     this._empty = (window.app.store.getPuzzles().length <= 1);
-    
+
     this._handleNameChange();
 
     this._registerUIEvents();
@@ -138,7 +138,7 @@
       this._$puzzleActions.stop(true, false).fadeIn();
     }
   };
-  
+
   Header.prototype._handleNameChange = function() {
     this._$puzzleName.text(window.app.store.getActivePuzzle().name);
   };
@@ -149,7 +149,7 @@
     for (var i = 0; i < events.length; ++i) {
       window.app.store.on(events[i], bound);
     }
-    
+
     events = ['remoteChange', 'modifiedPuzzle', 'switchedPuzzle'];
     bound = this._handleNameChange.bind(this);
     for (var i = 0; i < events.length; ++i) {

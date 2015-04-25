@@ -9,10 +9,10 @@
     this._manualEntry = false;
     this._settingsChangedWhileRunning = false;
     this._timerRunning = false;
-    
+
     this._scrambleQueue = new window.app.ScrambleQueue();
     this._currentScramble = null;
-    
+
     this._scrambleQueue.on('softTimeout',
       this._showScramble.bind(this, 'Loading...'));
     this._scrambleQueue.on('scramble', this._showScramble.bind(this));
@@ -27,7 +27,7 @@
     this._updateSettings();
 
     this._registerModelEvents();
-    
+
     appView.on('load', this._scrambleQueue.request.bind(this._scrambleQueue));
 
     // NOTE: we do not run this._showLatestTime() here because the AppView does
@@ -42,7 +42,7 @@
     this._showLatestTime();
     this.stop();
   };
-  
+
   TimerView.prototype.currentScramble = function() {
     return this._currentScramble;
   };
@@ -165,7 +165,7 @@
       window.app.store.on(timesEvents[i], timesHandler);
     }
   };
-  
+
   TimerView.prototype._scramblerChanged = function() {
     if (!this._timerRunning) {
       this._scrambleQueue.request();
@@ -187,7 +187,7 @@
       }
     }.bind(this));
   };
-  
+
   TimerView.prototype._showScramble = function(scramble) {
     this._appView.setScramble(scramble);
     if (scramble ===  'Loading...' || scramble === null) {

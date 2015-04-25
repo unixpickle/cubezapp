@@ -45,14 +45,14 @@
       this.cancel();
     }
   };
-  
+
   ScrambleQueue.prototype._attemptToShift = function() {
     var scrambler = this._scrambler;
     var scramble = this._shiftQueue(scrambler);
     if (scramble === null) {
       return;
     }
-    
+
     // This needs to be asynchronous because this.emit() is synchronous and the
     // caller will not expect a synchronous callback.
     var reqNum = ++this._requestNumber;
@@ -65,7 +65,7 @@
       }
     }.bind(this), 10);
   };
-  
+
   ScrambleQueue.prototype._generateScramble = function() {
     var reqNum = ++this._requestNumber;
     var timeout;

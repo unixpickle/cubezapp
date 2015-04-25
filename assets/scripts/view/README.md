@@ -64,7 +64,7 @@ This tab will allow the user to do a number of things. However, it is not implem
 <a name="timer-view-object"></a>
 ## TimerView
 
-The TimerView presents the user's current time. It is responsible for entering and leaving theater mode and for formatting times according to the user's update setting.
+The TimerView presents the user's current time. It is responsible for entering and leaving theater mode and for formatting times according to the user's update setting. It also manages the current scramble.
 
 The TimerView class has the following properties:
 
