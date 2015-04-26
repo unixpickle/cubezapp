@@ -8,6 +8,7 @@
   }
 
   function initializeController() {
+    window.app.settingsController = new window.app.SettingsController();
     window.app.view.on('load', function() {
       window.app.timerController = new window.app.TimerController();
     });

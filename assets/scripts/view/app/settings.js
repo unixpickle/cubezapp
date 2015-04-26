@@ -391,7 +391,7 @@
     // They could have changed the subscramble while it was fading out.
     if (this._subscrambleField.visible) {
       this.emit('scramblerChanged', this._scrambleDropdown.value(),
-        this._subscramblers()[0] || 'None');
+        this._subscrambleDropdown.value() || 'None');
     }
   };
 
