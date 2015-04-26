@@ -10,14 +10,11 @@
     this._settingsChangedWhileRunning = false;
     this._timerRunning = false;
 
-    this._scrambleQueue = new window.app.ScrambleQueue();
     this._currentScramble = null;
-
-    this._scrambleQueue.on('softTimeout',
+    this._scrambleStream = new window.app.ScrambleStream();
+    this._scrambleStream.on('scramble', this._showScramble.bind(this));
+    this._scrambleStream.on('softTimeout',
       this._showScramble.bind(this, 'Loading...'));
-    this._scrambleQueue.on('scramble', this._showScramble.bind(this));
-    this._scrambleQueue.on('scramblerChanged',
-      this._scramblerChanged.bind(this));
 
     this.controls = new Controls();
 
@@ -28,7 +25,7 @@
 
     this._registerModelEvents();
 
-    appView.on('load', this._scrambleQueue.request.bind(this._scrambleQueue));
+    appView.on('load', this._scrambleStream.resume.bind(this._scrambleStream));
 
     // NOTE: we do not run this._showLatestTime() here because the AppView does
     // that as part of the loading process.
@@ -39,8 +36,16 @@
   TimerView.ACCURACY_NONE = 2;
 
   TimerView.prototype.cancel = function() {
+    this._assertRunning();
     this._showLatestTime();
-    this.stop();
+    this._scrambleStream.resumeReuseScramble();
+    if (this._theaterMode) {
+      this._appView.setTheaterMode(false);
+    }
+    if (this._settingsChangedWhileRunning) {
+      this._settingsChangedWhileRunning = false;
+      this._updateSettings();
+    }
   };
 
   TimerView.prototype.currentScramble = function() {
@@ -74,13 +79,13 @@
     } else {
       this._appView.setTime('0.00');
     }
-    this._scrambleQueue.requestInBackground();
+    this._scrambleStream.pause();
     this._showScramble(null);
   };
 
   TimerView.prototype.stop = function() {
     this._assertRunning();
-    this._scrambleQueue.request();
+    this._scrambleStream.resume();
     if (this._theaterMode) {
       this._appView.setTheaterMode(false);
     }
@@ -163,12 +168,6 @@
       'switchedPuzzle'];
     for (var i = 0; i < timesEvents.length; ++i) {
       window.app.store.on(timesEvents[i], timesHandler);
-    }
-  };
-
-  TimerView.prototype._scramblerChanged = function() {
-    if (!this._timerRunning) {
-      this._scrambleQueue.request();
     }
   };
 

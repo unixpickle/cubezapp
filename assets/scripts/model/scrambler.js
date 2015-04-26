@@ -1,6 +1,7 @@
 (function() {
 
   var SOFT_TIMEOUT = 300;
+  var QUEUE_SIZE = 5;
 
   var SCRAMBLE_LENGTHS = {
     '3x3x3  Moves': 25,
@@ -8,120 +9,139 @@
     'Skewb  Moves': 25
   };
 
-  // ScrambleQueue queues up scrambles for the user.
-  function ScrambleQueue() {
+  // A ScrambleStream generates scrambles for the current puzzle.
+  function ScrambleStream() {
     window.app.EventEmitter.call(this);
-    this._queue = {};
-    this._scrambler = Scrambler.current();
-    this._requestNumber = 0;
-    this._scrambleRequested = false;
+
+    this._generatingScramble = false;
+    this._needScramble = false;
+    this._queue = new ScrambleQueue();
+    this._paused = true;
+
+    this._lastEmittedScramble = null;
+
+    this._currentScrambler = Scrambler.current();
+    this._currentPuzzleId = window.app.store.getActivePuzzle().id;
+
     this._registerModelEvents();
   }
 
-  ScrambleQueue.prototype = Object.create(window.app.EventEmitter.prototype);
+  ScrambleStream.prototype = Object.create(window.app.EventEmitter.prototype);
 
-  ScrambleQueue.prototype.cancel = function() {
-    this._scrambleRequested = false;
+  ScrambleStream.prototype.pause = function() {
+    this._paused = true;
+    this._needScramble = false;
   };
 
-  ScrambleQueue.prototype.isScrambleRequested = function() {
-    return this._scrambleRequested;
+  ScrambleStream.prototype.resume = function() {
+    this._paused = false;
+    this._generateOrDequeue();
   };
 
-  ScrambleQueue.prototype.request = function() {
-    if (this._scrambleRequested) {
-      return;
-    }
-    this._scrambleRequested = true;
-    this._generateScramble();
-    this._attemptToShift();
+  ScrambleStream.prototype.resumeReuseScramble = function() {
+    this._paused = false;
+    this._replenishQueue();
+    this.emit(this._lastEmittedScramble);
   };
 
-  ScrambleQueue.prototype.requestInBackground = function() {
-    if (!this._scrambleRequested) {
-      this.request();
-      this.cancel();
+  ScrambleStream.prototype._emitScramble = function(scramble) {
+    this._lastEmittedScramble = scramble;
+    this.emit('scramble', scramble);
+  }
+
+  ScrambleStream.prototype._generateOrDequeue = function() {
+    var shifted = this._queue.shift(this._currentScrambler);
+    if (shifted !== null) {
+      this._needScramble = false;
+      this._emitScramble(shifted);
     } else {
-      this.cancel();
+      this._needScramble = true;
+    }
+    this._replenishQueue();
+  };
+
+  ScrambleStream.prototype._modelChanged = function() {
+    var scrambler = Scrambler.current();
+    var puzzleId = window.app.store.getActivePuzzle().id;
+    if (!scrambler.equals(this._currentScrambler) ||
+        this._currentPuzzleId !== puzzleId) {
+      this._currentScrambler = scrambler;
+      this._currentPuzzleId = puzzleId;
+      if (this._paused) {
+        this._replenishQueue();
+      } else {
+        this._generateOrDequeue();
+      }
     }
   };
 
-  ScrambleQueue.prototype._attemptToShift = function() {
-    var scrambler = this._scrambler;
-    var scramble = this._shiftQueue(scrambler);
-    if (scramble === null) {
+  ScrambleStream.prototype._registerModelEvents = function() {
+    var handler = this._modelChanged.bind(this);
+    var events = ['remoteChanged', 'switchedPuzzle', 'modifiedPuzzle'];
+    for (var i = 0; i < events.length; ++i) {
+      window.app.store.on(events[i], handler);
+    }
+  };
+
+  ScrambleStream.prototype._replenishQueue = function() {
+    if (this._generatingScramble || this._queueHasEnough()) {
       return;
     }
+    this._generatingScramble = true;
 
-    // This needs to be asynchronous because this.emit() is synchronous and the
-    // caller will not expect a synchronous callback.
-    var reqNum = ++this._requestNumber;
-    setTimeout(function() {
-      if (this._scrambleRequested && this._requestNumber === reqNum) {
-        this.emit('scramble', scramble);
-      } else {
-        // Race condition; try to reuse the scramble later.
-        this._pushQueue(scrambler, scramble);
-      }
-    }.bind(this), 10);
-  };
-
-  ScrambleQueue.prototype._generateScramble = function() {
-    var reqNum = ++this._requestNumber;
+    var scrambler = this._currentScrambler;
     var timeout;
     timeout = setTimeout(function() {
-      if (this._scrambleRequested && this._requestNumber === reqNum) {
+      if (this._currentScrambler === scrambler && this._needScramble) {
         this.emit('softTimeout');
-        timeout = null;
       }
+      timeout = null;
     }.bind(this), SOFT_TIMEOUT);
 
-    this._scrambler.generate(function(scrambler, scramble) {
+    scrambler.generate(function(scramble) {
       if (timeout !== null) {
         clearTimeout(timeout);
       }
-      if (this._scrambleRequested && this._requestNumber === reqNum) {
-        this.emit('scramble', scramble);
-        this._scrambleRequested = false;
+      this._generatingScramble = false;
+      if (this._currentScrambler !== scrambler || !this._needScramble) {
+        this._queue.push(scrambler, scramble);
       } else {
-        this._pushQueue(scrambler, scramble);
+        this._needScramble = false;
+        this._emitScramble(scramble);
       }
-    }.bind(this, this._scrambler));
+      this._replenishQueue();
+    }.bind(this));
   };
 
-  ScrambleQueue.prototype._handleModelChange = function() {
-    var current = Scrambler.current();
-    if (!current.equals(this._scrambler)) {
-      this._scrambler = current;
-      if (this._scrambleRequested) {
-        this.cancel();
-        this.request();
-      } else {
-        this.emit('scramblerChanged');
-      }
+  ScrambleStream.prototype._queueHasEnough = function() {
+    return this._queue.count(this._currentScrambler) >= QUEUE_SIZE;
+  };
+
+  // A ScrambleQueue can queue up scrambles for each scramble type.
+  function ScrambleQueue() {
+    this._queue = {};
+  }
+
+  ScrambleQueue.prototype.count = function(scrambler) {
+    var hash = scrambler.hash();
+    if (this._queue[hash]) {
+      return this._queue[hash].length;
     }
+    return 0;
   };
 
-  ScrambleQueue.prototype._pushQueue = function(setting, scramble) {
-    var hash = setting.hash();
+  ScrambleQueue.prototype.push = function(scrambler, scramble) {
+    var hash = scrambler.hash();
     var queued = this._queue[hash];
     if (!queued) {
       this._queue[hash] = [scramble];
     } else {
       queued.push(scramble);
     }
-  };
+  }
 
-  ScrambleQueue.prototype._registerModelEvents = function() {
-    var handler = this._handleModelChange.bind(this);
-    var events = ['remoteChange', 'modifiedPuzzle', 'switchedPuzzle'];
-    for (var i = 0; i < events.length; ++i) {
-      window.app.store.on(events[i], handler);
-    }
-  };
-
-  ScrambleQueue.prototype._shiftQueue = function(setting) {
-    var hash = setting.hash();
+  ScrambleQueue.prototype.shift = function(scrambler) {
+    var hash = scrambler.hash();
     if ('undefined' === typeof this._queue[hash]) {
       return null;
     } else if (this._queue[hash].length === 0) {
@@ -131,7 +151,7 @@
     }
   };
 
-  // A Scrambler generates scrambles.
+  // A Scrambler generates scrambles of a specific type.
   function Scrambler(name, type) {
     this._name = name;
     this._type = type;
@@ -172,6 +192,6 @@
     return this._name === 'None';
   };
 
-  window.app.ScrambleQueue = ScrambleQueue;
+  window.app.ScrambleStream = ScrambleStream;
 
 })();
