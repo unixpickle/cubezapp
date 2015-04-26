@@ -391,7 +391,12 @@
     // Generate title bar.
     var title = $('<div class="title"></div>');
     title.append($('<label></label>').text(titleStr));
-    title.append($('<button></button>').click(this.close.bind(this)));
+    var closeButton = $('<button></button>').click(this.close.bind(this));
+    title.append(closeButton);
+    closeButton.mousedown(function(e) {
+      e.stopPropagation();
+      return false;
+    });
 
     // Generate footer.
     var footer = $('<div class="footer"></div>');
