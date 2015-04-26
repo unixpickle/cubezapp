@@ -25,7 +25,7 @@
     }
     exports = module.exports;
   }
-  
+
   function includeAPI(name) {
     if ('undefined' !== typeof window) {
       return window.puzzlejs[name];
@@ -55,13 +55,13 @@
     [1, 11, 55, 165, 330, 462, 462, 330, 165, 55, 11, 1],
     [1, 12, 66, 220, 495, 792, 924, 792, 495, 220, 66, 12, 1]
   ];
-  
+
   // choose takes two numbers, a and b, and returns (a choose b).
   function choose(a, b) {
     if (a < 13) {
       return pascalsTriangle[a][b];
     }
-  
+
     var res = 1;
     for (var i = 0; i < b; ++i) {
       res *= a;
@@ -69,7 +69,7 @@
     }
     return res/factorial(b);
   }
-  
+
   // countTrue takes an array and returns the number of elements which are true.
   function countTrue(list) {
     var res = 0;
@@ -80,14 +80,14 @@
     }
     return res;
   }
-  
+
   // encodeChoose encodes an array which represents a given "choice"--that is, an
   // array of boolean values. This acts as a perfect-mapping hash function for
   // the unordered choose operation.
   function encodeChoose(choice) {
     return encodeExplicitChoose(0, choice, countTrue(choice));
   }
-  
+
   // encodeExplicitChoose implements the backbone of encodeChoose().
   // The start argument specifies the index in the [choice] array to start at.
   // The choice array stores a set of true and false boolean values.
@@ -103,7 +103,7 @@
         }
       }
     }
-  
+
     var numMissed = 0;
     for (var i = start, len = choice.length; i < len; ++i) {
       if (choice[i] === true) {
@@ -115,13 +115,13 @@
     }
     return -1;
   }
-  
+
   exports.choose = choose;
   exports.encodeChoose = encodeChoose;
   var factorials = [1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800,
     39916800, 479001600, 6227020800];
   var applyPermCache = [];
-  
+
   // allPerms generates all the permutations of a given length.
   function allPerms(size) {
     if (size === 0) {
@@ -129,7 +129,7 @@
     } else if (size === 1) {
       return [[0]];
     }
-  
+
     // Recursively generate permutations
     var result = [];
     var subPermutations = allPerms(size-1);
@@ -147,7 +147,7 @@
     }
     return result;
   }
-  
+
   // applyPerm applies a permutation to an array. The first argument is the array,
   // the second is the permutation. The result is stored in the first argument.
   function applyPerm(arr, perm) {
@@ -162,7 +162,7 @@
       arr[i] = applyPermCache[i];
     }
   }
-  
+
   // comparePerms "compares" the permutations a and b and returns -1 if a<b, 1 if
   // a>b, or 0 if a=b. This is like comparing encodePerm(a) with encodePerm(b).
   function comparePerms(a, b) {
@@ -178,16 +178,16 @@
     }
     return 0;
   }
-  
+
   // decodePerm generates a permutation array from a permutation's perfect hash.
   function decodePerm(hash, size) {
     var permutation = [];
-  
+
     // Pre-allocate the array (i.e. avoid using a sparse array)
     for (var i = 0; i < size; ++i) {
       permutation[i] = 0;
     }
-  
+
     // Read the "digits" of the permutation.
     for (var i = 0, len = size-1; i < len; ++i) {
       var coefficient = factorial(len - i);
@@ -195,7 +195,7 @@
       permutation[i] = digit;
       hash -= digit * coefficient;
     }
-  
+
     // Convert the digits into a real permutation.
     for (var i = size-2; i >= 0; --i) {
       var theDigit = permutation[i];
@@ -205,10 +205,10 @@
         }
       }
     }
-  
+
     return permutation;
   }
-  
+
   // encodeDestructablePerm optimally encodes an array of permuted integers. In
   // the process, it modifies the array. This avoids an extra memory allocation
   // which encodePerm() cannot avoid at the expense of the original array.
@@ -216,17 +216,17 @@
     if (permutation.length <= 1) {
       return 0;
     }
-  
+
     var result = 0;
     for (var i = 0, len = permutation.length-1; i < len; ++i) {
       var current = permutation[i];
-  
+
       // If the first item of the sub-permutation does not belong at the
       // beginning, we need to offset our result.
       if (current !== 0) {
         result += factorial(len-i)*current;
       }
-  
+
       // Get rid of any trace of "current" from the sub-permutation .
       for (var j = i+1; j < len; ++j) {
         if (permutation[j] > current) {
@@ -234,15 +234,15 @@
         }
       }
     }
-  
+
     return result;
   }
-  
+
   // encodePerm encodes a permutation optimally without modifying it.
   function encodePerm(permutation) {
     return encodeDestructablePerm(permutation.slice());
   }
-  
+
   // factorial returns the product of the numbers up to and including n. For
   // instance, factorial(4) is 4*3*2*1. A special case is that factorial(0) = 1.
   function factorial(n) {
@@ -251,13 +251,13 @@
     }
     return factorials[n];
   }
-  
+
   // parity computes the parity of a permutation. This returns true for even
   // parity and false for odd parity.
   function parity(permutation) {
     return paritySort(permutation.slice());
   }
-  
+
   // paritySort computes the parity of a permutation, sorting the given
   // permutation in the process. Therefore, this can avoid an extra allocation
   // which the parity() routine cannot.
@@ -268,9 +268,9 @@
       if (list[i] === i) {
         continue;
       }
-  
+
       parity = !parity;
-  
+
       // Find the other value (which we know is after i)
       for (var j = i+1; j < len+1; ++j) {
         if (list[j] === i) {
@@ -281,7 +281,7 @@
     }
     return parity;
   }
-  
+
   // randomPerm generates a random permutation of a given length.
   function randomPerm(len) {
     // Generate a list of symbols.
@@ -289,7 +289,7 @@
     for (var i = 0; i < len; ++i) {
       symbols[i] = i;
     }
-  
+
     // Picking random symbols from the list and add them to the result.
     var result = [];
     while (symbols.length > 0) {
@@ -298,10 +298,10 @@
       symbols.splice(idx, 1);
       result.push(value);
     }
-  
+
     return result;
   }
-  
+
   // randomPermParity generates a random permutation of a given length.
   // The second argument specifies the parity of the permutation. If it is false,
   // the permutation will have odd parity.
@@ -309,19 +309,19 @@
     if (len <= 1 && p === false) {
       throw new Error('cannot generate odd permutation on ' + len + ' symbols');
     }
-  
+
     var res = randomPerm(len);
-  
+
     // Do a swap if the parity is wrong.
     if (parity(res) !== p) {
       var first = res[0];
       res[0] = res[1];
       res[1] = first;
     }
-  
+
     return res;
   }
-  
+
   exports.allPerms = allPerms;
   exports.applyPerm = applyPerm;
   exports.comparePerms = comparePerms;
@@ -362,7 +362,7 @@
     }
     exports = module.exports;
   }
-  
+
   function includeAPI(name) {
     if ('undefined' !== typeof window) {
       return window.puzzlejs[name];
@@ -386,7 +386,7 @@
   // and a UD flip, the y rotation is performed first, the LR flip second, and the
   // UD flip third. So, symmetry 15 represents UDflip*LRflip*y'. It can also be
   // noted that the UD flip commutes with the LR flip and the y rotation.
-  
+
   // udSymmetryProducts[a*16 + b] gives the symmetry a*b.
   var udSymmetryProducts = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
@@ -406,35 +406,35 @@
     14, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 0, 1,
     15, 12, 13, 14, 9, 10, 11, 8, 7, 4, 5, 6, 1, 2, 3, 0
   ];
-  
+
   // udSymmetryInverses[s] gives s'.
   var udSymmetryInverses = [0, 3, 2, 1, 4, 5, 6, 7, 8, 11, 10, 9, 12, 13, 14, 15];
-  
+
   // udSymmetryInverse returns the inverse of a UD symmetry.
   function udSymmetryInverse(sym) {
     return udSymmetryInverses[sym];
   }
-  
+
   // udSymmetryLRFlip returns true if the symmetry includes an LR reflection.
   function udSymmetryLRFlip(sym) {
     return (sym & 4) !== 0;
   }
-  
+
   // udSymmetryProduct returns the product of two symmetries, s1*s2.
   function udSymmetryProduct(s1, s2) {
     return udSymmetryProducts[(s1 << 4) | s2];
   }
-  
+
   // udSymmetryUDFlip returns true if the symmetry includes a UD reflection.
   function udSymmetryUDFlip(sym) {
     return (sym & 8) !== 0;
   }
-  
+
   // udSymmetryY returns the number of y rotations performed by the symmetry.
   function udSymmetryY(sym) {
     return sym & 3;
   }
-  
+
   exports.udSymmetryInverse = udSymmetryInverse;
   exports.udSymmetryLRFlip = udSymmetryLRFlip;
   exports.udSymmetryProduct = udSymmetryProduct;
@@ -469,7 +469,7 @@
     }
     exports = module.exports;
   }
-  
+
   function includeAPI(name) {
     if ('undefined' !== typeof window) {
       return window.puzzlejs[name];
@@ -484,14 +484,14 @@
 
   // A Corner stores the piece index and orientation of a corner.
   //
-  // To understand the meaning of a Corner's fields, you must first
+  // To understand the meaning of a Corner's fields, you must firs
   // understand the coordinate system. There are there axes, x, y, and z.
   // The x axis is 0 at the L face and 1 at the R face.
   // The y axis is 0 at the D face and 1 at the U face.
   // The z axis is 0 at the B face and 1 at the F face.
   //
   // A corner piece's index is determined by it's original position on the
-  // cube. The index is a binary number of the form ZYX, where Z is the most
+  // cube. The index is a binary number of the form ZYX, where Z is the mos
   // significant digit. Thus, the BLD corner is 0, the BRU corner is 3, the
   // FRU corner is 7, etc.
   //
@@ -503,12 +503,12 @@
     this.piece = piece;
     this.orientation = orientation;
   }
-  
+
   // copy returns a copy of this corner.
   Corner.prototype.copy = function() {
     return new Corner(this.piece, this.orientation);
   };
-  
+
   // A Cube represent the corners of a cube.
   // This constructor returns a solved Cube.
   function Cube() {
@@ -517,7 +517,7 @@
       this.corners[i] = new Corner(i, 1);
     }
   }
-  
+
   // copy returns a deep copy of the Cube.
   Cube.prototype.copy = function() {
     var newCube = [];
@@ -528,7 +528,7 @@
     res.corners = newCube;
     return res;
   };
-  
+
   // fixLastCorner makes sure the corner orientation case is valid by twisting
   // corner 7.
   Cube.prototype.fixLastCorner = function() {
@@ -536,7 +536,7 @@
     // twists two adjacent corners) to "solve" every corner except the last one.
     // The twist of the last corner (which started out solved) tells us which
     // orientation it should have had.
-  
+
     // All corners in this ordering are adjacent, allowing the sune combo to work.
     var ordering = [0, 1, 5, 4, 6, 2, 3, 7];
     var orientations = [];
@@ -556,7 +556,7 @@
         orientations[i+1] = (nextOrientation + 1) % 3;
       }
     }
-  
+
     // The twist of the last corner is the inverse of what it should be in the
     // scramble.
     if (orientations[7] === 0) {
@@ -565,7 +565,7 @@
       this.corners[7].orientation = 0;
     }
   };
-  
+
   // halfTurn applies a half turn on a given face.
   Cube.prototype.halfTurn = function(face) {
     switch (face) {
@@ -621,7 +621,7 @@
       break;
     }
   };
-  
+
   // move applies a move to a Cube.
   Cube.prototype.move = function(m) {
     if (m.turns() === 2) {
@@ -630,7 +630,7 @@
       this.quarterTurn(m.face(), m.turns());
     }
   };
-  
+
   // quarterTurn applies a quarter turn to a Cube.
   Cube.prototype.quarterTurn = function(face, turns) {
     switch (face) {
@@ -776,8 +776,8 @@
       break;
     }
   };
-  
-  // solved returns true if the first 7 corners are solved. The eighth corner must
+
+  // solved returns true if the first 7 corners are solved. The eighth corner mus
   // be solved if the first 7 are.
   Cube.prototype.solved = function() {
     for (var i = 0; i < 7; ++i) {
@@ -788,18 +788,18 @@
     }
     return true;
   };
-  
+
   exports.Corner = Corner;
   exports.Cube = Cube;
   var PermsAPI = includeAPI('perms');
-  
+
   // A FullHeuristic keeps track of the number of moves needed to solve a given
   // state of the Pocket Cube. It only tracks states up to a certain depth, since
   // there are too many states to index and store in memory at once.
   function FullHeuristic(depth) {
     this.depth = depth;
     this.table = {};
-  
+
     // Do a breadth-first search to generate the heuristic table.
     var moves = basisMoves();
     var queue = [{depth: 0, cube: new Cube(), hash: '' + encodeCube(new Cube())}];
@@ -807,16 +807,16 @@
     while (queue.length > 0) {
       node = queue[0];
       queue.splice(0, 1);
-  
+
       if (this.table.hasOwnProperty(node.hash)) {
         continue;
       }
       this.table[node.hash] = node.depth;
-  
+
       if (node.depth === this.depth) {
         continue;
       }
-  
+
       // Branch off.
       for (var i = 0, len = moves.length; i < len; ++i) {
         var newCube = node.cube.copy();
@@ -829,7 +829,7 @@
       }
     }
   }
-  
+
   // lookup returns the lower bound for the number of moves to solve a given cube.
   FullHeuristic.prototype.lookup = function(cube) {
     var result = this.table[encodeCube(cube)];
@@ -838,7 +838,7 @@
     }
     return result;
   };
-  
+
   function encodeCO(cube) {
     var res = 0;
     var mul = 1;
@@ -848,7 +848,7 @@
     }
     return res;
   }
-  
+
   function encodeCP(cube) {
     var permutation = [];
     for (var i = 0; i < 8; ++i) {
@@ -856,15 +856,15 @@
     }
     return PermsAPI.encodeDestructablePerm(permutation);
   }
-  
+
   function encodeCube(cube) {
     return encodeCP(cube)*2187 + encodeCO(cube);
   }
-  
+
   exports.FullHeuristic = FullHeuristic;
   var _basisMovesList;
-  
-  // A Move represents a WCA move on the pocketcube. 
+
+  // A Move represents a WCA move on the pocketcube.
   // A move can occur on the faces U, D, F, B, R, and L. These are the first 6
   // values of the Move type. The next 6 values are U', D', F', B', R', L'. The
   // final six values are U2, D2, F2, B2, R2, L2. Thus, there are a total of 18
@@ -872,20 +872,20 @@
   function Move(number) {
     this.number = number;
   }
-  
+
   // axis returns the number 0, 1, or 2 corresponding to the face. The 0 axis
   // corresponds to L and R. The 1 axis corresponds to U and D. The 2 axis
   // corresponds to F and B.
   Move.prototype.axis = function() {
     return [-1, 1, 1, 2, 2, 0, 0][this.face()];
   };
-  
+
   // face returns the face of the move, which will be in the range [1, 6]
   // corresponding to U, D, F, B, R, and L respectively.
   Move.prototype.face = function() {
     return (this.number % 6) + 1;
   };
-  
+
   // inverse returns the inverse of the move.
   Move.prototype.inverse = function() {
     if (this.number < 6) {
@@ -896,7 +896,7 @@
       return this;
     }
   };
-  
+
   // toString generates a WCA move from this move.
   Move.prototype.toString = function() {
     var faces = 'UDFBRL';
@@ -909,7 +909,7 @@
       return face + "'";
     }
   };
-  
+
   // turns returns the number of turns represented by the move. This may be 1, -1,
   // or 2.
   Move.prototype.turns = function() {
@@ -921,7 +921,7 @@
       return 2;
     }
   };
-  
+
   // allMoves returns all the moves, sequentially.
   function allMoves() {
     var res = [];
@@ -930,18 +930,18 @@
     }
     return res;
   }
-  
+
   // basisMoves returns the moves which are necessary to generate every unrotated
   // state on the cube.
   function basisMoves() {
     return _basisMovesList.slice();
   }
-  
+
   // movesToString generates a WCA string from an array of moves.
   function movesToString(moves) {
     return moves.join(' ');
   }
-  
+
   // parseMove parses a move from a WCA string.
   function parseMove(s) {
     if (s.length === 1) {
@@ -964,7 +964,7 @@
       throw new Error('Invalid move: ' + s);
     }
   }
-  
+
   // parseMoves parses a space-separated list of WCA moves.
   function parseMoves(s) {
     var parts = s.split(' ');
@@ -974,7 +974,7 @@
     }
     return res;
   }
-  
+
   // scrambleMoves generates a random list of basis moves.
   function scrambleMoves(count) {
     // Faces 1, 3, and 5 are U, F, and R respectively.
@@ -992,10 +992,10 @@
     }
     return moves;
   }
-  
+
   // Generate a list of the standard basis moves.
   _basisMovesList = parseMoves("R R' R2 U U' U2 F F' F2");
-  
+
   exports.Move = Move;
   exports.allMoves = allMoves;
   exports.basisMoves = basisMoves;
@@ -1004,7 +1004,7 @@
   exports.parseMoves = parseMoves;
   exports.scrambleMoves = scrambleMoves;
   var randomPerm = includeAPI('perms').randomPerm;
-  
+
   function randomLastLayer() {
     // Three random orientations and a solved corner.
     var orientations = [];
@@ -1012,7 +1012,7 @@
       orientations[i] = Math.floor(Math.random() * 3);
     }
     orientations[3] = 1;
-  
+
     // Find the orientation of the last corner.
     var o = orientations.slice();
     for (var i = 0; i < 4; ++i) {
@@ -1029,7 +1029,7 @@
     } else if (o[3] === 2) {
       orientations[3] = 0;
     }
-  
+
     var cube = new Cube();
     var perm = randomPerm(4);
     var pieces = [2, 3, 7, 6];
@@ -1037,13 +1037,13 @@
       cube.corners[pieces[i]].piece = pieces[perm[i]];
       cube.corners[pieces[i]].orientation = orientations[i];
     }
-  
+
     return cube;
   }
-  
+
   function randomState() {
     var result = new Cube();
-  
+
     // Corner 0 needs to stay solved so that no B, L, or D moves are needed.
     var pieces = randomPerm(7);
     for (var i = 0; i < 7; ++i) {
@@ -1053,10 +1053,10 @@
       result.corners[i].orientation = Math.floor(Math.random() * 3);
     }
     result.fixLastCorner();
-  
+
     return result;
   }
-  
+
   exports.randomLastLayer = randomLastLayer;
   exports.randomState = randomState;
   function depthFirst(cube, heuristic, moves, depth, lastFace, lastLastFace) {
@@ -1069,12 +1069,12 @@
     } else if (heuristic.lookup(cube) > depth) {
       return null;
     }
-  
+
     // Apply all the moves.
     for (var i = 0, len = moves.length; i < len; ++i) {
       var move = moves[i];
       var face = move.face();
-  
+
       // Prevent redundant moves.
       if (face === lastFace) {
         continue;
@@ -1085,21 +1085,21 @@
           continue;
         }
       }
-  
+
       // Generate the new state.
       var newState = cube.copy();
       newState.move(move);
-  
+
       var result = depthFirst(newState, heuristic, moves, depth-1, face,
         lastFace);
       if (result !== null) {
         return [move].concat(result);
       }
     }
-  
+
     return null;
   }
-  
+
   function solve(cube, heuristic, minDepth) {
     for (var depth = minDepth || 0; depth <= 11; ++depth) {
       var solution = depthFirst(cube, heuristic, basisMoves(), depth, 0, 0);
@@ -1109,7 +1109,7 @@
     }
     return null;
   }
-  
+
   exports.solve = solve;
 
 })();
@@ -1140,7 +1140,7 @@
     }
     exports = module.exports;
   }
-  
+
   function includeAPI(name) {
     if ('undefined' !== typeof window) {
       return window.puzzlejs[name];
@@ -1157,7 +1157,7 @@
   function CompactTable(count) {
     this._data = new Uint8Array(count >>> 1);
   }
-  
+
   // fillWith sets every cell in the table to a given 4-bit number.
   CompactTable.prototype.fillWith = function(number) {
     var cell = number | (number << 4);
@@ -1165,22 +1165,22 @@
       this._data[i] = cell;
     }
   };
-  
+
   // get returns the 4-bit number at a given cell index.
   CompactTable.prototype.get = function(idx) {
     // If idx is even, get the lower 4 bits at idx/2, otherwise get the higher 4
     // bits at idx/2.
     return (this._data[idx >>> 1] >>> ((idx & 1) << 2)) & 0xf;
   };
-  
+
   // set sets the 4-bit number at a given cell index.
   CompactTable.prototype.set = function(idx, value) {
     var rawIdx = idx >>> 1;
     var shift = (idx & 1) << 2;
-  
+
     // Zero out the 4-bit field.
     this._data[rawIdx] &= 0xff ^ (0xf << shift);
-  
+
     // Set the 4-bit field.
     this._data[rawIdx] |= (value << shift);
   };
@@ -1188,33 +1188,33 @@
     this.edges = new Edges();
     this.corners = new Corners();
   }
-  
+
   Cube.prototype.copy = function() {
     var res = Object.create(Cube.prototype);
     res.edges = this.edges.copy();
     res.corners = this.corners.copy();
     return res;
   };
-  
+
   Cube.prototype.halfTurn = function(face) {
     this.corners.halfTurn(face);
     this.edges.halfTurn(face);
   };
-  
+
   Cube.prototype.move = function(m) {
     this.corners.move(m);
     this.edges.move(m);
   };
-  
+
   Cube.prototype.quarterTurn = function(face, turns) {
     this.corners.quarterTurn(face, turns);
     this.edges.quarterTurn(face, turns);
   };
-  
+
   Cube.prototype.solved = function() {
     return this.corners.solved() && this.edges.solved();
   };
-  
+
   /**
    * An Edge represents a physical edge of a cube.
    *
@@ -1228,18 +1228,18 @@
     this.piece = piece;
     this.flip = flip;
   }
-  
+
   Edge.prototype.copy = function() {
     return new Edge(this.piece, this.flip);
   };
-  
+
   function Edges() {
     this.edges = [];
     for (var i = 0; i < 12; ++i) {
       this.edges[i] = new Edge(i, false);
     }
   }
-  
+
   Edges.prototype.copy = function() {
     var newEdges = [];
     for (var i = 0; i < 12; ++i) {
@@ -1249,7 +1249,7 @@
     res.edges = newEdges;
     return res;
   };
-  
+
   Edges.prototype.halfTurn = function(face) {
     switch (face) {
     case 1:
@@ -1304,7 +1304,7 @@
       break;
     }
   };
-  
+
   Edges.prototype.move = function(m) {
     if (m.turns() === 2) {
       this.halfTurn(m.face());
@@ -1312,7 +1312,7 @@
       this.quarterTurn(m.face(), m.turns());
     }
   };
-  
+
   Edges.prototype.quarterTurn = function(face, turns) {
     switch (face) {
     case 1:
@@ -1415,7 +1415,7 @@
       break;
     }
   };
-  
+
   Edges.prototype.solved = function() {
     for (var i = 0; i < 11; ++i) {
       var edge = this.edges[i];
@@ -1425,7 +1425,7 @@
     }
     return true;
   };
-  
+
   exports.CubieCorner = Corner;
   exports.CubieCorners = Corners;
   exports.CubieCube = Cube;
@@ -1445,19 +1445,19 @@
   exports.movesToString = movesToString;
   exports.parseMove = parseMove;
   exports.parseMoves = parseMoves;
-  
+
   // Import the permutation API.
   var perms = includeAPI('perms');
-  
+
   // Import the symmetry API.
   var symmetry = includeAPI('symmetry');
   // cancelMoves performs move cancellation on a sequence of moves. The result is
   // returned and the original array is not modified.
   function cancelMoves(moves) {
     var res = moves.slice();
-  
+
     // TODO: remove redundancy like L R L'.
-  
+
     // Loop through each move and make sure it has a different face than the move
     // before it.
     var lastFace = 0;
@@ -1484,26 +1484,26 @@
       }
       lastFace = face;
     }
-  
+
     return res;
   }
-  
+
   function scrambleMoves(len) {
     var axis = -1;
     var moves = allMoves();
     var result = [];
-  
+
     for (var i = 0; i < len; ++i) {
       // Pick a random move
       var moveIdx = Math.floor(Math.random() * moves.length);
       var move = moves[moveIdx];
-  
+
       // Reset the moves and the axis if necessary.
       if (move.axis() !== axis) {
         axis = move.axis();
         moves = allMoves();
       }
-  
+
       // Remove all moves which affect this face to prevent redundant moves.
       for (var j = 0; j < moves.length; ++j) {
         if (moves[j].face() === move.face()) {
@@ -1511,13 +1511,13 @@
           --j;
         }
       }
-  
+
       result[i] = move;
     }
-  
+
     return result;
   }
-  
+
   exports.cancelMoves = cancelMoves;
   exports.scrambleMoves = scrambleMoves;
   // NumberQueue acts as an allocation-free queue for storing numbers.
@@ -1528,12 +1528,12 @@
     this._end = 0;
     this._count = 0;
   }
-  
+
   // empty returns true if and only if the queue contains no numbers.
   NumberQueue.prototype.empty = function() {
     return this._count === 0;
   };
-  
+
   // push adds a 32-bit number to the queue.
   NumberQueue.prototype.push = function(p) {
     if (this._count === this._capacity) {
@@ -1546,7 +1546,7 @@
       this._end = 0;
     }
   }
-  
+
   // shift removes a 32-bit number from the queue and returns it.
   NumberQueue.prototype.shift = function() {
     if (this._count === 0) {
@@ -1565,13 +1565,13 @@
   // corresponds to the physical slot in the X axis cube. A value in this array
   // corresponds to the physical slot in the Y axis cube.
   var xCornerIndices = [1, 3, 0, 2, 5, 7, 4, 6]
-  
+
   // xEdgeIndices are the indexes of the edges on the Y axis cube which correspond
   // to edges on the X axis cube. An index in this array corresponds to the
   // physical slot in the X axis cube. A value in this array corresponds to the
   // physical slot in the Y axis cube.
   var xEdgeIndices = [3, 0, 1, 2, 10, 4, 9, 6, 7, 8, 11, 5]
-  
+
   // xMoveTranslation maps moves from the Y axis phase-1 cube to moves on the X
   // axis cube. The mapping is: F->F, B->B, U->R, D->L, L->U, R->D.
   // For example, doing U on a Y-axis cube is like doing R on the X-axis version
@@ -1579,30 +1579,30 @@
   // This mapping is kind of like doing a "z" rotation before the move.
   var xMoveTranslation = [4, 5, 2, 3, 1, 0, 10, 11, 8, 9, 7, 6, 16, 17, 14, 15,
     13, 12];
-  
+
   // zCornerIndices are like xCornerIndices but for the Z axis cube.
   var zCornerIndices = [2, 3, 6, 7, 0, 1, 4, 5]
-  
+
   // zEdgeIndices are like xEdgeIndices but for the Z axis cube.
   var zEdgeIndices = [2, 11, 8, 10, 3, 1, 0, 5, 6, 4, 9, 7]
-  
+
   // zMoveTranslation is like xMoveTranslation, but it's for doing an "x" rotation
   // before applying a move. The mapping is: R->R, L->L, F->U, B->D, U->B, D->F.
   var zMoveTranslation = [3, 2, 0, 1, 4, 5, 9, 8, 6, 7, 10, 11, 15, 14, 12, 13,
     16, 17];
-  
+
   // These constants store the number of states for each coordinate.
   var PHASE1_CO_COUNT = 2187;
   var PHASE1_EO_COUNT = 2048;
   var PHASE1_SLICE_COUNT = 495;
-  
+
   // These constants store the solved value for each coordinate.
   var PHASE1_SOLVED_CO = 1093;
   var PHASE1_SOLVED_EO = 0;
   var PHASE1_SOLVED_SLICE = 220;
-  
+
   var PHASE1_MOVE_COUNT = 18;
-  
+
   // A Phase1Cube is an efficient way to represent the parts of a cube which
   // matter for the first phase of Kociemba's algorithm.
   // This constructor takes an optional argument which should be a CubieCube if
@@ -1610,15 +1610,15 @@
   function Phase1Cube(cc) {
     if ('undefined' !== typeof cc) {
       var xzCO = encodeXZCO(cc.corners);
-  
+
       this.xCO = xzCO[0];
       this.yCO = encodeCO(cc.corners);
       this.zCO = xzCO[1];
-  
+
       this.yEO = encodeYEO(cc.edges);
       this.zEO = encodeZEO(cc.edges);
       this.xEO = convertYEOToXEO(this.yEO)
-  
+
       var msSlice = encodeMSSlice(cc.edges);
       this.mSlice = msSlice[0];
       this.eSlice = encodeESlice(cc.edges);
@@ -1638,7 +1638,7 @@
       this.sSlice = PHASE1_SOLVED_SLICE;
     }
   }
-  
+
   // anySolved returns true if the phase-1 state is solved along any axis.
   Phase1Cube.prototype.anySolved = function() {
     // I don't use the PHASE1_SOLVED_ globals because accessing global variables
@@ -1652,11 +1652,11 @@
     }
     return false;
   };
-  
+
   // copy returns a copy of the Phase1Cube.
   Phase1Cube.prototype.copy = function() {
     var res = Object.create(Phase1Cube.prototype);
-  
+
     res.xCO = this.xCO;
     res.yCO = this.yCO;
     res.zCO = this.zCO;
@@ -1666,32 +1666,32 @@
     res.mSlice = this.mSlice;
     res.eSlice = this.eSlice;
     res.sSlice = this.sSlice;
-  
+
     return res;
   };
-  
+
   // move applies a move to the Phase1Cube.
   Phase1Cube.prototype.move = function(move, table) {
     var m = move.number;
-  
+
     // Apply the move to the y-axis cube.
     this.yCO = table.co[this.yCO*18 + m];
     this.yEO = table.eo[this.yEO*18 + m];
     this.eSlice = table.slice[this.eSlice*18 + m];
-  
+
     // Apply the move to the z-axis cube.
     var zMove = zMoveTranslation[m];
     this.zCO = table.co[this.zCO*18 + zMove];
     this.zEO = table.eo[this.zEO*18 + zMove];
     this.sSlice = table.slice[this.sSlice*18 + zMove];
-  
+
     // Apply the move to the x-axis cube.
     var xMove = xMoveTranslation[m];
     this.xCO = table.co[this.xCO*18 + xMove];
     this.xEO = table.eo[this.xEO*18 + xMove];
     this.mSlice = table.slice[this.mSlice*18 + xMove];
   };
-  
+
   // set updates this object's fields to reflect a given Phase1Cube.
   Phase1Cube.prototype.set = function(obj) {
     this.xCO = obj.xCO;
@@ -1704,13 +1704,13 @@
     this.eSlice = obj.eSlice;
     this.sSlice = obj.sSlice;
   };
-  
+
   // solved returns an array with three booleans, [x, y, z], which indicates
   // whether any axis is solved for phase-1.
   Phase1Cube.prototype.solved = function() {
     // I don't use the PHASE1_SOLVED_ globals because accessing global variables
     // is relatively inefficient and this is a hot function.
-  
+
     var x = true;
     var y = true;
     var z = true;
@@ -1737,7 +1737,7 @@
     }
     return [x, y, z];
   };
-  
+
   // Phase1Moves is a table containing the necessary data to efficiently perform
   // moves on a Phase1Cube.
   // Note that only one move table is needed for all 3 axes (i.e. all three
@@ -1748,65 +1748,65 @@
     this.slice = new Int16Array(PHASE1_SLICE_COUNT * PHASE1_MOVE_COUNT);
     this.eo = new Int16Array(PHASE1_EO_COUNT * PHASE1_MOVE_COUNT);
     this.co = new Int16Array(PHASE1_CO_COUNT * PHASE1_MOVE_COUNT);
-  
+
     this._generateCO();
     this._generateEO();
     this._generateESlice();
   }
-  
+
   Phase1Moves.prototype._generateCO = function() {
     for (var i = 0, len = this.co.length; i < len; ++i) {
       this.co[i] = -1;
     }
-  
+
     for (var i = 0; i < PHASE1_CO_COUNT; ++i) {
       var corners = decodeCO(i);
       for (var move = 0; move < PHASE1_MOVE_COUNT; ++move) {
         if (this.co[i*PHASE1_MOVE_COUNT + move] >= 0) {
           continue;
         }
-  
+
         // Set the end state in the table.
         var aCase = corners.copy();
         aCase.move(new Move(move));
         var endState = encodeCO(aCase);
         this.co[i*PHASE1_MOVE_COUNT + move] = endState;
-  
+
         // Set the inverse in the table.
         this.co[endState*PHASE1_MOVE_COUNT + new Move(move).inverse().number] = i;
       }
     }
   };
-  
+
   Phase1Moves.prototype._generateEO = function() {
     for (var i = 0, len = this.eo.length; i < len; ++i) {
       this.eo[i] = -1;
     }
-  
+
     for (var i = 0; i < PHASE1_EO_COUNT; ++i) {
       var edges = decodeEO(i);
       for (var move = 0; move < PHASE1_MOVE_COUNT; ++move) {
         if (this.eo[i*PHASE1_MOVE_COUNT + move] >= 0) {
           continue;
         }
-  
+
         // Set the end state in the table.
         var aCase = edges.copy();
         aCase.move(new Move(move));
         var endState = encodeYEO(aCase);
         this.eo[i*PHASE1_MOVE_COUNT + move] = endState;
-  
+
         // Set the inverse in the table.
         this.eo[endState*PHASE1_MOVE_COUNT + new Move(move).inverse().number] = i;
       }
     }
   };
-  
+
   Phase1Moves.prototype._generateESlice = function() {
     for (var i = 0, len = this.slice.length; i < len; ++i) {
       this.slice[i] = -1;
     }
-  
+
     // Generate the E slice cases by looping through all the possible ways to
     // choose 4 elements from a set of 12.
     var sliceCase = 0;
@@ -1824,13 +1824,13 @@
               if (this.slice[sliceCase*PHASE1_MOVE_COUNT + move] >= 0) {
                 continue;
               }
-  
+
               // Set the end state in the table.
               var aCase = state.copy();
               aCase.move(new Move(move));
               var encoded = encodeBogusSlice(aCase);
               this.slice[sliceCase*PHASE1_MOVE_COUNT + move] = encoded;
-  
+
               // Set the inverse in the table.
               var invMove = new Move(move).inverse().number;
               this.slice[encoded*PHASE1_MOVE_COUNT + invMove] =
@@ -1842,11 +1842,11 @@
       }
     }
   };
-  
+
   // convertYEOToXEO converts a y-axis EO case to the x axis.
   function convertYEOToXEO(yEO) {
     var res = 0;
-  
+
     // Translate the EO bitmap, noting that xEdgeIndices[10] is 11 and is thus
     // never set in the FB bitmap.
     var parity = 0;
@@ -1857,29 +1857,29 @@
         parity ^= 1;
       }
     }
-  
+
     // If the last thing in the translated bitmap would be a 1, flip the parity.
     if ((yEO & (1 << xEdgeIndices[11])) !== 0) {
       parity ^= 1;
     }
-  
+
     // If there is parity, then the missing element (i.e. #10) is 1.
     res |= parity << 10;
-  
+
     return res;
   }
-  
+
   // decodeCO generates Corners which represent a given CO case.
   function decodeCO(co) {
     var c = new Corners();
-  
+
     // Compute the orientations of the first 7 corners.
     var scaler = 1;
     for (var x = 0; x < 7; ++x) {
       c.corners[x].orientation = Math.floor(co / scaler) % 3;
       scaler *= 3;
     }
-  
+
     // Compute the last corner's orientation.
     // The way this works is based on the fact that a sune combo which twists two
     // adjacent corners is all that is necessary to generate any corner
@@ -1909,10 +1909,10 @@
     } else if (orientations[7] === 2) {
       c.corners[7].orientation = 0;
     }
-  
+
     return c;
   }
-  
+
   // decodeEO generates Edges which represent a given EO case.
   function decodeEO(eo) {
     var edges = new Edges();
@@ -1926,7 +1926,7 @@
     edges.edges[11].flip = parity;
     return edges;
   }
-  
+
   // encodeBogusSlice encodes a slice permutation case, treating pieces with
   // values of "-1" as E slice edges.
   function encodeBogusSlice(edges) {
@@ -1936,7 +1936,7 @@
     }
     return perms.encodeChoose(list);
   }
-  
+
   // encodeCO encodes the CO case of a given set of Corners.
   function encodeCO(c) {
     var res = 0;
@@ -1947,7 +1947,7 @@
     }
     return res;
   }
-  
+
   // encodeESlice encodes the E slice of a given set of Edges.
   function encodeESlice(edges) {
     var list = [];
@@ -1961,7 +1961,7 @@
     }
     return perms.encodeChoose(list);
   }
-  
+
   // encodeMSSlice encodes the M and S slices of Edges.
   function encodeMSSlice(edges) {
     var mChoice = [];
@@ -1986,18 +1986,18 @@
     }
     return [perms.encodeChoose(mChoice), perms.encodeChoose(sChoice)];
   }
-  
+
   // encodeXZCO encodes the CO of Corners on the X and Z axes.
   function encodeXZCO(corners) {
     var x = [];
     var z = [];
     var xVal = 0;
     var zVal = 0;
-  
+
     // For each corner, find the direction of the x and z stickers.
     for (var i = 0; i < 8; ++i) {
       var corner = corners.corners[i];
-  
+
       // If the corner was in its original slot, here's what the directions
       // would be.
       var o = corner.orientation;
@@ -2011,7 +2011,7 @@
         x[i] = 1;
         z[i] = 0;
       }
-  
+
       // If it takes an odd number of quarter turns to move the corner back to
       // its original slot, swap x and z.
       var d = (corner.piece ^ i) & 7;
@@ -2021,7 +2021,7 @@
         z[i] = oldX;
       }
     }
-  
+
     // Add the information together to generate the final values.
     var scaler = 1;
     for (var i = 0; i < 7; ++i) {
@@ -2032,7 +2032,7 @@
         xDirection = 1;
       }
       xVal += scaler * xDirection;
-  
+
       var zDirection = z[zCornerIndices[i]];
       if (zDirection === 1) {
         zDirection = 2;
@@ -2040,13 +2040,13 @@
         zDirection = 1;
       }
       zVal += scaler * zDirection;
-  
+
       scaler *= 3;
     }
-  
+
     return [xVal, zVal];
   }
-  
+
   // encodeYEO encodes the EO case of a given set of Edges.
   function encodeYEO(e) {
     var res = 0;
@@ -2057,7 +2057,7 @@
     }
     return res;
   }
-  
+
   // encodeZEO encodes the EO cases for the z-axis cube.
   function encodeZEO(edges) {
     var res = 0;
@@ -2067,13 +2067,13 @@
       var flip = edge.flip;
       var p = edge.piece
       if (p === 0 || p === 2 || p === 6 || p === 8) {
-        // This is an M slice edge piece, so it changes orientation if it
+        // This is an M slice edge piece, so it changes orientation if i
         // was on the S slice or the E slice.
         if (idx !== 0 && idx !== 2 && idx !== 6 && idx !== 8) {
           flip = !flip;
         }
       } else {
-        // This is an E or S slice edge, so it changes orientation if it
+        // This is an E or S slice edge, so it changes orientation if i
         // was on the M slice.
         if (idx === 0 || idx === 2 || idx === 6 || idx === 8) {
           flip = !flip
@@ -2085,27 +2085,27 @@
     }
     return res;
   }
-  
+
   exports.Phase1Cube = Phase1Cube;
   exports.Phase1Moves = Phase1Moves;
   // PHASE1_CO_EO_DEPTH is the maximum depth which will be found in the COEO
   // pruning table. This is not as high as it could be; it is optimized to avoid
   // searching the entire space while still searching most of it.
   var PHASE1_CO_EO_DEPTH = 8;
-  
+
   // PHASE1_EO_SLICE_DEPTH is the maximum depth which will be found in the EOSLICE
   // pruning table. See PHASE1_CO_EO_DEPTH for more.
   var PHASE1_EO_SLICE_DEPTH = 8;
-  
+
   // Phase1Heuristic stores the data needed to effectively prune the search for a
   // solution for phase-1.
   function Phase1Heuristic(moves) {
     this.coEO = new CompactTable(PHASE1_CO_COUNT * PHASE1_EO_COUNT);
-    this.eoSlice = new CompactTable(PHASE1_SLICE_COUNT * PHASE1_EO_COUNT);  
+    this.eoSlice = new CompactTable(PHASE1_SLICE_COUNT * PHASE1_EO_COUNT);
     this._computeCOEO(moves);
     this._computeEOSlice(moves);
   }
-  
+
   // lowerBound returns the minimum number of moves needed to solve at least one
   // phase-1 axis.
   Phase1Heuristic.prototype.lowerBound = function(c) {
@@ -2115,7 +2115,7 @@
     var eo0 = this.coEO.get(c.xEO | (c.xCO << 11));
     var eo1 = this.coEO.get(c.yEO | (c.yCO << 11));
     var eo2 = this.coEO.get(c.zEO | (c.zCO << 11));
-  
+
     // Return the least of the three heuristic values.
     var a = Math.max(slice0, eo0);
     var b = Math.max(slice1, eo1);
@@ -2125,13 +2125,13 @@
     } else {
       return Math.min(a, c);
     }
-  
-    // NOTE: using Math.min() with three arguments might slow down v8 since it
+
+    // NOTE: using Math.min() with three arguments might slow down v8 since i
     // doesn't like polymorphic functions.
     // return Math.min(Math.max(slice0, eo0), Math.max(slice1, eo1),
     //   Math.max(slice2, eo2));
   };
-  
+
   // _computeCOEO generates the CO+EO table.
   Phase1Heuristic.prototype._computeCOEO = function(moves) {
     // The number 549711 was found emperically and does not seem to belong in a
@@ -2140,14 +2140,14 @@
     makePhase1EOHeuristic(549711, PHASE1_SOLVED_CO, PHASE1_CO_EO_DEPTH,
       this.coEO, moves.eo, moves.co);
   };
-  
+
   // _computeEOSlice generates the EOSlice table.
   Phase1Heuristic.prototype._computeEOSlice = function(moves) {
     // For info on the number 238263, see the comment in _computeCOEO.
     makePhase1EOHeuristic(238263, PHASE1_SOLVED_SLICE, PHASE1_EO_SLICE_DEPTH,
       this.eoSlice, moves.eo, moves.slice);
   };
-  
+
   // makePhase1Heuristic generates a heuristic which is composed of edge
   // orientations combined with some other coordinate.
   function makePhase1EOHeuristic(queueCap, otherStart, maxDepth, table, eoMoves,
@@ -2155,19 +2155,19 @@
     // Some info on bitfields might help you:
     // A hash is computed as: EO | (otherCoord << 11).
     // A search node is computed as: depth | (hash << 4).
-  
+
     table.fillWith(maxDepth);
     table.set(otherStart << 11, 0);
-  
+
     var queue = new NumberQueue(queueCap);
     queue.push(otherStart << 15);
-  
+
     while (!queue.empty()) {
       var node = queue.shift();
       var depth = node & 0xf;
       var eo = (node >>> 4) & 0x7ff;
       var other = (node >>> 15);
-  
+
       for (var move = 0; move < 18; ++move) {
         var newEO = eoMoves[eo*18 + move];
         var newOther = otherMoves[other*18 + move];
@@ -2181,7 +2181,7 @@
       }
     }
   }
-  
+
   exports.Phase1Heuristic = Phase1Heuristic;
   // A Solver keeps track of context for a depth-first search.
   function Solver(heuristic, moves, cb, deadline, depth) {
@@ -2190,19 +2190,19 @@
     this.cb = cb;
     this.deadline = deadline;
     this.depth = depth;
-  
+
     // this.basis caches 18 Move objects to avoid allocation.
     this.basis = [];
     for (var i = 0; i < 18; ++i) {
       this.basis[i] = new Move(i);
     }
-  
+
     // this.preAllocCubes caches a cube per level of depth in the search.
     this.preAllocCubes = [];
     for (var i = 0; i < depth; ++i) {
       this.preAllocCubes[i] = new Phase1Cube();
     }
-  
+
     // this.solution is used to track the current solution; using this allows us
     // to avoid memory allocation in some browsers.
     this.solution = [];
@@ -2210,7 +2210,7 @@
       this.solution[i] = new Move(0);
     }
   }
-  
+
   // deepen increases the depth of this solver by 1.
   Solver.prototype.deepen = function() {
     var i = this.depth;
@@ -2218,16 +2218,16 @@
     this.preAllocCubes[i] = new Phase1Cube();
     this.solution[i] = new Move(0);
   };
-  
+
   // solve finds solutions for the cube.
   Solver.prototype.solve = function(cube) {
     return this._search(cube, 0, 0, -1);
   }
-  
+
   Solver.prototype._expired = function() {
     return new Date().getTime() > this.deadline;
   };
-  
+
   Solver.prototype._search = function(cube, depth, lastFace, lastAxis) {
     if (depth === this.depth) {
       if (cube.anySolved()) {
@@ -2240,9 +2240,9 @@
     } else if (this.heuristic.lowerBound(cube) > this.depth - depth) {
       return true;
     }
-  
+
     var newCube = this.preAllocCubes[depth];
-  
+
     // The last move should not be a double turn since that would preserve the
     // phase-1 state.
     var moveCount = (depth === this.depth - 1 ? 12 : 18);
@@ -2256,28 +2256,28 @@
         // be a solution with L R, but not one with R L).
         continue;
       }
-  
+
       // Get the cube which results from applying the given move.
       var move = this.basis[i];
       newCube.set(cube);
       newCube.move(move, this.moves);
-  
+
       // Recurse one level deeper, setting the move in the solution buffer.
       this.solution[depth] = move;
       if (!this._search(newCube, depth+1, face, axis)) {
         return false;
       }
-  
-      // this._expired allocates memory and thus consumes time. Luckily, short
+
+      // this._expired allocates memory and thus consumes time. Luckily, shor
       // circuit evaluation makes this a three-liner.
       if (this._depth - depth >= 7 && this._expired()) {
         return false;
       }
     }
-  
+
     return true;
   };
-  
+
   // solvePhase1 uses iterative deepening to solve the cube.
   // The cb argument is a callback which receives two arguments, a solution and a
   // Phase1Cube, for each solution. If the callback returns true, the search will
@@ -2296,7 +2296,7 @@
       ++depth;
     }
   }
-  
+
   exports.solvePhase1 = solvePhase1;
   // Phase2Coords manages all the coordinates needed for the phase-2 solver.
   function Phase2Coords() {
@@ -2306,18 +2306,18 @@
     this.edges = new Phase2EdgeCoord(perm8);
     this.slice = new Phase2SliceCoord(perms.allPerms(4));
   }
-  
+
   // A Phase2Cube represents the state of a cube that is important to the phase-2
   // solver.
   function Phase2Cube() {
     // The solved choose coordinate represents 00110011
     this.chooseCoord = 60;
-  
+
     this.cornerCoord = 0;
     this.edgeCoord = 0;
     this.sliceCoord = 0;
   }
-  
+
   // move applies a phase-2 move (a number in the range [0, 10)) to the cube given
   // a pre-computed Phase2Coords table.
   Phase2Cube.prototype.move = function(m, coords) {
@@ -2326,7 +2326,7 @@
     this.edgeCoord = coords.edges.move(this.edgeCoord, m);
     this.sliceCoord = coords.slice.move(this.sliceCoord, m);
   };
-  
+
   // set updates this cube's coordinates to match the given cube.
   Phase2Cube.prototype.set = function(c) {
     this.chooseCoord = c.chooseCoord;
@@ -2334,13 +2334,13 @@
     this.edgeCoord = c.edgeCoord;
     this.sliceCoord = c.sliceCoord;
   };
-  
+
   // solved returns true if the Phase2Cube is solved.
   Phase2Cube.prototype.solved = function() {
     return (this.cornerCoord >>> 4) === 0 && (this.edgeCoord >>> 4) === 0 &&
       this.sliceCoord === 0;
   };
-  
+
   // convertCubieToPhase2 converts a Cube to a Phase2Cube on a given axis. This
   // requires a Phase2Coords table to work.
   function convertCubieToPhase2(cube, axis, coords) {
@@ -2365,7 +2365,7 @@
     res.edgeCoord = coords.edges.rawToSym(edgePerm);
     return res;
   }
-  
+
   function encodeESlicePerm(e) {
     var perm = [];
     for (var i = 0; i < 4; ++i) {
@@ -2378,7 +2378,7 @@
     }
     return perms.encodeDestructablePerm(perm);
   }
-  
+
   function encodeFBEdges(e) {
     var perm = [];
     for (var i = 0; i < 8; ++i) {
@@ -2391,7 +2391,7 @@
     }
     return perms.encodeDestructablePerm(perm);
   }
-  
+
   function encodeMSlicePerm(e) {
     var perm = [];
     for (var i = 0; i < 4; ++i) {
@@ -2404,7 +2404,7 @@
     }
     return perms.encodeDestructablePerm(perm);
   }
-  
+
   function encodeRLEdges(e) {
     var perm = [];
     for (var i = 0; i < 8; ++i) {
@@ -2417,7 +2417,7 @@
     }
     return perms.encodeDestructablePerm(perm);
   }
-  
+
   function encodeSSlicePerm(e) {
     var perm = [];
     for (var i = 0; i < 4; ++i) {
@@ -2430,7 +2430,7 @@
     }
     return perms.encodeDestructablePerm(perm);
   }
-  
+
   function encodeUDEdges(e) {
     var perm = [];
     for (var i = 0; i < 8; ++i) {
@@ -2443,7 +2443,7 @@
     }
     return perms.encodeDestructablePerm(perm);
   }
-  
+
   function encodeXCornerPerm(c) {
     var perm = [];
     for (var i = 0; i < 8; ++i) {
@@ -2453,7 +2453,7 @@
     }
     return perms.encodeDestructablePerm(perm);
   }
-  
+
   function encodeYCornerPerm(c) {
     var perm = [];
     for (var i = 0; i < 8; ++i) {
@@ -2461,7 +2461,7 @@
     }
     return perms.encodeDestructablePerm(perm);
   }
-  
+
   function encodeZCornerPerm(c) {
     var perm = [];
     for (var i = 0; i < 8; ++i) {
@@ -2471,22 +2471,22 @@
     }
     return perms.encodeDestructablePerm(perm);
   }
-  
+
   // p2MoveAxis returns the axis of a phase-2 move.
   function p2MoveAxis(m) {
     return [2, 2, 0, 0, 1, 1, 1, 1, 1, 1][m];
   }
-  
+
   // p2MoveFace returns the face of a phase-2 move.
   function p2MoveFace(m) {
     return [3, 4, 5, 6, 1, 1, 1, 2, 2, 2][m];
   }
-  
+
   // p2MoveInverse finds the inverse of a phase-2 move.
   function p2MoveInverse(m) {
     return [0, 1, 2, 3, 5, 4, 6, 8, 7, 9][m];
   }
-  
+
   // p2MoveMove returns the Move for a phase-2 move.
   // Along the Y axis (axis 1), the phase-2 moves are F2 B2 R2 L2 U U' U2 D D' D2
   // in that order.
@@ -2498,7 +2498,7 @@
     ][axis][m];
     return new Move(num);
   }
-  
+
   exports.Phase2Coords = Phase2Coords;
   exports.Phase2Cube = Phase2Cube;
   exports.convertCubieToPhase2 = convertCubieToPhase2;
@@ -2508,7 +2508,7 @@
   var P2_CORNERS_SLICE_MAX = 12;
   var P2_EDGES_CHOOSE_MAX = 10;
   var P2_EDGES_SLICE_MAX = 9;
-  
+
   // Phase2Heuristic estimates the lower bound for the number of moves to solve a
   // Phase2Cube.
   function Phase2Heuristic(coords) {
@@ -2516,21 +2516,21 @@
     // E slice edges for each case. The cases are encoded as:
     // CornerSym*24 + SlicePerm.
     this.cornersSlice = new CompactTable(2768 * 24);
-  
+
     // This stores the number of moves needed to solve the edges and to bring all
     // the top-layer edges to the top layer.
     this.edgesChoose = new CompactTable(2768 * 70);
-  
+
     // This stores the number of moves needed to solve both the edges and the E
     // slice edges for each case. The cases are encoded as:
     // EdgeSym*24 + SlicePerm.
     this.edgesSlice = new CompactTable(2768 * 24);
-  
+
     this._generateCornersSlice(coords);
     this._generateEdgesChoose(coords);
     this._generateEdgesSlice(coords);
   }
-  
+
   // lowerBound returns a lower bound for the number of moves to solve a given
   // Phase2Cube. This requires a Phase2Coords table.
   Phase2Heuristic.prototype.lowerBound = function(c, coords) {
@@ -2540,18 +2540,18 @@
     if (cMoves >= P2_EDGES_CHOOSE_MAX && cMoves >= P2_EDGES_SLICE_MAX) {
       return cMoves;
     }
-  
+
     // Figure out the edge+choose heuristic coordinate.
     var ecHash = hashEdgesChoose(c.edgeCoord, c.chooseCoord, coords);
     var ecMoves = this.edgesChoose.get(ecHash);
     if (ecMoves > cMoves && ecMoves >= P2_EDGES_SLICE_MAX) {
       return ecMoves;
     }
-  
+
     // Figure out the edge+slice heuristic coordinate.
     var eHash = hashEdgesSlice(c.edgeCoord, c.sliceCoord, coords);
     var eMoves = this.edgesSlice.get(eHash);
-  
+
     // Don't call Math.max because it's a slight amount of extra overhead and this
     // function's performance is critical.
     if (ecMoves > cMoves) {
@@ -2568,20 +2568,20 @@
       }
     }
   };
-  
+
   Phase2Heuristic.prototype._generateCornersSlice = function(coords) {
     this.cornersSlice.fillWith(P2_CORNERS_SLICE_MAX);
-  
+
     // The arrangement of bits in the queue's nodes are as follows:
     // (LSB) (4 bits: depth) (5 bits: slice) (12 bits: corners) (MSB)
-  
+
     // Setup the queue to have the start node.
     var queue = new NumberQueue(13590);
     queue.push(0);
-  
+
     // We have explored the start node. It's depth is zero (obviously).
     this.cornersSlice.set(0, 0);
-  
+
     // While there's still stuff in the queue, do the search.
     while (!queue.empty()) {
       // Shift a node and extract its bitfields.
@@ -2589,7 +2589,7 @@
       var depth = (node & 0xf);
       var slice = (node >>> 4) & 0x1f;
       var corners = (node >>> 9);
-  
+
       // Apply all 10 moves to the node.
       for (var m = 0; m < 10; ++m) {
         var newSlice = coords.slice.move(slice, m);
@@ -2597,7 +2597,7 @@
         var symSlice = coords.slice.invConjSym(newCorners & 0xf, newSlice);
         var symCorners = (newCorners >>> 4);
         hash = symSlice + symCorners*24;
-  
+
         // If this node has not been visited, push it to the queue.
         if (this.cornersSlice.get(hash) === P2_CORNERS_SLICE_MAX) {
           this.cornersSlice.set(hash, depth + 1);
@@ -2608,27 +2608,27 @@
       }
     }
   };
-  
+
   Phase2Heuristic.prototype._generateEdgesChoose = function(coords) {
     this.edgesChoose.fillWith(P2_EDGES_CHOOSE_MAX);
-  
+
     // The arrangement of bits in the queue's nodes are as follows:
     // (LSB) (4 bits: depth) (7 bits: choose) (12 bits: edges) (MSB)
-  
+
     // Setup the queue to have the start node.
     var queue = new NumberQueue(46680);
     queue.push(60 << 4);
-  
+
     // We have visited the first node.
     this.edgesChoose.set(60, 0);
-  
+
     while (!queue.empty()) {
       // Shift a node and extract its bitfields.
       var node = queue.shift();
       var depth = (node & 0xf);
       var choose = (node >>> 4) & 0x7f;
       var edges = (node >>> 11);
-  
+
       // Apply all 10 moves to the node.
       for (var m = 0; m < 10; ++m) {
         var newChoose = coords.choose.move(choose, m);
@@ -2636,7 +2636,7 @@
         var symChoose = coords.choose.invConjSym(newEdges & 0xf, newChoose);
         var symEdges = (newEdges >>> 4);
         hash = symChoose + symEdges*70;
-  
+
         // If this node has not been visited, push it to the queue.
         if (this.edgesChoose.get(hash) === P2_EDGES_CHOOSE_MAX) {
           this.edgesChoose.set(hash, depth + 1);
@@ -2647,27 +2647,27 @@
       }
     }
   };
-  
+
   Phase2Heuristic.prototype._generateEdgesSlice = function(coords) {
     this.edgesSlice.fillWith(P2_EDGES_SLICE_MAX);
-  
+
     // The arrangement of bits in the queue's nodes are as follows:
     // (LSB) (4 bits: depth) (5 bits: slice) (12 bits: edges) (MSB)
-  
+
     // Setup the queue to have the start node.
     var queue = new NumberQueue(19350);
     queue.push(0);
-  
+
     // We have visited the first node.
     this.edgesSlice.set(0, 0);
-  
+
     while (!queue.empty()) {
       // Shift a node and extract its bitfields.
       var node = queue.shift();
       var depth = (node & 0xf);
       var slice = (node >>> 4) & 0x1f;
       var edges = (node >>> 9);
-  
+
       // Apply all 10 moves to the node.
       for (var m = 0; m < 10; ++m) {
         var newSlice = coords.slice.move(slice, m);
@@ -2675,7 +2675,7 @@
         var symSlice = coords.slice.invConjSym(newEdges & 0xf, newSlice);
         var symEdges = (newEdges >>> 4);
         hash = symSlice + symEdges*24;
-  
+
         // If this node has not been visited, push it to the queue.
         if (this.edgesSlice.get(hash) === P2_EDGES_SLICE_MAX) {
           this.edgesSlice.set(hash, depth + 1);
@@ -2686,25 +2686,25 @@
       }
     }
   };
-  
+
   function hashCornersSlice(corners, slice, coords) {
     var symSlice = coords.slice.invConjSym(corners & 0xf, slice);
     var symCorners = (corners >>> 4);
     return symSlice + symCorners*24;
   }
-  
+
   function hashEdgesChoose(edges, choose, coords) {
     var symChoose = coords.choose.invConjSym(edges & 0xf, choose);
     var symEdges = (edges >>> 4);
     return symChoose + symEdges*70;
   }
-  
+
   function hashEdgesSlice(edges, slice, coords) {
     var symSlice = coords.slice.invConjSym(edges & 0xf, slice);
     var symEdges = (edges >>> 4);
     return symSlice + symEdges*24;
   }
-  
+
   exports.Phase2Heuristic = Phase2Heuristic;
   // Phase2ChooseCoord manages the coordinate for the UD corner "choice". This
   // coordinate keeps track of which corners belong on the bottom layer or the top
@@ -2713,16 +2713,16 @@
     // this._invSymmetries stores every case conjugated by every symmetry. The
     // value this._invSymmetries[raw*16 + sym] gives sym*raw*sym'.
     this._invSymmetries = new Uint8Array(70 * 16);
-  
+
     // this._moves stores every move applied to every configuration. A given move
     // can be applied to a raw state using this.moves[raw*10 + move].
     this._moves = new Uint8Array(70 * 10);
-  
+
     var cases = this._cases();
     this._generateMoves(cases);
     this._generateInvSymmetries(cases);
   }
-  
+
   // convertRawCorners converts a raw corner coordinate into a Phase2SliceCoord.
   Phase2ChooseCoord.prototype.convertRawCorners = function(rawCoord) {
     // NOTE: this could be made faster with a conversion table. This may be an
@@ -2730,18 +2730,18 @@
     var permutation = perms.decodePerm(rawCoord, 8);
     return cornerPermToChoose(permutation);
   };
-  
+
   // invConjSym conjugates a coordinate with the inverse of a symmetry, returning
   // sym*coord*sym'.
   Phase2ChooseCoord.prototype.invConjSym = function(sym, coord) {
     return this._invSymmetries[(coord << 4) | sym];
   }
-  
+
   // move applies a move to the choose case.
   Phase2ChooseCoord.prototype.move = function(coord, move) {
     return this._moves[coord*10 + move];
   };
-  
+
   // _cases creates a list of all 70 choices represented as arrays and returns it.
   Phase2ChooseCoord.prototype._cases = function() {
     var res = [];
@@ -2762,13 +2762,13 @@
     }
     return res;
   };
-  
+
   // _generateInvSymmetries generates the symmetries for every case.
   Phase2ChooseCoord.prototype._generateInvSymmetries = function(cases) {
     for (var i = 0; i < 70; ++i) {
       // The identity symmetry does not change the case.
       this._invSymmetries[i << 4] = i;
-  
+
       var cornerPerm = cornerPermFromChoose(cases[i]);
       for (var sym = 1; sym < 0x10; ++sym) {
         var newPerm = p2CornerSymmetryConj(symmetry.udSymmetryInverse(sym),
@@ -2777,29 +2777,29 @@
       }
     }
   };
-  
+
   // _generateMoves generates the moves for every case.
   Phase2ChooseCoord.prototype._generateMoves = function(cases) {
     for (var i = 0, len = 70*10; i < len; ++i) {
       this._moves[i] = 0xff;
     }
-  
+
     for (var i = 0; i < 70; ++i) {
       var choose = cases[i];
       for (var move = 0; move < 10; ++move) {
         if (this._moves[i*10 + move] !== 0xff) {
           continue;
         }
-  
+
         var appliedCase = moveYCornerChoose(choose, move);
         this._moves[i*10 + move] = appliedCase;
-  
+
         // Store the inverse of the move to avoid extra moveYCornerChoose calls.
         this._moves[appliedCase*10 + p2MoveInverse(move)] = i;
       }
     }
   };
-  
+
   // Phase2SliceCoord manages the M slice coordinate for the phase-2 solver. This
   // coordinate is very small (only 24 permutations), so this object is very
   // lightweight.
@@ -2808,26 +2808,26 @@
     // symmetries to a slice coordinate. The value
     // this._invSymmetries[raw*16 + sym] is equal to sym*raw*sym'.
     this._invSymmetries = new Uint8Array(24 * 16);
-  
+
     // this._moves stores every move applied to every configuration. A given move
     // can be applied to a raw state using this._moves[raw*10 + move].
     this._moves = new Uint8Array(24 * 10);
-  
+
     this._generateMoves(perm4);
     this._generateSymmetries(perm4);
   }
-  
+
   // invConjSym conjugates a coordinate with the inverse of a symmetry, returning
   // sym*coord*sym'.
   Phase2SliceCoord.prototype.invConjSym = function(sym, coord) {
     return this._invSymmetries[(coord << 4) | sym];
   };
-  
+
   // move applies a move to the slice.
   Phase2SliceCoord.prototype.move = function(coord, move) {
     return this._moves[coord*10 + move];
   };
-  
+
   // _generateMoves generates the move table for the slice.
   Phase2SliceCoord.prototype._generateMoves = function(perm4) {
     for (var i = 0; i < 24; ++i) {
@@ -2838,7 +2838,7 @@
       }
     }
   };
-  
+
   // _generateSymmetries generates the table for applying symmetries to a given
   // coordinate.
   Phase2SliceCoord.prototype._generateSymmetries = function(perm4) {
@@ -2851,7 +2851,7 @@
       }
     }
   };
-  
+
   // cornerPermFromChoose generates a corner permutation that represents the given
   // choose array for top/bottom corners. A true in the choose array indicates a
   // top-layer corner.
@@ -2870,7 +2870,7 @@
     }
     return cornerPerm;
   }
-  
+
   // cornerPermToChoose turns a corner permutation into a choose array, encodes
   // it, and returns the encoded choose.
   function cornerPermToChoose(perm) {
@@ -2880,7 +2880,7 @@
     }
     return perms.encodeChoose(choose);
   }
-  
+
   // moveESlicePerm applies a move to a permutation which represents the E slice
   // edges. This returns a perfect hash of the result and does not modify the
   // original permutation.
@@ -2912,9 +2912,9 @@
     }
     return perms.encodeDestructablePerm(p);
   }
-  
+
   // moveYCornerChoose applies a phase-2 move to a given corner choice. It then
-  // then hashes the result and returns said hash. The original permutation is not
+  // then hashes the result and returns said hash. The original permutation is no
   // modified.
   function moveYCornerChoose(choose, move) {
     // NOTE: this code was generated by translating Go code to JavaScript.
@@ -3006,31 +3006,31 @@
     }
     return perms.encodeChoose(p);
   }
-  
+
   // p2SliceSymmetryConj conjugates a phase-2 slice permutation case with a UD
   // symmetry. The result, sym'*array*sym, is returned.
   function p2SliceSymmetryConj(sym, array) {
     // Apply sym to the identity permutation.
     var result = [0, 1, 2, 3];
     p2SliceSymmetryPermute(sym, result);
-  
+
     // Apply array to get array*sym.
     perms.applyPerm(result, array);
-  
+
     // Apply sym' to get sym'*array*sym.
     p2SliceSymmetryPermute(symmetry.udSymmetryInverse(sym), result);
-  
+
     return result;
   }
-  
+
   // p2SliceSymmetryPermute applies a UD symmetry to a given permutation of 4
   // elements which represent slice edge pieces on a phase-2 cube.
   function p2SliceSymmetryPermute(sym, array) {
     var lrFlip = symmetry.udSymmetryLRFlip(sym);
-  
+
     // NOTE: the edges in the E slice are ordered: FR, FL, BR, BL. This is not a
     // direct ring around the cube, so we have to do permutations manually.
-  
+
     // Apply whatever y rotation we need to. Unfortunately, we can't use the nice
     // permute4...() functions because the slice array isn't ordered in a ring.
     var yRot = symmetry.udSymmetryY(sym);
@@ -3049,7 +3049,7 @@
     } else if (yRot === 2) {
       // y^2 is LRflip*FBflip.
       lrFlip = !lrFlip;
-  
+
       // Perform an FBflip.
       var temp = array[0];
       array[0] = array[2];
@@ -3058,7 +3058,7 @@
       array[1] = array[3];
       array[3] = temp;
     }
-  
+
     if (lrFlip) {
       var temp = array[0];
       array[0] = array[1];
@@ -3067,10 +3067,10 @@
       array[2] = array[3];
       array[3] = temp;
     }
-  
+
     // NOTE: a UD flip has no effect on the E slice.
   }
-  
+
   exports.Phase2ChooseCoord = Phase2ChooseCoord;
   exports.Phase2SliceCoord = Phase2SliceCoord;
   exports.p2SliceSymmetryConj = p2SliceSymmetryPermute;
@@ -3080,19 +3080,19 @@
     this.heuristic = heuristic;
     this.coords = coords;
     this.deadline = deadline;
-  
+
     this.depth = 0;
     this.cubes = [];
-  
+
     this.nodesSinceDate = 0;
   }
-  
+
   // deepen prepares this solver for a deeper search.
   Phase2Solver.prototype.deepen = function() {
     this.cubes[this.depth] = new Phase2Cube();
     this.depth++;
   };
-  
+
   // solve runs a search at the current depth.
   Phase2Solver.prototype.solve = function(cube) {
     try {
@@ -3104,19 +3104,19 @@
       return null;
     }
   };
-  
+
   Phase2Solver.prototype._checkExpired = function() {
     if (new Date().getTime() > this.deadline) {
       throw 'solve timed out';
     }
   };
-  
+
   Phase2Solver.prototype._search = function(cube, depth, lastFace, lastAxis) {
     if (++this.nodesSinceDate === 500000) {
       this.nodesSinceDate = 0;
       this._checkExpired();
     }
-  
+
     if (depth === this.depth) {
       if (cube.solved()) {
         return [];
@@ -3125,7 +3125,7 @@
     } else if (this.heuristic.lowerBound(cube, this.coords) > this.depth-depth) {
       return null;
     }
-  
+
     var newCube = this.cubes[depth];
     for (var i = 0; i < 10; ++i) {
       var face = p2MoveFace(i);
@@ -3138,20 +3138,20 @@
         // the same axis.
         continue;
       }
-  
+
       newCube.set(cube);
       newCube.move(i, this.coords);
-  
+
       var res = this._search(newCube, depth+1, face, axis);
       if (res !== null) {
         res.splice(0, 0, i);
         return res;
       }
     }
-  
+
     return null;
   };
-  
+
   // solvePhase2 finds a solution to a Phase2Cube and returns it or returns null
   // if no solution was found (either because no solution exists or because of a
   // timeout).
@@ -3168,7 +3168,7 @@
     }
     return null;
   }
-  
+
   exports.solvePhase2 = solvePhase2;
   // moveSymInvConjugates[m][s] gives s*m*s'.
   var moveSymInvConjugates = [
@@ -3183,7 +3183,7 @@
     [8, 8, 8, 8, 7, 7, 7, 7, 4, 4, 4, 4, 5, 5, 5, 5],
     [9, 9, 9, 9, 9, 9, 9, 9, 6, 6, 6, 6, 6, 6, 6, 6]
   ];
-  
+
   // Phase2SymCoord is an abstract base class which helps implement phase-2
   // symmetry coordinates.
   //
@@ -3200,50 +3200,50 @@
       throw new Error('Phase2SymCoord cannot represent more than 4096 ' +
         'equivalence classes');
     }
-  
+
     // this._moves maps every pair (C, M) to a symmetry coordinate, where C is a
     // unique edge case up to symmetry and M is a move between 0 and 10.
     this._moves = new Uint16Array(numSym * 10);
-  
+
     // this._rawToSym maps every raw coordinate to a corresponding symmetry
     // coordinate.
     this._rawToSym = new Uint16Array(numRaw);
-  
+
     // Set every entry in the moves table to 0xffff.
     for (var i = 0, len = numSym*10; i < len; ++i) {
       this._moves[i] = 0xffff;
     }
-  
+
     // Set every entry in the rawToSym table to 0xffff.
     for (var i = 0; i < numRaw; ++i) {
       this._rawToSym[i] = 0xffff;
     }
   }
-  
+
   // move applies a move to a symmetry coordinate and returns a new symmetry
   // coordinate.
   Phase2SymCoord.prototype.move = function(coord, move) {
     var s = coord & 0xf;
     var c = coord >>> 4;
-  
+
     // Find the move s*m*s'. We do this because s'*(s*m*s')*c*s is equivalent to
     // m*s'*c*s, which is what we are really looking for.
     var moveInvConj = p2MoveSymmetryInvConj(s, move);
     var x = this._moves[c*10 + moveInvConj];
-  
+
     var s1 = x & 0xf;
     var c1 = x >>> 4;
-  
+
     // We now have s*m*s'*c expressed as s1'*c1*s1, but we want m*s'*c*s. This is
     // equal to s*x*s', so the result is (s'*s1')*c1*(s1*s).
     return (c1 << 4) | symmetry.udSymmetryProduct(s1, s);
   };
-  
+
   // rawToSym converts a raw edge coordinate to a symmetry coordinate.
   Phase2SymCoord.prototype.rawToSym = function(raw) {
     return this._rawToSym[raw];
   };
-  
+
   // _generateMoves fills in the move table for the symmetry coordinate.
   // The rawPerms argument contains the permutations corresponding to the raw
   // coordinate.
@@ -3253,39 +3253,39 @@
   Phase2SymCoord.prototype._generateMoves = function(rawPerms, moveFunc) {
     for (var i = 0, len = rawPerms.length; i < len; ++i) {
       var symCoord = this._rawToSym[i];
-  
+
       // We only want symmetry coordinates with the identity symmetry.
       if ((symCoord & 0xf) !== 0) {
         continue;
       }
-  
+
       var perm = rawPerms[i];
       var symCase = symCoord >>> 4;
       for (var move = 0; move < 10; ++move) {
         if (this._moves[symCase*10 + move] !== 0xffff) {
           continue;
         }
-  
+
         var res = moveFunc(perm, move);
         var resSym = this._rawToSym[res];
         this._moves[symCase*10 + move] = resSym;
-  
+
         // Avoid some extra calls to moveFunc (which may be relatively expensive)
         // by also doing the inverse of the move.
-  
+
         var s = resSym & 0xf;
         var c1 = resSym >>> 4;
-  
-        // We know that m*symCase = s'*c1*s. Using some algebra, we can show that
+
+        // We know that m*symCase = s'*c1*s. Using some algebra, we can show tha
         // (s*m'*s')*c1 = s*symCase*s'.
-  
+
         var invMove = p2MoveSymmetryInvConj(s, p2MoveInverse(move));
         var invCoord = (symCase << 4) | symmetry.udSymmetryInverse(s);
         this._moves[c1*10 + invMove] = invCoord;
       }
     }
   };
-  
+
   // _generateRawToSym generates the _rawToSym table which maps raw cases to their
   // symmetry coordinates.
   // The rawPerms argument contains the permutations corresponding to the raw
@@ -3297,7 +3297,7 @@
     // caseCount is incremented every time a new equivalence class is found. By
     // the end of the loop, this should equal this._moves.length/10.
     var caseCount = 0;
-  
+
     // Find the first permutation for each symmetry equivalence class.
     for (var i = 0, len = rawPerms.length; i < len; ++i) {
       // Skip this iteration if the permutation has already been accounted for by
@@ -3305,13 +3305,13 @@
       if (this._rawToSym[i] !== 0xffff) {
         continue;
       }
-  
+
       // Get the index of the unique case up to symmetry.
       var symHash = caseCount++;
-  
+
       // Save this permutation in the table with the identity symmetry operator.
       this._rawToSym[i] = symHash << 4;
-  
+
       // Generate all the symmetries of this permutation and hash each one.
       var perm = rawPerms[i];
       for (var sym = 1; sym < 0x10; ++sym) {
@@ -3323,31 +3323,31 @@
       }
     }
   }
-  
+
   // Phase2CornerCoord manages everything having to do with the phase-2 corner
   // symmetry coordinate.
   function Phase2CornerCoord(perm8) {
     Phase2SymCoord.call(this, 40320, 2768);
-  
+
     this._generateRawToSym(perm8, p2CornerSymmetryConj);
     this._generateMoves(perm8, moveYCornerPerm);
   }
-  
+
   Phase2CornerCoord.prototype = Object.create(Phase2SymCoord.prototype);
-  
+
   // Phase2EdgeCoord manages everything having to do with the phase-2 edge
   // symmetry coordinate.
   function Phase2EdgeCoord(perm8) {
     Phase2SymCoord.call(this, 40320, 2768);
-  
+
     this._generateRawToSym(perm8, p2EdgeSymmetryConj);
     this._generateMoves(perm8, moveUDEdgePerm);
   }
-  
+
   Phase2EdgeCoord.prototype = Object.create(Phase2SymCoord.prototype);
-  
+
   // moveUDPerm applies a phase-2 move to a given edge permutation case. It then
-  // hashes the result and returns said hash. The original permutation is not
+  // hashes the result and returns said hash. The original permutation is no
   // modified.
   function moveUDEdgePerm(perm, move) {
     // NOTE: this code was generated by translating Go code to JavaScript.
@@ -3423,9 +3423,9 @@
     }
     return perms.encodeDestructablePerm(p);
   }
-  
-  // moveYCornerPerm applies a phase-2 move to a given corner permutation case. It
-  // then hashes the result and returns said hash. The original permutation is not
+
+  // moveYCornerPerm applies a phase-2 move to a given corner permutation case. I
+  // then hashes the result and returns said hash. The original permutation is no
   // modified.
   function moveYCornerPerm(perm, move) {
     // NOTE: this code was generated by translating Go code to JavaScript.
@@ -3513,28 +3513,28 @@
     }
     return perms.encodeDestructablePerm(p);
   }
-  
+
   // p2CornerSymmetryConj conjugates a phase-2 corner permutation case with a UD
   // symmetry. The result, sym'*array*sym, is returned.
   function p2CornerSymmetryConj(sym, array) {
     // Apply sym to the identity permutation.
     var result = [0, 1, 2, 3, 4, 5, 6, 7];
     p2CornerSymmetryPermute(sym, result);
-  
+
     // Apply array to get array*sym.
     perms.applyPerm(result, array);
-  
+
     // Apply sym' to get sym'*array*sym.
     p2CornerSymmetryPermute(symmetry.udSymmetryInverse(sym), result);
-  
+
     return result;
   }
-  
+
   // p2CornerSymmetryPermute applies a UD symmetry to a given permutation of 8
   // elements which represent the corner pieces on a phase-2 cube.
   function p2CornerSymmetryPermute(sym, array) {
     var lrFlip = symmetry.udSymmetryLRFlip(sym);
-  
+
     // Apply whatever y rotation there might be.
     var yRot = symmetry.udSymmetryY(sym);
     if (yRot === 1) {
@@ -3565,7 +3565,7 @@
       // y2 is equivalent to LRflip*FBflip, so I will do an FBflip and switch
       // lrFlip.
       lrFlip = !lrFlip;
-  
+
       // Swap the first four corners with the last four corners (0YX + 4 = 1YX).
       for (var i = 0; i < 4; ++i) {
         var temp = array[i];
@@ -3573,7 +3573,7 @@
         array[i | 4] = temp;
       }
     }
-  
+
     if (lrFlip) {
       // Swap even corners with odd corners, since ZY0 + 1 = ZY1.
       for (var i = 0; i < 8; i += 2) {
@@ -3582,17 +3582,17 @@
         array[i | 1] = temp;
       }
     }
-  
+
     if (symmetry.udSymmetryUDFlip(sym)) {
       // Swap corners with coordinates Z0X with those with coordinates Z1X.
       for (var i = 0; i < 4; ++i) {
         // Right now, I is the number ZX. We want Z0X, so we shift up the second
         // bit.
         var bottomIdx = (i & 1) | ((i & 2) << 1);
-  
+
         // ORing the bottom index with 2 turns X0Z into X1Z.
         var topIdx = bottomIdx | 2;
-  
+
         // Do the swap itself.
         var temp = array[bottomIdx];
         array[bottomIdx] = array[topIdx];
@@ -3600,28 +3600,28 @@
       }
     }
   }
-  
+
   // p2EdgeSymmetryConj conjugates a phase-2 edge permutation case with a UD
   // symmetry. The result, sym'*array*sym, is returned.
   function p2EdgeSymmetryConj(sym, array) {
     // Apply sym to the identity permutation.
     var result = [0, 1, 2, 3, 4, 5, 6, 7];
     p2EdgeSymmetryPermute(sym, result);
-  
+
     // Apply array to get array*sym.
     perms.applyPerm(result, array);
-  
+
     // Apply sym' to get sym'*array*sym.
     p2EdgeSymmetryPermute(symmetry.udSymmetryInverse(sym), result);
-  
+
     return result;
   }
-  
+
   // p2EdgeSymmetryPermute applies a UD symmetry to a given permutation of 8
   // elements which represent UD edge pieces on a phase-2 cube.
   function p2EdgeSymmetryPermute(sym, array) {
     var lrFlip = symmetry.udSymmetryLRFlip(sym);
-  
+
     // Apply whatever y rotation there might be.
     var yRot = symmetry.udSymmetryY(sym);
     if (yRot === 1) {
@@ -3633,7 +3633,7 @@
     } else if (yRot === 2) {
       // Doing y^2 is equivalent to doing LRflip*FBflip.
       lrFlip = !lrFlip;
-  
+
       // Do an FBflip.
       var temp = array[0];
       array[0] = array[2];
@@ -3642,7 +3642,7 @@
       array[4] = array[6];
       array[6] = temp;
     }
-  
+
     // If there is an LR reflection, swap [1] with [3] and [5] with [7].
     if (lrFlip) {
       var temp = array[1];
@@ -3652,8 +3652,8 @@
       array[5] = array[7];
       array[7] = temp;
     }
-  
-    // If there is a UD reflection, swap the first four elements with the last
+
+    // If there is a UD reflection, swap the first four elements with the las
     // four elements.
     if (symmetry.udSymmetryUDFlip(sym)) {
       for (var i = 0; i < 4; ++i) {
@@ -3663,12 +3663,12 @@
       }
     }
   }
-  
+
   // p2MoveSymmetryInvConj conjugates a move m with a symmetry s' to find s*m*s'.
   function p2MoveSymmetryInvConj(s, m) {
     return moveSymInvConjugates[m][s];
   }
-  
+
   function permute4Forwards(array, start) {
     // Ignoring start, this does the following:
     // a[0], a[1], a[2], a[3] = a[3], a[0], a[1], a[2].
@@ -3678,7 +3678,7 @@
     array[start + 1] = array[start];
     array[start] = temp;
   }
-  
+
   function permute4Backwards(array, start) {
     // Ignoring start, this does the following:
     // a[0], a[1], a[2], a[3] = a[1], a[2], a[3], a[0]
@@ -3688,7 +3688,7 @@
     array[start + 2] = array[start + 3];
     array[start + 3] = temp;
   }
-  
+
   exports.Phase2CornerCoord = Phase2CornerCoord;
   exports.Phase2EdgeCoord = Phase2EdgeCoord;
   exports.p2CornerSymmetryConj = p2CornerSymmetryConj;
@@ -3697,28 +3697,28 @@
   exports.p2EdgeSymmetryPermute = p2EdgeSymmetryPermute;
   function randomCorners() {
     var result = new Cube();
-  
+
     var pieces = perms.randomPermParity(8, true);
     for (var i = 0; i < 8; ++i) {
       result.corners.corners[i].piece = pieces[i];
     }
-  
+
     for (var i = 0; i < 7; ++i) {
       result.corners.corners[i].orientation = Math.floor(Math.random() * 3);
     }
     result.corners.fixLastCorner();
-    
+
     return result;
   }
-  
+
   function randomEdges() {
     var result = new Cube();
-    
+
     var pieces = perms.randomPermParity(12, true);
     for (var i = 0; i < 12; ++i) {
       result.edges.edges[i].piece = pieces[i];
     }
-    
+
     var flipLast = false;
     for (var i = 0; i < 11; ++i) {
       var flag = Math.random() >= 0.5;
@@ -3728,13 +3728,13 @@
       }
     }
     result.edges.edges[11].flip = flipLast;
-    
+
     return result;
   }
-  
+
   function randomLastLayer() {
     var result = randomZBLL();
-  
+
     // Generate the edge orientations.
     var topEdges = [0, 4, 5, 6];
     var lastFlip = false;
@@ -3746,35 +3746,35 @@
       }
     }
     result.edges.edges[topEdges[3]].flip = lastFlip;
-  
+
     return result;
   }
-  
+
   function randomState() {
     var result = new Cube();
-  
+
     // NOTE: we do not use pocketcube.randomState() because that state will always
     // leave the BDL corner solved. For 3x3 we don't want this restriction.
-  
+
     // Generate a random permutation.
     var pieces = perms.randomPerm(8);
     for (var i = 0; i < 8; ++i) {
       result.corners.corners[i].piece = pieces[i];
     }
-  
+
     // Generate random orientations.
     for (var i = 0; i < 7; ++i) {
       result.corners.corners[i].orientation = Math.floor(Math.random() * 3);
     }
     result.corners.fixLastCorner();
-  
+
     // Generate a random edge permutation.
     var cornerParity = perms.parity(pieces);
     var edgePerm = perms.randomPermParity(12, cornerParity);
     for (var i = 0; i < 12; ++i) {
       result.edges.edges[i].piece = edgePerm[i];
     }
-  
+
     // Generate random EO.
     var parity = false;
     for (var i = 0; i < 11; ++i) {
@@ -3785,29 +3785,29 @@
       }
     }
     result.edges.edges[11].flip = parity;
-  
+
     return result;
   }
-  
+
   function randomZBLL() {
     var result = new Cube();
     result.corners = pocketcube.randomLastLayer();
-  
+
     var cornerPerm = [];
     for (var i = 0; i < 8; ++i) {
       cornerPerm[i] = result.corners.corners[i].piece;
     }
     var cornerParity = perms.parity(cornerPerm);
-  
+
     var edgePerm = perms.randomPermParity(4, cornerParity);
     var topEdges = [0, 4, 5, 6];
     for (var i = 0; i < 4; ++i) {
       result.edges.edges[topEdges[i]].piece = topEdges[edgePerm[i]];
     }
-  
+
     return result;
   }
-  
+
   exports.randomCorners = randomCorners;
   exports.randomEdges = randomEdges;
   exports.randomLastLayer = randomLastLayer;
@@ -3817,7 +3817,7 @@
   // should be relatively easy to find and also relatively quick to apply to a
   // cube.
   var SHORT_LENGTH = 21;
-  
+
   // SolveTables hold the move and heuristic tables for both phases of the solver.
   // The default SolveTables should be acceptable for most uses.
   function SolveTables(p1Moves, p1Heuristic, p2Coords, p2Heuristic) {
@@ -3826,7 +3826,7 @@
     this.p2Coords = p2Coords || new Phase2Coords();
     this.p2Heuristic = p2Heuristic || new Phase2Heuristic(this.p2Coords);
   }
-  
+
   // SolveTimeouts contain basic information about how much time to spend on
   // various types of solutions.
   // The default SolveTimeouts will be acceptable for most purposes.
@@ -3839,7 +3839,7 @@
     this.shortTimeout = shortTimeout;
     this.longTimeout = longTimeout || 10000;
   }
-  
+
   // solveCube synchronously finds a solution to a cube given SolveTables and
   // SolveTimeouts.
   function solveCube(cube, tables, timeouts) {
@@ -3849,7 +3849,7 @@
     if ('undefined' === typeof timeouts) {
       timeouts = new SolveTimeouts();
     }
-  
+
     // Attempt to find a short solution.
     if (timeouts.shortTimeout > 0) {
       var s = solveLen(cube, tables, SHORT_LENGTH, timeouts.shortTimeout);
@@ -3857,11 +3857,11 @@
         return s;
       }
     }
-  
+
     // Look for longer solutions.
     return solveLen(cube, tables, 30, timeouts.longTimeout);
   }
-  
+
   function solveLen(cube, tables, maxLen, timeout) {
     var deadline = new Date().getTime() + timeout;
     var p1Cube = new Phase1Cube(cube);
@@ -3896,7 +3896,7 @@
     }, timeout);
     return result;
   }
-  
+
   exports.SolveTables = SolveTables;
   exports.SolveTimeouts = SolveTimeouts;
   exports.solveCube = solveCube;
@@ -3929,7 +3929,7 @@
     }
     exports = module.exports;
   }
-  
+
   function includeAPI(name) {
     if ('undefined' !== typeof window) {
       return window.puzzlejs[name];
@@ -3946,12 +3946,12 @@
     this.centerHeuristicData = makeCenterHeuristic();
     this.coHeuristicData = makeCOHeuristic();
   }
-  
+
   Heuristic.prototype.lookup = function(state) {
     return Math.max(this.coHeuristicData[encodeCO(state.corners)],
       this.centerHeuristicData[encodeCenters(state.centers)]);
   };
-  
+
   function encodeCO(corners) {
     var res = '';
     for (var i = 0; i < 8; ++i) {
@@ -3959,7 +3959,7 @@
     }
     return res;
   }
-  
+
   function encodeCenters(centers) {
     var res = '';
     for (var i = 0; i < 6; ++i) {
@@ -3967,7 +3967,7 @@
     }
     return res;
   }
-  
+
   function makeCOHeuristic() {
     var res = {};
     var nodes = [{state: new Skewb(), hash: encodeCO(new Skewb().corners),
@@ -3977,18 +3977,18 @@
     while (nodes.length > 0) {
       var node = nodes[0];
       nodes.splice(0, 1);
-  
+
       // Check if the state has been visited before.
       if (res.hasOwnProperty(node.hash)) {
         continue;
       }
       res[node.hash] = node.depth;
-  
+
       // Branch out.
       for (var i = 0, len = moves.length; i < len; ++i) {
         var newNode = node.state.copy();
         newNode.move(moves[i]);
-  
+
         var hash = encodeCO(newNode.corners);
         if (!visited[hash]) {
           nodes.push({state: newNode, depth: node.depth+1, hash: hash});
@@ -3998,7 +3998,7 @@
     }
     return res;
   }
-  
+
   function makeCenterHeuristic() {
     var res = {};
     var nodes = [{state: new Skewb(), hash: encodeCenters(new Skewb().centers),
@@ -4008,19 +4008,19 @@
     while (nodes.length > 0) {
       var node = nodes[0];
       nodes.splice(0, 1);
-  
+
       // Check if the state has been visited before.
       var idx = encodeCenters(node.state.centers);
       if (res.hasOwnProperty(idx)) {
         continue;
       }
       res[idx] = node.depth;
-  
+
       // Branch out.
       for (var i = 0, len = moves.length; i < len; ++i) {
         var newNode = node.state.copy();
         newNode.move(moves[i]);
-  
+
         var hash = encodeCenters(newNode.centers);
         if (!visited[hash]) {
           nodes.push({state: newNode, depth: node.depth+1, hash: hash});
@@ -4030,13 +4030,13 @@
     }
     return res;
   }
-  
+
   exports.Heuristic = Heuristic;
   function Move(face, clock) {
     this.face = face;
     this.clock = clock;
   }
-  
+
   Move.prototype.toString = function() {
     var faceName = "BLRU"[this.face];
     if (this.clock) {
@@ -4045,7 +4045,7 @@
       return faceName + "'";
     }
   };
-  
+
   function allMoves() {
     var res = [];
     for (var i = 0; i < 4; ++i) {
@@ -4054,11 +4054,11 @@
     }
     return res;
   }
-  
+
   function movesToString(moves) {
     return moves.join(' ');
   }
-  
+
   function parseMove(str) {
     if (str.length === 2) {
       if (str[1] !== "'") {
@@ -4077,7 +4077,7 @@
       throw new Error('Invalid move: ' + str);
     }
   }
-  
+
   function parseMoves(str) {
     var moves = [];
     var tokens = str.split(' ');
@@ -4086,7 +4086,7 @@
     }
     return moves;
   }
-  
+
   function scrambleMoves(len) {
     var moves = [];
     var lastAxis = -1;
@@ -4101,7 +4101,7 @@
     }
     return moves;
   }
-  
+
   exports.Move = Move;
   exports.allMoves = allMoves;
   exports.movesToString = movesToString;
@@ -4109,10 +4109,10 @@
   exports.parseMoves = parseMoves;
   exports.scrambleMoves = scrambleMoves;
   var randomPermParity = includeAPI('perms').randomPermParity;
-  
+
   // Generate this using encodeCornerCases(findCornerCases()).
   var allCornerCases = null;
-  
+
   function decodeCorners(str) {
     var res = [];
     for (var i = 0; i < 8; ++i) {
@@ -4120,7 +4120,7 @@
     }
     return res;
   }
-  
+
   function encodeCornerCases(cases) {
     var res = [];
     for (var i = 0, len = cases.length; i < len; ++i) {
@@ -4128,7 +4128,7 @@
     }
     return res;
   }
-  
+
   function encodeCorners(corners) {
     var res = "";
     for (var i = 0; i < 8; i++) {
@@ -4136,7 +4136,7 @@
     }
     return res;
   }
-  
+
   function findCornerCases() {
     var found = {};
     var cases = [];
@@ -4146,14 +4146,14 @@
       // Get the next node.
       var node = nodes[0];
       nodes.splice(0, 1);
-  
+
       // Mark it as visited or continue if it was already visited.
       var enc = encodeCorners(node.corners);
       if (found.hasOwnProperty(enc)) {
         continue;
       }
       found[enc] = 1;
-  
+
       // Branch out.
       cases.push(node.corners);
       for (var i = 0, len = moves.length; i < len; ++i) {
@@ -4164,11 +4164,11 @@
     }
     return cases;
   }
-  
+
   function randomCenters() {
     return randomPermParity(6, true);
   }
-  
+
   function randomCorners() {
     if (allCornerCases === null) {
       allCornerCases = encodeCornerCases(findCornerCases());
@@ -4176,14 +4176,14 @@
     var cornerIdx = Math.floor(Math.random() * allCornerCases.length);
     return decodeCorners(allCornerCases[cornerIdx]);
   }
-  
+
   function randomState() {
     var res = new Skewb();
     res.centers = randomCenters();
     res.corners = randomCorners();
     return res;
   }
-  
+
   exports.randomCenters = randomCenters;
   exports.randomCorners = randomCorners;
   exports.randomState = randomState;
@@ -4191,11 +4191,11 @@
     this.piece = piece;
     this.orientation = orientation;
   }
-  
+
   Corner.prototype.copy = function() {
     return new Corner(this.piece, this.orientation);
   };
-  
+
   function Skewb() {
     this.centers = [0, 1, 2, 3, 4, 5];
     this.corners = [];
@@ -4203,7 +4203,7 @@
       this.corners.push(new Corner(i, 0));
     }
   }
-  
+
   Skewb.prototype.copy = function() {
     var res = Object.create(Skewb.prototype);
     res.centers = this.centers.slice();
@@ -4213,7 +4213,7 @@
     }
     return res;
   };
-  
+
   Skewb.prototype.move = function(move) {
     switch (move.face) {
     case 0:
@@ -4230,7 +4230,7 @@
       break;
     }
   };
-  
+
   Skewb.prototype.rotateX = function() {
     // Permute the centers.
     var ref = this.centers[2];
@@ -4238,7 +4238,7 @@
     this.centers[1] = this.centers[3];
     this.centers[3] = this.centers[0];
     this.centers[0] = ref;
-  
+
     // Permute the corners.
     var ref1 = this.corners[6];
     this.corners[6] = this.corners[4];
@@ -4250,7 +4250,7 @@
     this.corners[5] = this.corners[1];
     this.corners[1] = this.corners[3];
     this.corners[3] = ref1;
-  
+
     // Swap the y and z orientations.
     for (var i = 0; i < 8; ++i) {
       if (this.corners[i].orientation === 1) {
@@ -4260,7 +4260,7 @@
       }
     }
   };
-  
+
   Skewb.prototype.rotateY = function() {
     // Permute the centers.
     var ref = this.centers[4];
@@ -4268,7 +4268,7 @@
     this.centers[3] = this.centers[5];
     this.centers[5] = this.centers[2];
     this.centers[2] = ref;
-  
+
     // Permute the corners.
     ref1 = this.corners[6];
     this.corners[6] = this.corners[7];
@@ -4280,7 +4280,7 @@
     this.corners[5] = this.corners[1];
     this.corners[1] = this.corners[0];
     this.corners[0] = ref1;
-  
+
     // Swap the x and z orientations.
     for (var i = 0; i < 8; ++i) {
       if (this.corners[i].orientation === 0) {
@@ -4290,7 +4290,7 @@
       }
     }
   };
-  
+
   Skewb.prototype.rotateZ = function() {
     // Permute the centers.
     var ref = this.centers[5];
@@ -4298,7 +4298,7 @@
     this.centers[1] = this.centers[4];
     this.centers[4] = this.centers[0];
     this.centers[0] = ref;
-  
+
     // Permute the corners.
     var ref1 = this.corners[0];
     this.corners[0] = this.corners[1];
@@ -4310,7 +4310,7 @@
     this.corners[5] = this.corners[7];
     this.corners[7] = this.corners[6];
     this.corners[6] = ref1;
-  
+
     // Swap the x and y orientations.
     for (var i = 0; i < 8; ++i) {
       if (this.corners[i].orientation === 0) {
@@ -4320,7 +4320,7 @@
       }
     }
   };
-  
+
   Skewb.prototype.solved = function() {
     for (var i = 0; i < 6; ++i) {
       if (this.centers[i] !== i) {
@@ -4334,7 +4334,7 @@
     }
     return true;
   };
-  
+
   Skewb.prototype.turnB = function(clock) {
     // Permute corners.
     if (clock) {
@@ -4348,7 +4348,7 @@
       this.corners[4] = this.corners[1];
       this.corners[1] = ref;
     }
-  
+
     // Permute centers.
     if (clock) {
       var ref = this.centers[3];
@@ -4361,7 +4361,7 @@
       this.centers[1] = this.centers[3];
       this.centers[3] = ref;
     }
-  
+
     // Orient corners.
     var corners = [0, 1, 2, 4];
     for (var idx = 0; idx < 4; ++idx) {
@@ -4373,7 +4373,7 @@
       }
     }
   };
-  
+
   Skewb.prototype.turnL = function(clock) {
     // Permute corners.
     if (clock) {
@@ -4387,7 +4387,7 @@
       this.corners[5] = this.corners[0];
       this.corners[0] = ref;
     }
-  
+
     // Permute centers.
     if (clock) {
       var ref = this.centers[5];
@@ -4400,7 +4400,7 @@
       this.centers[1] = this.centers[5];
       this.centers[5] = ref;
     }
-  
+
     // Orient corners.
     var corners = [0, 4, 6, 5];
     for (var idx = 0; idx < 4; ++idx) {
@@ -4412,7 +4412,7 @@
       }
     }
   };
-  
+
   Skewb.prototype.turnR = function(clock) {
     // Permute corners.
     if (clock) {
@@ -4426,7 +4426,7 @@
       this.corners[0] = this.corners[5];
       this.corners[5] = ref;
     }
-  
+
     // Permute centers.
     if (clock) {
       var ref = this.centers[1];
@@ -4439,7 +4439,7 @@
       this.centers[3] = this.centers[1];
       this.centers[1] = ref;
     }
-  
+
     // Orient corners.
     var corners = [0, 1, 3, 5];
     for (var idx = 0; idx < 4; ++idx) {
@@ -4451,7 +4451,7 @@
       }
     }
   };
-  
+
   Skewb.prototype.turnU = function(clock) {
     // Permute corners.
     if (clock) {
@@ -4465,7 +4465,7 @@
       this.corners[0] = this.corners[3];
       this.corners[3] = ref;
     }
-  
+
     // Permute centers.
     if (clock) {
       var ref = this.centers[3];
@@ -4478,7 +4478,7 @@
       this.centers[5] = this.centers[3];
       this.centers[3] = ref;
     }
-  
+
     // Orient corners.
     var corners = [0, 2, 3, 6];
     for (var idx = 0; idx < 4; ++idx) {
@@ -4490,7 +4490,7 @@
       }
     }
   };
-  
+
   exports.Corner = Corner;
   exports.Skewb = Skewb;
   function depthFirst(start, remaining, heuristic, lastFace) {
@@ -4503,7 +4503,7 @@
     } else if (heuristic.lookup(start) > remaining) {
       return null;
     }
-  
+
     for (var i = 0; i < 4; ++i) {
       if (i === lastFace) {
         continue;
@@ -4520,7 +4520,7 @@
     }
     return null;
   }
-  
+
   function solve(state, heuristic) {
     for (var i = 0; i < 11; ++i) {
       var solution = depthFirst(state, i, heuristic, -1);
@@ -4533,7 +4533,7 @@
     }
     return null;
   }
-  
+
   exports.solve = solve;
 
 })();
@@ -4564,7 +4564,7 @@
     }
     exports = module.exports;
   }
-  
+
   function includeAPI(name) {
     if ('undefined' !== typeof window) {
       return window.puzzlejs[name];
@@ -4581,12 +4581,12 @@
   var skewb = includeAPI('skewb');
   var pocketcube = includeAPI('pocketcube');
   var pocketHeuristic = null;
-  
+
   function pocketMoves(count) {
     var moves = pocketcube.scrambleMoves(count);
     return pocketcube.movesToString(moves);
   }
-  
+
   function pocketOptState() {
     if (pocketHeuristic === null) {
       pocketHeuristic = new pocketcube.FullHeuristic(5);
@@ -4595,7 +4595,7 @@
     var solution = pocketcube.solve(state, pocketHeuristic);
     return pocketcube.movesToString(solution);
   }
-  
+
   function pocketState() {
     if (pocketHeuristic === null) {
       pocketHeuristic = new pocketcube.FullHeuristic(5);
@@ -4606,39 +4606,39 @@
   }
   var rubikTables = null;
   var rubikTimeouts = null;
-  
+
   function rubikCorners() {
     return solveRubikState(rubik.randomCorners());
   }
-  
+
   function rubikEdges() {
     return solveRubikState(rubik.randomEdges());
   }
-  
+
   function rubikLastLayer() {
     return solveRubikState(rubik.randomLastLayer());
   }
-  
+
   function rubikMoves(count) {
     var moves = rubik.scrambleMoves(count);
     return rubik.movesToString(moves);
   }
-  
+
   function rubikState() {
     return solveRubikState(rubik.randomState());
   }
-  
+
   function rubikZBLL() {
     return solveRubikState(rubik.randomZBLL());
   }
-  
+
   function solveRubikState(state) {
     // Make sure the needed global variables are there.
     if (rubikTables === null || rubikTimeouts === null) {
       rubikTables = new rubik.SolveTables();
       rubikTimeouts = new rubik.SolveTimeouts();
     }
-  
+
     // Solve the cube!
     var solution = rubik.solveCube(state, rubikTables, rubikTimeouts);
     if (solution === null) {
@@ -4647,19 +4647,19 @@
     return rubik.movesToString(solution);
   }
   var scramblers = null;
-  
+
   function allPuzzles() {
     if (scramblers === null) {
       createScramblers();
     }
-  
+
     var res = [];
     for (var i = 0, len = scramblers.length; i < len; ++i) {
       res[i] = scramblers[i].name;
     }
     return res;
   }
-  
+
   function createScramblers() {
     scramblers = [
       {
@@ -4734,12 +4734,12 @@
       }
     ];
   }
-  
+
   function generateScramble(puzzle, scrambler, moves) {
     if (scramblers === null) {
       createScramblers();
     }
-  
+
     // Find the info for the scrambler.
     var info = null;
     for (var i = 0, len = scramblers.length; i < len; ++i) {
@@ -4753,7 +4753,7 @@
         }
       }
     }
-  
+
     if (info === null) {
       throw new Error('unknown scrambler: ' + puzzle + '/' + scrambler);
     }
@@ -4763,7 +4763,7 @@
       return info.f();
     }
   }
-  
+
   function scramblersForPuzzle(puzzle) {
     for (var i = 0, len = scramblers.length; i < len; ++i) {
       if (scramblers[i].name === puzzle) {
@@ -4777,17 +4777,17 @@
     }
     throw new Error('unknown puzzle: ' + puzzle);
   }
-  
+
   exports.allPuzzles = allPuzzles;
   exports.generateScramble = generateScramble;
   exports.scramblersForPuzzle = scramblersForPuzzle;
   var skewbHeuristic = null;
-  
+
   function skewbMoves(count) {
     var moves = skewb.scrambleMoves(count);
     return skewb.movesToString(moves);
   }
-  
+
   function skewbState() {
     if (skewbHeuristic === null) {
       skewbHeuristic = new skewb.Heuristic();

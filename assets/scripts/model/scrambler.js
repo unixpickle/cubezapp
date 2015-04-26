@@ -155,7 +155,7 @@
       return res;
     }
   };
-  
+
   ScrambleQueue.prototype._load = function() {
     if (localStorage.scrambleQueue) {
       this._queue = JSON.parse(localStorage.scrambleQueue);
@@ -163,7 +163,7 @@
       this._save();
     }
   };
-  
+
   ScrambleQueue.prototype._registerStorageEvents = function() {
     var handler = this._storageChanged.bind(this);
     if (window.addEventListener) {
@@ -172,14 +172,14 @@
       window.attachEvent('onstorage', handler);
     }
   };
-  
+
   ScrambleQueue.prototype._save = function() {
     try {
       localStorage.scrambleQueue = JSON.stringify(this._queue);
     } catch (e) {
     }
   };
-  
+
   ScrambleQueue.prototype._storageChanged = function() {
     this._queue = JSON.parse(localStorage.scrambleQueue);
   };
