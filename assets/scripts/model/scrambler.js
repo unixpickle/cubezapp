@@ -120,6 +120,8 @@
   // A ScrambleQueue can queue up scrambles for each scramble type.
   function ScrambleQueue() {
     this._queue = {};
+    this._load();
+    this._registerStorageEvents();
   }
 
   ScrambleQueue.prototype.count = function(scrambler) {
@@ -138,6 +140,7 @@
     } else {
       queued.push(scramble);
     }
+    this._save();
   }
 
   ScrambleQueue.prototype.shift = function(scrambler) {
@@ -147,8 +150,38 @@
     } else if (this._queue[hash].length === 0) {
       return null;
     } else {
-      return this._queue[hash].shift();
+      var res = this._queue[hash].shift();
+      this._save();
+      return res;
     }
+  };
+  
+  ScrambleQueue.prototype._load = function() {
+    if (localStorage.scrambleQueue) {
+      this._queue = JSON.parse(localStorage.scrambleQueue);
+    } else {
+      this._save();
+    }
+  };
+  
+  ScrambleQueue.prototype._registerStorageEvents = function() {
+    var handler = this._storageChanged.bind(this);
+    if (window.addEventListener) {
+      window.addEventListener('storage', handler, false);
+    } else {
+      window.attachEvent('onstorage', handler);
+    }
+  };
+  
+  ScrambleQueue.prototype._save = function() {
+    try {
+      localStorage.scrambleQueue = JSON.stringify(this._queue);
+    } catch (e) {
+    }
+  };
+  
+  ScrambleQueue.prototype._storageChanged = function() {
+    this._queue = JSON.parse(localStorage.scrambleQueue);
   };
 
   // A Scrambler generates scrambles of a specific type.
