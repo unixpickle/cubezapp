@@ -77,7 +77,7 @@
 
   ScrambleStream.prototype._registerModelEvents = function() {
     var handler = this._modelChanged.bind(this);
-    var events = ['remoteChanged', 'switchedPuzzle', 'modifiedPuzzle'];
+    var events = ['remoteChange', 'switchedPuzzle', 'modifiedPuzzle'];
     for (var i = 0; i < events.length; ++i) {
       window.app.store.on(events[i], handler);
     }

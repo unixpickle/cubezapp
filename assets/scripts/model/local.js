@@ -14,7 +14,7 @@
     this._puzzles = null;
     this._globalSettings = null;
 
-    // Register change events.
+    this._lastLocalStoreData = null;
     this._changeListener = this._dataChanged.bind(this);
     if (window.addEventListener) {
       window.addEventListener('storage', this._changeListener, false);
@@ -160,10 +160,15 @@
   };
 
   LocalStore.prototype._dataChanged = function() {
+    // The change might be unrelated to the store.
+    if (localStorage.localStoreData === this._lastLocalStoreData) {
+      return;
+    }
+
     var oldActive = this._active.id;
     this._loadData();
 
-    // Find the old active puzzle by its id.
+    // We should not change the active puzzle unless we have no choice.
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       if (this._puzzles[i].id === oldActive) {
         this._active = this._puzzles[i];
@@ -233,6 +238,8 @@
         lastUsed: new Date().getTime()
       });
     }
+
+    this._save();
   };
 
   LocalStore.prototype._loadData = function() {
@@ -246,6 +253,7 @@
       return;
     }
 
+    this._lastLocalStoreData = localStorage.localStoreData;
     var data = JSON.parse(localStorage.localStoreData);
 
     this._puzzles = data.puzzles;
@@ -288,7 +296,9 @@
     };
     // If they are in some kind of private browsing mode, this may fail.
     try {
-      localStorage.localStoreData = JSON.stringify(data);
+      var data = JSON.stringify(data);
+      localStorage.localStoreData = data;
+      this._lastLocalStoreData = data;
     } catch (e) {
     }
   };
