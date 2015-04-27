@@ -44,6 +44,7 @@ Here are the methods which the store provides:
  * **deleteSolve**(id) - delete a solve from the current puzzle. While this is a synchronous operation, it may still fail. If the delete operation fails, it will be as if the puzzle was deleted (upon the `deleteSolve` call) and then re-added externally (once the request failed).
  * **getActivePuzzle**() - get the current [Puzzle](#puzzle-object).
  * **getGlobalSettings**() - get the current [Global Settings](#global-settings-object).
+ * **getLatestSolve**() - get the latest solve for the current puzzle. This returns `null` if no solves have been completed for the current puzzle. Notice that this is synchronous whereas *getSolves(0, 1, cb)* would be asynchronous.
  * **getPuzzles**() - get the ordered list of [Puzzle](#puzzle-object) objects.
  * **getSolveCount**(cb) - get the number of [Solve](#solve-object) objects for the current puzzle.
  * **getSolves**(start, count, cb) - get a list of [Solve](#solve-object) objects asynchronously.
@@ -76,8 +77,8 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
  * **icon** - string - the icon identifier
  * **scrambler** - string - the type of puzzle.js scrambler to use
  * **scrambleType** - string - the subtype of the scrambler to use
- * **scrambleLength** - int - the number of moves to use in the scramble if applicable
  * **lastUsed** - int - the UNIX time in milliseconds that the user last modified or switched to this puzzle
+ * **timerInput** - int - an enum for the input method. The values of this setting are given meaning by the view and controller.
  * **id** - string - the unique identifier of the puzzle. **This field will not be present if the puzzle has not been added to the store.**
 
 <a name="global-settings-object"></a>
@@ -87,4 +88,5 @@ The **Global Settings** object stores the user's global settings. Here are the f
 
  * **flavor** - string - the name of the flavor the user has set. **Default:** "Blueberry"
  * **righty** - bool - true if the user is right handed. **Default:** true
-
+ * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller.
+ * **theaterMode** - bool - enter theater mode while timing.

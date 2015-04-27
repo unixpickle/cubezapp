@@ -1,5 +1,5 @@
 (function() {
-  
+
   // generateId generates a random 32-character hexadecimal string.
   function generateId() {
     // Use window.crypto.getRandomValues() if it is available.
@@ -16,7 +16,7 @@
       }
       return result;
     }
-    
+
     // We must fall back on the Math.random() function.
     var identifier = '';
     var time = (new Date()).getTime() % 0x100;
@@ -30,7 +30,7 @@
     }
     return identifier;
   }
-  
+
   window.app.generateId = generateId;
-  
+
 })();

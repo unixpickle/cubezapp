@@ -1,5 +1,5 @@
 (function() {
-  
+
   // This is an exhaustive list of every animation attribute that an animator
   // can animate.
   var attributes = [
@@ -11,12 +11,12 @@
     'scrambleOpacity',
     'timeSize', 'timeY'
   ];
-  
+
   // An Animation performs a curve-based animation of a numeric value.
   function Animation(start, end, duration, delay, curve) {
     this.start = start;
     this.end = end;
-    
+
     // Optional arguments.
     if ('number' === typeof duration) {
       this.duration = duration * 1000;
@@ -33,7 +33,7 @@
     } else {
       this.curve = defaultCurve;
     }
-    
+
     this.timestamp = new Date().getTime();
     this._done = false;
   }
@@ -44,7 +44,7 @@
       this._done = true;
       return this.end;
     }
-    
+
     // See how much of the animation has elapsed.
     var elapsed = new Date().getTime() - this.timestamp;
     var fraction = Math.max((elapsed-this.delay)/this.duration, 0);
@@ -52,17 +52,17 @@
       this._done = true;
       return this.end;
     }
-    
+
     // Compute the intermediate value.
     return this.start + (this.end-this.start)*this.curve(fraction);
   };
-  
+
   // done returns true if the animation is complete. The value returned is
   // updated whenever current() is called.
   Animation.prototype.done = function() {
     return this._done;
   };
-  
+
   // An Animator performs a set of animations.
   function Animator() {
     this._animations = {};
@@ -74,7 +74,7 @@
       this._current[attributes[i]] = 0;
     }
   }
-  
+
   // animateAttribute starts an animation to transition an attribute to a given
   // value.
   // The duration, delay and curve arguments are optional.
@@ -98,7 +98,7 @@
   Animator.prototype.current = function() {
     return this._current;
   };
-  
+
   // setAttribute sets a value for a given attribute without animating it.
   // If the attribute was already being animated, the given value is set as the
   // destination for the existing animation.
@@ -115,7 +115,7 @@
       this._current[attr] = val;
     }
   };
-  
+
   // setAttributes sets a bunch of values.
   Animator.prototype.setAttributes = function(map) {
     for (var key in map) {
@@ -125,7 +125,7 @@
       this.setAttribute(key, map[key]);
     }
   };
-  
+
   Animator.prototype._refresh = function() {
     // Update the current state based on animations.
     this._done = true;
@@ -141,7 +141,7 @@
         }
       }
     }
-    
+
     // Pass the current state to the callback if it's available.
     if ('function' === typeof this.onAnimate) {
       this.onAnimate(this._current);
@@ -158,11 +158,11 @@
       setTimeout(this._refresh.bind(this), 1000/60);
     }
   };
-  
+
   function defaultCurve(x) {
     return 3*Math.pow(x, 2) - 2*Math.pow(x, 3);
   }
-  
+
   window.app.Animator = Animator;
-  
+
 })();

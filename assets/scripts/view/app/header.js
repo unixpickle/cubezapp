@@ -1,30 +1,30 @@
 (function() {
-  
+
   // This is the height of the dropdown contents.
   var DROPDOWN_HEIGHT = 200;
-  
+
   // This is the width of each puzzle in the dropdown.
   var PUZZLE_WIDTH = 180;
-  
-  // This is the number of pixels between each element in the dropdown.
+
+  // This is the number of pixels between each puzzle in the dropdown.
   var SPACING = 18;
-  
+
   // These values represent different states of the header.
   var STATE_CLOSED = 0;
   var STATE_OPEN = 1;
   var STATE_DELETING = 2;
-  
+
   function Header() {
-    // Setup the UI elements.
-    this._element = $('#header');
-    this._styler = new window.app.Styler(this._element[0]);
-    this._puzzleActions = this._element.find('.puzzle-actions');
-    this._puzzleName = this._element.find('.name');
-    this._puzzles = new Puzzles();
-    
+    window.app.EventEmitter.call(this);
+
+    this._$element = $('#header');
+    this._$puzzleActions = this._$element.find('.puzzle-actions');
+    this._$puzzleName = this._$element.find('.name');
+    this._dropdown = new Dropdown();
+
     // Setup the shielding for when the dropdown is down.
-    this._shielding = $('<div></div>');
-    this._shielding.css({
+    this._$shielding = $('<div></div>');
+    this._$shielding.css({
       position: 'fixed',
       width: '100%',
       height: '100%',
@@ -32,199 +32,138 @@
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       webkitBackfaceVisibility: 'hidden'
     });
-    this._shielding.insertBefore(this._element);
-    this._shielding.click(this.close.bind(this));
-    
-    // Initialize the state.
+    this._$shielding.insertBefore(this._$element);
+    this._$shielding.click(this.close.bind(this));
+
     this._state = STATE_CLOSED;
-    this._hasPuzzles = false;
-    
-    // this._updatedPuzzles is non-null if the puzzle list was changed while the
-    // puzzles dropdown was not open.
-    this._updatedPuzzles = null;
-    
-    // Register event handlers.
-    this._puzzleName.click(this._toggle.bind(this));
-    this._puzzles.onAdd = this._add.bind(this);
-    this._puzzles.onDelete = this._deletePuzzle.bind(this);
-    this._puzzles.onSwitch = this._switchPuzzle.bind(this);
-    this._puzzleActions.find('.add').click(this._add.bind(this));
-    this._puzzleActions.find('.remove').click(this._delete.bind(this));
+    this._empty = (window.app.store.getPuzzles().length <= 1);
+
+    this._$puzzleName.text(window.app.store.getActivePuzzle().name);
+
+    this._registerUIEvents();
+    this._registerModelEvents();
   }
+
+  Header.prototype = Object.create(window.app.EventEmitter.prototype);
 
   Header.prototype.close = function() {
     if (this._state === STATE_CLOSED) {
       return;
     } else if (this._state === STATE_DELETING) {
-      this._puzzles.stopDeleting();
+      this._dropdown.hideDeleteButtons();
     }
-    
-    // Close the puzzles dropdown.
-    this._puzzles.close();
-    
-    // Fade out the shielding.
-    this._shielding.stop(true, false);
-    this._shielding.fadeOut();
-    
-    // Fade out the action buttons.
-    if (this._hasPuzzles) {
-      this._puzzleActions.stop(true, false).fadeOut();
+
+    this._dropdown.close();
+
+    this._$shielding.stop(true, false);
+    this._$shielding.fadeOut();
+
+    if (!this._empty) {
+      this._$puzzleActions.stop(true, false).fadeOut();
     }
-    
+
     this._state = STATE_CLOSED;
-    
+
     window.app.keyboard.remove(this);
   };
 
   Header.prototype.height = function() {
     return 44;
   };
-  
+
   Header.prototype.keydown = function(e) {
     if (e.which === 27) {
       this.close();
     }
     return false;
   };
-  
+
   Header.prototype.layout = function(attrs) {
     if (attrs.headerOpacity === 0) {
-      this._styler.css({display: 'none'});
+      this._$element.css({display: 'none'});
     } else {
-      this._styler.css({
+      this._$element.css({
         display: 'block',
         opacity: attrs.headerOpacity,
         top: attrs.headerOffset
       });
     }
   };
-  
+
   Header.prototype.open = function() {
     if (this._state !== STATE_CLOSED) {
       return;
     }
-    
-    // If the puzzles were changed while the header was closed, updated them.
-    if (this._updatedPuzzles !== null) {
-      this._puzzles.setPuzzles(this._updatedPuzzles);
-      this._updatedPuzzles = null;
+
+    this._dropdown.open();
+
+    this._$shielding.stop(true, false).fadeIn();
+    if (!this._empty) {
+      this._$puzzleActions.stop(true, false).fadeIn();
     }
-    
-    // Open the puzzles dropdown.
-    this._puzzles.open();
-    
-    // Fade in various things.
-    this._shielding.stop(true, false).fadeIn();
-    if (this._hasPuzzles) {
-      this._puzzleActions.stop(true, false).fadeIn();
-    }
-    
+
     this._state = STATE_OPEN;
-    
+
     window.app.keyboard.push(this);
   };
-  
-  Header.prototype.removePuzzle = function(puzzle) {
-    // Normal cases.
-    switch (this._state) {
-    case STATE_DELETING:
-      this._puzzles.stopDeleting();
-      this._state = STATE_OPEN;
-    case STATE_OPEN:
-      this._puzzles.removePuzzle(puzzle);
-      this._hasPuzzles = (this._puzzles.puzzles().length > 0);
-      if (!this._hasPuzzles) {
-        this._puzzleActions.fadeOut();
-      }
-      break;
-    case STATE_CLOSED:
-      if (this._updatePuzzles === null) {
-        this._updatePuzzles = this._puzzles.puzzles().slice();
-      }
-      var idx = this._updatePuzzles.indexOf(puzzle);
-      if (idx >= 0) {
-        this._updatePuzzles.splice(idx, 1);
-      }
-      this._hasPuzzles = (this._updatedPuzzles.length > 0);
-      break;
-    default:
-      throw new Error('unknown state: ' + this._state);
-    }
-  };
-  
-  Header.prototype.setActivePuzzle = function(puzzle) {
-    this.setPuzzleName(puzzle.name);
-  };
-  
-  Header.prototype.setPuzzleName = function(name) {
-    this._puzzleName.text(name);
-  };
-  
-  Header.prototype.setPuzzles = function(puzzles) {
-    if (this._state === STATE_CLOSED) {
-      this._updatedPuzzles = puzzles;
-      this._hasPuzzles = (puzzles.length > 0);
-      return;
-    } else if (this._state === STATE_DELETING) {
-      this._puzzles.stopDeleting();
-      this._state = STATE_OPEN;
-    }
-    
-    this._puzzles.setPuzzles(puzzles);
-    
-    // If the last puzzle was removed or the first puzzle was added, we need to
-    // fade out/in the action buttons.
-    var lastHas = this._hasPuzzles;
-    this._hasPuzzles = (puzzles.length > 0);
-    if (lastHas === this._hasPuzzles) {
-      return;
-    }
-    if (this._hasPuzzles) {
-      this._puzzleActions.fadeIn();
-    } else {
-      this._puzzleActions.fadeOut();
-    }
-  };
-  
-  Header.prototype._add = function() {
-    if (this._state === STATE_CLOSED) {
-      return;
-    } else if (this._state === STATE_DELETING) {
-      this._puzzles.stopDeleting();
-      this._state = STATE_OPEN;
-    }
-    new window.app.AddPopup().show();
-  };
-  
-  Header.prototype._delete = function() {
+
+  Header.prototype._deleteClicked = function() {
     if (this._state === STATE_DELETING) {
-      this._puzzles.stopDeleting();
+      this._dropdown.hideDeleteButtons();
       this._state = STATE_OPEN;
-      return;
-    } else if (this._state !== STATE_OPEN) {
+    } else if (this._state === STATE_OPEN) {
+      this._dropdown.showDeleteButtons();
+      this._state = STATE_DELETING;
+    }
+  };
+
+  Header.prototype._handleCountChange = function(count) {
+    var wasEmpty = this._empty;
+    this._empty = (count <= 1);
+
+    if (this._state === STATE_CLOSED || this._empty === wasEmpty) {
       return;
     }
-    this._puzzles.startDeleting();
-    this._state = STATE_DELETING;
-  };
-  
-  Header.prototype._deletePuzzle = function(puzzle) {
-    if (this._state !== STATE_DELETING) {
-      return;
+
+    // This can only happen if a remote client deletes all the puzzles except
+    // one while this client is in delete mode.
+    if (this._state === STATE_DELETING) {
+      this._dropdown.hideDeleteButtons();
+      this._state = STATE_OPEN;
     }
-    this._state = STATE_OPEN;
-    this._puzzles.stopDeleting();
-    window.app.home.deletePuzzle(puzzle);
-  };
-  
-  Header.prototype._switchPuzzle = function(puzzle) {
-    if (this._state !== STATE_OPEN) {
-      return;
+
+    if (this._empty) {
+      this._$puzzleActions.stop(true, false).fadeOut();
+    } else {
+      this._$puzzleActions.stop(true, false).fadeIn();
     }
-    this.close();
-    window.app.home.switchPuzzle(puzzle);
   };
-  
+
+  Header.prototype._handleNameChange = function(puzzle) {
+    this._$puzzleName.text(puzzle.name);
+  };
+
+  Header.prototype._registerModelEvents = function() {
+    var countHandler = this._handleCountChange.bind(this);
+    window.app.storeObserver.observePuzzleCount(countHandler);
+    
+    var nameHandler = this._handleNameChange.bind(this);
+    window.app.storeObserver.observeActivePuzzle('name', nameHandler);
+  };
+
+  Header.prototype._registerUIEvents = function() {
+    this._$puzzleName.click(this._toggle.bind(this));
+    this._dropdown.onAdd = this.emit.bind(this, 'addPuzzle');
+    this._dropdown.onDelete = function(id) {
+      this._dropdown.hideDeleteButtons();
+      this._state = STATE_OPEN;
+      this.emit('deletePuzzle', id);
+    }.bind(this)
+    this._dropdown.onSwitch = this.emit.bind(this, 'switchPuzzle');
+    this._$puzzleActions.find('.add').click(this.emit.bind(this, 'addPuzzle'));
+    this._$puzzleActions.find('.remove').click(this._deleteClicked.bind(this));
+  };
+
   Header.prototype._toggle = function() {
     switch (this._state) {
     case STATE_DELETING:
@@ -238,206 +177,199 @@
       throw new Error('unknown state: ' + this._state);
     }
   };
-  
-  // Puzzles manages the puzzles dropdown.
-  function Puzzles() {
-    // Basic UI components.
-    this._element = $('#puzzles');
-    this._contents = this._element.find('.contents');
-    this._deleteButtons = $();
-    this._puzzles = [];
+
+  // Dropdown manages the puzzles dropdown.
+  function Dropdown() {
+    this._$element = $('#puzzles');
+    this._$contents = this._$element.find('.contents');
+    this._$deleteButtons = $();
     this._puzzleElements = [];
-    
+    this._puzzleIdToElement = {};
+
     // This pre-bound handler is used to capture browser resize events for the
     // scrollbar.
     this._scrollHandler = this._resizeForScrollbar.bind(this);
-    
-    // Event handlers for adding, deleting and switching.
+
+    this._isDeleting = false;
+    this._isOpen = false;
+    this._updateOnOpen = false;
+
     this.onAdd = null;
     this.onDelete = null;
     this.onSwitch = null;
+
+    this._generateContents();
+    this._registerModelEvents();
   }
-  
-  // close slides up the dropdown.
-  Puzzles.prototype.close = function() {
-    // Hide the scrollbar if there was one.
-    this._contents.css({'overflow-x': 'hidden'});
-    
-    // Slide away the puzzles dropdown.
-    this._element.stop(true, false);
-    this._element.slideUp();
-    
+
+  Dropdown.prototype.close = function() {
+    this._isOpen = false;
+    this._$contents.css({'overflow-x': 'hidden'});
+    this._$element.stop(true, false);
+    this._$element.slideUp();
     window.app.windowSize.removeListener(this._scrollHandler);
   };
-  
-  // puzzles returns the current list of puzzles in the header.
-  Puzzles.prototype.puzzles = function() {
-    return this._puzzles;
+
+  Dropdown.prototype.hideDeleteButtons = function() {
+    this._$deleteButtons.stop(true, false).fadeOut();
+    this._isDeleting = false;
   };
-  
-  // open slides down the dropdown.
-  Puzzles.prototype.open = function() {
-    // Slide in the dropdown.
-    this._element.stop(true, false);
-    this._element.slideDown({complete: this._doneOpen.bind(this)});
-  };
-  
-  // removePuzzle animates a puzzle disappearing from the list.
-  Puzzles.prototype.removePuzzle = function(puzzle) {
-    // If there was only one puzzle left, fade it out and show the plus button.
-    if (this._puzzles.length === 1) {
-      this._puzzles = [];
-      this._puzzleElements = [];
-      this._deleteButtons = $();
-      
-      this._contents.children('div').fadeOut();
-      var button = $('<button class="header-button big-add">Add</button>');
-      button.css({display: 'none'});
-      button.click(this._add.bind(this));
-      this._contents.append(button);
-      button.fadeIn();
-      return;
+
+  Dropdown.prototype.open = function() {
+    this._isOpen = true;
+    if (this._updateOnOpen) {
+      this._updateOnOpen = false;
+      this._generateContents();
     }
-    
-    // Find the index of the puzzle.
-    var index = -1;
-    for (var i = 0, len = this._puzzles.length; i < len; ++i) {
-      if (this._puzzles[i].id === puzzle.id) {
-        index = i;
-        break;
-      }
-    }
-    
-    // If the puzzle was not in the list, do nothing.
-    if (index < 0) {
-      return;
-    }
-    
-    // Fade out the puzzle and remove it from every list.
-    this._puzzleElements[index].fadeOut();
-    this._puzzleElements.splice(index, 1);
-    this._puzzles.splice(index, 1);
-    this._deleteButtons = this._deleteButtons.not(this._deleteButtons[index]);
-    
-    // Move the puzzles which were to the right of the deleted puzzle.
-    for (var i = index, len = this._puzzleElements.length; i < len; ++i) {
-      var x = SPACING*(i+1) + PUZZLE_WIDTH*i;
-      this._puzzleElements[i].animate({left: x});
-      $(this._deleteButtons[i]).animate({left: x + PUZZLE_WIDTH - 15});
-    }
-    
-    // Adjust the size of the content div after the animations are done.
-    setTimeout(function() {
-      var totalLen = this._puzzles.length;
-      var content = this._contents.children('div');
-      content.css({width: SPACING*(totalLen+1) + PUZZLE_WIDTH*totalLen});
-      
-      // The scrollbar may have vanished.
-      this._resizeForScrollbar();
-    }.bind(this), 400);
+    this._$element.stop(true, false);
+    this._$element.slideDown({complete: this._enableScrolling.bind(this)});
   };
-  
-  // startDeleting shows all the delete buttons.
-  Puzzles.prototype.startDeleting = function() {
-    this._deleteButtons.stop(true, false).fadeIn();
+
+  Dropdown.prototype.showDeleteButtons = function() {
+    this._$deleteButtons.stop(true, false).fadeIn();
+    this._isDeleting = true;
   };
-  
-  // stopDeleting hides all the delete buttons.
-  Puzzles.prototype.stopDeleting = function() {
-    this._deleteButtons.stop(true, false).fadeOut();
+
+  Dropdown.prototype._deletePuzzleFromDOM = function($deleteElement) {
+    var idx = this._puzzleElements.indexOf($deleteElement);
+    var $deleteButton = this._$deleteButtons.eq(idx);
+
+    this._puzzleElements.splice(idx, 1);
+    this._$deleteButtons = this._$deleteButtons.not($deleteButton);
+
+    $([$deleteElement[0], $deleteButton[0]]).fadeOut(function() {
+      $(this).remove();
+    });
   };
-  
-  // setPuzzles updates the puzzles in the dropdown without any animation.
-  Puzzles.prototype.setPuzzles = function(puzzles) {
-    this._puzzles = puzzles;
+
+  Dropdown.prototype._enableScrolling = function() {
+    this._$contents.css({'overflow-x': 'auto'});
+    this._resizeForScrollbar();
+    window.app.windowSize.addListener(this._scrollHandler);
+  };
+
+  Dropdown.prototype._generateContents = function() {
+    this._puzzleIdToElement = {};
     this._puzzleElements = [];
-    this._deleteButtons = $();
-    this._contents.empty();
-    
-    // If there's no puzzles, we show a giant add button.
-    if (puzzles.length === 0) {
+    this._$deleteButtons = $();
+    this._$contents.empty();
+
+    var puzzles = window.app.store.getPuzzles().slice(1);
+    this._empty = (puzzles.length === 0);
+
+    if (this._empty) {
       var button = $('<button class="header-button big-add">Add</button>');
-      button.click(this._add.bind(this));
-      this._contents.append(button);
+      button.click(function() {
+        this.onAdd();
+      }.bind(this));
+      this._$contents.append(button);
       return;
     }
-    
-    // Generate the div which will contain the puzzles.
-    var contents = $('<div></div>');
-    contents.css({
+
+    // We need a relative positioned div which will contain the puzzle elements.
+    var $contents = $('<div class="visible-content"></div>');
+    $contents.css({
       position: 'relative',
       height: DROPDOWN_HEIGHT,
       width: puzzles.length*(PUZZLE_WIDTH+SPACING) + SPACING
     });
-    
-    // Generate the puzzle elements and their delete buttons.
-    var x = SPACING;
+
+    var puzzleLeft = SPACING;
     for (var i = 0, len = puzzles.length; i < len; ++i) {
-      // Generate the main puzzle element.
       var puzzle = puzzles[i];
-      var element = generatePuzzleElement(puzzle);
-      element.css({left: x});
-      contents.append(element);
-      this._puzzleElements.push(element);
-      
-      // Clicking the element switches puzzles.
-      element.click(function(puzzle) {
-        if ('function' !== typeof this.onSwitch) {
-          throw new Error('invalid onSwitch callback');
-        }
-        this.onSwitch(puzzle);
-      }.bind(this, puzzle));
-      
-      // Generate the delete button.
-      var deleteButton = $('<button class="delete">Delete</button>');
-      deleteButton.css({
-        left: x + PUZZLE_WIDTH - 15,
-        display: 'none'
-      });
-      contents.append(deleteButton);
-      this._deleteButtons = this._deleteButtons.add(deleteButton);
-      
-      // Clicking the delete button requests a deletion.
-      deleteButton.click(function(puzzle) {
-        if ('function' !== typeof this.onDelete) {
-          throw new Error('invalid onDelete callback');
-        }
-        this.onDelete(puzzle);
-      }.bind(this, puzzle));
-      
-      // Update the x coordinate for the next puzzle.
-      x += SPACING + PUZZLE_WIDTH;
+
+      var $element = generatePuzzleElement(puzzle);
+      $element.css({left: puzzleLeft}).click(function(puzzleId) {
+        this.onSwitch(puzzleId);
+      }.bind(this, puzzle.id));
+      $contents.append($element);
+      this._puzzleIdToElement[puzzle.id] = $element;
+      this._puzzleElements.push($element);
+
+      var $deleteButton = $('<button class="delete">Delete</button>');
+      $deleteButton.css({
+        left: puzzleLeft + PUZZLE_WIDTH - 15,
+        display: (this._isDeleting ? 'block' : 'none')
+      }).click(function(puzzleId) {
+        this.onDelete(puzzleId);
+      }.bind(this, puzzle.id));
+      $contents.append($deleteButton);
+      this._$deleteButtons = this._$deleteButtons.add($deleteButton);
+
+      puzzleLeft += SPACING + PUZZLE_WIDTH;
     }
-    this._contents.empty();
-    this._contents.append(contents);
+
+    this._$contents.append($contents);
   };
-  
-  Puzzles.prototype._add = function() {
-    if ('function' !== typeof this.onAdd) {
-      throw new Error('invalid onAdd callback');
+
+  Dropdown.prototype._puzzleDeleted = function(puzzleId) {
+    if (this._puzzleElements.length === 1) {
+      this._transitionToEmpty();
+      return;
     }
-    this.onAdd();
+
+    this._deletePuzzleFromDOM(this._puzzleIdToElement[puzzleId]);
+    this._repositionPuzzles();
   };
-  
-  Puzzles.prototype._doneOpen = function() {
-    this._contents.css({'overflow-x': 'auto'});
-    this._resizeForScrollbar();
-    window.app.windowSize.addListener(this._scrollHandler);
-  };
-  
-  Puzzles.prototype._resizeForScrollbar = function() {
-    // Figure out how much space the scrollbar is taking.
-    var clientHeight = this._contents[0].clientHeight ||
-      this._contents.height();
-    var difference = this._contents.height() - clientHeight;
+
+  Dropdown.prototype._registerModelEvents = function() {
+    window.app.store.on('remoteChange', this._generateContents.bind(this));
+    window.app.store.on('deletedPuzzle', this._puzzleDeleted.bind(this));
     
+    var closeUpdateLaterEvents = ['addedPuzzle', 'switchedPuzzle'];
+    for (var i = 0; i < closeUpdateLaterEvents.length; ++i) {
+      var event = closeUpdateLaterEvents[i];
+      window.app.store.on(event, function() {
+        if (this._isOpen) {
+          this.close();
+        }
+        this._updateOnOpen = true;
+      }.bind(this));
+    }
+  };
+
+  Dropdown.prototype._repositionPuzzles = function() {
+    var puzzleLeft = SPACING;
+    for (var i = 0, len = this._puzzleElements.length; i < len; ++i) {
+      var $element = this._puzzleElements[i];
+      $element.animate({left: puzzleLeft});
+      var deleteLeft = puzzleLeft + PUZZLE_WIDTH - 15;
+      this._$deleteButtons.eq(i).animate({left: deleteLeft});
+      puzzleLeft += SPACING + PUZZLE_WIDTH;
+    }
+  };
+
+  Dropdown.prototype._resizeForScrollbar = function() {
+    // Figure out how much space the scrollbar is taking.
+    var clientHeight = this._$contents[0].clientHeight ||
+      this._$contents.height();
+    var difference = this._$contents.height() - clientHeight;
+
     // Compute the new height and set it if needed.
     var newHeight = DROPDOWN_HEIGHT + difference;
-    if (newHeight != this._element.height()) {
-      this._element.height(newHeight);
+    if (newHeight != this._$element.height()) {
+      this._$element.height(newHeight);
     }
   };
-  
+
+  Dropdown.prototype._transitionToEmpty = function() {
+    this._empty = true;
+    this._puzzleElements = [];
+    this._$deleteButtons = $();
+    this._puzzleIdToElement = {};
+
+    this._$contents.children('div').fadeOut(function() {
+      $(this).remove();
+    });
+
+    var button = $('<button class="header-button big-add">Add</button>');
+    button.css({display: 'none'}).click(function() {
+      this.onAdd();
+    }.bind(this));
+    this._$contents.append(button);
+    button.fadeIn();
+  };
+
   function generatePuzzleElement(puzzle) {
     var element = $('<div class="puzzle"></div>');
     var label = $('<label></label>');
@@ -450,7 +382,7 @@
     element.append(label);
     return element;
   }
-  
+
   window.app.Header = Header;
-  
+
 })();

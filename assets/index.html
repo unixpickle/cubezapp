@@ -2,20 +2,20 @@
 <html>
   <head>
     <title>Cubezapp</title>
-    
+
     <!-- IE favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-    
+
     <!-- Other browsers favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    
+
     <!-- This is a font import. -->
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Oxygen:400,700,300' rel='stylesheet' type='text/css'>
-    
+
     <!-- This makes the site big enough on mobile to be usable -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
+
     <!-- Stylesheets are magical things that make your site beautiful -->
     <link rel="stylesheet" type="text/css" href="styles/app/footer.css">
     <link rel="stylesheet" type="text/css" href="styles/app/header.css">
@@ -32,10 +32,10 @@
     <link rel="stylesheet" type="text/css" href="styles/popups/popup.css">
     <link rel="stylesheet" type="text/css" href="styles/popups/rename.css">
     <link rel="stylesheet" type="text/css" href="styles/shake.css">
-    
+
     <!-- These APIs aren't specific to Cubezapp, but hey, they're nice -->
     <script src="external/jquery-2.1.3.min.js"></script>
-    <script src="external/puzzle.web.0.10.3.js"></script>
+    <script src="external/puzzle.web.0.11.1.js"></script>
     <script src="external/crystal.js"></script>
     <script src="external/dropdown.js/dropdown.js"></script>
     <script src="external/checkbox.0.2.1.js"></script>
@@ -48,17 +48,19 @@
     </script>
 
     <script src="scripts/event_emitter.js"></script>
-    
+
     <!-- Model scripts provide data management functionality -->
     <script src="scripts/model/format.js"></script>
     <script src="scripts/model/id.js"></script>
     <script src="scripts/model/local.js"></script>
+    <script src="scripts/model/observer.js"></script>
+    <script src="scripts/model/scrambler.js"></script>
     <script src="scripts/model/stats.js"></script>
     <script src="scripts/model/ticket.js"></script>
-    
+
     <!-- View scripts provide the front-end experience -->
     <script src="scripts/view/app/animator.js"></script>
-    <script src="scripts/view/app/app.js"></script>
+    <script src="scripts/view/app/app_view.js"></script>
     <script src="scripts/view/app/averages.js"></script>
     <script src="scripts/view/app/footer.js"></script>
     <script src="scripts/view/app/graph.js"></script>
@@ -67,24 +69,27 @@
     <script src="scripts/view/app/settings.js"></script>
     <script src="scripts/view/app/stats.js"></script>
     <script src="scripts/view/app/time.js"></script>
+    <script src="scripts/view/app/timer.js"></script>
     <script src="scripts/view/app/times_list.js"></script>
     <script src="scripts/view/assets.js"></script>
+    <script src="scripts/view/flavors.js"></script>
     <script src="scripts/view/pentagons.js"></script>
     <script src="scripts/view/popups/add.js"></script>
     <script src="scripts/view/popups/delete.js"></script>
     <script src="scripts/view/popups/message.js"></script>
     <script src="scripts/view/popups/popup.js"></script>
     <script src="scripts/view/popups/rename.js"></script>
-    <script src="scripts/view/styler.js"></script>
-    
-    <!-- Controller scripts implement the glue between parts of the app -->
-    <script src="scripts/controller/flavors.js"></script>
-    <script src="scripts/controller/home.js"></script>
+    <script src="scripts/view/window_size.js"></script>
+
+    <!-- Controller scripts handle events from the view -->
+    <script src="scripts/controller/header.js"></script>
     <script src="scripts/controller/keyboard.js"></script>
+    <script src="scripts/controller/settings.js"></script>
     <script src="scripts/controller/stackmat.js"></script>
     <script src="scripts/controller/timer.js"></script>
-    <script src="scripts/controller/window_size.js"></script>
-    
+
+    <script src="scripts/init.js"></script>
+
     <!-- This style will be modified by JavaScript code -->
     <style type="text/css" id="flavor-style">
     .flavor-background {
@@ -101,33 +106,30 @@
   <body>
     <!-- The pentagons fill the background of the page -->
     <canvas id="pentagons"></canvas>
-    
+
     <div id="scramble-container">
-      <!-- The scramble appears here -->
       <div id="scramble"></div>
     </div>
-  
+
     <!-- The time field shows the current time -->
     <div id="time">
-      <label>Hit Space</label>
+      <label></label>
       <div class="blinker"></div>
     </div>
     <div id="memo-time"></div>
-    
-    <!-- This will show the user if they got a PB -->
+
+    <!-- This will show the user if they got a PB while the footer is down -->
     <div id="pb-status"></div>
-    
+
     <!-- The footer shows times, graphs, settings, and stats -->
     <div id="footer">
       <div class="top">
-        <!-- These are the two tab buttons -->
         <button class="tab stats-tab">Stats</button>
         <button class="tab settings-tab">Settings</button>
-        
+
         <!-- This bar indicates which tab is currently selected -->
         <div class="bar flavor-background"></div>
-        
-        <!-- This is the button which closes the footer -->
+
         <button class="close"></button>
       </div>
       <div class="bottom">
@@ -145,13 +147,13 @@
             </div>
           </div>
         </div>
-        
-        <!-- This constitutes the "Settings" tab -->
+
+        <!-- The settings tab is populated by JavaScript -->
         <div class="settings-contents">
         </div>
       </div>
     </div>
-    
+
     <!-- The header has the current puzzle name and account info -->
     <div id="header">
       <label class="name flavor-text">Curvy Copter</label>
@@ -160,13 +162,13 @@
         <button class="header-button remove">Remove</button>
       </div>
     </div>
-    
+
     <!-- The puzzles dropdown comes down from the header -->
     <div id="puzzles">
       <!-- We embed the contents in the element because otherwise a bug in
            Safari prevents the user from seeing a scrollbar -->
       <div class="contents"></div>
     </div>
-    
+
   </body>
 </html>

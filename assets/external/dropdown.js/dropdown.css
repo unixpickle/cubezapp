@@ -10,12 +10,12 @@
   margin-right: 5px;
   width: 10px;
   height: 10px;
-  
+
   background-position: center;
   background-repeat: no-repeat;
   background-image: url('arrow.png');
   background-size: 100% 100%;
-  
+
   /* Allow clicks to hit contents and pass through arrow. */
   pointer-events: none;
 }
@@ -25,13 +25,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  
+
   float: left;
-  
+
   color: #999;
   width: calc(100% - 22px);
   padding-left: 7px;
-  
+
   /* Allow clicks to hit contents. */
   pointer-events: none;
 }
@@ -64,10 +64,10 @@ ul.dropdownjs-menu li {
   list-style-type: none;
   padding: 0 10px 0 30px;
   margin: 0;
-  
+
   color: #777;
   cursor: pointer;
-  
+
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

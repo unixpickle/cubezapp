@@ -16,30 +16,29 @@
 #scramble {
   /* Invisible until code loads it. */
   visibility: hidden;
-  
+
   display: inline-block;
   max-width: calc(100% - 100px);
   padding: 5px 10px 5px 10px;
-  
+
   color: white;
   font-size: 20px;
-  border-radius: 10px;
   border: 3px solid white;
 }
 
 #time {
   /* Invisible until code loads it. */
   display: none;
-  
+
   position: fixed;
   width: 100%;
   height: 0;
-  
+
   text-align: center;
   border: none;
   background-color: transparent;
   color: white;
-  
+
   margin: 0;
   padding: 0;
 }
@@ -47,45 +46,45 @@
 #time label {
   display: inline-block;
   pointer-events: none;
-  
+
   font-family: 'Roboto', sans-serif;
 }
 
 #time .blinker {
   /* Invisible until code shows it. */
   display: none;
-  
+
   position: absolute;
   top: 0;
-  
+
   height: 100%;
   width: 1px;
   background-color: white;
-  
+
   pointer-events: none;
 }
 
 #memo-time {
   /* Invisible until code loads it. */
   display: none;
-  
+
   position: fixed;
   width: 100%;
-  
+
   text-align: center;
   color: white;
-  
+
   font-family: 'Roboto', sans-serif;
 }
 
 #pb-status {
   /* Invisible until code loads it. */
   display: none;
-  
+
   position: fixed;
   left: 0;
   width: 100%;
   text-align: center;
-  
+
   color: white;
 }
