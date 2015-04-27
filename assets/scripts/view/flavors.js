@@ -133,10 +133,9 @@
   };
 
   Flavors.prototype._registerModelEvents = function() {
-    var cb = function(settings) {
-      this._modelFlavorChanged(settings.flavor);
-    }.bind(this);
-    window.app.storeObserver.observeGlobalSettings('flavor', cb);
+    window.app.observe.globalSettings('flavor', function() {
+      this._modelFlavorChanged(window.app.store.getGlobalSettings().flavor);
+    }.bind(this));
   };
 
   Flavors.prototype._startAlternating = function(alternating) {

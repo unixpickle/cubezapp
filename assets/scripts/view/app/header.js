@@ -117,9 +117,9 @@
     }
   };
 
-  Header.prototype._handleCountChange = function(count) {
+  Header.prototype._handleCountChange = function() {
     var wasEmpty = this._empty;
-    this._empty = (count <= 1);
+    this._empty = (window.app.store.getPuzzles().length <= 1);
 
     if (this._state === STATE_CLOSED || this._empty === wasEmpty) {
       return;
@@ -139,16 +139,13 @@
     }
   };
 
-  Header.prototype._handleNameChange = function(puzzle) {
-    this._$puzzleName.text(puzzle.name);
+  Header.prototype._handleNameChange = function() {
+    this._$puzzleName.text(window.app.store.getActivePuzzle().name);
   };
 
   Header.prototype._registerModelEvents = function() {
-    var countHandler = this._handleCountChange.bind(this);
-    window.app.storeObserver.observePuzzleCount(countHandler);
-    
-    var nameHandler = this._handleNameChange.bind(this);
-    window.app.storeObserver.observeActivePuzzle('name', nameHandler);
+    window.app.observe.puzzleCount(this._handleCountChange.bind(this));
+    window.app.observe.activePuzzle('name', this._handleNameChange.bind(this));
   };
 
   Header.prototype._registerUIEvents = function() {
@@ -158,7 +155,7 @@
       this._dropdown.hideDeleteButtons();
       this._state = STATE_OPEN;
       this.emit('deletePuzzle', id);
-    }.bind(this)
+    }.bind(this);
     this._dropdown.onSwitch = this.emit.bind(this, 'switchPuzzle');
     this._$puzzleActions.find('.add').click(this.emit.bind(this, 'addPuzzle'));
     this._$puzzleActions.find('.remove').click(this._deleteClicked.bind(this));
@@ -315,7 +312,7 @@
   Dropdown.prototype._registerModelEvents = function() {
     window.app.store.on('remoteChange', this._generateContents.bind(this));
     window.app.store.on('deletedPuzzle', this._puzzleDeleted.bind(this));
-    
+
     var closeUpdateLaterEvents = ['addedPuzzle', 'switchedPuzzle'];
     for (var i = 0; i < closeUpdateLaterEvents.length; ++i) {
       var event = closeUpdateLaterEvents[i];

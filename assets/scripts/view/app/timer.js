@@ -139,8 +139,8 @@
       throw new Error('timer is not running');
     }
   };
-  
-  TimerView.prototype._handleLatestSolveChanged = function(solve) {
+
+  TimerView.prototype._handleLatestSolveChanged = function() {
     if (!this._timerRunning) {
       this._showLatestSolve();
     }
@@ -155,12 +155,9 @@
   };
 
   TimerView.prototype._registerModelEvents = function() {
-    var globalSettings = ['theaterMode', 'timerAccuracy'];
-    window.app.storeObserver.observeGlobalSettings(globalSettings,
+    window.app.observe.globalSettings(['theaterMode', 'timerAccuracy'],
       this._handleSettingsChanged.bind(this));
-    
-    var solveAttrs = ['time', 'memo'];
-    window.app.storeObserver.observeLatestSolve(solveAttrs,
+    window.app.observe.latestSolve(['time', 'memo'],
       this._handleLatestSolveChanged.bind(this));
   };
 

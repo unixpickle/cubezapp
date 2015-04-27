@@ -10,31 +10,31 @@
   function StoreObserver() {
   }
 
-  StoreObserver.prototype.observeActivePuzzle = function(attrs, callback) {
+  StoreObserver.prototype.activePuzzle = function(attrs, callback) {
     return this._observeAttrs(ACTIVE_PUZZLE_EVENTS, function() {
       return window.app.store.getActivePuzzle();
     }, attrs, callback);
   };
 
-  StoreObserver.prototype.observeGlobalSettings = function(attrs, callback) {
+  StoreObserver.prototype.globalSettings = function(attrs, callback) {
     return this._observeAttrs(GLOBAL_SETTING_EVENTS, function() {
       return window.app.store.getGlobalSettings();
     }, attrs, callback);
   };
 
-  StoreObserver.prototype.observeLatestSolve = function(attrs, callback) {
+  StoreObserver.prototype.latestSolve = function(attrs, callback) {
     return this._observeAttrs(LATEST_SOLVE_EVENTS, function() {
       return window.app.store.getLatestSolve();
     }, attrs, callback);
   };
 
-  StoreObserver.prototype.observePuzzleCount = function(callback) {
+  StoreObserver.prototype.puzzleCount = function(callback) {
     var count = window.app.store.getPuzzles().length;
     return new Observation(PUZZLE_COUNT_EVENTS, function() {
       var newCount = window.app.store.getPuzzles().length;
       if (newCount !== count) {
         count = newCount;
-        callback(newCount);
+        callback();
       }
     }).start();
   };
@@ -51,7 +51,7 @@
     return new Observation(events, function() {
       var changed = false;
       var obj = objFunc();
-      
+
       if (currentValues === null && obj !== null) {
         changed = true;
         currentValues = extractProperties(obj, attrs);
@@ -68,9 +68,9 @@
           }
         }
       }
-      
+
       if (changed) {
-        cb(obj);
+        cb();
       }
     }).start();
   }
@@ -119,6 +119,6 @@
     return res;
   }
 
-  window.app.storeObserver = new StoreObserver();
+  window.app.observe = new StoreObserver();
 
 })();

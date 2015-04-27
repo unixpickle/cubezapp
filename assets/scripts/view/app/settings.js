@@ -439,7 +439,7 @@
       this._subscrambleDropdown.setOptions(options);
     }
   };
-  
+
   Settings.prototype._registerModelEvents = function() {
     var puzzleEvents = {
       'icon': this._updatePuzzleIcon,
@@ -450,21 +450,17 @@
     var puzzleAttributes = Object.keys(puzzleEvents);
     for (var i = 0, len = puzzleAttributes.length; i < len; ++i) {
       var attr = puzzleAttributes[i];
-      window.app.storeObserver.observeActivePuzzle(attr,
-        puzzleEvents[attr].bind(this));
+      window.app.observe.activePuzzle(attr, puzzleEvents[attr].bind(this));
     }
-    
-    window.app.storeObserver.observeGlobalSettings('flavor',
-      this._updateFlavor.bind(this));
+
+    window.app.observe.globalSettings('flavor', this._updateFlavor.bind(this));
   };
 
   Settings.prototype._showInitialData = function() {
-    var puzzle = window.app.store.getActivePuzzle();
-    var globalSettings = window.app.store.getGlobalSettings();
-    this._updateFlavor(globalSettings);
-    this._updatePuzzleIcon(puzzle);
-    this._updatePuzzleName(puzzle);
-    this._updateScramble(puzzle, true);
+    this._updateFlavor();
+    this._updatePuzzleIcon();
+    this._updatePuzzleName();
+    this._updateScramble(true);
     this.layout(false);
   };
 
@@ -482,12 +478,14 @@
     return names;
   };
 
-  Settings.prototype._updateFlavor = function(globalSettings) {
+  Settings.prototype._updateFlavor = function() {
     this._hideDropdowns();
+    var globalSettings = window.app.store.getGlobalSettings();
     this._flavorDropdown.setSelectedValue(globalSettings.flavor);
   };
 
-  Settings.prototype._updatePuzzleIcon = function(puzzle) {
+  Settings.prototype._updatePuzzleIcon = function() {
+    var puzzle = window.app.store.getActivePuzzle();
     this._puzzleIcon.css({
       backgroundImage: 'url(images/puzzles/' + puzzle.icon + '.png)'
     });
@@ -495,13 +493,16 @@
     this._iconDropdown.setSelectedValue(iconName);
   };
 
-  Settings.prototype._updatePuzzleName = function(puzzle) {
+  Settings.prototype._updatePuzzleName = function() {
+    var puzzle = window.app.store.getActivePuzzle();
     this._puzzleLabel.text(puzzle.name);
   };
 
-  Settings.prototype._updateScramble = function(puzzle, dontLayout) {
+  Settings.prototype._updateScramble = function(dontLayout) {
     this._hideDropdowns();
-    
+
+    var puzzle = window.app.store.getActivePuzzle();
+
     this._scrambleDropdown.setSelectedValue(puzzle.scrambler);
     this._popuplateSubscramble();
     this._subscrambleDropdown.setSelectedValue(puzzle.scrambleType);

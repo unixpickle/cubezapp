@@ -66,7 +66,7 @@
     window.app.keyboard.remove(this);
     window.app.windowSize.removeListener(this._resizeHandler);
   };
-  
+
   // keyup allows us to detect the escape key.
   Popup.prototype.keyup = function(e) {
     if (e.which === ESCAPE_KEY) {
@@ -272,7 +272,7 @@
       ANIMATION_DURATION);
     var easeValue = this._ease(sinceStart / ANIMATION_DURATION);
     var skipTime = this._inverseEase(1 - easeValue) * ANIMATION_DURATION;
-    
+
     this._reversed = true;
     this._startTime = now - skipTime;
 
@@ -305,7 +305,7 @@
     var c = -7.2908241330981340;
     return a * Math.exp(b * Math.exp(c * t));
   };
-  
+
   Animation.prototype._inverseEase = function(x) {
     if (x <= 0) {
       return 0;

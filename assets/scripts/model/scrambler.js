@@ -68,9 +68,8 @@
   };
 
   ScrambleStream.prototype._registerModelEvents = function() {
-    var attrs = ['id', 'scrambler', 'scrambleType'];
-    var handler = this._modelChanged.bind(this);
-    window.app.storeObserver.observeActivePuzzle(attrs, handler);
+    window.app.observe.activePuzzle(['id', 'scrambler', 'scrambleType'],
+      this._modelChanged.bind(this));
   };
 
   ScrambleStream.prototype._replenishQueue = function() {
