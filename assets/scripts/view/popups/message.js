@@ -3,7 +3,7 @@
   function MessagePopup(title, message) {
     var content = $('<div class="message-popup-content"></div>').text(message);
     this._dialog = new window.app.Dialog(title, content, ['OK']);
-    this._dialog.onAction = this._action.bind(this);
+    this._dialog.on('action', this._action.bind(this));
   }
 
   MessagePopup.prototype.show = function() {

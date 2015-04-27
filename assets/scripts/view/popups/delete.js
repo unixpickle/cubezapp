@@ -6,7 +6,7 @@
     var content = $('<div class="delete-popup-content"></div>').text(msg);
     this._dialog = new window.app.Dialog('Are you sure?', content,
       ['Cancel', 'Delete']);
-    this._dialog.onAction = this._action.bind(this);
+    this._dialog.on('action', this._action.bind(this));
     this._callback = cb;
   }
 
@@ -14,8 +14,8 @@
     this._dialog.show();
   };
 
-  DeletePopup.prototype._action = function(name) {
-    if (name === 'Delete') {
+  DeletePopup.prototype._action = function(index) {
+    if (index === 1) {
       this._callback();
     }
     this._dialog.close();

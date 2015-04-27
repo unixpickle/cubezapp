@@ -12,15 +12,15 @@
     var input = content.find('input');
     this._dialog = new window.app.Dialog('Rename', content,
       ['Cancel', 'Rename']);
-    this._dialog.onAction = this._action.bind(this);
+    this._dialog.on('action', this._action.bind(this));
   }
 
   RenamePopup.prototype.show = function() {
     this._dialog.show();
   };
 
-  RenamePopup.prototype._action = function(name) {
-    if (name === 'Rename') {
+  RenamePopup.prototype._action = function(idx) {
+    if (idx === 1) {
       // TODO: this.
     }
     this._dialog.close();

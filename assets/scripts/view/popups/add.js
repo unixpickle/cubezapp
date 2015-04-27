@@ -52,8 +52,8 @@
     var separator = $('<div class="separator"></div>');
     element.append([puzzle, separator, this._$fields]);
     this._dialog = new window.app.Dialog('New Puzzle', element, ['Create']);
-    this._dialog.onAction = this._done.bind(this);
-    this._dialog.onClose = this._handleClose.bind(this);
+    this._dialog.on('action', this._done.bind(this));
+    this._dialog.on('close', this._handleClose.bind(this));
   }
 
   AddPopup.prototype.show = function() {
@@ -222,6 +222,7 @@
 
     // Close this popup and the header popup behind it.
     this._dialog.close();
+    this._handleClose();
     window.app.view.closePuzzles();
 
     // Add the puzzle and switch to it.
