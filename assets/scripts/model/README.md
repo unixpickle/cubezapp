@@ -123,15 +123,19 @@ These methods all return an [Observation](#observation-object) object.
 
 To track changes to the name and/or icon of the active puzzle, you can do this:
 
-    window.app.observe.activePuzzle(['name', 'icon'], function() {
-      console.log('change detected');
-    });
+```javascript
+window.app.observe.activePuzzle(['name', 'icon'], function() {
+  console.log('change detected');
+});
+```
 
 To track the time of the latest solve, you can do this:
 
-    window.app.observe.latestSolve('time', function() {
-      console.log('change detected');
-    });
+```javascript
+window.app.observe.latestSolve('time', function() {
+  console.log('change detected');
+});
+```
 
 <a name="observation-object"></a>
 ## Observation
