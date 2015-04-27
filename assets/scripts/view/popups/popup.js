@@ -268,9 +268,13 @@
   // it completes.
   Animation.prototype.reverse = function() {
     var now = new Date().getTime();
-    var sinceStart = now - this._startTime;
+    var sinceStart = Math.min(Math.max(now - this._startTime, 0),
+      ANIMATION_DURATION);
+    var easeValue = this._ease(sinceStart / ANIMATION_DURATION);
+    var skipTime = this._inverseEase(1 - easeValue) * ANIMATION_DURATION;
+    
     this._reversed = true;
-    this._startTime = now - Math.max(0, ANIMATION_DURATION - sinceStart);
+    this._startTime = now - skipTime;
 
     // If it's not already animating (i.e. still fading in), we need to restart
     // the animation process.
@@ -300,6 +304,18 @@
     var b = -6.4041738958415664;
     var c = -7.2908241330981340;
     return a * Math.exp(b * Math.exp(c * t));
+  };
+  
+  Animation.prototype._inverseEase = function(x) {
+    if (x <= 0) {
+      return 0;
+    } else if (x >= 1) {
+      return 1;
+    }
+    var a =  1.0042954579734844;
+    var b = -6.4041738958415664;
+    var c = -7.2908241330981340;
+    return Math.log(Math.log(x / a) / b) / c;
   };
 
   // _showFrame renders a given percentage of the animation.
