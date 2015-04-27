@@ -1,5 +1,8 @@
 (function() {
 
+  var LAG_THRESHOLD = 200;
+  var LAG_SMOOTH_TIME = 5;
+
   // This is an exhaustive list of every animation attribute that an animator
   // can animate.
   var attributes = [
@@ -35,6 +38,7 @@
     }
 
     this.timestamp = new Date().getTime();
+    this.lastTimestamp = this.timestamp;
     this._done = false;
   }
 
@@ -44,9 +48,15 @@
       this._done = true;
       return this.end;
     }
-
-    // See how much of the animation has elapsed.
-    var elapsed = new Date().getTime() - this.timestamp;
+    
+    var now = new Date().getTime();
+    var frameDelay = now - this.lastTimestamp;
+    this.lastTimestamp = now;
+    if (frameDelay > LAG_THRESHOLD) {
+      this.timestamp += frameDelay - LAG_SMOOTH_TIME;
+    }
+    
+    var elapsed = now - this.timestamp;
     var fraction = Math.max((elapsed-this.delay)/this.duration, 0);
     if (fraction >= 1) {
       this._done = true;
