@@ -5,22 +5,20 @@
   var CONTENT_HEIGHT = 200;
 
   function AddPopup() {
-    // Generate the puzzle.
-    var puzzle = $('<div class="puzzle"></div>');
-    puzzle.append();
-    puzzle.append();
+    window.app.EventEmitter.call(this);
+
+    var $puzzle = $('<div class="puzzle"></div>');
     this._$puzzleIcon = $('<div class="icon flavor-background"></div>');
     this._$puzzleName = $('<label>Name</label>');
-    puzzle.append([this._$puzzleIcon, this._$puzzleName]);
+    $puzzle.append([this._$puzzleIcon, this._$puzzleName]);
 
-    // Create the fields container.
     this._$fields = $('<div class="fields"></div>');
 
     // This state is used to know whether or not to play an animation to show
     // the subscramble dropdown.
     this._showingSubscramble = false;
 
-    // These keep track of which field the user has explicitly set.
+    // Keep track of which field the user has explicitly set.
     this._userChangedIcon = false;
     this._userChangedScramble = false;
 
@@ -37,33 +35,83 @@
     this._$subscrambleField = null;
     this._subscrambleDropdown = null;
 
-    // Generate the input fields.
     this._createBLDField();
     this._createIconField();
     this._createNameField();
     this._createScrambleField();
     this._createSubscrambleField();
 
-    // Layout the fields.
     this._initialLayout();
 
-    // Create the actual popup.
-    var element = $('<div class="add-popup-content"></div>');
-    var separator = $('<div class="separator"></div>');
-    element.append([puzzle, separator, this._$fields]);
-    this._dialog = new window.app.Dialog('New Puzzle', element, ['Create']);
-    this._dialog.on('action', this._done.bind(this));
+    var $element = $('<div class="add-popup-content"></div>');
+    var $separator = $('<div class="separator"></div>');
+    $element.append([$puzzle, $separator, this._$fields]);
+    this._dialog = new window.app.Dialog('New Puzzle', $element, ['Create']);
+    this._dialog.on('action', this.emit.bind(this, 'create'));
     this._dialog.on('close', this._handleClose.bind(this));
   }
+
+  AddPopup.prototype = Object.create(window.app.EventEmitter.prototype);
+
+  AddPopup.prototype.bld = function() {
+    return this._bldCheck.checked();
+  };
+
+  AddPopup.prototype.close = function() {
+    this._dialog.close();
+    this._handleClose();
+  };
+
+  AddPopup.prototype.icon = function() {
+    return window.app.iconFiles[this._iconDropdown.selected()];
+  };
+
+  AddPopup.prototype.name = function() {
+    return this._$nameInput.val();
+  };
+
+  AddPopup.prototype.scrambler = function() {
+    return this._scrambleDropdown.value();
+  };
+
+  AddPopup.prototype.shakeName = function() {
+    this._$nameInput.focus();
+    var prefixes = ['webkitAnimation', 'animation'];
+    var element = this._$nameInput[0];
+    for (var i = 0; i < 2; ++i) {
+      var prefix = prefixes[i];
+      element.style[prefix + 'Name'] = 'shake';
+      element.style[prefix + 'Duration'] = '0.5s';
+      element.style[prefix + 'Direction'] = 'normal';
+      element.style[prefix + 'Delay'] = '0s';
+      element.style[prefix + 'FillMode'] = 'none';
+    }
+    element.addEventListener('animationend', function() {
+      element.style.animationName = 'none';
+      element.style.webkitAnimationName = 'none';
+    });
+    element.addEventListener('webkitAnimationEnd', function() {
+      element.style.animationName = 'none';
+      element.style.webkitAnimationName = 'none';
+    });
+  };
 
   AddPopup.prototype.show = function() {
     this._dialog.show();
   };
 
+  AddPopup.prototype.scrambleType = function() {
+    var subscramblers = this._subscramblers();
+    if (subscramblers.length === 1) {
+      return subscramblers[0];
+    } else if (subscramblers.length > 1) {
+      return this._subscrambleDropdown.value();
+    }
+  };
+
   AddPopup.prototype._changedIcon = function() {
     this._userChangedIcon = true;
 
-    // Get the filename from the human-readable name.
     var name = window.app.iconFiles[this._iconDropdown.selected()];
     this._$puzzleIcon.css({
       backgroundImage: 'url(images/puzzles/' + name + '.png)'
@@ -202,39 +250,7 @@
 
   // _done process the user's input and creates a puzzle.
   AddPopup.prototype._done = function() {
-    var name = this._$nameInput.val();
-    if (name === '') {
-      this._$nameInput.focus();
-      this._shakeName();
-      return;
-    }
-
-    // Fiend the info they selected.
-    var icon = window.app.iconFiles[this._iconDropdown.selected()];
-    var scrambler = this._scrambleDropdown.value();
-    var subscramblers = this._subscramblers();
-    var subscrambler = '';
-    if (subscramblers.length === 1) {
-      subscrambler = subscramblers[0];
-    } else if (subscramblers.length > 1) {
-      subscrambler = this._subscrambleDropdown.value();
-    }
-
-    // Close this popup and the header popup behind it.
-    this._dialog.close();
-    this._handleClose();
-    window.app.view.closePuzzles();
-
-    // Add the puzzle and switch to it.
-    window.app.home.addPuzzle({
-      name: name,
-      icon: icon,
-      scrambler: scrambler,
-      scrambleType: subscrambler,
-      scrambleLength: 0,
-      blindfolded: this._bldCheck.checked(),
-      lastUsed: new Date().getTime()
-    });
+    this.emit('create');
   };
 
   // _fieldPositions computes the top coordinates for each field.
@@ -284,27 +300,6 @@
       this._$fields.append(fields[i]);
     }
     this._$fields.append(this._$subscrambleField);
-  };
-
-  AddPopup.prototype._shakeName = function() {
-    var prefixes = ['webkitAnimation', 'animation'];
-    var element = this._$nameInput[0];
-    for (var i = 0; i < 2; ++i) {
-      var prefix = prefixes[i];
-      element.style[prefix + 'Name'] = 'shake';
-      element.style[prefix + 'Duration'] = '0.5s';
-      element.style[prefix + 'Direction'] = 'normal';
-      element.style[prefix + 'Delay'] = '0s';
-      element.style[prefix + 'FillMode'] = 'none';
-    }
-    element.addEventListener('animationend', function() {
-      element.style.animationName = 'none';
-      element.style.webkitAnimationName = 'none';
-    });
-    element.addEventListener('webkitAnimationEnd', function() {
-      element.style.animationName = 'none';
-      element.style.webkitAnimationName = 'none';
-    });
   };
 
   AddPopup.prototype._subscramblers = function() {

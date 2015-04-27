@@ -165,7 +165,7 @@
     });
 
     var timesEvents = ['modifiedSolve', 'addedSolve', 'deletedSolve',
-      'switchedPuzzle'];
+      'switchedPuzzle', 'addedPuzzle'];
     for (var i = 0; i < timesEvents.length; ++i) {
       window.app.store.on(timesEvents[i], timesHandler);
     }

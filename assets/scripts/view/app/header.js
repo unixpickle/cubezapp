@@ -150,7 +150,8 @@
       window.app.store.on(events[i], bound);
     }
 
-    events = ['remoteChange', 'modifiedPuzzle', 'switchedPuzzle'];
+    events = ['remoteChange', 'modifiedPuzzle', 'switchedPuzzle',
+      'addedPuzzle'];
     bound = this._handleNameChange.bind(this);
     for (var i = 0; i < events.length; ++i) {
       window.app.store.on(events[i], bound);

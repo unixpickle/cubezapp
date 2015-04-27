@@ -29,6 +29,9 @@
 
   LocalStore.prototype.addPuzzle = function(puzzle) {
     puzzle.id = window.app.generateId();
+    if ('undefined' === typeof puzzle.solves) {
+      puzzle.solves = [];
+    }
     this._puzzles.unshift(puzzle);
     this._active = puzzle;
     this._save();
