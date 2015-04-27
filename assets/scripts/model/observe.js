@@ -7,28 +7,28 @@
     'switchedPuzzle', 'addedPuzzle'];
   var PUZZLE_COUNT_EVENTS = ['addedPuzzle', 'deletedPuzzle', 'remoteChange'];
 
-  function StoreObserver() {
+  function Observe() {
   }
 
-  StoreObserver.prototype.activePuzzle = function(attrs, callback) {
+  Observe.prototype.activePuzzle = function(attrs, callback) {
     return this._observeAttrs(ACTIVE_PUZZLE_EVENTS, function() {
       return window.app.store.getActivePuzzle();
     }, attrs, callback);
   };
 
-  StoreObserver.prototype.globalSettings = function(attrs, callback) {
+  Observe.prototype.globalSettings = function(attrs, callback) {
     return this._observeAttrs(GLOBAL_SETTING_EVENTS, function() {
       return window.app.store.getGlobalSettings();
     }, attrs, callback);
   };
 
-  StoreObserver.prototype.latestSolve = function(attrs, callback) {
+  Observe.prototype.latestSolve = function(attrs, callback) {
     return this._observeAttrs(LATEST_SOLVE_EVENTS, function() {
       return window.app.store.getLatestSolve();
     }, attrs, callback);
   };
 
-  StoreObserver.prototype.puzzleCount = function(callback) {
+  Observe.prototype.puzzleCount = function(callback) {
     var count = window.app.store.getPuzzles().length;
     return new Observation(PUZZLE_COUNT_EVENTS, function() {
       var newCount = window.app.store.getPuzzles().length;
@@ -40,7 +40,7 @@
   };
 
   // _observeAttrs observes attribute changes on objFunc() for a set of events.
-  StoreObserver.prototype._observeAttrs = function(events, objFunc, attrs, cb) {
+  Observe.prototype._observeAttrs = function(events, objFunc, attrs, cb) {
     if ('string' === typeof attrs) {
       attrs = [attrs];
     } else {
@@ -119,6 +119,6 @@
     return res;
   }
 
-  window.app.observe = new StoreObserver();
+  window.app.observe = new Observe();
 
 })();

@@ -4,6 +4,14 @@ The model stores the user's data. In the future, it will be responsible for sync
 
 This document will provide some documentation on the interface that the model provides for the rest of the app.
 
+Here are the sections of this document:
+
+ * [The Format API](#format-api-section)
+ * [Identifiers](#identifiers-section)
+ * [The store](#store-section)
+ * [Observe](#observe-section)
+
+<a name="format-api-section"></a>
 # The Format API
 
 The model provides some functions on the `window.app` object which manipulate times:
@@ -11,15 +19,17 @@ The model provides some functions on the `window.app` object which manipulate ti
  * **formatSeconds**(millis) - this generates a representation of a time in milliseconds without including centiseconds.
  * **formatTime**(millis) - this generates the canonical time representation of a time in milliseconds.
 
+<a name="identifiers-section"></a>
 # Identifiers
 
 The store uses unique identifiers a lot. To generate a pseudorandom 32-digit hex identifier, call `window.app.generateId`.
 
+<a name="store-section"></a>
 # The store
 
-The global object `window.app.store` has various methods which provide data to the application. In addition, it implements the [EventEmitter interface](../event_emitter.md) to notify observers about data changes.
+The global object `window.app.store` has various methods which provide data to the application. In addition, it implements the [EventEmitter interface](../event_emitter.md) to notify other parts of the app about data changes.
 
-The store sends a number of events. These events are listed to look like functions in order to highlight the arguments they will receive.
+The store emits a number of events. These events are listed to look like functions in order to highlight the arguments they will receive.
 
  * **addedPuzzle**(puzzle) - the user added a puzzle and it is now the current puzzle. Not triggered by remote changes.
  * **addedSolve**(solve) - the user saved a new solve. Not triggered by remote changes.
@@ -34,7 +44,7 @@ The store sends a number of events. These events are listed to look like functio
  * **switchPuzzleError**(err) - the puzzle could not be switched because of an error.
  * **switchedPuzzle**() - the current puzzle has been changed. Not triggered by remote changes.
 
-There are many data manipulation methods on the store. Some of these options take a `cb` (callback) argument. If the method takes a `cb` argument, it is an asynchronous operation and may fail. If the method does not take a `cb` argument, it is synchronous. Synchronous operations are guaranteed to work, although they may not synchronize with a server until later.
+There are many data manipulation methods on the store. Some of these methods take a `cb` (callback) argument. If a method takes a `cb` argument, it is an asynchronous operation and may fail. If the method does not take a `cb` argument, it is synchronous. Synchronous operations are guaranteed to work, although they may not synchronize with a server until later.
 
 Here are the methods which the store provides:
 
@@ -90,3 +100,46 @@ The **Global Settings** object stores the user's global settings. Here are the f
  * **righty** - bool - true if the user is right handed. **Default:** true
  * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller.
  * **theaterMode** - bool - enter theater mode while timing.
+
+<a name="observe-section"></a>
+# Observe
+
+Although `window.app.store` does emit various events, it does not provide fine-tuned observation functionality. To supplement these events, the `window.app.observe` object provides several methods to observe specific pieces of information within the model.
+
+`window.app.observe` implements the following methods:
+
+ * **activePuzzle**(attrOrList, callback) - observe changes in the active puzzle.
+ * **globalSettings**(attrOrList, callback) - observe changes in the global settings.
+ * **latestSolve**(attrOrList, callback) - observe changes in the latest solve.
+ * **puzzleCount**(callback) - observe changes in the number of puzzles.
+
+All of these methods take a callback argument. The callback receives no arguments.
+
+The `attrOrList` argument specifies which properties on the specified object to track. This argument can be a string or an array of strings.
+
+These methods all return an [Observation](#observation-object) object.
+
+## Example
+
+To track changes to the name and/or icon of the active puzzle, you can do this:
+
+    window.app.observe.activePuzzle(['name', 'icon'], function() {
+      console.log('change detected');
+    });
+
+To track the time of the latest solve, you can do this:
+
+    window.app.observe.latestSolve('time', function() {
+      console.log('change detected');
+    });
+
+<a name="observation-object"></a>
+## Observation
+
+An Observation object is returned by a call to `window.app.observe`. The object controls that particular observation. By default, the observation is running, meaning that a callback will be triggered when changes occur.
+
+An instance of Observation implements the following methods:
+
+ * **isRunning**() - returns a boolean indicating whether or not the observation is running.
+ * **start**() - start the observation.
+ * **stop**() - stop the observation.
