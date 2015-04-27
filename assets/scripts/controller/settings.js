@@ -1,7 +1,7 @@
 (function() {
 
-  function SettingsController() {
-    this._view = window.app.view.footer.settings;
+  function SettingsController(view) {
+    this._view = view;
     var events = ['flavorChanged', 'iconChanged', 'scramblerChanged'];
     for (var i = 0; i < events.length; ++i) {
       var functionName = '_' + events[i];

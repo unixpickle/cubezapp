@@ -8,7 +8,10 @@
   }
 
   function initializeController() {
-    window.app.settingsController = new window.app.SettingsController();
+    window.app.settingsController =
+      new window.app.SettingsController(window.app.view.footer.settings);
+    window.app.headerController =
+      new window.app.HeaderController(window.app.view.header);
     window.app.view.on('load', function() {
       window.app.timerController = new window.app.TimerController();
     });

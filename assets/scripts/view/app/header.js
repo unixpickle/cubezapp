@@ -160,7 +160,11 @@
   Header.prototype._registerUIEvents = function() {
     this._$puzzleName.click(this._toggle.bind(this));
     this._dropdown.onAdd = this.emit.bind(this, 'addPuzzle');
-    this._dropdown.onDelete = this.emit.bind(this, 'deletePuzzle');
+    this._dropdown.onDelete = function(id) {
+      this._dropdown.hideDeleteButtons();
+      this._state = STATE_OPEN;
+      this.emit('deletePuzzle', id);
+    }.bind(this)
     this._dropdown.onSwitch = this.emit.bind(this, 'switchPuzzle');
     this._$puzzleActions.find('.add').click(this.emit.bind(this, 'addPuzzle'));
     this._$puzzleActions.find('.remove').click(this._deleteClicked.bind(this));
@@ -315,14 +319,19 @@
   };
 
   Dropdown.prototype._registerModelEvents = function() {
-    window.app.store.on('addedPuzzle', function() {
-      if (this._isOpen) {
-        this.close();
-      }
-      this._updateOnOpen = true;
-    });
     window.app.store.on('remoteChange', this._generateContents.bind(this));
     window.app.store.on('deletedPuzzle', this._puzzleDeleted.bind(this));
+    
+    var closeUpdateLaterEvents = ['addedPuzzle', 'switchedPuzzle'];
+    for (var i = 0; i < closeUpdateLaterEvents.length; ++i) {
+      var event = closeUpdateLaterEvents[i];
+      window.app.store.on(event, function() {
+        if (this._isOpen) {
+          this.close();
+        }
+        this._updateOnOpen = true;
+      }.bind(this));
+    }
   };
 
   Dropdown.prototype._repositionPuzzles = function() {
