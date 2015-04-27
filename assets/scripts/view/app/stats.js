@@ -18,6 +18,8 @@
     this.averages.setVisible(false);
 
     this._showingStats = false;
+    this._registerModelEvents();
+    this._initializeUI();
   }
 
   Stats.prototype.layout = function() {
@@ -37,30 +39,22 @@
     }
   };
 
-  Stats.prototype.setPuzzle = function(puzzle) {
-    var icon = 'images/gray_puzzles/' + puzzle.icon + '.png';
-    this._$grayPuzzleIcon.css({backgroundImage: 'url(' + icon + ')'});
+  Stats.prototype._handleIconChanged = function() {
+    var iconName = window.app.store.getActivePuzzle().icon;
+    var iconPath = 'images/gray_puzzles/' + iconName + '.png';
+    this._$grayPuzzleIcon.css({backgroundImage: 'url(' + iconPath + ')'});
   };
 
-  Stats.prototype.setShowingStats = function(flag, animate) {
-    if (this._showingStats === flag) {
-      return;
-    }
-    this._showingStats = flag;
-    if (flag) {
-      if (animate) {
-        this._$movingPane.animate({top: 0});
-      } else {
-        this._$movingPane.css({top: 0});
-      }
-    } else {
-      var newTop = -this._$movingPane.height() / 2;
-      if (animate) {
-        this._$movingPane.animate({top: newTop});
-      } else {
-        this._$movingPane.css({top: newTop});
-      }
-    }
+  Stats.prototype._handleSolveChanged = function() {
+    var showing = (window.app.store.getLatestSolve() !== null);
+    var animate = false;
+    // TODO: figure out a way to know whether or not we should animate.
+    this._setShowingStats(showing, animate);
+  };
+
+  Stats.prototype._initializeUI = function() {
+    this._handleIconChanged();
+    this._handleSolveChanged();
   };
 
   Stats.prototype._layoutContent = function() {
@@ -83,6 +77,32 @@
       var left = this.timesList.width();
       var graphWidth = width - (left + this.averages.width());
       this.graph.layout(left+COLUMN_PADDING, graphWidth-COLUMN_PADDING*2);
+    }
+  };
+
+  Stats.prototype._registerModelEvents = function() {
+    window.app.observe.latestSolve('id', this._handleSolveChanged.bind(this));
+    window.app.observe.activePuzzle('icon', this._handleIconChanged.bind(this));
+  };
+
+  Stats.prototype._setShowingStats = function(flag, animate) {
+    if (this._showingStats === flag) {
+      return;
+    }
+    this._showingStats = flag;
+    if (flag) {
+      if (animate) {
+        this._$movingPane.animate({top: 0});
+      } else {
+        this._$movingPane.css({top: 0});
+      }
+    } else {
+      var newTop = -this._$movingPane.height() / 2;
+      if (animate) {
+        this._$movingPane.animate({top: newTop});
+      } else {
+        this._$movingPane.css({top: newTop});
+      }
     }
   };
 
