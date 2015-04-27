@@ -300,7 +300,7 @@
     this._updateAll(false);
     var updateHandler = this._updateAll.bind(this, true);
     var updateEvents = ['modifiedGlobalSettings', 'modifiedPuzzle',
-      'remoteChanged', 'switchedPuzzle'];
+      'remoteChange', 'switchedPuzzle'];
     for (var i = 0; i < updateEvents.length; ++i) {
       window.app.store.on(updateEvents[i], updateHandler);
     }

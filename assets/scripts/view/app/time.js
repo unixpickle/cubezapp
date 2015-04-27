@@ -83,7 +83,7 @@
   Time.prototype.text = function(text) {
     this._text = text;
     this._$label.text(text);
-    this._$label.css({'font-size': this._usableFontSize() + 'px'});
+    this._$label.css({fontSize: this._usableFontSize() + 'px'});
     this._setBlinkerVisible(this._showingBlinker);
   };
 
