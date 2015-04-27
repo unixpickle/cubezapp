@@ -133,17 +133,10 @@
   };
 
   Flavors.prototype._registerModelEvents = function() {
-    window.app.store.on('modifiedGlobalSettings', function(attrs) {
-      if (attrs.flavor) {
-        this._modelFlavorChanged(attrs.flavor);
-      }
-    }.bind(this));
-    window.app.store.on('remoteChange', function() {
-      var newFlavor = window.app.store.getGlobalSettings().flavor;
-      if (newFlavor !== this._currentName) {
-        this._modelFlavorChanged(newFlavor);
-      }
-    }.bind(this));
+    var cb = function(settings) {
+      this._modelFlavorChanged(settings.flavor);
+    }.bind(this);
+    window.app.storeObserver.observeGlobalSettings('flavor', cb);
   };
 
   Flavors.prototype._startAlternating = function(alternating) {

@@ -19,9 +19,7 @@
     this._paused = true;
 
     this._lastEmittedScramble = null;
-
     this._currentScrambler = Scrambler.current();
-    this._currentPuzzleId = window.app.store.getActivePuzzle().id;
 
     this._registerModelEvents();
   }
@@ -61,27 +59,18 @@
   };
 
   ScrambleStream.prototype._modelChanged = function() {
-    var scrambler = Scrambler.current();
-    var puzzleId = window.app.store.getActivePuzzle().id;
-    if (!scrambler.equals(this._currentScrambler) ||
-        this._currentPuzzleId !== puzzleId) {
-      this._currentScrambler = scrambler;
-      this._currentPuzzleId = puzzleId;
-      if (this._paused) {
-        this._replenishQueue();
-      } else {
-        this._generateOrDequeue();
-      }
+    this._currentScrambler = Scrambler.current();
+    if (this._paused) {
+      this._replenishQueue();
+    } else {
+      this._generateOrDequeue();
     }
   };
 
   ScrambleStream.prototype._registerModelEvents = function() {
+    var attrs = ['id', 'scrambler', 'scrambleType'];
     var handler = this._modelChanged.bind(this);
-    var events = ['remoteChange', 'switchedPuzzle', 'modifiedPuzzle',
-      'addedPuzzle'];
-    for (var i = 0; i < events.length; ++i) {
-      window.app.store.on(events[i], handler);
-    }
+    window.app.storeObserver.observeActivePuzzle(attrs, handler);
   };
 
   ScrambleStream.prototype._replenishQueue = function() {

@@ -27,8 +27,8 @@
 
     appView.on('load', this._scrambleStream.resume.bind(this._scrambleStream));
 
-    // NOTE: we do not run this._showLatestTime() here because the AppView does
-    // that as part of the loading process.
+    // NOTE: we do not run this._showLatestSolve() here because the AppView does
+    // it as part of the loading process.
   }
 
   TimerView.ACCURACY_CENTISECONDS = 0;
@@ -139,6 +139,12 @@
       throw new Error('timer is not running');
     }
   };
+  
+  TimerView.prototype._handleLatestSolveChanged = function(solve) {
+    if (!this._timerRunning) {
+      this._showLatestSolve();
+    }
+  };
 
   TimerView.prototype._handleSettingsChanged = function() {
     if (this._timerRunning) {
@@ -148,43 +154,28 @@
     }
   };
 
-  TimerView.prototype._handleTimesChanged = function() {
-    if (!this._timerRunning) {
-      this._showLatestTime();
-    }
-  };
-
   TimerView.prototype._registerModelEvents = function() {
-    var settingsHandler = this._handleSettingsChanged.bind(this);
-    var timesHandler = this._handleTimesChanged.bind(this);
-
-    window.app.store.on('modifiedGlobalSettings', settingsHandler);
-    window.app.store.on('remoteChange', function() {
-      settingsHandler();
-      timesHandler();
-    });
-
-    var timesEvents = ['modifiedSolve', 'addedSolve', 'deletedSolve',
-      'switchedPuzzle', 'addedPuzzle'];
-    for (var i = 0; i < timesEvents.length; ++i) {
-      window.app.store.on(timesEvents[i], timesHandler);
-    }
+    var globalSettings = ['theaterMode', 'timerAccuracy'];
+    window.app.storeObserver.observeGlobalSettings(globalSettings,
+      this._handleSettingsChanged.bind(this));
+    
+    var solveAttrs = ['time', 'memo'];
+    window.app.storeObserver.observeLatestSolve(solveAttrs,
+      this._handleLatestSolveChanged.bind(this));
   };
 
-  TimerView.prototype._showLatestTime = function() {
-    window.app.store.getSolves(0, 1, function(err, solves) {
-      if (err || solves.length !== 1) {
-        this._appView.setTime(null);
-        return;
-      }
-      var solve = solves[0];
+  TimerView.prototype._showLatestSolve = function() {
+    var solve = window.app.store.getLatestSolve();
+    if (solve === null) {
+      this._appView.setTime(null);
+    } else {
       this._appView.setTime(window.app.formatTime(solve.time));
       if (solve.memo >= 0) {
         this._appView.setMemo(window.app.formatTime(solve.memo));
       } else {
         this._appView.setMemo(null);
       }
-    }.bind(this));
+    }
   };
 
   TimerView.prototype._showScramble = function(scramble) {

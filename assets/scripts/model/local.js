@@ -88,6 +88,13 @@
   LocalStore.prototype.getGlobalSettings = function() {
     return this._globalSettings;
   };
+  
+  LocalStore.prototype.getLatestSolve = function() {
+    if (this._active.solves.length === 0) {
+      return null;
+    }
+    return this._active.solves[0];
+  };
 
   LocalStore.prototype.getPuzzles = function() {
     return this._puzzles;

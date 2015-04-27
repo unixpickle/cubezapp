@@ -1,10 +1,9 @@
 (function() {
 
   function init() {
-    initializeModel(function(latestSolve) {
-      initializeView(latestSolve);
-      initializeController();
-    });
+    initializeModel();
+    initializeView();
+    initializeController();
   }
 
   function initializeController() {
@@ -17,22 +16,15 @@
     });
   }
 
-  function initializeModel(cb) {
+  function initializeModel() {
     var store = new window.app.LocalStore();
     window.app.store = store;
-    store.getSolves(0, 1, function(err, solves) {
-      var latestSolve = null;
-      if (!err && solves.length === 1) {
-        latestSolve = solves[0];
-      }
-      cb(latestSolve);
-    });
   }
 
-  function initializeView(latestSolve) {
+  function initializeView() {
     window.app.windowSize = new window.app.WindowSize();
     window.app.flavors = new window.app.Flavors();
-    window.app.view = new window.app.AppView(latestSolve);
+    window.app.view = new window.app.AppView();
   }
 
   $(init);

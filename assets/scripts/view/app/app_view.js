@@ -11,7 +11,7 @@
   var MIN_FOOTER_SIZE = 250;
   var MAX_FOOTER_SIZE = 400;
 
-  function AppView(latestRecord) {
+  function AppView() {
     window.app.EventEmitter.call(this);
 
     this._animator = new window.app.Animator();
@@ -25,18 +25,19 @@
 
     // We need to show (or not show) the memo time before running the load
     // animation.
+    var latestSolve = window.app.store.getLatestSolve();
     if (usingInputEntry()) {
       this.setTime('0.00');
-    } else if (latestRecord) {
-      this.setTime(window.app.formatTime(latestRecord.time));
-      if (latestRecord.memo >= 0) {
-        this._middle.setMemo(window.app.formatTime(latestRecord.memo));
+    } else if (latestSolve) {
+      this.setTime(window.app.formatTime(latestSolve.time));
+      if (latestSolve.memo >= 0) {
+        this._middle.setMemo(window.app.formatTime(latestSolve.memo));
       }
     } else {
       this.setTime(null);
     }
 
-    var memoVisible = (latestRecord && latestRecord.memo >= 0) ? true : false;
+    var memoVisible = (latestSolve && latestSolve.memo >= 0) ? true : false;
     this._initializeState(memoVisible);
     this._initializeAnimator();
     this._loadAnimation();

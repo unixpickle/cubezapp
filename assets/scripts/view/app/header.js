@@ -38,7 +38,7 @@
     this._state = STATE_CLOSED;
     this._empty = (window.app.store.getPuzzles().length <= 1);
 
-    this._handleNameChange();
+    this._$puzzleName.text(window.app.store.getActivePuzzle().name);
 
     this._registerUIEvents();
     this._registerModelEvents();
@@ -117,9 +117,9 @@
     }
   };
 
-  Header.prototype._handleDataChange = function() {
+  Header.prototype._handleCountChange = function(count) {
     var wasEmpty = this._empty;
-    this._empty = (window.app.store.getPuzzles().length <= 1);
+    this._empty = (count <= 1);
 
     if (this._state === STATE_CLOSED || this._empty === wasEmpty) {
       return;
@@ -139,23 +139,16 @@
     }
   };
 
-  Header.prototype._handleNameChange = function() {
-    this._$puzzleName.text(window.app.store.getActivePuzzle().name);
+  Header.prototype._handleNameChange = function(puzzle) {
+    this._$puzzleName.text(puzzle.name);
   };
 
   Header.prototype._registerModelEvents = function() {
-    var events = ['addedPuzzle', 'deletedPuzzle', 'remoteChange'];
-    var bound = this._handleDataChange.bind(this);
-    for (var i = 0; i < events.length; ++i) {
-      window.app.store.on(events[i], bound);
-    }
-
-    events = ['remoteChange', 'modifiedPuzzle', 'switchedPuzzle',
-      'addedPuzzle'];
-    bound = this._handleNameChange.bind(this);
-    for (var i = 0; i < events.length; ++i) {
-      window.app.store.on(events[i], bound);
-    }
+    var countHandler = this._handleCountChange.bind(this);
+    window.app.storeObserver.observePuzzleCount(countHandler);
+    
+    var nameHandler = this._handleNameChange.bind(this);
+    window.app.storeObserver.observeActivePuzzle('name', nameHandler);
   };
 
   Header.prototype._registerUIEvents = function() {
