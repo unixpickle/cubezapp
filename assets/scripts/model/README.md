@@ -56,7 +56,7 @@ Here are the methods which the store provides:
  * **getGlobalSettings**() - get the current [Global Settings](#global-settings-object).
  * **getLatestSolve**() - get the latest solve for the current puzzle. This returns `null` if no solves have been completed for the current puzzle. Notice that this is synchronous whereas *getSolves(0, 1, cb)* would be asynchronous.
  * **getPuzzles**() - get the ordered list of [Puzzle](#puzzle-object) objects.
- * **getSolveCount**(cb) - get the number of [Solve](#solve-object) objects for the current puzzle.
+ * **getSolveCount**() - get the number of [Solve](#solve-object) objects for the current puzzle.
  * **getSolves**(start, count, cb) - get a list of [Solve](#solve-object) objects asynchronously.
  * **modifyGlobalSettings**(attrs) - modify attributes of the global settings.
  * **modifyPuzzle**(attrs) - modify attributes of the current puzzle. Provide a dictionary of attributes to set on the current puzzle.

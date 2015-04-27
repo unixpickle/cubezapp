@@ -101,7 +101,7 @@
   };
 
   LocalStore.prototype.getSolveCount = function(cb) {
-    return new window.app.DataTicket(cb, this.getActivePuzzle)
+    return this._active.solves.length;
   };
 
   LocalStore.prototype.getSolves = function(start, count, cb) {
