@@ -37,7 +37,9 @@
 
   TimerView.prototype.cancel = function() {
     this._assertRunning();
-    this._showLatestTime();
+    this._timerRunning = false;
+    
+    this._showLatestSolve();
     this._scrambleStream.resumeReuseScramble();
     if (this._theaterMode) {
       this._appView.setTheaterMode(false);
@@ -51,8 +53,17 @@
   TimerView.prototype.currentScramble = function() {
     return this._currentScramble;
   };
+  
+  TimerView.prototype.newScramble = function() {
+    this._scrambleStream.pause();
+    this._scrambleStream.resume();
+  };
 
   TimerView.prototype.setManualEntry = function(flag) {
+    this._assertNotRunning();
+    if (this._manualEntry === flag) {
+      return;
+    }
     this._manualEntry = flag;
     if (!flag) {
       this._showLatestTime();
@@ -64,9 +75,9 @@
   };
 
   TimerView.prototype.start = function() {
-    if (this._timerRunning) {
-      throw new Error('timer already running');
-    }
+    this._assertNotRunning();
+    this._timerRunning = true;
+    
     if (this._theaterMode) {
       this._appView.setTheaterMode(true);
     }
@@ -85,6 +96,8 @@
 
   TimerView.prototype.stop = function() {
     this._assertRunning();
+    this._timerRunning = false;
+    
     this._scrambleStream.resume();
     if (this._theaterMode) {
       this._appView.setTheaterMode(false);
@@ -134,6 +147,12 @@
     this._appView.setMemo(memo);
   };
 
+  TimerView.prototype._assertNotRunning = function() {
+    if (this._timerRunning) {
+      throw new Error('timer cannot be running');
+    }
+  };
+
   TimerView.prototype._assertRunning = function() {
     if (!this._timerRunning) {
       throw new Error('timer is not running');
@@ -141,7 +160,7 @@
   };
 
   TimerView.prototype._handleLatestSolveChanged = function() {
-    if (!this._timerRunning) {
+    if (!this._timerRunning && !this._manualEntry) {
       this._showLatestSolve();
     }
   };

@@ -72,6 +72,7 @@ The TimerView class has the following methods:
 
  * **cancel**() - the user has cancelled the solve.
  * **currentScramble**() - returns the current scramble or `null` if no scramble is being displayed.
+ * **setManualEntry**(flag) - enable or disable manual entry mode.
  * **start**() - the user has initiated a solve.
  * **stop**() - the user has fully completed a solve.
  * **update**(millis, addTwo) - show the user a given number of milliseconds, optionally adding a +2.

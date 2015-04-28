@@ -3,12 +3,10 @@
 (function() {
 
   function Stackmat() {
-    this.onWait = null;
-    this.onReady = null;
-    this.onTime = null;
-    this.onDone = null;
-    this.onCancel = null;
+    window.app.EventEmitter.call(this);
   }
+  
+  Stackmat.prototype = Object.create(window.app.EventEmitter.prototype);
 
   Stackmat.prototype.connect = function() {
     // TODO: something here.

@@ -93,7 +93,7 @@
     if (this._active.solves.length === 0) {
       return null;
     }
-    return this._active.solves[0];
+    return this._active.solves[this._active.solves.length - 1];
   };
 
   LocalStore.prototype.getPuzzles = function() {
