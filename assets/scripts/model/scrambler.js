@@ -39,7 +39,7 @@
   ScrambleStream.prototype.resumeReuseScramble = function() {
     this._paused = false;
     this._replenishQueue();
-    this.emit(this._lastEmittedScramble);
+    this.emit('scramble', this._lastEmittedScramble);
   };
 
   ScrambleStream.prototype._emitScramble = function(scramble) {
