@@ -13,78 +13,359 @@
   var MAXIMUM_ROW_SPACE = 20;
   var COLUMN_SPACE = 30;
 
+  var FIELD_START_LEFT = 220;
+
   // LABEL_PADDING is the minimum space between a label and its corresponding
   // input.
   var LABEL_PADDING = 10;
 
-  // A Field is an abstract row in the settings tab.
-  function Field() {
-    this.showing = false;
-    this.visible = true;
+  function Settings() {
+    window.app.EventEmitter.call(this);
+
+    this._fields = [];
+    this._fieldMap = {};
+    this._addField('icon', new DropdownField('Icon'));
+    this._addField('scrambler', new DropdownField('Scramble'));
+    this._addField('scrambleType', new DropdownField(''));
+    this._addField('bld', new CheckField('BLD'));
+    this._addField('inspection', new CheckField('Inspection'));
+    this._addField('input', new DropdownField('Timer Input'));
+    this._addField('update', new DropdownField('Update'));
+    this._addField('righty', new CheckField('Right Handed'));
+    this._addField('theater', new CheckField('Theater Mode'));
+    this._addField('flavor', new DropdownField('Flavor'));
+    this._addField('configCube', new ButtonField('Configure Cube'));
+    this._addField('changeName', new ButtonField('Change Name'));
+
+    this._getField('scrambleType').element().css({display: 'none'});
+    this._scrambleTypeVisible = false;
+
+    this._$puzzle = $('<div class="puzzle"></div>');
+    this._$puzzleIcon = $('<div class="icon flavor-background"></div>');
+    this._$puzzleName = $('<label></label>');
+    this._$puzzle.append([this._$puzzleIcon, this._$puzzleName]);
+
+    this._$contents = $('<div class="settings-contents-contents"></div>');
+    this._$contents.append(this._$puzzle);
+
+    this._$element = $('#footer .settings-contents');
+    this._$element.append(this._$contents);
+
+    for (var i = 0, len = this._fields.length; i < len; ++i) {
+      this._$contents.append(this._fields[i].element());
+    }
+
+    this._registerUIEvents();
+    this._registerModelEvents();
+    this._initDropdownOptions();
+    this._initValues();
+    this.layout();
   }
 
-  Field.prototype.element = function() {
-    throw new Error('abstract method');
+  Settings.prototype = Object.create(window.app.EventEmitter.prototype);
+
+  Settings.prototype.flavorName = function() {
+    return this._getField('flavor').dropdown().value();
   };
 
-  Field.prototype.height = function() {
-    throw new Error('abstract method');
+  Settings.prototype.iconName = function() {
+    return this._getField('icon').dropdown().value();
   };
 
-  Field.prototype.updateShowing = function(animate) {
-    if (this.visible === this.showing) {
+  Settings.prototype.layout = function() {
+    this._layoutFields(false);
+  };
+
+  Settings.prototype.scrambleType = function() {
+    return this._getField('scrambleType').dropdown().value();
+  };
+
+  Settings.prototype.scrambler = function() {
+    return this._getField('scrambler').dropdown().value();
+  };
+
+  Settings.prototype._addField = function(name, field) {
+    this._fields.push(field);
+    this._fieldMap[name] = field;
+  };
+
+  Settings.prototype._contentHeight = function() {
+    return this._$element[0].clientHeight || this._$element.height();
+  };
+
+  Settings.prototype._getField = function(name) {
+    return this._fieldMap[name];
+  };
+
+  Settings.prototype._initDropdownOptions = function() {
+    this._getField('icon').dropdown().setOptions(window.app.iconNames);
+    this._getField('flavor').dropdown().setOptions(window.app.flavorNames);
+
+    var scrambles = window.puzzlejs.scrambler.allPuzzles().slice();
+    scrambles.unshift('None');
+    this._getField('scrambler').dropdown().setOptions(scrambles);
+  };
+
+  Settings.prototype._initValues = function() {
+    this._updateFlavor();
+    this._updateIcon();
+    this._updateName();
+    this._updateScrambler();
+    this._updateScrambleTypes(false);
+    this._updateScrambleType();
+  };
+
+  Settings.prototype._layoutFields = function(animate) {
+    var height = this._contentHeight();
+    var currentColumn = new Column(height);
+    var left = FIELD_START_LEFT;
+    for (var i = 0, len = this._fields.length; i < len; ++i) {
+      var field = this._fields[i];
+      var fieldArray = [field];
+      if (field === this._getField('scrambler')) {
+        fieldArray.push(this._getField('scrambleType'));
+        ++i;
+      }
+      if (!currentColumn.addFields(fieldArray)) {
+        if (!this._scrambleTypeVisible) {
+          currentColumn.removeField(this._getField('scrambleType'));
+        }
+        currentColumn.layoutAtLeft(left, animate);
+        left += currentColumn.width() + COLUMN_SPACE;
+
+        currentColumn = new Column(height);
+        currentColumn.addFields(fieldArray);
+      }
+    }
+
+    if (!this._scrambleTypeVisible) {
+      currentColumn.removeField(this._getField('scrambleType'));
+    }
+    currentColumn.layoutAtLeft(left, animate);
+
+    if (this._contentHeight() < height) {
+      this._layoutFields(animate);
+    }
+  };
+
+  Settings.prototype._registerModelEvents = function() {
+    var puzzleEvents = {
+      'flavor': this._updateFlavor,
+      'icon': this._updateIcon,
+      'name': this._updateName,
+      'scrambler': function() {
+        this._updateScrambler();
+        this._updateScrambleTypes(true);
+      },
+      'scrambleType': this._updateScrambleType
+    };
+    var keys = Object.keys(puzzleEvents);
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
+      window.app.observe.activePuzzle(key, puzzleEvents[key].bind(this));
+    }
+  };
+
+  Settings.prototype._registerUIEvents = function() {
+    this._getField('changeName').button().click(this.emit.bind(this,
+      'changeName'));
+
+    var dropdownFields = ['flavor', 'icon', 'scrambleType', 'scrambler'];
+    for (var i = 0, len = dropdownFields.length; i < len; ++i) {
+      this._getField(dropdownFields[i]).dropdown().onChange =
+        this.emit.bind(this, dropdownFields[i] + 'Changed');
+    }
+  };
+
+  Settings.prototype._updateFlavor = function() {
+    this._getField('flavor').dropdown().setSelectedValue(
+      window.app.store.getGlobalSettings().flavor
+    );
+  };
+
+  Settings.prototype._updateIcon = function() {
+    var fileName = window.app.store.getActivePuzzle().icon;
+    this._getField('icon').dropdown().setSelectedValue(
+      window.app.iconFilesToNames[fileName]
+    );
+    this._$puzzleIcon.css({
+      backgroundImage: 'url(images/puzzles/' + fileName + '.png)'
+    });
+  };
+  
+  Settings.prototype._updateName = function() {
+    this._$puzzleName.text(window.app.store.getActivePuzzle().name);
+  };
+  
+  Settings.prototype._updateScrambleType = function() {
+    this._getField('scrambleType').dropdown().setSelectedValue(
+      window.app.store.getActivePuzzle().scrambleType
+    );
+  };
+
+  Settings.prototype._updateScrambleTypes = function(animate) {
+    var scrambleTypes = [];
+    var scrambler = this.scrambler();
+    if (scrambler !== 'None') {
+      var scramblers = window.puzzlejs.scrambler.scramblersForPuzzle(scrambler);
+      for (var i = 0, len = scramblers.length; i < len; ++i) {
+        scrambleTypes[i] = scramblers[i].name;
+      }
+    }
+
+    var wasVisible = this._scrambleTypeVisible;
+    this._scrambleTypeVisible = (scrambleTypes.length > 1);
+
+    if (this._scrambleTypeVisible) {
+      this._getField('scrambleType').dropdown().setOptions(scrambleTypes);
+    }
+
+    if (this._scrambleTypeVisible !== wasVisible) {
+      this._layoutFields(animate);
+      var $element = this._getField('scrambleType').element();
+      if (animate) {
+        $element.stop(true, true);
+        if (this._scrambleTypeVisible) {
+          $element.fadeIn();
+        } else {
+          $element.fadeOut();
+        }
+      } else {
+        if (this._scrambleTypeVisible) {
+          $element.css({display: 'block', opacity: 1});
+        } else {
+          $element.css({display: 'none', opacity: 0});
+        }
+      }
+    }
+  };
+
+  Settings.prototype._updateScrambler = function() {
+    this._getField('scrambler').dropdown().setSelectedValue(
+      window.app.store.getActivePuzzle().scrambler
+    );
+  };
+
+  function Column(maxHeight) {
+    this._maxHeight = maxHeight;
+    this._fields = [];
+    this._height = 0;
+  }
+
+  Column.prototype.addFields = function(fields) {
+    var requiredHeight = 0;
+    for (var i = 0, len = fields.length; i < len; ++i) {
+      requiredHeight += fields[i].height();
+    }
+    var newHeight = this._height + requiredHeight +
+      MINIMUM_ROW_SPACE*(fields.length + this._fields.length + 1);
+    if (newHeight > this._maxHeight) {
+      return false;
+    }
+    for (var i = 0, len = fields.length; i < len; ++i) {
+      this._fields.push(fields[i]);
+    }
+    this._height += requiredHeight;
+    return true;
+  };
+
+  Column.prototype.layoutAtLeft = function(x, animate) {
+    var spacing = (this._maxHeight - this._height) / (this._fields.length + 1);
+    if (spacing > MAXIMUM_ROW_SPACE) {
+      spacing = MAXIMUM_ROW_SPACE;
+    }
+    var contentHeight = spacing*(this._fields.length - 1) + this._height;
+    var top = (this._maxHeight - contentHeight) / 2;
+    var width = this.width();
+    for (var i = 0, len = this._fields.length; i < len; ++i) {
+      var field = this._fields[i];
+      var $element = field.element();
+      var attrs = {left: x, width: width, top: Math.floor(top)};
+      if (animate) {
+        $element.animate(attrs);
+      } else {
+        $element.css(attrs);
+      }
+      top += spacing + field.height();
+    }
+  };
+
+  Column.prototype.removeField = function(field) {
+    var index = this._fields.indexOf(field);
+    if (index >= 0) {
+      this._height -= field.height();
+      this._fields.splice(index, 1);
+    }
+  };
+
+  Column.prototype.width = function() {
+    var width = 0;
+    for (var i = 0, len = this._fields.length; i < len; ++i) {
+      width = Math.max(width, this._fields[i].width());
+    }
+    return width;
+  };
+
+  // A Field is an abstract row in the settings tab.
+  function Field() {
+    this.showingEnabled = true;
+    this.enabled = true;
+  }
+
+  Field.prototype.updateEnabled = function(animate) {
+    if (this.showingEnabled === this.enabled) {
       return;
     }
-    if (this.visible) {
+    if (this.enabled) {
       if (animate) {
-        this.element().fadeIn();
+        this.element().css({pointerEvents: 'auto'}).animate({opacity: 1});
       } else {
-        this.element().css({display: 'block', opacity: 1});
+        this.element().css({pointerEvents: 'auto', opacity: 1});
       }
     } else {
       if (animate) {
-        this.element().fadeOut();
+        this.element().css({pointerEvents: 'none'}).animate({opacity: 0.5});
       } else {
-        this.element().css({display: 'none'});
+        this.element().css({pointerEvents: 'none', opacity: 0.5});
       }
     }
-    this.showing = this.visible;
+    this.showingEnabled = this.enabled;
   };
 
   // A ButtonField implements the field interface for a custom button.
   function ButtonField(title) {
     Field.call(this);
 
-    var button = $('<button class="flavor-background"></button>');
-    button.css({
+    var $button = $('<button class="flavor-background"></button>');
+    $button.css({
       fontSize: FONT_SIZE + 'px',
       height: BUTTON_HEIGHT,
       padding: '0 20px 0 20px'
     });
-    button.text(title);
+    $button.text(title);
 
     // Compute the button's width.
-    button.css({visibility: 'hidden', position: 'fixed'});
-    $(document.body).append(button);
-    this._width = button.outerWidth();
-    button.detach();
-    button.css({visibility: '', position: ''});
+    $button.css({visibility: 'hidden', position: 'fixed'});
+    $(document.body).append($button);
+    this._width = $button.outerWidth();
+    $button.detach();
+    $button.css({visibility: '', position: ''});
 
-    this._button = button;
-    this._element = $('<div class="field button-field"></div>');
-    this._element.append(button);
+    this._$button = $button;
+    this._$element = $('<div class="field button-field"></div>');
+    this._$element.append($button);
   }
 
   ButtonField.prototype = Object.create(Field.prototype);
 
   // button returns the field's button.
   ButtonField.prototype.button = function() {
-    return this._button;
+    return this._$button;
   };
 
   // element returns the field's element.
   ButtonField.prototype.element = function() {
-    return this._element;
+    return this._$element;
   };
 
   // height returns BUTTON_HEIGHT.
@@ -102,9 +383,9 @@
     Field.call(this);
 
     // Create the label element.
-    this._label = $('<label></label>');
-    this._label.text(name);
-    this._label.css({
+    this._$label = $('<label></label>');
+    this._$label.text(name);
+    this._$label.css({
       fontSize: FONT_SIZE + 'px',
       lineHeight: RECTANGULAR_FIELD_HEIGHT + 'px',
       height: RECTANGULAR_FIELD_HEIGHT + 'px',
@@ -113,18 +394,18 @@
     });
 
     // Compute the label's metrics.
-    $(document.body).append(this._label);
-    this._labelHeight = this._label.outerWidth();
-    this._labelWidth = this._label.outerWidth();
-    this._label.detach();
-    this._label.css({visibility: '', position: ''});
+    $(document.body).append(this._$label);
+    this._labelHeight = this._$label.outerWidth();
+    this._labelWidth = this._$label.outerWidth();
+    this._$label.detach();
+    this._$label.css({visibility: '', position: ''});
   }
 
   LabelField.prototype = Object.create(Field.prototype);
 
   // element returns the label.
   LabelField.prototype.element = function() {
-    return this._label;
+    return this._$label;
   };
 
   // height returns the label's height.
@@ -142,16 +423,16 @@
     LabelField.call(this, name);
 
     this._checkbox = window.app.flavors.makeCheckbox();
-    this._element = $('<div class="field check-field"></div>');
-    this._element.append(LabelField.prototype.element.call(this));
-    this._element.append(this._checkbox.element());
+    this._$element = $('<div class="field check-field"></div>');
+    this._$element.append(LabelField.prototype.element.call(this));
+    this._$element.append(this._checkbox.element());
   }
 
   CheckField.prototype = Object.create(LabelField.prototype);
 
   // element returns the element containing both the label and the checkbox.
   CheckField.prototype.element = function() {
-    return this._element;
+    return this._$element;
   };
 
   // height returns INPUT_HEIGHT
@@ -173,9 +454,9 @@
       [0xf0/0xff, 0xf0/0xff, 0xf0/0xff], RECTANGULAR_FIELD_HEIGHT, FONT_SIZE);
 
     // Create the field element.
-    this._element = $('<div class="field dropdown-field"></div>');
-    this._element.append(LabelField.prototype.element.call(this));
-    this._element.append(this._dropdown.element());
+    this._$element = $('<div class="field dropdown-field"></div>');
+    this._$element.append(LabelField.prototype.element.call(this));
+    this._$element.append(this._dropdown.element());
   }
 
   DropdownField.prototype = Object.create(LabelField.prototype);
@@ -187,7 +468,7 @@
 
   // element returns an element containing the dropdown and the label.
   DropdownField.prototype.element = function() {
-    return this._element;
+    return this._$element;
   };
 
   // height returns the height of the element.
@@ -199,318 +480,6 @@
   DropdownField.prototype.width = function() {
     return LabelField.prototype.width.call(this) + LABEL_PADDING +
       RECTANGULAR_FIELD_WIDTH;
-  };
-
-  // An InputField is a field which contains a label and a textbox.
-  function InputField(name) {
-    LabelField.call(this, name);
-
-    // Create the input element.
-    this._input = $('<input></input>').css({
-      width: RECTANGULAR_FIELD_WIDTH - 14,
-      height: RECTANGULAR_FIELD_HEIGHT - 4,
-      fontSize: FONT_SIZE + 'px'
-    });
-
-    // Create the field element.
-    this._element = $('<div class="field input-field"></div>');
-    this._element.append(LabelField.prototype.element.call(this));
-    this._element.append(this._input);
-  }
-
-  InputField.prototype = Object.create(LabelField.prototype);
-
-  // element returns an element containing the field and the label.
-  InputField.prototype.element = function() {
-    return this._element;
-  };
-
-  // height returns the height of the element.
-  InputField.prototype.height = function() {
-    return RECTANGULAR_FIELD_HEIGHT;
-  };
-
-  // input returns the input.
-  InputField.prototype.input = function() {
-    return this._input;
-  };
-
-  // width returns the minimum width of the element.
-  InputField.prototype.width = function() {
-    return LabelField.prototype.width.call(this) + LABEL_PADDING +
-      RECTANGULAR_FIELD_WIDTH;
-  };
-
-  function Settings() {
-    window.app.EventEmitter.call(this);
-
-    this._fields = [
-      new DropdownField('Icon'),
-      new DropdownField('Scramble'),
-      new DropdownField(''),
-      new CheckField('BLD'),
-      new CheckField('Inspection'),
-      new DropdownField('Timer Input'),
-      new DropdownField('Update'),
-      new CheckField('Right Handed'),
-      new CheckField('Theater Mode'),
-      new DropdownField('Flavor'),
-      new ButtonField('Configure Cube'),
-      new ButtonField('Change Name')
-    ];
-
-    var renameField = this._fields[this._fields.length - 1];
-    renameField.button().click(this._changeName.bind(this));
-
-    this._iconDropdown = this._fields[0].dropdown();
-    this._iconDropdown.setOptions(window.app.iconNames);
-    this._iconDropdown.onChange = this._changedIcon.bind(this);
-
-    this._flavorDropdown = this._fields[9].dropdown();
-    this._flavorDropdown.setOptions(window.app.flavorNames);
-    this._flavorDropdown.onChange = this._changedFlavor.bind(this);
-
-    this._scrambleField = this._fields[1];
-    this._scrambleDropdown = this._scrambleField.dropdown();
-    var scrambles = window.puzzlejs.scrambler.allPuzzles().slice();
-    scrambles.unshift('None');
-    this._scrambleDropdown.setOptions(scrambles);
-    this._scrambleDropdown.onChange = this._changedScramble.bind(this);
-
-    this._subscrambleField = this._fields[2];
-    this._subscrambleDropdown = this._subscrambleField.dropdown();
-    this._subscrambleDropdown.onChange = this._changedSubscramble.bind(this);
-
-    this._puzzle = $('<div class="puzzle"></div>');
-    this._puzzleIcon = $('<div class="icon flavor-background"></div>');
-    this._puzzleLabel = $('<label></label>');
-    this._puzzle.append([this._puzzleIcon, this._puzzleLabel]);
-
-    this._contents = $('<div class="settings-contents-contents"></div>');
-    this._contents.append(this._puzzle);
-
-    this._element = $('#footer .settings-contents');
-    this._element.append(this._contents);
-
-    for (var i = 0, len = this._fields.length; i < len; ++i) {
-      this._fields[i].element().css({display: 'none'});
-      this._contents.append(this._fields[i].element());
-    }
-
-    this._showInitialData();
-    this._registerModelEvents();
-  }
-
-  Settings.prototype = Object.create(window.app.EventEmitter.prototype);
-
-  Settings.prototype.layout = function(animate) {
-    var height = this._element[0].clientHeight || this._element.height();
-
-    // columnX is the x coordinate of the current column.
-    var columnX = 220;
-
-    // currentColumn will accumulate elements until the column is too tall.
-    var currentColumn = [];
-
-    // columnHeight represents the minimum height of the current column.
-    var columnHeight = MINIMUM_ROW_SPACE;
-
-    // columnWidth is the width needed to fit every field in the current column.
-    var columnWidth = 0;
-
-    for (var i = 0, len = this._fields.length; i < len; ++i) {
-      var field = this._fields[i];
-
-      if (!field.visible) {
-        field.updateShowing(animate);
-        continue;
-      }
-
-      var requiredHeight = field.height();
-      var addHeight = field.height();
-      if (field === this._scrambleField) {
-        requiredHeight += MINIMUM_ROW_SPACE + this._subscrambleField.height();
-        if (!this._subscrambleField.visible) {
-          addHeight = requiredHeight;
-        }
-      }
-
-      // Either start a new column or add this field to the current one.
-      if (columnHeight + requiredHeight + MINIMUM_ROW_SPACE > height) {
-        this._layoutColumn(currentColumn, columnX, columnWidth, height,
-          animate);
-        columnX += columnWidth + COLUMN_SPACE;
-        currentColumn = [field];
-        columnHeight = MINIMUM_ROW_SPACE*2 + addHeight;
-        columnWidth = field.width();
-      } else {
-        currentColumn.push(field);
-        columnHeight += MINIMUM_ROW_SPACE + addHeight;
-        columnWidth = Math.max(field.width(), columnWidth);
-      }
-    }
-
-    // The last column may need to be added.
-    if (currentColumn.length > 0) {
-      this._layoutColumn(currentColumn, columnX, columnWidth, height, animate);
-    }
-
-    // If the clientHeight is smaller than it was before (i.e. a scrollbar was
-    // added), then layout again. This is not a perfect technique, but it's good
-    // enough.
-    if ((this._element[0].clientHeight || this._element.height()) < height) {
-      this.layout();
-    }
-  };
-
-  Settings.prototype._changeName = function() {
-    // TODO: fire an event for this...
-    new window.app.RenamePopup().show();
-  };
-
-  Settings.prototype._changedFlavor = function() {
-    this.emit('flavorChanged', this._flavorDropdown.value());
-  };
-
-  Settings.prototype._changedIcon = function() {
-    var iconFile = window.app.iconFiles[this._iconDropdown.selected()];
-    this.emit('iconChanged', iconFile);
-  };
-
-  Settings.prototype._changedScramble = function() {
-    this.emit('scramblerChanged', this._scrambleDropdown.value(),
-      this._subscramblers()[0] || 'None');
-  };
-
-  Settings.prototype._changedSubscramble = function() {
-    // They could have changed the subscramble while it was fading out.
-    if (this._subscrambleField.visible) {
-      this.emit('scramblerChanged', this._scrambleDropdown.value(),
-        this._subscrambleDropdown.value() || 'None');
-    }
-  };
-
-  Settings.prototype._hideDropdowns = function() {
-    this._flavorDropdown.hide();
-    this._iconDropdown.hide();
-    this._scrambleDropdown.hide();
-    this._subscrambleDropdown.hide();
-  };
-
-  Settings.prototype._layoutColumn = function(column, x, width, height,
-    animate) {
-    // Find the raw height of all the elements without any spacing.
-    var rawHeight = 0;
-    for (var i = 0, len = column.length; i < len; ++i) {
-      rawHeight += column[i].height();
-    }
-
-    // Compute the spacing.
-    var spacing = Math.min((height-rawHeight) / (column.length+1),
-      MAXIMUM_ROW_SPACE);
-    var y = (height - rawHeight - spacing*(column.length-1))/2;
-    for (var i = 0, len = column.length; i < len; ++i) {
-      var field = column[i];
-      var element = field.element();
-      if (animate && field.showing) {
-        element.animate({
-          width: width,
-          left: x,
-          top: Math.floor(y)
-        }, {queue: false});
-      } else {
-        element.css({
-          width: width,
-          left: x,
-          top: Math.floor(y)
-        });
-      }
-      y += spacing + column[i].height();
-      field.updateShowing(animate);
-    }
-
-    this._contents.css({width: x+width+10});
-  };
-
-  Settings.prototype._popuplateSubscramble = function() {
-    var options = this._subscramblers();
-    this._subscrambleField.visible = (options.length > 1);
-    if (options.length > 1) {
-      this._subscrambleDropdown.setOptions(options);
-    }
-  };
-
-  Settings.prototype._registerModelEvents = function() {
-    var puzzleEvents = {
-      'icon': this._updatePuzzleIcon,
-      'name': this._updatePuzzleName,
-      'scrambler': this._updateScramble,
-      'scrambleType': this._updateScramble
-    };
-    var puzzleAttributes = Object.keys(puzzleEvents);
-    for (var i = 0, len = puzzleAttributes.length; i < len; ++i) {
-      var attr = puzzleAttributes[i];
-      window.app.observe.activePuzzle(attr, puzzleEvents[attr].bind(this));
-    }
-
-    window.app.observe.globalSettings('flavor', this._updateFlavor.bind(this));
-  };
-
-  Settings.prototype._showInitialData = function() {
-    this._updateFlavor();
-    this._updatePuzzleIcon();
-    this._updatePuzzleName();
-    this._updateScramble(true);
-    this.layout(false);
-  };
-
-  Settings.prototype._subscramblers = function() {
-    var puzzle = this._scrambleDropdown.value();
-    if (puzzle === 'None') {
-      return [];
-    }
-
-    var names = [];
-    var scramblers = window.puzzlejs.scrambler.scramblersForPuzzle(puzzle);
-    for (var i = 0, len = scramblers.length; i < len; ++i) {
-      names[i] = scramblers[i].name;
-    }
-    return names;
-  };
-
-  Settings.prototype._updateFlavor = function() {
-    this._hideDropdowns();
-    var globalSettings = window.app.store.getGlobalSettings();
-    this._flavorDropdown.setSelectedValue(globalSettings.flavor);
-  };
-
-  Settings.prototype._updatePuzzleIcon = function() {
-    var puzzle = window.app.store.getActivePuzzle();
-    this._puzzleIcon.css({
-      backgroundImage: 'url(images/puzzles/' + puzzle.icon + '.png)'
-    });
-    var iconName = window.app.iconFilesToNames[puzzle.icon];
-    this._iconDropdown.setSelectedValue(iconName);
-  };
-
-  Settings.prototype._updatePuzzleName = function() {
-    var puzzle = window.app.store.getActivePuzzle();
-    this._puzzleLabel.text(puzzle.name);
-  };
-
-  Settings.prototype._updateScramble = function(dontLayout) {
-    this._hideDropdowns();
-
-    var puzzle = window.app.store.getActivePuzzle();
-
-    this._scrambleDropdown.setSelectedValue(puzzle.scrambler);
-    this._popuplateSubscramble();
-    this._subscrambleDropdown.setSelectedValue(puzzle.scrambleType);
-
-    // We may need to re-layout because a field may have been shown or hidden.
-    if (!dontLayout) {
-      this.layout(true);
-    }
   };
 
   window.app.Settings = Settings;

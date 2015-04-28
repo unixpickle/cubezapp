@@ -18,12 +18,9 @@
   width: 180px;
   height: 160px;
 
-  float: left;
+  text-align: center;
 
   background-color: #f0f0f0;
-  cursor: pointer;
-
-  text-align: center;
 }
 
 #footer .settings-contents-contents > .puzzle .icon {

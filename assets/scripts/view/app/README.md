@@ -48,11 +48,19 @@ The settings tab of the footer allows the user to change puzzle specific, device
 
 It implements the [EventEmitter interface](../event_emitter.md) and fires the following events:
 
- * **flavorChanged**(flavorName) - the user has changed the site flavor.
- * **iconChanged**(iconFile) - the user has changed the current puzzle's icon.
- * **scramblerChanged**(scrambler, type) - the user has changed the scrambler or subscrambler for the puzzle.
+ * **flavorChanged**() - the user has changed the site flavor.
+ * **iconChanged**() - the user has changed the current puzzle's icon.
+ * **scrambleTypeChanged**() - the user has changed the scramble type. This will not be called for scrambler changes.
+ * **scramblerChanged**() - the user has changed the scrambler.
 
 Remember that none of these events indicate whether or not the model has been modified. The controller should register these events and make the necessary changes to the model.
+
+The settings tab also implements the following methods to get options which the user has selected:
+
+ * **flavorName**() - get the name of the flavor the user has chosen.
+ * **iconName**() - get the name of the icon the user has chosen.
+ * **scrambleType**() - get the name of the scramble type the user has chosen.
+ * **scrambler**() - get the name of the scrambler the user has chosen.
 
 <a name="stats-object"></a>
 ## Stats
