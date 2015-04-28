@@ -48,14 +48,14 @@
       this._done = true;
       return this.end;
     }
-    
+
     var now = new Date().getTime();
     var frameDelay = now - this.lastTimestamp;
     this.lastTimestamp = now;
     if (frameDelay > LAG_THRESHOLD) {
       this.timestamp += frameDelay - LAG_SMOOTH_TIME;
     }
-    
+
     var elapsed = now - this.timestamp;
     var fraction = Math.max((elapsed-this.delay)/this.duration, 0);
     if (fraction >= 1) {

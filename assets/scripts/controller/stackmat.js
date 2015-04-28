@@ -5,7 +5,7 @@
   function Stackmat() {
     window.app.EventEmitter.call(this);
   }
-  
+
   Stackmat.prototype = Object.create(window.app.EventEmitter.prototype);
 
   Stackmat.prototype.connect = function() {

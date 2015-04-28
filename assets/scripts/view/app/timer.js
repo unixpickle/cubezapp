@@ -38,7 +38,7 @@
   TimerView.prototype.cancel = function() {
     this._assertRunning();
     this._timerRunning = false;
-    
+
     this._showLatestSolve();
     this._scrambleStream.resumeReuseScramble();
     if (this._theaterMode) {
@@ -53,7 +53,7 @@
   TimerView.prototype.currentScramble = function() {
     return this._currentScramble;
   };
-  
+
   TimerView.prototype.newScramble = function() {
     this._scrambleStream.pause();
     this._scrambleStream.resume();
@@ -77,7 +77,7 @@
   TimerView.prototype.start = function() {
     this._assertNotRunning();
     this._timerRunning = true;
-    
+
     if (this._theaterMode) {
       this._appView.setTheaterMode(true);
     }
@@ -97,7 +97,7 @@
   TimerView.prototype.stop = function() {
     this._assertRunning();
     this._timerRunning = false;
-    
+
     this._scrambleStream.resume();
     if (this._theaterMode) {
       this._appView.setTheaterMode(false);

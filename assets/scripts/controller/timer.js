@@ -317,13 +317,13 @@
       throw new Error('invalid state at up()');
     }
   };
-  
+
   Session.prototype._done = function() {
     window.app.store.addSolve(this._result);
     window.app.view.timer.stop();
     this.emit('done');
   };
-  
+
   Session.prototype._startTimer = function() {
     this._startTime = new Date().getTime();
     this._timerInterval = setInterval(this.timerTick.bind(this),
@@ -428,13 +428,13 @@
       this._beginInspection();
     }
   };
-  
+
   InspectionSession.prototype._beginInspection = function() {
     this._inspectionStart = new Date().getTime();
     this._inspectionInterval = setInterval(this._interval.bind(this),
       TIME_INTERVAL);
   };
-  
+
   InspectionSession.prototype._endInspection = function() {
     var delay = new Date().getTime() - this._inspectionStart;
     this._inspectionTime = Math.max(delay, 0);
