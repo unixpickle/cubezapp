@@ -192,11 +192,11 @@
       backgroundImage: 'url(images/puzzles/' + fileName + '.png)'
     });
   };
-  
+
   Settings.prototype._updateName = function() {
     this._$puzzleName.text(window.app.store.getActivePuzzle().name);
   };
-  
+
   Settings.prototype._updateScrambleType = function() {
     this._getField('scrambleType').dropdown().setSelectedValue(
       window.app.store.getActivePuzzle().scrambleType
