@@ -2,8 +2,8 @@
 
   function SettingsController(view) {
     this._view = view;
-    var events = ['bldChanged', 'flavorChanged', 'iconChanged',
-      'scrambleTypeChanged', 'scramblerChanged', 'changeName'];
+    var events = ['bldChanged', 'flavorChanged', 'iconChanged', 'changeName',
+      'scrambleTypeChanged', 'scramblerChanged', 'theaterModeChanged'];
     for (var i = 0; i < events.length; ++i) {
       var functionName = '_' + events[i];
       this._view.on(events[i], this[functionName].bind(this));
@@ -50,6 +50,11 @@
     var scrambler = this._view.scrambler();
     var type = this._view.scrambleType();
     window.app.store.modifyPuzzle({scrambler: scrambler, scrambleType: type});
+  };
+  
+  SettingsController.prototype._theaterModeChanged = function() {
+    var flag = this._view.theaterMode();
+    window.app.store.modifyGlobalSettings({theaterMode: flag});
   };
 
   function isNameValid(name) {

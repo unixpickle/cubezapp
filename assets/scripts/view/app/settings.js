@@ -32,7 +32,7 @@
     this._addField('input', new DropdownField('Timer Input'));
     this._addField('update', new DropdownField('Update'));
     this._addField('righty', new CheckField('Right Handed'));
-    this._addField('theater', new CheckField('Theater Mode'));
+    this._addField('theaterMode', new CheckField('Theater Mode'));
     this._addField('flavor', new DropdownField('Flavor'));
     this._addField('configCube', new ButtonField('Configure Cube'));
     this._addField('changeName', new ButtonField('Change Name'));
@@ -87,6 +87,10 @@
   Settings.prototype.scrambler = function() {
     return this._getField('scrambler').dropdown().value();
   };
+  
+  Settings.prototype.theaterMode = function() {
+    return this._getField('theaterMode').checkbox().checked();
+  };
 
   Settings.prototype._addField = function(name, field) {
     this._fields.push(field);
@@ -118,6 +122,7 @@
     this._updateScrambler();
     this._updateScrambleTypes(false);
     this._updateScrambleType();
+    this._updateTheaterMode();
   };
 
   Settings.prototype._layoutFields = function(animate) {
@@ -183,7 +188,7 @@
         this.emit.bind(this, dropdownFields[i] + 'Changed');
     }
 
-    var checkboxes = ['bld'];
+    var checkboxes = ['bld', 'theaterMode'];
     for (var i = 0, len = checkboxes.length; i < len; ++i) {
       this._getField(checkboxes[i]).checkbox().onChange =
         this.emit.bind(this, checkboxes[i] + 'Changed');
@@ -262,6 +267,12 @@
   Settings.prototype._updateScrambler = function() {
     this._getField('scrambler').dropdown().setSelectedValue(
       window.app.store.getActivePuzzle().scrambler
+    );
+  };
+  
+  Settings.prototype._updateTheaterMode = function() {
+    this._getField('theaterMode').checkbox().setChecked(
+      window.app.store.getGlobalSettings().theaterMode
     );
   };
 
