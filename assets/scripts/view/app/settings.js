@@ -64,6 +64,10 @@
 
   Settings.prototype = Object.create(window.app.EventEmitter.prototype);
 
+  Settings.prototype.bld = function() {
+    return this._getField('bld').checkbox().checked();
+  };
+
   Settings.prototype.flavorName = function() {
     return this._getField('flavor').dropdown().value();
   };
@@ -107,6 +111,7 @@
   };
 
   Settings.prototype._initValues = function() {
+    this._updateBLD();
     this._updateFlavor();
     this._updateIcon();
     this._updateName();
@@ -149,15 +154,17 @@
   };
 
   Settings.prototype._registerModelEvents = function() {
+    window.app.observe.globalSettings('flavor', this._updateFlavor.bind(this));
+
     var puzzleEvents = {
-      'flavor': this._updateFlavor,
       'icon': this._updateIcon,
       'name': this._updateName,
       'scrambler': function() {
         this._updateScrambler();
         this._updateScrambleTypes(true);
       },
-      'scrambleType': this._updateScrambleType
+      'scrambleType': this._updateScrambleType,
+      'timerInput': this._updateBLD
     };
     var keys = Object.keys(puzzleEvents);
     for (var i = 0, len = keys.length; i < len; ++i) {
@@ -175,6 +182,18 @@
       this._getField(dropdownFields[i]).dropdown().onChange =
         this.emit.bind(this, dropdownFields[i] + 'Changed');
     }
+
+    var checkboxes = ['bld'];
+    for (var i = 0, len = checkboxes.length; i < len; ++i) {
+      this._getField(checkboxes[i]).checkbox().onChange =
+        this.emit.bind(this, checkboxes[i] + 'Changed');
+    }
+  };
+
+  Settings.prototype._updateBLD = function() {
+    var input = window.app.store.getActivePuzzle().timerInput;
+    var bld = (input === window.app.TimerController.INPUT_BLD);
+    this._getField('bld').checkbox().setChecked(bld);
   };
 
   Settings.prototype._updateFlavor = function() {
@@ -429,6 +448,11 @@
   }
 
   CheckField.prototype = Object.create(LabelField.prototype);
+
+  // checkbox returns the checkbox
+  CheckField.prototype.checkbox = function() {
+    return this._checkbox;
+  };
 
   // element returns the element containing both the label and the checkbox.
   CheckField.prototype.element = function() {

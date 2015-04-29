@@ -144,7 +144,7 @@
 
   TimerView.prototype.updateMemo = function(memo) {
     this._assertRunning();
-    this._appView.setMemo(memo);
+    this._appView.setMemo(window.app.formatTime(memo));
   };
 
   TimerView.prototype._assertNotRunning = function() {

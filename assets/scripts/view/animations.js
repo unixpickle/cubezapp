@@ -1,5 +1,5 @@
 (function() {
-  
+
   window.app.runShakeAnimation = function(element) {
     var prefixes = ['webkitAnimation', 'animation'];
     for (var i = 0; i < 2; ++i) {
@@ -19,5 +19,5 @@
       element.style.webkitAnimationName = 'none';
     });
   };
-  
+
 })();

@@ -48,6 +48,7 @@ The settings tab of the footer allows the user to change puzzle specific, device
 
 It implements the [EventEmitter interface](../event_emitter.md) and fires the following events:
 
+ * **bldChanged**() - the user has changed the BLD checkbox
  * **flavorChanged**() - the user has changed the site flavor.
  * **iconChanged**() - the user has changed the current puzzle's icon.
  * **scrambleTypeChanged**() - the user has changed the scramble type. This will not be called for scrambler changes.
@@ -57,6 +58,7 @@ Remember that none of these events indicate whether or not the model has been mo
 
 The settings tab also implements the following methods to get options which the user has selected:
 
+ * **bld**() - get the BLD setting the user has chosen.
  * **flavorName**() - get the name of the flavor the user has chosen.
  * **iconName**() - get the name of the icon the user has chosen.
  * **scrambleType**() - get the name of the scramble type the user has chosen.

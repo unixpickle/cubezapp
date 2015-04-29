@@ -2,13 +2,20 @@
 
   function SettingsController(view) {
     this._view = view;
-    var events = ['flavorChanged', 'iconChanged', 'scrambleTypeChanged',
-      'scramblerChanged', 'changeName'];
+    var events = ['bldChanged', 'flavorChanged', 'iconChanged',
+      'scrambleTypeChanged', 'scramblerChanged', 'changeName'];
     for (var i = 0; i < events.length; ++i) {
       var functionName = '_' + events[i];
       this._view.on(events[i], this[functionName].bind(this));
     }
   }
+
+  SettingsController.prototype._bldChanged = function() {
+    // TODO: make this better.
+    var inputMode = this._view.bld() ? window.app.TimerController.INPUT_BLD :
+      window.app.TimerController.INPUT_REGULAR;
+    window.app.store.modifyPuzzle({timerInput: inputMode});
+  };
 
   SettingsController.prototype._changeName = function() {
     var popup = new window.app.RenamePopup();

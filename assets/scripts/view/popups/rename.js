@@ -9,25 +9,25 @@
 
   function RenamePopup() {
     window.app.EventEmitter.call(this);
-    
+
     var $content = $(code);
     this._$input = $content.find('input');
-    
+
     this._dialog = new window.app.Dialog('Change Name', $content,
       ['Cancel', 'Rename']);
     this._dialog.on('action', this._action.bind(this));
   }
-  
+
   RenamePopup.prototype = Object.create(window.app.EventEmitter.prototype);
 
   RenamePopup.prototype.close = function() {
     this._dialog.close();
   };
-  
+
   RenamePopup.prototype.name = function() {
     return this._$input.val();
   };
-  
+
   RenamePopup.prototype.shakeInput = function() {
     window.app.runShakeAnimation(this._$input[0]);
   };

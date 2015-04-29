@@ -39,7 +39,7 @@
     // Clicking changes the checkbox.
     this._element.onclick = function() {
       this.setChecked(!this.checked());
-      if ('function' === this.onChange) {
+      if ('function' === typeof this.onChange) {
         this.onChange();
       }
     }.bind(this);
