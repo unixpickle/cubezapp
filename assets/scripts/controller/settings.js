@@ -3,12 +3,26 @@
   function SettingsController(view) {
     this._view = view;
     var events = ['flavorChanged', 'iconChanged', 'scrambleTypeChanged',
-      'scramblerChanged'];
+      'scramblerChanged', 'changeName'];
     for (var i = 0; i < events.length; ++i) {
       var functionName = '_' + events[i];
       this._view.on(events[i], this[functionName].bind(this));
     }
   }
+
+  SettingsController.prototype._changeName = function() {
+    var popup = new window.app.RenamePopup();
+    popup.on('rename', function() {
+      var name = popup.name();
+      if (!isNameValid(name)) {
+        popup.shakeInput();
+      } else {
+        window.app.store.modifyPuzzle({name: name});
+        popup.close();
+      }
+    });
+    popup.show();
+  };
 
   SettingsController.prototype._flavorChanged = function() {
     window.app.store.modifyGlobalSettings({flavor: this._view.flavorName()});
@@ -30,6 +44,19 @@
     var type = this._view.scrambleType();
     window.app.store.modifyPuzzle({scrambler: scrambler, scrambleType: type});
   };
+
+  function isNameValid(name) {
+    if (name.length === 0) {
+      return false;
+    }
+    var puzzles = window.app.store.getPuzzles();
+    for (var i = 0, len = puzzles.length; i < len; ++i) {
+      if (puzzles[i].name === name) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   window.app.SettingsController = SettingsController;
 

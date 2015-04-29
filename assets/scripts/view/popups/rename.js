@@ -13,7 +13,7 @@
     var $content = $(code);
     this._$input = $content.find('input');
     
-    this._dialog = new window.app.Dialog('Rename', $content,
+    this._dialog = new window.app.Dialog('Change Name', $content,
       ['Cancel', 'Rename']);
     this._dialog.on('action', this._action.bind(this));
   }
@@ -22,6 +22,10 @@
 
   RenamePopup.prototype.close = function() {
     this._dialog.close();
+  };
+  
+  RenamePopup.prototype.name = function() {
+    return this._$input.val();
   };
   
   RenamePopup.prototype.shakeInput = function() {
@@ -35,7 +39,7 @@
 
   RenamePopup.prototype._action = function(idx) {
     if (idx === 1) {
-      this.emit('rename', this._$input.val());
+      this.emit('rename');
     } else {
       this._dialog.close();
     }
