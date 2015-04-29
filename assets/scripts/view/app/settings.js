@@ -347,7 +347,7 @@
     // Compute the button's width.
     $button.css({visibility: 'hidden', position: 'fixed'});
     $(document.body).append($button);
-    this._width = $button.outerWidth();
+    this._width = Math.floor($button.outerWidth()) + 1;
     $button.detach();
     $button.css({visibility: '', position: ''});
 

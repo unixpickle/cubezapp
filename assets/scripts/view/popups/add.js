@@ -76,24 +76,7 @@
 
   AddPopup.prototype.shakeName = function() {
     this._$nameInput.focus();
-    var prefixes = ['webkitAnimation', 'animation'];
-    var element = this._$nameInput[0];
-    for (var i = 0; i < 2; ++i) {
-      var prefix = prefixes[i];
-      element.style[prefix + 'Name'] = 'shake';
-      element.style[prefix + 'Duration'] = '0.5s';
-      element.style[prefix + 'Direction'] = 'normal';
-      element.style[prefix + 'Delay'] = '0s';
-      element.style[prefix + 'FillMode'] = 'none';
-    }
-    element.addEventListener('animationend', function() {
-      element.style.animationName = 'none';
-      element.style.webkitAnimationName = 'none';
-    });
-    element.addEventListener('webkitAnimationEnd', function() {
-      element.style.animationName = 'none';
-      element.style.webkitAnimationName = 'none';
-    });
+    window.app.runShakeAnimation(this._$nameInput[0]);
   };
 
   AddPopup.prototype.show = function() {
@@ -246,11 +229,6 @@
     // By default, this field is invisible.
     this._$subscrambleField.css({display: 'none'});
     this._subscrambleDropdown.onChange = this._changedSubscramble.bind(this);
-  };
-
-  // _done process the user's input and creates a puzzle.
-  AddPopup.prototype._done = function() {
-    this.emit('create');
   };
 
   // _fieldPositions computes the top coordinates for each field.

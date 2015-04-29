@@ -8,22 +8,37 @@
   ';
 
   function RenamePopup() {
-    var content = $(code);
-    var input = content.find('input');
-    this._dialog = new window.app.Dialog('Rename', content,
+    window.app.EventEmitter.call(this);
+    
+    var $content = $(code);
+    this._$input = $content.find('input');
+    
+    this._dialog = new window.app.Dialog('Rename', $content,
       ['Cancel', 'Rename']);
     this._dialog.on('action', this._action.bind(this));
   }
+  
+  RenamePopup.prototype = Object.create(window.app.EventEmitter.prototype);
+
+  RenamePopup.prototype.close = function() {
+    this._dialog.close();
+  };
+  
+  RenamePopup.prototype.shakeInput = function() {
+    window.app.runShakeAnimation(this._$input[0]);
+  };
 
   RenamePopup.prototype.show = function() {
     this._dialog.show();
+    this._$input.focus();
   };
 
   RenamePopup.prototype._action = function(idx) {
     if (idx === 1) {
-      // TODO: this.
+      this.emit('rename', this._$input.val());
+    } else {
+      this._dialog.close();
     }
-    this._dialog.close();
   };
 
   window.app.RenamePopup = RenamePopup;
