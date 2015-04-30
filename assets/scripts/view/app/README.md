@@ -4,7 +4,7 @@ This directory contains the source code for the main application views. This inc
 
 # AppView
 
-The class corresponding to the app view is `window.app.AppView`. Its implementation can be found in [app/app_view.js](app/app_view.js). There should never be more than one instance of AppView!
+The class corresponding to the app view is `window.app.AppView`. There should never be more than one instance of AppView!
 
 The AppView implements the [EventEmitter interface](../event_emitter.md) and fires the following events:
 
@@ -32,7 +32,7 @@ AppView implements the following methods:
 
 Out of all the components of the application, the footer presents the user with the most information and grants them the most power. The user can use the footer to change almost every setting and view many statistics about their times. Since the footer is so packed with functionality, it is split up into various subviews.
 
-The footer itself is represented by the `window.app.Footer` class. Its implementation can be found in [app/footer.js](app/footer.js). A Footer should only be instantiated by the AppView class.
+The footer itself is represented by the `window.app.Footer` class. A Footer should only be instantiated by the AppView class.
 
 An instance of Footer has the following properties:
 
