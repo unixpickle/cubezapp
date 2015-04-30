@@ -83,7 +83,7 @@
   Settings.prototype.layout = function() {
     this._layoutFields(false);
   };
-  
+
   Settings.prototype.righty = function() {
     return this._getField('righty').checkbox().checked();
   }

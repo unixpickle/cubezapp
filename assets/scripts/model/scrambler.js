@@ -196,7 +196,7 @@
     var puzzle = window.app.store.getActivePuzzle();
     return new Scrambler(puzzle.scrambler, puzzle.scrambleType);
   };
-  
+
   Scrambler.prototype.differentForLefty = function() {
     return this._name === '2x2x2';
   };
@@ -230,7 +230,7 @@
   Scrambler.prototype.isNone = function() {
     return this._name === 'None';
   };
-  
+
   Scrambler.prototype.makeLefty = function(scramble) {
     var moves = scramble.split(' ');
     for (var i = 0, len = moves.length; i < len; ++i) {
