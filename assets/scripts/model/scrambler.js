@@ -39,12 +39,17 @@
   ScrambleStream.prototype.resumeReuseScramble = function() {
     this._paused = false;
     this._replenishQueue();
-    this.emit('scramble', this._lastEmittedScramble);
+    this._emitScramble(this._lastEmittedScramble);
   };
 
   ScrambleStream.prototype._emitScramble = function(scramble) {
     this._lastEmittedScramble = scramble;
-    this.emit('scramble', scramble);
+    if (!window.app.store.getGlobalSettings().righty &&  
+        this._currentScrambler.differentForLefty()) {
+      this.emit('scramble', this._currentScrambler.makeLefty(scramble));
+    } else {
+      this.emit('scramble', scramble);
+    }
   }
 
   ScrambleStream.prototype._generateOrDequeue = function() {
@@ -70,6 +75,14 @@
   ScrambleStream.prototype._registerModelEvents = function() {
     window.app.observe.activePuzzle(['id', 'scrambler', 'scrambleType'],
       this._modelChanged.bind(this));
+    window.app.observe.globalSettings('righty', this._rightyChanged.bind(this));
+  };
+
+  ScrambleStream.prototype._rightyChanged = function() {
+    if (!this._paused && !this._needScramble &&
+        this._currentScrambler.differentForLefty) {
+      this._emitScramble(this._lastEmittedScramble);
+    }
   };
 
   ScrambleStream.prototype._replenishQueue = function() {
@@ -183,6 +196,10 @@
     var puzzle = window.app.store.getActivePuzzle();
     return new Scrambler(puzzle.scrambler, puzzle.scrambleType);
   };
+  
+  Scrambler.prototype.differentForLefty = function() {
+    return this._name === '2x2x2';
+  };
 
   Scrambler.prototype.equals = function(s) {
     return this._name === s._name && this._type === s._type;
@@ -212,6 +229,25 @@
 
   Scrambler.prototype.isNone = function() {
     return this._name === 'None';
+  };
+  
+  Scrambler.prototype.makeLefty = function(scramble) {
+    var moves = scramble.split(' ');
+    for (var i = 0, len = moves.length; i < len; ++i) {
+      var move = moves[i];
+      if (move[0] === 'R') {
+        move = move.replace('R', 'L');
+      }
+      if (move.length === 2) {
+        if (move[1] === "'") {
+          move = move.substring(0, 1);
+        }
+      } else {
+        move = move + "'";
+      }
+      moves[i] = move;
+    }
+    return moves.join(' ');
   };
 
   window.app.ScrambleStream = ScrambleStream;
