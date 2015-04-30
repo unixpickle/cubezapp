@@ -67,7 +67,7 @@
     }
     this._manualEntry = flag;
     if (!flag) {
-      this._showLatestTime();
+      this._showLatestSolve();
       this._appView.setTimeBlinking(false);
     } else {
       this._appView.setTimeBlinking(true);
@@ -161,7 +161,6 @@
   };
 
   TimerView.prototype._handleLatestSolveChanged = function() {
-    console.log('yo');
     if (!this._timerRunning && !this._manualEntry) {
       this._showLatestSolve();
     }

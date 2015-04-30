@@ -53,7 +53,6 @@
     });
 
     if (this._showingBlinker) {
-      // Layout blinker.
       this._$blinker.css({
         left: this._$label.offset().left + this._$label.outerWidth()
       });
@@ -62,10 +61,11 @@
 
   Time.prototype.setBlinking = function(flag) {
     if (!flag) {
-      // Hide the blinker and stop blinking.
+      this._showingBlinker = false;
       this._setBlinkerVisible(false);
       if (this._blinkInterval !== null) {
         clearInterval(this._blinkInterval);
+        this._blinkInterval = null;
       }
       return;
     }
@@ -90,14 +90,12 @@
   Time.prototype._setBlinkerVisible = function(flag) {
     if (!flag) {
       this._$blinker.css({display: 'none'});
-      return;
+    } else {
+      this._$blinker.css({
+        display: 'block',
+        left: this._$label.offset().left + this._$label.outerWidth()
+      });
     }
-
-    // Layout blinker.
-    this._$blinker.css({
-      display: 'block',
-      left: this._$label.offset().left + this._$label.outerWidth()
-    });
   };
 
   Time.prototype._usableFontSize = function() {

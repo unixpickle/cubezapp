@@ -168,7 +168,7 @@
       throw new Error('invalid scrambleHeight: ' + height);
     }
     return height;
-  }
+  };
 
   // setMemo sets the memo time's text contents.
   Middle.prototype.setMemo = function(memo) {
@@ -178,7 +178,7 @@
   // setPB sets the PB's text contents.
   Middle.prototype.setPB = function(pb) {
     this._$pbStatus.text(pb || '');
-  }
+  };
 
   // setScramble sets the scramble's text contents.
   Middle.prototype.setScramble = function(text) {
@@ -193,7 +193,7 @@
   // setTimeBlinking sets whether the time blinker is blinking.
   Middle.prototype.setTimeBlinking = function(flag) {
     this._time.setBlinking(flag);
-  }
+  };
 
   window.app.Middle = Middle;
 
