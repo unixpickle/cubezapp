@@ -224,7 +224,7 @@
 
   Settings.prototype._updateFlavor = function() {
     this._getField('flavor').dropdown().setSelectedValue(
-      window.app.store.getGlobalSettings().flavor
+      window.app.flavors.idToName(window.app.store.getGlobalSettings().flavor)
     );
   };
 

@@ -33,7 +33,8 @@
   };
 
   SettingsController.prototype._flavorChanged = function() {
-    window.app.store.modifyGlobalSettings({flavor: this._view.flavorName()});
+    var flavorId = window.app.flavors.nameToId(this._view.flavorName());
+    window.app.store.modifyGlobalSettings({flavor: flavorId});
   };
 
   SettingsController.prototype._iconChanged = function() {

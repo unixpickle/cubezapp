@@ -96,10 +96,10 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
 
 The **Global Settings** object stores the user's global settings. Here are the fields it contains and their defaults:
 
- * **flavor** - string - the name of the flavor the user has set. **Default:** "Blueberry"
+ * **flavor** - string - a hex color identifier (e.g. #f0d5a9) which indicates the color of the current flavor. If the flavor is the alternation flavor, this is simply "#" with no hex after it. The flavor view must give unrecognized values meaning for legacy purposes. **Default:** "" (empty string)
  * **righty** - bool - true if the user is right handed. **Default:** true
- * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller.
- * **theaterMode** - bool - enter theater mode while timing.
+ * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller. **Default:** 0
+ * **theaterMode** - bool - enter theater mode while timing. **Default:** true
 
 <a name="observe-section"></a>
 # Observe

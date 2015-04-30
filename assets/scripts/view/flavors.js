@@ -78,7 +78,7 @@
     // this._transition is the current Transition object.
     this._transition = null;
 
-    var flavor = window.app.store.getGlobalSettings().flavor;
+    var flavor = this.idToName(window.app.store.getGlobalSettings().flavor);
     this._initializeFlavor(flavor);
 
     this._registerModelEvents();
@@ -87,6 +87,32 @@
     // background color.
     document.body.className = 'flavor-background';
   }
+
+  // idToName converts a flavor ID to a flavor name.
+  Flavors.prototype.idToName = function(id) {
+    if (id === '#') {
+      return ALTERNATION_FLAVOR;
+    }
+    var parsed = colorForHex(id);
+    if (parsed === null) {
+      return COLOR_FLAVOR_NAMES[0];
+    }
+    var closest = null;
+    var difference = 0xff*3;
+    for (var i = 0, len = COLOR_FLAVOR_NAMES.length; i < len; ++i) {
+      var name = COLOR_FLAVOR_NAMES[i];
+      var color = COLOR_FLAVORS[name].color;
+      var diff = 0;
+      for (var j = 0; j < 3; ++j) {
+        diff += Math.abs(color[j] - parsed[j]);
+      }
+      if (diff < difference) {
+        difference = diff;
+        closest = name;
+      }
+    }
+    return closest;
+  };
 
   // makeCheckbox generates a checkbox that follows the theme color.
   Flavors.prototype.makeCheckbox = function() {
@@ -98,6 +124,15 @@
     result.setVisible(true);
     this._checkboxes.push(result);
     return result;
+  };
+
+  // nameToId converts a flavor name to an ID.
+  Flavors.prototype.nameToId = function(name) {
+    if (name === ALTERNATION_FLAVOR) {
+      return '#';
+    }
+    var color = COLOR_FLAVORS[name].color;
+    return hexForColor(color);
   };
 
   // removeCheckbox stops updating the color of a given checkbox.
@@ -134,7 +169,9 @@
 
   Flavors.prototype._registerModelEvents = function() {
     window.app.observe.globalSettings('flavor', function() {
-      this._modelFlavorChanged(window.app.store.getGlobalSettings().flavor);
+      this._modelFlavorChanged(
+        this.idToName(window.app.store.getGlobalSettings().flavor)
+      );
     }.bind(this));
   };
 
@@ -275,6 +312,21 @@
 
     this._requestFrame();
   };
+
+  function colorForHex(hex) {
+    if (hex[0] !== '#' || hex.length != 7) {
+      return null;
+    }
+    var res = [];
+    for (var i = 0; i < 3; ++i) {
+      var val = parseInt(hex.substr(1 + 2*i, 2), 16);
+      if (isNaN(val)) {
+        return null;
+      }
+      res[i] = val;
+    }
+    return res;
+  }
 
   function hexForColor(color) {
     var hexCode = '#';
