@@ -2,7 +2,7 @@
 
   function SettingsController(view) {
     this._view = view;
-    var events = ['changeName', 'flavorChanged', 'iconChanged',
+    var events = ['changeName', 'flavorChanged', 'iconChanged', 'rightyChanged',
       'scrambleTypeChanged', 'scramblerChanged', 'theaterModeChanged',
       'updateChanged'];
     for (var i = 0; i < events.length; ++i) {
@@ -58,6 +58,10 @@
       }
     }
     window.app.store.modifyPuzzle({timerInput: input});
+  };
+
+  SettingsController.prototype._rightyChanged = function() {
+    window.app.store.modifyGlobalSettings({righty: this._view.righty()});
   };
 
   SettingsController.prototype._scrambleTypeChanged = function() {

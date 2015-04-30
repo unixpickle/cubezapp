@@ -75,7 +75,7 @@
   Settings.prototype.iconName = function() {
     return this._getField('icon').dropdown().value();
   };
-  
+
   Settings.prototype.inspection = function() {
     return this._getField('inspection').checkbox().checked();
   };
@@ -83,6 +83,10 @@
   Settings.prototype.layout = function() {
     this._layoutFields(false);
   };
+  
+  Settings.prototype.righty = function() {
+    return this._getField('righty').checkbox().checked();
+  }
 
   Settings.prototype.scrambleType = function() {
     return this._getField('scrambleType').dropdown().value();
@@ -95,7 +99,7 @@
   Settings.prototype.theaterMode = function() {
     return this._getField('theaterMode').checkbox().checked();
   };
-  
+
   Settings.prototype.timerInput = function() {
     return this._getField('timerInput').dropdown().value();
   };
@@ -138,6 +142,7 @@
     this._updateIcon();
     this._updateInspection(false);
     this._updateName();
+    this._updateRighty();
     this._updateScrambler();
     this._updateScrambleTypes(false);
     this._updateScrambleType();
@@ -186,7 +191,8 @@
     var globalEvents = {
       'flavor': this._updateFlavor,
       'timerAccuracy': this._updateUpdate,
-      'theaterMode': this._updateTheaterMode
+      'theaterMode': this._updateTheaterMode,
+      'righty': this._updateRighty
     };
     keys = Object.keys(globalEvents);
     for (var i = 0, len = keys.length; i < len; ++i) {
@@ -226,7 +232,7 @@
         this.emit.bind(this, dropdownFields[i] + 'Changed');
     }
 
-    var checkboxes = ['bld', 'inspection', 'theaterMode'];
+    var checkboxes = ['bld', 'inspection', 'righty', 'theaterMode'];
     for (var i = 0, len = checkboxes.length; i < len; ++i) {
       this._getField(checkboxes[i]).checkbox().onChange =
         this.emit.bind(this, checkboxes[i] + 'Changed');
@@ -274,6 +280,12 @@
 
   Settings.prototype._updateName = function() {
     this._$puzzleName.text(window.app.store.getActivePuzzle().name);
+  };
+
+  Settings.prototype._updateRighty = function() {
+    this._getField('righty').checkbox().setChecked(
+      window.app.store.getGlobalSettings().righty
+    );
   };
 
   Settings.prototype._updateScrambleType = function() {
@@ -330,7 +342,7 @@
       window.app.store.getGlobalSettings().theaterMode
     );
   };
-  
+
   Settings.prototype._updateTimerInput = function(animate) {
     var input = window.app.store.getActivePuzzle().timerInput;
     var mode = null;

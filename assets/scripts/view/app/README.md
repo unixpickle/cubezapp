@@ -52,6 +52,7 @@ It implements the [EventEmitter interface](../event_emitter.md) and fires the fo
  * **flavorChanged**() - the user has changed the site flavor.
  * **iconChanged**() - the user has changed the current puzzle's icon.
  * **inspectionChanged**() - the user has changed the inspection checkbox.
+ * **rightyChanged**() - the user has changed the right handed checkbox.
  * **scrambleTypeChanged**() - the user has changed the scramble type. This will not be called for scrambler changes.
  * **scramblerChanged**() - the user has changed the scrambler.
  * **theaterModeChanged**() - the user has changed the theater mode setting.
@@ -66,6 +67,7 @@ The settings tab also implements the following methods to get options which the 
  * **flavorName**() - get the name of the flavor the user has chosen.
  * **iconName**() - get the name of the icon the user has chosen.
  * **inspection**() - get whether the user has set inspection mode.
+ * **righty**() - get the right handed setting the user has chosen.
  * **scrambleType**() - get the name of the scramble type the user has chosen.
  * **scrambler**() - get the name of the scrambler the user has chosen.
  * **theaterMode**() - get the theater mode flag the user has chosen.
