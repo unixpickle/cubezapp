@@ -65,6 +65,8 @@
   function isNameValid(name) {
     if (name.length === 0) {
       return false;
+    } else if (name === window.app.store.getActivePuzzle().name) {
+      return true;
     }
     var puzzles = window.app.store.getPuzzles();
     for (var i = 0, len = puzzles.length; i < len; ++i) {
