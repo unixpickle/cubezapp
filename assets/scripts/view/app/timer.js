@@ -161,6 +161,7 @@
   };
 
   TimerView.prototype._handleLatestSolveChanged = function() {
+    console.log('yo');
     if (!this._timerRunning && !this._manualEntry) {
       this._showLatestSolve();
     }

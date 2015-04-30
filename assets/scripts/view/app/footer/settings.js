@@ -172,7 +172,8 @@
 
     var globalEvents = {
       'flavor': this._updateFlavor,
-      'timerAccuracy': this._updateUpdate
+      'timerAccuracy': this._updateUpdate,
+      'theaterMode': this._updateTheaterMode
     };
     keys = Object.keys(globalEvents);
     for (var i = 0, len = keys.length; i < len; ++i) {

@@ -4,7 +4,7 @@
     'switchedPuzzle', 'addedPuzzle'];
   var GLOBAL_SETTING_EVENTS = ['remoteChange', 'modifiedGlobalSettings'];
   var LATEST_SOLVE_EVENTS = ['modifiedSolve', 'addedSolve', 'deletedSolve',
-    'switchedPuzzle', 'addedPuzzle'];
+    'switchedPuzzle', 'addedPuzzle', 'remoteChange'];
   var PUZZLE_COUNT_EVENTS = ['addedPuzzle', 'deletedPuzzle', 'remoteChange'];
 
   function Observe() {
