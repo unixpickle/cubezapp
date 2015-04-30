@@ -57,7 +57,7 @@
   // loaded.
   function Flavors() {
     handleColorHashtagURLs();
-    
+
     // this._alternationIndex is used to make sure that alternation does not
     // repeat itself.
     this._alternationIndex = 0;

@@ -2,21 +2,18 @@
 
   function SettingsController(view) {
     this._view = view;
-    var events = ['bldChanged', 'flavorChanged', 'iconChanged', 'changeName',
+    var events = ['changeName', 'flavorChanged', 'iconChanged',
       'scrambleTypeChanged', 'scramblerChanged', 'theaterModeChanged',
       'updateChanged'];
     for (var i = 0; i < events.length; ++i) {
       var functionName = '_' + events[i];
       this._view.on(events[i], this[functionName].bind(this));
     }
+    var inputEvents = ['bldChanged', 'inspectionChanged', 'timerInputChanged'];
+    for (var i = 0; i < inputEvents.length; ++i) {
+      this._view.on(inputEvents[i], this._inputChanged.bind(this));
+    }
   }
-
-  SettingsController.prototype._bldChanged = function() {
-    // TODO: make this better.
-    var inputMode = this._view.bld() ? window.app.TimerController.INPUT_BLD :
-      window.app.TimerController.INPUT_REGULAR;
-    window.app.store.modifyPuzzle({timerInput: inputMode});
-  };
 
   SettingsController.prototype._changeName = function() {
     var popup = new window.app.RenamePopup();
@@ -42,6 +39,25 @@
     var iconIndex = window.app.iconNames.indexOf(iconName);
     var iconFile = window.app.iconFiles[iconIndex];
     window.app.store.modifyPuzzle({icon: iconFile});
+  };
+
+  SettingsController.prototype._inputChanged = function() {
+    var input = 0;
+    if (this._view.bld()) {
+      input = window.app.TimerController.INPUT_BLD;
+    } else if (this._view.inspection()) {
+      input = window.app.TimerController.INPUT_INSPECTION;
+    } else {
+      var modeStr = this._view.timerInput();
+      if (modeStr === 'Regular') {
+        input = window.app.TimerController.INPUT_REGULAR;
+      } else if (modeStr === 'Stackmat') {
+        input = window.app.TimerController.INPUT_STACKMAT;
+      } else {
+        input = window.app.TimerController.INPUT_ENTRY;
+      }
+    }
+    window.app.store.modifyPuzzle({timerInput: input});
   };
 
   SettingsController.prototype._scrambleTypeChanged = function() {

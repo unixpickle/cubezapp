@@ -48,12 +48,14 @@ The settings tab of the footer allows the user to change puzzle specific, device
 
 It implements the [EventEmitter interface](../event_emitter.md) and fires the following events:
 
- * **bldChanged**() - the user has changed the BLD checkbox
+ * **bldChanged**() - the user has changed the BLD checkbox.
  * **flavorChanged**() - the user has changed the site flavor.
  * **iconChanged**() - the user has changed the current puzzle's icon.
+ * **inspectionChanged**() - the user has changed the inspection checkbox.
  * **scrambleTypeChanged**() - the user has changed the scramble type. This will not be called for scrambler changes.
  * **scramblerChanged**() - the user has changed the scrambler.
  * **theaterModeChanged**() - the user has changed the theater mode setting.
+ * **timerInputChanged**() - the user has changed the timer input dropdown.
  * **updateChanged**() - the user has changed the timer accuracy.
 
 Remember that none of these events indicate whether or not the model has been modified. The controller should register these events and make the necessary changes to the model.
@@ -63,9 +65,11 @@ The settings tab also implements the following methods to get options which the 
  * **bld**() - get the BLD setting the user has chosen.
  * **flavorName**() - get the name of the flavor the user has chosen.
  * **iconName**() - get the name of the icon the user has chosen.
+ * **inspection**() - get whether the user has set inspection mode.
  * **scrambleType**() - get the name of the scramble type the user has chosen.
  * **scrambler**() - get the name of the scrambler the user has chosen.
  * **theaterMode**() - get the theater mode flag the user has chosen.
+ * **timerInput**() - either 'Regular', 'Manual Entry', or 'Stackmat'.
  * **update**() - get the integer value for the timer accuracy.
 
 <a name="stats-object"></a>

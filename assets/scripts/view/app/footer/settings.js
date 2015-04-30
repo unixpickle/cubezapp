@@ -29,7 +29,7 @@
     this._addField('scrambleType', new DropdownField(''));
     this._addField('bld', new CheckField('BLD'));
     this._addField('inspection', new CheckField('Inspection'));
-    this._addField('input', new DropdownField('Timer Input'));
+    this._addField('timerInput', new DropdownField('Timer Input'));
     this._addField('update', new DropdownField('Update'));
     this._addField('righty', new CheckField('Right Handed'));
     this._addField('theaterMode', new CheckField('Theater Mode'));
@@ -75,6 +75,10 @@
   Settings.prototype.iconName = function() {
     return this._getField('icon').dropdown().value();
   };
+  
+  Settings.prototype.inspection = function() {
+    return this._getField('inspection').checkbox().checked();
+  };
 
   Settings.prototype.layout = function() {
     this._layoutFields(false);
@@ -90,6 +94,10 @@
 
   Settings.prototype.theaterMode = function() {
     return this._getField('theaterMode').checkbox().checked();
+  };
+  
+  Settings.prototype.timerInput = function() {
+    return this._getField('timerInput').dropdown().value();
   };
 
   Settings.prototype.update = function() {
@@ -115,6 +123,9 @@
     this._getField('update').dropdown().setOptions(
       window.app.TimerView.ACCURACY_NAMES
     );
+    this._getField('timerInput').dropdown().setOptions([
+      'Regular', 'Manual Entry', 'Stackmat'
+    ]);
 
     var scrambles = window.puzzlejs.scrambler.allPuzzles().slice();
     scrambles.unshift('None');
@@ -125,11 +136,13 @@
     this._updateBLD();
     this._updateFlavor();
     this._updateIcon();
+    this._updateInspection(false);
     this._updateName();
     this._updateScrambler();
     this._updateScrambleTypes(false);
     this._updateScrambleType();
     this._updateTheaterMode();
+    this._updateTimerInput(false);
     this._updateUpdate();
   };
 
@@ -189,7 +202,11 @@
         this._updateScrambleTypes(true);
       },
       'scrambleType': this._updateScrambleType,
-      'timerInput': this._updateBLD
+      'timerInput': function() {
+        this._updateBLD();
+        this._updateInspection(true);
+        this._updateTimerInput(true);
+      }
     };
     keys = Object.keys(puzzleEvents);
     for (var i = 0, len = keys.length; i < len; ++i) {
@@ -203,13 +220,13 @@
       'changeName'));
 
     var dropdownFields = ['flavor', 'icon', 'scrambleType', 'scrambler',
-      'update'];
+      'timerInput', 'update'];
     for (var i = 0, len = dropdownFields.length; i < len; ++i) {
       this._getField(dropdownFields[i]).dropdown().onChange =
         this.emit.bind(this, dropdownFields[i] + 'Changed');
     }
 
-    var checkboxes = ['bld', 'theaterMode'];
+    var checkboxes = ['bld', 'inspection', 'theaterMode'];
     for (var i = 0, len = checkboxes.length; i < len; ++i) {
       this._getField(checkboxes[i]).checkbox().onChange =
         this.emit.bind(this, checkboxes[i] + 'Changed');
@@ -236,6 +253,23 @@
     this._$puzzleIcon.css({
       backgroundImage: 'url(images/puzzles/' + fileName + '.png)'
     });
+  };
+
+  Settings.prototype._updateInspection = function(animate) {
+    var field = this._getField('inspection');
+    var checkbox = field.checkbox();
+    var input = window.app.store.getActivePuzzle().timerInput;
+    if (input === window.app.TimerController.INPUT_BLD) {
+      checkbox.setChecked(false);
+      field.enabled = false;
+    } else if (input === window.app.TimerController.INPUT_INSPECTION) {
+      checkbox.setChecked(true);
+      field.enabled = true;
+    } else {
+      checkbox.setChecked(false);
+      field.enabled = true;
+    }
+    field.updateEnabled(animate);
   };
 
   Settings.prototype._updateName = function() {
@@ -295,6 +329,26 @@
     this._getField('theaterMode').checkbox().setChecked(
       window.app.store.getGlobalSettings().theaterMode
     );
+  };
+  
+  Settings.prototype._updateTimerInput = function(animate) {
+    var input = window.app.store.getActivePuzzle().timerInput;
+    var mode = null;
+    if (input === window.app.TimerController.INPUT_REGULAR) {
+      mode = 'Regular';
+    } else if (input === window.app.TimerController.INPUT_ENTRY) {
+      mode = 'Manual Entry';
+    } else if (input === window.app.TimerController.INPUT_STACKMAT) {
+      mode = 'Stackmat';
+    }
+    var field = this._getField('timerInput');
+    if (mode === null) {
+      field.enabled = false;
+    } else {
+      field.enabled = true;
+      field.dropdown().setSelectedValue(mode);
+    }
+    field.updateEnabled(animate);
   };
 
   Settings.prototype._updateUpdate = function() {
@@ -375,13 +429,15 @@
     }
     if (this.enabled) {
       if (animate) {
-        this.element().css({pointerEvents: 'auto'}).animate({opacity: 1});
+        this.element().css({pointerEvents: 'auto'}).animate({opacity: 1},
+          'fast');
       } else {
         this.element().css({pointerEvents: 'auto', opacity: 1});
       }
     } else {
       if (animate) {
-        this.element().css({pointerEvents: 'none'}).animate({opacity: 0.5});
+        this.element().css({pointerEvents: 'none'}).animate({opacity: 0.5},
+          'fast');
       } else {
         this.element().css({pointerEvents: 'none', opacity: 0.5});
       }
