@@ -56,6 +56,8 @@
   // Flavors is the flavor manager. It must be created after the model is
   // loaded.
   function Flavors() {
+    handleColorHashtagURLs();
+    
     // this._alternationIndex is used to make sure that alternation does not
     // repeat itself.
     this._alternationIndex = 0;
@@ -326,6 +328,18 @@
       res[i] = val;
     }
     return res;
+  }
+
+  function handleColorHashtagURLs() {
+    var hash = (window.location.hash || '');
+    var color = colorForHex(hash);
+    if (color !== null) {
+      COLOR_FLAVORS[hash] = {color: color};
+      COLOR_FLAVOR_NAMES.push(hash);
+      window.app.flavorNames = COLOR_FLAVOR_NAMES.slice();
+      window.app.flavorNames.push(ALTERNATION_FLAVOR);
+      window.app.store.modifyGlobalSettings({flavor: hash});
+    }
   }
 
   function hexForColor(color) {
