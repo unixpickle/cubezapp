@@ -87,9 +87,13 @@
   Settings.prototype.scrambler = function() {
     return this._getField('scrambler').dropdown().value();
   };
-  
+
   Settings.prototype.theaterMode = function() {
     return this._getField('theaterMode').checkbox().checked();
+  };
+
+  Settings.prototype.update = function() {
+    return this._getField('update').dropdown().selected();
   };
 
   Settings.prototype._addField = function(name, field) {
@@ -108,6 +112,9 @@
   Settings.prototype._initDropdownOptions = function() {
     this._getField('icon').dropdown().setOptions(window.app.iconNames);
     this._getField('flavor').dropdown().setOptions(window.app.flavorNames);
+    this._getField('update').dropdown().setOptions(
+      window.app.TimerView.ACCURACY_NAMES
+    );
 
     var scrambles = window.puzzlejs.scrambler.allPuzzles().slice();
     scrambles.unshift('None');
@@ -123,6 +130,7 @@
     this._updateScrambleTypes(false);
     this._updateScrambleType();
     this._updateTheaterMode();
+    this._updateUpdate();
   };
 
   Settings.prototype._layoutFields = function(animate) {
@@ -159,7 +167,18 @@
   };
 
   Settings.prototype._registerModelEvents = function() {
-    window.app.observe.globalSettings('flavor', this._updateFlavor.bind(this));
+    var keys;
+    var key;
+
+    var globalEvents = {
+      'flavor': this._updateFlavor,
+      'timerAccuracy': this._updateUpdate
+    };
+    keys = Object.keys(globalEvents);
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      key = keys[i];
+      window.app.observe.globalSettings(key, globalEvents[key].bind(this));
+    }
 
     var puzzleEvents = {
       'icon': this._updateIcon,
@@ -171,9 +190,9 @@
       'scrambleType': this._updateScrambleType,
       'timerInput': this._updateBLD
     };
-    var keys = Object.keys(puzzleEvents);
+    keys = Object.keys(puzzleEvents);
     for (var i = 0, len = keys.length; i < len; ++i) {
-      var key = keys[i];
+      key = keys[i];
       window.app.observe.activePuzzle(key, puzzleEvents[key].bind(this));
     }
   };
@@ -182,7 +201,8 @@
     this._getField('changeName').button().click(this.emit.bind(this,
       'changeName'));
 
-    var dropdownFields = ['flavor', 'icon', 'scrambleType', 'scrambler'];
+    var dropdownFields = ['flavor', 'icon', 'scrambleType', 'scrambler',
+      'update'];
     for (var i = 0, len = dropdownFields.length; i < len; ++i) {
       this._getField(dropdownFields[i]).dropdown().onChange =
         this.emit.bind(this, dropdownFields[i] + 'Changed');
@@ -269,10 +289,16 @@
       window.app.store.getActivePuzzle().scrambler
     );
   };
-  
+
   Settings.prototype._updateTheaterMode = function() {
     this._getField('theaterMode').checkbox().setChecked(
       window.app.store.getGlobalSettings().theaterMode
+    );
+  };
+
+  Settings.prototype._updateUpdate = function() {
+    this._getField('update').dropdown().setSelected(
+      window.app.store.getGlobalSettings().timerAccuracy
     );
   };
 

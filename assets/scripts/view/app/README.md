@@ -54,6 +54,7 @@ It implements the [EventEmitter interface](../event_emitter.md) and fires the fo
  * **scrambleTypeChanged**() - the user has changed the scramble type. This will not be called for scrambler changes.
  * **scramblerChanged**() - the user has changed the scrambler.
  * **theaterModeChanged**() - the user has changed the theater mode setting.
+ * **updateChanged**() - the user has changed the timer accuracy.
 
 Remember that none of these events indicate whether or not the model has been modified. The controller should register these events and make the necessary changes to the model.
 
@@ -65,6 +66,7 @@ The settings tab also implements the following methods to get options which the 
  * **scrambleType**() - get the name of the scramble type the user has chosen.
  * **scrambler**() - get the name of the scrambler the user has chosen.
  * **theaterMode**() - get the theater mode flag the user has chosen.
+ * **update**() - get the integer value for the timer accuracy.
 
 <a name="stats-object"></a>
 ## Stats

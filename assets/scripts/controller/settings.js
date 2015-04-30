@@ -3,7 +3,8 @@
   function SettingsController(view) {
     this._view = view;
     var events = ['bldChanged', 'flavorChanged', 'iconChanged', 'changeName',
-      'scrambleTypeChanged', 'scramblerChanged', 'theaterModeChanged'];
+      'scrambleTypeChanged', 'scramblerChanged', 'theaterModeChanged',
+      'updateChanged'];
     for (var i = 0; i < events.length; ++i) {
       var functionName = '_' + events[i];
       this._view.on(events[i], this[functionName].bind(this));
@@ -51,10 +52,14 @@
     var type = this._view.scrambleType();
     window.app.store.modifyPuzzle({scrambler: scrambler, scrambleType: type});
   };
-  
+
   SettingsController.prototype._theaterModeChanged = function() {
     var flag = this._view.theaterMode();
     window.app.store.modifyGlobalSettings({theaterMode: flag});
+  };
+
+  SettingsController.prototype._updateChanged = function() {
+    window.app.store.modifyGlobalSettings({timerAccuracy: this._view.update()});
   };
 
   function isNameValid(name) {

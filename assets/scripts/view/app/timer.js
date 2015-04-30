@@ -34,6 +34,7 @@
   TimerView.ACCURACY_CENTISECONDS = 0;
   TimerView.ACCURACY_SECONDS = 1;
   TimerView.ACCURACY_NONE = 2;
+  TimerView.ACCURACY_NAMES = ['Centiseconds', 'Seconds', 'None'];
 
   TimerView.prototype.cancel = function() {
     this._assertRunning();
