@@ -29,7 +29,13 @@
     if (usingInputEntry()) {
       this.setTime('0.00');
     } else if (latestSolve) {
-      this.setTime(window.app.formatTime(latestSolve.time));
+      var time = latestSolve.time;
+      var suffix = '';
+      if (latestSolve.plus2) {
+        time += 2000;
+        suffix = '+';
+      }
+      this.setTime(window.app.formatTime(time) + suffix);
       if (latestSolve.memo >= 0) {
         this._middle.setMemo(window.app.formatTime(latestSolve.memo));
       }
@@ -122,7 +128,7 @@
   // setTime sets the time's text contents.
   AppView.prototype.setTime = function(time) {
     // TODO: say "Tap Screen" if this is a mobile device.
-    this._middle.setTime(time || 'Hit Space');
+    this._middle.setTime(time || noTimesLabel());
   };
 
   // setTimeBlinking sets whether the time blinker is blinking.
@@ -532,6 +538,17 @@
       throw new TypeError('invalid type for scrambleAvailable');
     } else if ('boolean' !== typeof this.scrambleVisible) {
       throw new TypeError('invalid type for scrambleVisible');
+    }
+  }
+
+  function noTimesLabel() {
+    if ('ontouchstart' in window) {
+      return 'Tap Screen';
+    } else if (window.app.store.getActivePuzzle().timerInput ===
+        window.app.TimerController.INPUT_STACKMAT) {
+      return 'Stackmat';
+    } else {
+      return 'Hit Space';
     }
   }
 

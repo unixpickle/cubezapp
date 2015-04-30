@@ -99,11 +99,12 @@
   };
 
   Time.prototype._usableFontSize = function() {
-    if (this._text === 'Hit Space' || this._text == 'Ready' ||
-        this._text === 'Timing') {
+    var special = ['Hit Space', 'Ready', 'Timing', 'Tap Screen', 'Stackmat'];
+    if (special.indexOf(this._text) >= 0) {
       return this._requestedFontSize * 0.8;
+    } else {
+      return this._requestedFontSize;
     }
-    return this._requestedFontSize;
   };
 
   window.app.Time = Time;

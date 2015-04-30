@@ -174,9 +174,23 @@
     }
   };
 
+  TimerView.prototype._handleTimerInputChanged = function() {
+    // In some situations, this function is necessary to change "Hit Space" to
+    // "Stackmat" or vice versa.
+    // NOTE: we can't use this._manualEntry because this may be called by the
+    // observer before setManualEntry() is.
+    var isManual = window.app.store.getActivePuzzle().timerInput ===
+      window.app.TimerController.INPUT_ENTRY;
+    if (!this._timerRunning && !isManual) {
+      this._showLatestSolve();
+    }
+  };
+
   TimerView.prototype._registerModelEvents = function() {
     window.app.observe.globalSettings(['theaterMode', 'timerAccuracy'],
       this._handleSettingsChanged.bind(this));
+    window.app.observe.activePuzzle('timerInput',
+      this._handleTimerInputChanged.bind(this));
     window.app.observe.latestSolve(['time', 'memo'],
       this._handleLatestSolveChanged.bind(this));
   };
@@ -186,7 +200,13 @@
     if (solve === null) {
       this._appView.setTime(null);
     } else {
-      this._appView.setTime(window.app.formatTime(solve.time));
+      var time = solve.time;
+      var suffix = '';
+      if (solve.plus2) {
+        time += 2000;
+        suffix = '+';
+      }
+      this._appView.setTime(window.app.formatTime(time) + suffix);
       if (solve.memo >= 0) {
         this._appView.setMemo(window.app.formatTime(solve.memo));
       } else {
