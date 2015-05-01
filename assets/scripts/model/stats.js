@@ -5,89 +5,142 @@
 // simple minion who has no free will nor wishes to have it.
 (function() {
 
+  // Averages of 50 or more will pretend DNF solves aren't there.
+  var FILTER_DNF_CUTOFF = 50;
+
   function bestAverage(times, count) {
+    // NOTE: this can be optimized if it needs to be.
     var best = -1;
+    var bestIdx = -1;
     for (var i = 0, len = times.length-count; i <= len; ++i) {
-      var subList = times.slice(i, i+count);
+      var subList;
+      if (count >= FILTER_DNF_CUTOFF) {
+        subList = filterDNFs(times, i, count);
+        if (subList === null) {
+          break;
+        }
+      } else {
+        subList = times.slice(i, i+count);
+        if (dnfCount(subList) > 1) {
+          continue;
+        }
+      }
       removeBestWorst(subList);
       var average = mean(subList);
       if (average < best || best === -1) {
         best = average;
+        bestIdx = i;
       }
     }
-    return best;
+    return {best: best, index: bestIdx};
   }
 
-  function bestMean(times, count) {
+  function bestMeanOf3(times) {
     var best = -1;
-    for (var i = 0, len = times.length-(count-1); i < len; ++i) {
-      var subList = times.slice(i, i+count);
+    var bestIdx = -1;
+    for (var i = 0, len = times.length-3; i <= len; ++i) {
+      var subList = times.slice(i, i+3);
+      if (dnfCount(subList) > 0) {
+        continue;
+      }
       var average = mean(subList);
       if (average < best || best === -1) {
         best = average;
       }
     }
-    return best;
+    return {best: best, index: bestIdx};
   }
 
   function bestTime(times) {
     var best = -1;
     for (var i = 0, len = times.length; i < len; ++i) {
-      if (i === 0 || times[i] < best) {
-        best = times[i];
+      var time = times[i];
+      if (time >= 0) {
+        if (i === 0 || time < best) {
+          best = time;
+        }
       }
     }
     return best;
   }
 
-  function computeStatistics(times) {
-    // Compute the general statistics.
-    var average = NaN;
-    var best = NaN;
-    var count = times.length;
-    var worst = NaN;
-    if (times.length > 0) {
-      best = bestTime(times);
-      worst = worstTime(times);
-    }
-    if (times.length > 2) {
-      var t = times.slice();
-      removeBestWorst(t);
-      average = mean(t);
-    }
-    var res = {average: average, best: best, count: count, worst: worst,
-      averages: []};
+  function computeStatisticsForSolves(solves) {
+    var times = timesForSolves(solves);
+    // TODO: the rest of the stuff here.
+  }
 
-    // Compute the averages table
-    if (times.length > 2) {
-      res.averages.push(["mo3", lastMean(times, 3), bestMean(times, 3)]);
-    }
-    var averages = [5, 12, 50, 100, 1000];
-    for (var i = 0, len = averages.length; i < len; ++i) {
-      var avg = averages[i];
-      if (avg > times.length) {
-        break;
+  function dnfCount(times) {
+    var count = 0;
+    for (var i = 0, len = times.length; i < len; ++i) {
+      if (times[i] < 0) {
+        ++count;
       }
-      res.averages.push(['' + avg, lastAverage(times, avg),
-        bestAverage(times, avg)]);
     }
-    return res;
+    return count;
+  }
+
+  function filterDNFs(times, start, count) {
+    var res = [];
+    for (var i = start, l = times.length; i < l && res.length < count; ++i) {
+      var time = times[i];
+      if (time >= 0) {
+        res.push(time);
+      }
+    }
+    if (res.length < count) {
+      return null;
+    } else {
+      return res;
+    }
+  }
+
+  function globalMean(times) {
+    var sum = 0;
+    var count = 0;
+    for (var i = 0, len = times.length; i < len; ++i) {
+      var time = times[i];
+      if (time >= 0) {
+        ++count;
+        sum += time;
+      }
+    }
+    return sum / count;
   }
 
   function lastAverage(times, count) {
     if (times.length < count) {
-      return NaN;
+      return -1;
     }
-    var subList = times.slice(0, count);
+    var subList;
+    if (count >= FILTER_DNF_CUTOFF) {
+      subList = [];
+      for (var i = times.length-1; i >= 0 && subList.length < count; --i) {
+        var time = times[i];
+        if (time >= 0) {
+          subList.push(time);
+        }
+      }
+      if (subList.length < count) {
+        return -1;
+      }
+    } else {
+      subList = times.slice(times.length-count, times.length);
+      if (dnfCount(subList) > 1) {
+        return -1;
+      }
+    }
     removeBestWorst(subList);
     return mean(subList);
   }
 
-  function lastMean(times, count) {
-    if (times.length < count) {
-      return NaN;
+  function lastMeanOf3(times) {
+    if (times.length < 3) {
+      return -1;
     }
-    var subList = times.slice(0, count);
+    var subList = times.slice(times.length-3, times.length);
+    if (dnfCount(subList) > 0) {
+      return -1;
+    }
     return mean(subList);
   }
 
@@ -104,51 +157,48 @@
       return;
     }
 
-    // In O(n), find the max and min values.
-    var max = 0;
-    var maxIdx = -1;
-    var min = 0;
-    var minIdx = -1;
+    var worst = 0;
+    var worstIdx = -1;
+    var best = 0;
+    var bestIdx = -1;
     for (var i = 0, len = times.length; i < len; ++i) {
       var time = times[i];
-      if (time > max || maxIdx === -1) {
-        max = time;
-        maxIdx = i;
-      }
-      if (time < min || minIdx === -1) {
-        min = time;
-        minIdx = i;
+      if (time < 0) {
+        worst = -1;
+        worstIdx = i;
+      } else {
+        var worstIsDNF = (worst === -1);
+        if (!maxIsDNF && (time > worst || worstIdx === -1)) {
+          worst = time;
+          worstIdx = i;
+        }
+        if (time < best || bestIdx === -1) {
+          best = time;
+          bestIdx = i;
+        }
       }
     }
 
-    // Remove the max and min values.
-    times.splice(maxIdx, 1);
-    if (minIdx < maxIdx) {
-      times.splice(minIdx, 1);
-    } else if (minIdx > maxIdx) {
-      times.splice(minIdx-1, 1);
+    times.splice(worstIdx, 1);
+    if (bestIdx < worstIdx) {
+      times.splice(bestIdx, 1);
+    } else if (bestIdx > worstIdx) {
+      times.splice(bestIdx-1, 1);
     }
   }
 
-  function statsForSolves(solves) {
+  function timesForSolves(solves) {
     var times = [];
     for (var i = 0, len = solves.length; i < len; ++i) {
-      times[i] = window.app.solveTime(solves[i]);
-    }
-    return computeStatistics(times);
-  }
-
-  function worstTime(times) {
-    var worst = -1;
-    for (var i = 0, len = times.length; i < len; ++i) {
-      if (i === 0 || times[i] > worst) {
-        worst = times[i];
+      var solve = solves[i];
+      if (solve.dnf) {
+        times.push(-1);
+      } else {
+        times.push(window.app.solveTime(solve));
       }
     }
-    return worst;
   }
 
-  window.app.computeStatistics = computeStatistics;
-  window.app.statsForSolves = statsForSolves;
+  window.app.computeStatisticsForSolves = computeStatisticsForSolves;
 
 })();

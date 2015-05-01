@@ -90,8 +90,8 @@ The store also provides some helper functions for solves:
 The **Stats** object stores averages, PBs, and other information about the user's solves. Here are the fields it has:
 
  * **count** - int - the total number of solves in the current puzzle.
- * **mean** - int - the global mean of all non-DNF solve times in the current puzzle.
- * **best** - [Solve](#solve-object) - the user's best timed solve.
+ * **mean** - int - the global mean of all non-DNF solve times in the current puzzle. If no mean is available, this is -1.
+ * **best** - [Solve](#solve-object) - the user's best timed solve. If no solve times are available, this is -1.
  * **averages** - array - the averages table. Every element in this table will have the following fields:
    * **name** - string - usually, this is a numeric string like "5", but it may also be "mo3".
    * **last** - [AverageInfo](#average-info-object) - the most recent average of this size.
