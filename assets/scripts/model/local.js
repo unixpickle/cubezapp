@@ -304,10 +304,15 @@
     this._fillInMissingSettings();
 
     var active = localStorage.activePuzzle;
+    var puzzles = this._puzzles;
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       if (puzzles[i].id === active) {
         this._active = puzzles[i];
+        break;
       }
+    }
+    if (this._active === null) {
+      this._active = puzzles[0];
     }
 
     this._save();

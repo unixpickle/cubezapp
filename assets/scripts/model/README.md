@@ -33,7 +33,7 @@ The store emits a number of events. These events are listed to look like functio
 
  * **addedPuzzle**(puzzle) - the user added a puzzle and it is now the current puzzle. Not triggered by remote changes.
  * **addedSolve**(solve) - the user saved a new solve. Not triggered by remote changes.
- * **computedStats**(stats) - the statistics for the current puzzle were re-computed.
+ * **computedStats**(stats) - the statistics for the current puzzle were re-computed. The stats argument is a [Stats](#stats-object) object.
  * **deletedPuzzle**(id) - the user deleted a puzzle. Not triggered by remote changes.
  * **deletedSolve**(id) - the user deleted a solve. Not triggered by remote changes.
  * **loadingStats**() - the current statistics are invalid because the statistics are being recomputed.
@@ -96,6 +96,7 @@ The **Stats** object stores averages, PBs, and other information about the user'
    * **name** - string - usually, this is a numeric string like "5", but it may also be "mo3".
    * **last** - [AverageInfo](#average-info-object) - the most recent average of this size.
    * **best** - [AverageInfo](#average-info-object) - the best average of this size.
+   * **lastWasPB** - bool - if this is true, the user just got a new PB average and this is it.
 
 <a name="average-info-object">
 ### AverageInfo
@@ -105,7 +106,7 @@ The **AverageInfo** object stores information about a single average. It contain
  * **time** - int - the average time in milliseconds.
  * **stdDev** - int - the standard deviation for times.
  * **beat** - int - the time needed to beat this average. This is -1 if no such time exists.
- * **
+ * **solves** - array of [Solve](#solve-object) objects.
 
 <a name="puzzle-object"></a>
 ## Puzzle
