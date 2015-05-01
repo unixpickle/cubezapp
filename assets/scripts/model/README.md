@@ -76,7 +76,36 @@ The **Solve** object stores all the information for a single recorded time. Here
  * **plus2** - bool - whether or not the solve was a +2. If this is true, the extra two seconds should be *added* to `time`.
  * **scramble** - string - the scramble that was given
  * **time** - int - the number of milliseconds that the solve physically took.
+ * **lastPB** - int - the number of milliseconds for the most recent personal best before this solve. For the first solve, this is -1. This can be used to tell if a given solve is a PB, because all PBs will have times less than the last PB. **This field will not be present if the solve has not been added to the store. The store maintains this field automatically.**
  * **id** - string - the unique identifier of the solve. **This field will not be present if the solve has not been added to the store.**
+
+The store also provides some helper functions for solves:
+
+ * window.app.solveIsPB(solve) - get a boolean indicating whether a solve is a PB. This does not look at milliseconds; it complies with the WCA regulations.
+ * window.app.solveTime(solve) - get the time of a solve, counting penalties.
+
+<a name="stats-object"></a>
+## Stats
+
+The **Stats** object stores averages, PBs, and other information about the user's solves. Here are the fields it has:
+
+ * **count** - int - the total number of solves in the current puzzle.
+ * **mean** - int - the global mean of all non-DNF solve times in the current puzzle.
+ * **best** - [Solve](#solve-object) - the user's best timed solve.
+ * **averages** - array - the averages table. Every element in this table will have the following fields:
+   * **name** - string - usually, this is a numeric string like "5", but it may also be "mo3".
+   * **last** - [AverageInfo](#average-info-object) - the most recent average of this size.
+   * **best** - [AverageInfo](#average-info-object) - the best average of this size.
+
+<a name="average-info-object">
+### AverageInfo
+
+The **AverageInfo** object stores information about a single average. It contains the following fields:
+
+ * **time** - int - the average time in milliseconds.
+ * **stdDev** - int - the standard deviation for times.
+ * **beat** - int - the time needed to beat this average. This is -1 if no such time exists.
+ * **
 
 <a name="puzzle-object"></a>
 ## Puzzle

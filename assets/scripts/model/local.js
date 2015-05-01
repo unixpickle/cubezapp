@@ -41,6 +41,7 @@
   LocalStore.prototype.addSolve = function(solve) {
     solve.id = window.app.generateId();
     this._active.solves.push(solve);
+    recomputeLastPBs(this._active.solves, this._active.solves.length-1);
     this._save();
     this.emit('addedSolve', solve);
   };
@@ -65,6 +66,7 @@
     for (var i = solves.length-1; i >= 0; --i) {
       if (solves[i].id === id) {
         solves.splice(i, 1);
+        recomputeLastPBs(solves, i);
         this._save();
         this.emit('deletedSolve', id);
         return;
@@ -132,11 +134,12 @@
   };
 
   LocalStore.prototype.modifySolve = function(id, attrs) {
-    var solves = this._active.solves;
     var solve = null;
-    for (var i = solves.length-1; i >= 0; --i) {
-      if (solves[i].id === id) {
-        solve = solves[i];
+    var solveIndex;
+    var solves = this._active.solves;
+    for (solveIndex = solves.length-1; solveIndex >= 0; --solveIndex) {
+      if (solves[solveIndex].id === id) {
+        solve = solves[solveIndex];
         break;
       }
     }
@@ -148,6 +151,7 @@
         solve[key] = attrs[key];
       }
     }
+    recomputeLastPBs(solves, solveIndex+1);
     this._save();
     this.emit('modifiedSolve', id, attrs);
   };
@@ -189,18 +193,6 @@
     this.emit('remoteChange');
   };
 
-  // _fillInMissingSettings makes it easier to add new global settings in the
-  // future.
-  LocalStore.prototype._fillInMissingSettings = function() {
-    var keys = Object.keys(DEFAULT_SETTINGS);
-    for (var i = 0, len = keys.length; i < len; ++i) {
-      var key = keys[i];
-      if (!this._globalSettings.hasOwnProperty(key)) {
-        this._globalSettings[key] = DEFAULT_SETTINGS[key];
-      }
-    }
-  };
-
   // _fillInMissingPuzzleFields makes it easier to add new puzzle fields in the
   // future.
   LocalStore.prototype._fillInMissingPuzzleFields = function() {
@@ -222,6 +214,28 @@
       if (!puzzle.hasOwnProperty('solves')) {
         puzzle.solves = [];
       }
+    }
+  };
+
+  // _fillInMissingSettings makes it easier to add new global settings in the
+  // future.
+  LocalStore.prototype._fillInMissingSettings = function() {
+    var keys = Object.keys(DEFAULT_SETTINGS);
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
+      if (!this._globalSettings.hasOwnProperty(key)) {
+        this._globalSettings[key] = DEFAULT_SETTINGS[key];
+      }
+    }
+  };
+
+  // _fillInMissingSolveFields makes it easier to add new solve fields in the
+  // future.
+  LocalStore.prototype._fillInMissingSolveFields = function() {
+    var puzzles = this._puzzles;
+    for (var i = 0, len = puzzles.length; i < len; ++i) {
+      var solves = puzzles[i].solves;
+      recomputeLastPBs(solves, 0);
     }
   };
 
@@ -268,6 +282,7 @@
 
     this._puzzles = data.puzzles;
     this._fillInMissingPuzzleFields();
+    this._fillInMissingSolveFields();
 
     this._globalSettings = (data.globalSettings || {});
     this._fillInMissingSettings();
@@ -283,6 +298,7 @@
   LocalStore.prototype._loadLegacy = function() {
     this._puzzles = JSON.parse(localStorage.puzzles);
     this._fillInMissingPuzzleFields();
+    this._fillInMissingSolveFields();
 
     this._globalSettings = {};
     this._fillInMissingSettings();
@@ -310,6 +326,30 @@
       localStorage.localStoreData = data;
       this._lastLocalStoreData = data;
     } catch (e) {
+    }
+  };
+
+  function recomputeLastPBs(solves, startIndex) {
+    if (startIndex >= solves.length) {
+      return;
+    }
+
+    var lastPB = -1;
+    if (startIndex === 1) {
+      lastPB = window.app.solveTime(solves[startIndex - 1]);
+    } else if (startIndex > 1) {
+      lastPB = Math.min(solves[startIndex - 1].lastPB,
+        window.app.solveTime(solves[startIndex - 1]));
+    }
+
+    for (var i = startIndex, len = solves.length; i < len; ++i) {
+      var solve = solves[i];
+      solve.lastPB = lastPB;
+      if (lastPB < 0) {
+        lastPB = window.app.solveTime(solve);
+      } else {
+        lastPB = Math.min(lastPB, window.app.solveTime(solve));
+      }
     }
   };
 
