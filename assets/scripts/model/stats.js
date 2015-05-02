@@ -1,202 +1,231 @@
 // NOTE TO READER:
-// According to the blessed qqTimer, the "average" and the "mean" are different
+// According to the cubing community, the "average" and the "mean" are different
 // things. The "mean" is the arithmetic mean, while the average removes the best
-// and worst times before computing the mean. I know this is wrong, but I am a
-// simple minion who has no free will nor wishes to have it.
+// and worst times before computing the mean.
 (function() {
 
-  // Averages of 50 or more will pretend DNF solves aren't there.
+  // FILTER_DNF_CUTOFF is the minimum size of an average which should ignore
+  // DNFs.
   var FILTER_DNF_CUTOFF = 50;
 
-  function bestAverage(times, count) {
-    // NOTE: this can be optimized if it needs to be.
-    var best = -1;
-    var bestIdx = -1;
-    for (var i = 0, len = times.length-count; i <= len; ++i) {
-      var subList;
-      if (count >= FILTER_DNF_CUTOFF) {
-        subList = filterDNFs(times, i, count);
-        if (subList === null) {
-          break;
-        }
-      } else {
-        subList = times.slice(i, i+count);
-        if (dnfCount(subList) > 1) {
-          continue;
-        }
-      }
-      removeBestWorst(subList);
-      var average = mean(subList);
-      if (average < best || best === -1) {
-        best = average;
-        bestIdx = i;
-      }
-    }
-    return {best: best, index: bestIdx};
+  // DNF_TIME is a constant used to represent DNFs as integers.
+  var DNF_TIME = -1;
+
+  // An UnfilteredAverage is a rolling average which removes a certain number of
+  // best and worst times and which always counts DNFs as bad times.
+  function UnfilteredAverage(size, numRemove) {
+    this._size = size;
+    this._numRemove = numRemove;
+
+    this._dnfCount = 0;
+
+    this._average = new MovingAverage(size - numRemove*2);
+    this._times = new NumberStack(size);
+    this._best = new SortedArray();
+    this._middle = new SortedArray();
+    this._worst = new SortedArray();
   }
 
-  function bestMeanOf3(times) {
-    var best = -1;
-    var bestIdx = -1;
-    for (var i = 0, len = times.length-3; i <= len; ++i) {
-      var subList = times.slice(i, i+3);
-      if (dnfCount(subList) > 0) {
-        continue;
-      }
-      var average = mean(subList);
-      if (average < best || best === -1) {
-        best = average;
-      }
-    }
-    return {best: best, index: bestIdx};
-  }
-
-  function bestTime(times) {
-    var best = -1;
-    for (var i = 0, len = times.length; i < len; ++i) {
-      var time = times[i];
-      if (time >= 0) {
-        if (i === 0 || time < best) {
-          best = time;
-        }
-      }
-    }
-    return best;
-  }
-
-  function computeStatisticsForSolves(solves) {
-    var times = timesForSolves(solves);
-    // TODO: the rest of the stuff here.
-  }
-
-  function dnfCount(times) {
-    var count = 0;
-    for (var i = 0, len = times.length; i < len; ++i) {
-      if (times[i] < 0) {
-        ++count;
-      }
-    }
-    return count;
-  }
-
-  function filterDNFs(times, start, count) {
-    var res = [];
-    for (var i = start, l = times.length; i < l && res.length < count; ++i) {
-      var time = times[i];
-      if (time >= 0) {
-        res.push(time);
-      }
-    }
-    if (res.length < count) {
-      return null;
-    } else {
-      return res;
-    }
-  }
-
-  function globalMean(times) {
-    var sum = 0;
-    var count = 0;
-    for (var i = 0, len = times.length; i < len; ++i) {
-      var time = times[i];
-      if (time >= 0) {
-        ++count;
-        sum += time;
-      }
-    }
-    return sum / count;
-  }
-
-  function lastAverage(times, count) {
-    if (times.length < count) {
+  // average returns the current average or -1 if the average is a DNF.
+  UnfilteredAverage.prototype.average = function() {
+    if (this._dnfCount > this._numRemove) {
       return -1;
     }
-    var subList;
-    if (count >= FILTER_DNF_CUTOFF) {
-      subList = [];
-      for (var i = times.length-1; i >= 0 && subList.length < count; --i) {
-        var time = times[i];
-        if (time >= 0) {
-          subList.push(time);
-        }
-      }
-      if (subList.length < count) {
-        return -1;
-      }
-    } else {
-      subList = times.slice(times.length-count, times.length);
-      if (dnfCount(subList) > 1) {
-        return -1;
-      }
-    }
-    removeBestWorst(subList);
-    return mean(subList);
-  }
+    return this._average.average();
+  };
 
-  function lastMeanOf3(times) {
-    if (times.length < 3) {
-      return -1;
+  // pushTime adds the next time to the rolling average and removes the very
+  // first time.
+  UnfilteredAverage.prototype.pushTime = function(time) {
+    this._shiftTime();
+    this._times.push(time);
+    if (time === DNF_TIME) {
+      ++this._dnfCount;
     }
-    var subList = times.slice(times.length-3, times.length);
-    if (dnfCount(subList) > 0) {
-      return -1;
-    }
-    return mean(subList);
-  }
 
-  function mean(times) {
-    var sum = 0;
-    for (var i = 0, len = times.length; i < len; ++i) {
-      sum += times[i];
-    }
-    return sum / times.length;
-  }
+    this._worst.add(time);
+    this._balanceData();
+  };
 
-  function removeBestWorst(times) {
-    if (times.length === 0) {
+  UnfilteredAverage.prototype._balanceData = function() {
+    while (this._worst.count() > this._numRemove) {
+      var time = this._worst.popBest();
+      this._middle.add(time);
+      this._average.add(time);
+    }
+    var middleCapacity = this._size - this._numRemove*2;
+    while (this._middle.count() > middleCapacity) {
+      var time = this._middle.popBest();
+      this._average.remove(time);
+      this._best.add(time);
+    }
+  };
+
+  UnfilteredAverage.prototype._shiftTime = function() {
+    if (this._times.count() < this._size) {
       return;
     }
 
-    var worst = 0;
-    var worstIdx = -1;
-    var best = 0;
-    var bestIdx = -1;
-    for (var i = 0, len = times.length; i < len; ++i) {
-      var time = times[i];
-      if (time < 0) {
-        worst = -1;
-        worstIdx = i;
-      } else {
-        var worstIsDNF = (worst === -1);
-        if (!maxIsDNF && (time > worst || worstIdx === -1)) {
-          worst = time;
-          worstIdx = i;
-        }
-        if (time < best || bestIdx === -1) {
-          best = time;
-          bestIdx = i;
-        }
-      }
+    var time = this._times.shift();
+    if (time === DNF_TIME) {
+      --this._dnfCount;
     }
 
-    times.splice(worstIdx, 1);
-    if (bestIdx < worstIdx) {
-      times.splice(bestIdx, 1);
-    } else if (bestIdx > worstIdx) {
-      times.splice(bestIdx-1, 1);
+    if (!this._middle.remove(time)) {
+      if (!this._worst.remove(time)) {
+        if (!this._best.remove(time)) {
+          throw new Error('time was not in any table');
+        }
+      }
+    } else {
+      this._average.remove(time);
     }
+  };
+
+  // A FilteredAverage is a rolling average which completely ignores DNFs.
+  function FilteredAverage(size, numRemove) {
+    UnfilteredAverage.call(this, size, numRemove);
   }
 
-  function timesForSolves(solves) {
-    var times = [];
-    for (var i = 0, len = solves.length; i < len; ++i) {
-      var solve = solves[i];
-      if (solve.dnf) {
-        times.push(-1);
+  FilteredAverage.prototype = Object.create(UnfilteredAverage.prototype);
+
+  FilteredAverage.prototype.pushTime = function(time) {
+    if (time !== DNF_TIME) {
+      UnfilteredAverage.prototype.pushTime.call(this, time);
+    }
+  };
+
+  // A SortedArray keeps an array of integers sorted. It treats DNF_TIME as
+  // positive infinity. This could be implemented as a binary tree in the
+  // future.
+  function SortedArray() {
+    this._list = [];
+  }
+
+  SortedArray.prototype.add = function(value) {
+    var idx = this._findIndex(value);
+    this._list.splice(idx, 0, value);
+  };
+
+  SortedArray.prototype.count = function() {
+    return this._list.length;
+  };
+
+  SortedArray.prototype.popBest = function() {
+    if (this._list.length === 0) {
+      throw new Error('underflow');
+    }
+    var val = this._list[0];
+    this._list.splice(0, 1);
+    return val;
+  };
+
+  SortedArray.prototype.remove = function(value) {
+    var idx = this._findValue(value);
+    if (idx === this._list.length || this._list[idx] !== value) {
+      return false;
+    } else {
+      this._list.splice(idx, 1);
+      return true;
+    }
+  };
+
+  SortedArray.prototype._endsWithDNF = function() {
+    if (this._list.length > 0) {
+      return this._list[this._list.length - 1] === DNF_TIME;
+    } else {
+      return false;
+    }
+  };
+
+  SortedArray.prototype._findIndex = function(value) {
+    if (value === DNF_TIME) {
+      if (this._endsWithDNF()) {
+        return this._list.length - 1;
       } else {
-        times.push(window.app.solveTime(solve));
+        return this._list.length;
       }
     }
+    var begin = -1;
+    var end = this._list.length;
+    while (begin + 1 < end) {
+      var idx = (begin + end) >> 1;
+      var val = this._list[idx];
+      if (val > value || val === DNF_TIME) {
+        end = idx;
+      } else if (val < value) {
+        begin = idx;
+      } else {
+        return idx;
+      }
+    }
+    return begin + 1;
+  };
+
+  // A MovingAverage computes the average of a moving window of values.
+  function MovingAverage(count) {
+    this._count = count;
+    this._value = 0;
+  }
+
+  MovingAverage.prototype.add = function(val) {
+    this._value += val;
+  };
+
+  MovingAverage.prototype.average = function() {
+    return this._value / this._count;
+  };
+
+  MovingAverage.prototype.remove = function(val) {
+    this._value -= val;
+  };
+
+  // A NumberStack is a list of numbers which O(1) push and shift time.
+  function NumberStack(capacity) {
+    this._array = [];
+    this._capacity = capacity;
+    this._start = 0;
+    this._end = 0;
+    this._count = 0;
+  }
+
+  NumberStack.prototype.count = function() {
+    return this._count;
+  };
+
+  NumberStack.prototype.get = function(idx) {
+    if (idx < 0 || idx >= this._count) {
+      throw new Error('index out of bounds: ' + idx);
+    }
+    return this._array[(idx + this._start) % this._capacity];
+  };
+
+  NumberStack.prototype.push = function(number) {
+    if (this._count === this._capacity) {
+      throw new Error('overflow');
+    }
+    ++this._count;
+    this._array[this._end++] = number;
+    if (this._end === this._capacity) {
+      this._end = 0;
+    }
+  };
+
+  NumberStack.prototype.shift = function() {
+    if (this._count === 0) {
+      throw new Error('underflow');
+    }
+    --this._count;
+    var res = this._array[this._start++];
+    if (this._start === this._capacity) {
+      this._start = 0;
+    }
+    return res;
+  };
+
+  function currentSolveArray() {
+    // NOTE: this will only work offline with the LocalStore.
+    return window.app.store.getActive().solves;
   }
 
   window.app.computeStatisticsForSolves = computeStatisticsForSolves;

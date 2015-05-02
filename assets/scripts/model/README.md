@@ -107,6 +107,7 @@ The **AverageInfo** object stores information about a single average. It contain
  * **stdDev** - int - the standard deviation for times.
  * **beat** - int - the time needed to beat this average. This is -1 if no such time exists.
  * **solves** - array of [Solve](#solve-object) objects.
+ * **excludedSolves** - a subset of **solves** which contains solves that were not counted towards the average time. For means, this is empty.
 
 <a name="puzzle-object"></a>
 ## Puzzle
