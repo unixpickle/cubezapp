@@ -90,24 +90,32 @@ The store also provides some helper functions for solves:
 The **Stats** object stores averages, PBs, and other information about the user's solves. Here are the fields it has:
 
  * **count** - int - the total number of solves in the current puzzle.
+ * **nonDNF** - int - the total number of solves which were not marked as DNF.
  * **mean** - int - the global mean of all non-DNF solve times in the current puzzle. If no mean is available, this is -1.
  * **best** - [Solve](#solve-object) - the user's best timed solve. If no solve times are available, this is -1.
  * **averages** - array - the averages table. Every element in this table will have the following fields:
    * **name** - string - usually, this is a numeric string like "5", but it may also be "mo3".
-   * **last** - [AverageInfo](#average-info-object) - the most recent average of this size.
-   * **best** - [AverageInfo](#average-info-object) - the best average of this size.
-   * **lastWasPB** - bool - if this is true, the user just got a new PB average and this is it.
+   * **last** - [AverageInfo](#average-info-object) - the most recent average of this size or null if no average exists.
+   * **best** - [AverageInfo](#average-info-object) - the best average of this size or null if no average exists.
+   * **lastWasPB** - bool - if this is true, *last* is equal to *best*.
 
-<a name="average-info-object">
+<a name="average-info-object"></a>
 ### AverageInfo
 
 The **AverageInfo** object stores information about a single average. It contains the following fields:
 
  * **time** - int - the average time in milliseconds.
- * **stdDev** - int - the standard deviation for times.
- * **beat** - int - the time needed to beat this average. This is -1 if no such time exists.
- * **solves** - array of [Solve](#solve-object) objects.
- * **excludedSolves** - a subset of **solves** which contains solves that were not counted towards the average time. For means, this is empty.
+ * **stdDev** - int - the standard deviation for the times which were counted.
+ * **beat** - int - the time needed to beat this average. This is NaN if no such time exists.
+ * **solves** - array of [SolveExclude](#solve-exclude-object) objects.
+
+<a name="solve-exclude-object"></a>
+### SolveExclude
+
+This object is a solve which can either be excluded or included. It has the following fields:
+
+ * **exclude** - bool - true if the solve was excluded, false if it was included.
+ * **solve** - [Solve](#solve-object) - the solve.
 
 <a name="puzzle-object"></a>
 ## Puzzle
