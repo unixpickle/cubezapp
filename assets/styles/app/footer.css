@@ -133,6 +133,7 @@
   right: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  font-size: 17px;
 }
 
 #footer .stats-not-empty > .averages > .overview {
@@ -144,17 +145,18 @@
   font-weight: bold;
 }
 
+#footer .stats-not-empty > .averages > .overview > .row {
+  height: 20px;
+  white-space: nowrap;
+  clear: both;
+}
+
 #footer .stats-not-empty > .averages > .overview .left-field {
   float: left;
-  margin-right: 5px;
 }
 
 #footer .stats-not-empty > .averages > .overview .right-field {
   float: right;
-}
-
-#footer .stats-not-empty > .averages > .overview > .row {
-  height: 20px;
 }
 
 #footer .stats-not-empty > .averages > table {

@@ -1,5 +1,8 @@
 (function() {
 
+  var OVERVIEW_PADDING = 7;
+  var OVERVIEW_FLOAT_SPACING = 5;
+
   function Averages() {
     window.app.EventEmitter.call(this);
     this._$element = $('#footer .stats-contents .averages');
@@ -41,10 +44,18 @@
   };
   
   Averages.prototype._minimumWidth = function() {
+    this._$table.css({width: 'auto'});
     var tableWidth = this._$table.width();
+    this._$table.css({width: '100%'});
+    
+    var leftPart = this._$overview.find('.left-field').width();
+    var rightPart = this._$overview.find('.right-field').width();
     this._$overview.css({display: 'inline-block'});
     var overviewWidth = this._$overview.width();
     this._$overview.css({display: 'block'});
+    
+    overviewWidth = Math.max(overviewWidth, leftPart + rightPart +
+      OVERVIEW_PADDING*2 + OVERVIEW_FLOAT_SPACING);
     return Math.max(tableWidth, overviewWidth);
   };
   
