@@ -133,30 +133,25 @@
   right: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  color: #999;
   font-size: 17px;
+  font-weight: lighter;
 }
 
 #footer .stats-not-empty > .averages > .overview {
-  padding: 5px 7px 5px 7px;
+  padding: 5px 10px 10px 10px;
+  overflow: auto;
 }
 
 #footer .stats-not-empty > .averages > .overview label {
   margin-right: 5px;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 #footer .stats-not-empty > .averages > .overview > .row {
-  height: 20px;
-  white-space: nowrap;
-  clear: both;
-}
-
-#footer .stats-not-empty > .averages > .overview .left-field {
   float: left;
-}
-
-#footer .stats-not-empty > .averages > .overview .right-field {
-  float: right;
+  margin-right: 15px;
+  margin-top: 5px;
 }
 
 #footer .stats-not-empty > .averages > table {
@@ -171,17 +166,26 @@
 
 #footer .stats-not-empty > .averages td,
 #footer .stats-not-empty > .averages th {
-  font-weight: normal;
-  padding: 0 2px 0 2px;
+  text-align: center;
+  font-weight: lighter;
+  padding: 4px 20px 4px 20px;
   margin: 0;
   border-bottom: 2px solid #f0f0f0;
 }
 
-#footer .stats-not-empty > .averages .left,
-#footer .stats-not-empty > .averages .middle,
+#footer .stats-not-empty > .averages .left {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
 #footer .stats-not-empty > .averages .left,
 #footer .stats-not-empty > .averages .middle {
   border-right: 2px solid #f0f0f0;
+}
+
+#footer .stats-not-empty > .averages .middle,
+#footer .stats-not-empty > .averages .right {
+  
 }
 
 #footer .settings-contents {

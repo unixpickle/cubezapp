@@ -1,7 +1,7 @@
 (function() {
 
-  var OVERVIEW_PADDING = 7;
-  var OVERVIEW_FLOAT_SPACING = 5;
+  var OVERVIEW_PADDING = 10;
+  var OVERVIEW_FLOAT_SPACING = 15;
 
   function Averages() {
     window.app.EventEmitter.call(this);
@@ -11,10 +11,10 @@
     this._minWidth = 0;
     this._showStats(window.app.store.getStats());
     this._registerModelEvents();
-    
+
     window.app.fonts.on('load', this.emit.bind(this, 'needsLayout'));
   }
-  
+
   Averages.prototype = Object.create(window.app.EventEmitter.prototype);
 
   Averages.prototype.layout = function(width) {
@@ -22,7 +22,7 @@
       this._$element.css({width: width});
       return;
     }
-    
+
     var minWidth = this._minimumWidth();
     this._$element.css({width: minWidth});
 
@@ -42,29 +42,25 @@
   Averages.prototype.width = function() {
     return this._$element.width();
   };
-  
+
   Averages.prototype._minimumWidth = function() {
     this._$table.css({width: 'auto'});
     var tableWidth = this._$table.width();
     this._$table.css({width: '100%'});
-    
-    var leftPart = this._$overview.find('.left-field').width();
-    var rightPart = this._$overview.find('.right-field').width();
+
     this._$overview.css({display: 'inline-block'});
     var overviewWidth = this._$overview.width();
     this._$overview.css({display: 'block'});
-    
-    overviewWidth = Math.max(overviewWidth, leftPart + rightPart +
-      OVERVIEW_PADDING*2 + OVERVIEW_FLOAT_SPACING);
+
     return Math.max(tableWidth, overviewWidth);
   };
-  
+
   Averages.prototype._registerModelEvents = function(events) {
     window.app.store.on('computedStats', this._showStats.bind(this));
     // TODO: register loadingStats and empty the table if stats are gone for too
     // long.
   };
-  
+
   Averages.prototype._showStats = function(stats) {
     this._$element.empty();
     if (stats === null) {
@@ -73,27 +69,26 @@
     this._$overview = generateOverview(stats);
     this._$table = generateTable(stats);
     this._$element.append([this._$overview, this._$table]);
-    
+
     this.emit('needsLayout');
   };
-  
+
   function generateOverview(stats) {
-    var solvesField = '<div class="left-field"><label>Solves:</label>' +
-      stats.count + '</div>';
-    
+    var solvesRow = '<div class="row"><label>Solves:</label>' + stats.count +
+      '</div>';
+
     if (stats.count === 0) {
-      return $('<div class="overview"><div class="row">' + solvesField +
-        '</div></div>');
+      return $('<div class="overview">' + solvesField + '</div>');
     }
-    
-    var meanField = '<div class="right-field"><label>Mean:</label>' +
+
+    var meanRow = '<div class="row"><label>Mean:</label>' +
       window.app.formatTime(stats.mean) + '</div>';
-    var topRow = '<div class="row">' + solvesField + meanField + '</div>';
-    var secondRow = '<div class="row"><label>Best:</label>' +
+    var bestRow = '<div class="row"><label>Best:</label>' +
       window.app.formatTime(window.app.solveTime(stats.best)) + '</div>';
-    return $('<div class="overview">' + topRow + secondRow + '</div>');
+    return $('<div class="overview">' + solvesRow + meanRow + bestRow +
+      '</div>');
   }
-  
+
   function generateTable(stats) {
     var $table = $('<table><tr><th class="left"></th><th class="middle">' +
       'Last avg</th><th class="right">Best avg</th></tr></table>');
