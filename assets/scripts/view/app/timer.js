@@ -25,7 +25,7 @@
 
     this._registerModelEvents();
 
-    appView.on('load', this._scrambleStream.resume.bind(this._scrambleStream));
+    appView.on('load', this._appLoaded.bind(this));
 
     // NOTE: we do not run this._showLatestSolve() here because the AppView does
     // it as part of the loading process.
@@ -45,6 +45,7 @@
     if (this._theaterMode) {
       this._appView.setTheaterMode(false);
     }
+    this._showPBLabel();
     if (this._settingsChangedWhileRunning) {
       this._settingsChangedWhileRunning = false;
       this._updateSettings();
@@ -103,6 +104,7 @@
     if (this._theaterMode) {
       this._appView.setTheaterMode(false);
     }
+    this._showPBLabel();
     if (this._settingsChangedWhileRunning) {
       this._settingsChangedWhileRunning = false;
       this._updateSettings();
@@ -148,6 +150,11 @@
     this._appView.setMemo(window.app.formatTime(memo));
   };
 
+  TimerView.prototype._appLoaded = function() {
+    this._scrambleStream.resume();
+    this._showPBLabel();
+  };
+
   TimerView.prototype._assertNotRunning = function() {
     if (this._timerRunning) {
       throw new Error('timer cannot be running');
@@ -161,8 +168,11 @@
   };
 
   TimerView.prototype._handleLatestSolveChanged = function() {
-    if (!this._timerRunning && !this._manualEntry) {
-      this._showLatestSolve();
+    if (!this._timerRunning) {
+      this._showPBLabel();
+      if (!this._manualEntry) {
+        this._showLatestSolve();
+      }
     }
   };
 
@@ -174,11 +184,22 @@
     }
   };
 
+  TimerView.prototype._handleStatsComputed = function() {
+    if (!this._timerRunning) {
+      this._showPBLabel();
+    }
+  };
+
+  TimerView.prototype._handleStatsLoading = function() {
+    this._appView.setPB(null);
+  };
+
   TimerView.prototype._handleTimerInputChanged = function() {
     // In some situations, this function is necessary to change "Hit Space" to
     // "Stackmat" or vice versa.
-    // NOTE: we can't use this._manualEntry because this may be called by the
-    // observer before setManualEntry() is.
+    // NOTE: we can't use this._manualEntry because _handleTimerInputChanged
+    // may be called by the observer before setManualEntry() is called by the
+    // controller.
     var isManual = window.app.store.getActivePuzzle().timerInput ===
       window.app.TimerController.INPUT_ENTRY;
     if (!this._timerRunning && !isManual) {
@@ -193,6 +214,8 @@
       this._handleTimerInputChanged.bind(this));
     window.app.observe.latestSolve(['time', 'memo'],
       this._handleLatestSolveChanged.bind(this));
+    window.app.store.on('computedStats', this._handleStatsComputed.bind(this));
+    window.app.store.on('loadingStats', this._handleStatsLoading.bind(this));
   };
 
   TimerView.prototype._showLatestSolve = function() {
@@ -212,6 +235,32 @@
       } else {
         this._appView.setMemo(null);
       }
+    }
+  };
+
+  TimerView.prototype._showPBLabel = function() {
+    var stats = window.app.store.getStats();
+    if (stats === null) {
+      this._appView.setPB(null);
+      return;
+    }
+
+    var pbAverage = false;
+    for (var i = 0, len = stats.averages.length; i < len; ++i) {
+      if (stats.averages[i].lastWasPB) {
+        pbAverage = true;
+      }
+    }
+
+    var latestSolve = window.app.store.getLatestSolve();
+    var pbSolve = window.app.solveIsPB(latestSolve);
+
+    if (pbAverage && pbSolve) {
+      this._appView.setPB('New PB time and average');
+    } else if (pbAverage) {
+      this._appView.setPB('New PB average');
+    } else if (pbSolve) {
+      this._appView.setPB('New PB');
     }
   };
 

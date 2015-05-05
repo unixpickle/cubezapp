@@ -16,19 +16,19 @@
     this._computers = [];
     this._best = [];
     this._lastWasPB = [];
-    
+
     this._count = 0;
     this._nonDNF = 0;
     this._timeSum = 0;
     this._bestSolve = null;
     this._bestTime = NaN;
-    
-    for (var i = 0, len = SIZES.LENGTH; i < len; ++i) {
+
+    for (var i = 0, len = SIZES.length; i < len; ++i) {
       var size = SIZES[i];
       this._computers[i] = new AverageComputer(size, NUM_REMOVE[i],
         size >= FILTER_DNF_CUTOFF);
       this._best[i] = null;
-      this._lastWasPB = false;
+      this._lastWasPB[i] = false;
     }
   }
 
@@ -48,7 +48,7 @@
       this._checkBest(i);
     }
   };
-  
+
   OfflineAverages.prototype.stats = function() {
     var averages = [];
     for (var i = 0, len = this._computers.length; i < len; ++i) {
@@ -71,17 +71,17 @@
   };
 
   OfflineAverages.prototype._checkBest = function(computerIdx) {
-    var computer = this._computers[i];
+    var computer = this._computers[computerIdx];
     var average = computer.average();
     if (isNaN(average)) {
       return;
     }
-    var best = this._best[i];
+    var best = this._best[computerIdx];
     if (best === null || averageBeatsAverage(average, best.average())) {
-      this._best[i] = computer.copy();
-      this._lastWasPB[i] = true;
+      this._best[computerIdx] = computer.copy();
+      this._lastWasPB[computerIdx] = true;
     } else {
-      this._lastWasPB[i] = false;
+      this._lastWasPB[computerIdx] = false;
     }
   };
 
@@ -96,22 +96,23 @@
   AverageComputer.prototype.average = function() {
     return this._center.average();
   };
-  
+
   AverageComputer.prototype.averageInfo = function() {
     var average = this.average();
     if (isNaN(average)) {
       return null;
     }
+    console.log('stddev', this.standardDeviation());
     return {
       beat: this.timeToBeat(),
       solves: this.solveExcludeValues(),
       stdDev: this.standardDeviation(),
-      time: avg
+      time: average
     };
   };
 
   AverageComputer.prototype.copy = function() {
-    var res = Object.create(AverageComputer);
+    var res = Object.create(AverageComputer.prototype);
     res._size = this._size;
     res._numRemove = this._numRemove;
     res._filter = this._filter;
@@ -127,14 +128,21 @@
     var time = solve.dnf ? Infinity : window.app.solveTime(solve);
     this._center.pushValue(time);
     this._solves.push(solve);
-    this._solves.shift();
+    if (this._solves.count() > this._size) {
+      this._solves.shift();
+    }
   };
 
   AverageComputer.prototype.solveExcludeValues = function() {
-    var list = [];
-    for (var i = 0, len = this._solves.length; i < len; ++i) {
-      list[i] = {exclude: false, solve: this._solves[i]};
+    if (this._solves.count() < this._size) {
+      return null;
     }
+
+    var list = [];
+    this._solves.forEach(function(i, solve) {
+      list[i] = {exclude: false, solve: solve};
+    });
+
     list.sort(function(a, b) {
       if (a.solve.dnf) {
         return 1;
@@ -143,9 +151,10 @@
       }
       return window.app.solveTime(a.solve) - window.app.solveTime(b.solve);
     });
+
     for (var i = 0; i < this._numRemove; ++i) {
       list[i].exclude = true;
-      list[this._list.length - (i + 1)].exclude = true;
+      list[list.length - (i + 1)].exclude = true;
     }
     return list;
   };
@@ -184,7 +193,17 @@
     return this._count;
   };
 
+  LinkedList.prototype.forEach = function(f) {
+    var node = this._first;
+    var i = 0;
+    while (node !== null) {
+      f(i++, node.object);
+      node = node.next;
+    }
+  };
+
   LinkedList.prototype.push = function(x) {
+    ++this._count;
     var node = {object: x, next: null, last: this._last};
     if (this._last === null) {
       this._first = node;
@@ -199,6 +218,7 @@
     if (this._last === null) {
       return null;
     }
+    --this._count;
     var res = this._last.object;
     this._last = this._last.last;
     if (this._last === null) {
@@ -212,7 +232,7 @@
   function averageBeatsAverage(newAverage, oldAverage) {
     return Math.floor(newAverage / 10) < Math.floor(oldAverage / 10);
   }
-  
+
   window.app.OfflineAverages = OfflineAverages;
 
 })();

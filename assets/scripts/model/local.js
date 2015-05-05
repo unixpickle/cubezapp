@@ -13,6 +13,8 @@
     this._active = null;
     this._puzzles = null;
     this._globalSettings = null;
+    this._stats = null;
+    this._averages = null;
 
     this._lastLocalStoreData = null;
     this._changeListener = this._dataChanged.bind(this);
@@ -23,6 +25,7 @@
     }
 
     this._loadData();
+    this._computeStats();
   }
 
   LocalStore.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -34,6 +37,7 @@
     }
     this._puzzles.unshift(puzzle);
     this._active = puzzle;
+    this._recomputeStatsFromScratch();
     this._save();
     this.emit('addedPuzzle', puzzle);
   };
@@ -41,7 +45,13 @@
   LocalStore.prototype.addSolve = function(solve) {
     solve.id = window.app.generateId();
     this._active.solves.push(solve);
+
     recomputeLastPBs(this._active.solves, this._active.solves.length-1);
+    if (this._averages) {
+      this._averages.pushSolve(solve);
+    }
+    this._recomputeStats();
+
     this._save();
     this.emit('addedSolve', solve);
   };
@@ -67,6 +77,7 @@
       if (solves[i].id === id) {
         solves.splice(i, 1);
         recomputeLastPBs(solves, i);
+        this._recomputeStatsFromScratch();
         this._save();
         this.emit('deletedSolve', id);
         return;
@@ -111,6 +122,10 @@
     return new window.app.DataTicket(cb, list);
   };
 
+  LocalStore.prototype.getStats = function() {
+    return this._stats;
+  };
+
   LocalStore.prototype.modifyGlobalSettings = function(attrs) {
     for (var key in attrs) {
       if (!attrs.hasOwnProperty(key)) {
@@ -152,6 +167,7 @@
       }
     }
     recomputeLastPBs(solves, solveIndex+1);
+    this._recomputeStatsFromScratch();
     this._save();
     this.emit('modifiedSolve', id, attrs);
   };
@@ -163,6 +179,7 @@
         this._active = puzzle;
         this._puzzles.splice(i, 1);
         this._puzzles.unshift(this._active);
+        this._recomputeStatsFromScratch();
         this._save();
         this.emit('switchedPuzzle');
         return new window.app.DataTicket(cb, null);
@@ -171,6 +188,15 @@
     var err = new Error('puzzle not found: ' + id);
     this.emit('switchPuzzleError', err);
     return new window.app.ErrorTicket(cb, err);
+  };
+
+  LocalStore.prototype._computeStats = function() {
+    this._averages = new window.app.OfflineAverages();
+    var solves = this._active.solves;
+    for (var i = 0, len = solves.length; i < len; ++i) {
+      this._averages.pushSolve(solves[i]);
+    }
+    this._stats = this._averages.stats();
   };
 
   LocalStore.prototype._dataChanged = function() {
@@ -316,6 +342,29 @@
     }
 
     this._save();
+  };
+
+  LocalStore.prototype._recomputeStats = function() {
+    this._stats = null;
+    this.emit('loadingStats');
+    setTimeout(function() {
+      if (this._stats === null) {
+        if (this._averages === null) {
+          this._averages = new window.app.OfflineAverages();
+          var solves = this._active.solves;
+          for (var i = 0, len = solves.length; i < len; ++i) {
+            this._averages.pushSolve(solves[i]);
+          }
+        }
+        this._stats = this._averages.stats();
+        this.emit('computedStats', this._stats);
+      }
+    }.bind(this), 1);
+  };
+
+  LocalStore.prototype._recomputeStatsFromScratch = function() {
+    this._averages = null;
+    this._recomputeStats();
   };
 
   LocalStore.prototype._save = function() {

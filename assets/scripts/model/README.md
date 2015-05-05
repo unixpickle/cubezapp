@@ -58,6 +58,7 @@ Here are the methods which the store provides:
  * **getPuzzles**() - get the ordered list of [Puzzle](#puzzle-object) objects.
  * **getSolveCount**() - get the number of [Solve](#solve-object) objects for the current puzzle.
  * **getSolves**(start, count, cb) - get a list of [Solve](#solve-object) objects asynchronously.
+ * **getStats**() - get the current [Stats](#stats-object) object. This returns null if the stats are currently being recomputed.
  * **modifyGlobalSettings**(attrs) - modify attributes of the global settings.
  * **modifyPuzzle**(attrs) - modify attributes of the current puzzle. Provide a dictionary of attributes to set on the current puzzle.
  * **modifySolve**(id, attrs) - modify attributes of a solve in the current puzzle. Provide a solve id and an object containing attributes to set.
