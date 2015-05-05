@@ -222,6 +222,7 @@
     var solve = window.app.store.getLatestSolve();
     if (solve === null) {
       this._appView.setTime(null);
+      this._appView.setMemo(null);
     } else {
       var time = solve.time;
       var suffix = '';
@@ -240,20 +241,19 @@
 
   TimerView.prototype._showPBLabel = function() {
     var stats = window.app.store.getStats();
-    if (stats === null) {
+    var latestSolve = window.app.store.getLatestSolve();
+    if (stats === null || latestSolve === null) {
       this._appView.setPB(null);
       return;
     }
 
+    var pbSolve = window.app.solveIsPB(latestSolve);
     var pbAverage = false;
     for (var i = 0, len = stats.averages.length; i < len; ++i) {
       if (stats.averages[i].lastWasPB) {
         pbAverage = true;
       }
     }
-
-    var latestSolve = window.app.store.getLatestSolve();
-    var pbSolve = window.app.solveIsPB(latestSolve);
 
     if (pbAverage && pbSolve) {
       this._appView.setPB('New PB time and average');

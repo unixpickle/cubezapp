@@ -8,6 +8,7 @@
     this._$element = $('#footer');
     this._top = new FooterTop();
     this._$bottom = this._$element.find('.bottom');
+    this._visible = false;
     this.settings = new window.app.Settings();
     this.stats = new window.app.Stats();
 
@@ -40,8 +41,11 @@
   Footer.prototype.layout = function(attrs) {
     if (attrs.footerOpacity === 0) {
       this._$element.css({display: 'none'});
+      this._visible = false;
       return;
     }
+    
+    this._visible = true;
 
     // Use the attributes to layout the footer.
     this._$element.css({
@@ -73,6 +77,10 @@
       this._lastWidth = window.app.windowSize.width;
       this._lastHeight = attrs.footerHeight;
     }
+  };
+  
+  Footer.prototype.visible = function() {
+    return this._visible;
   };
 
   Footer.prototype._setupResizing = function() {

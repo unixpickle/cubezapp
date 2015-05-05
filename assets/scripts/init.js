@@ -23,6 +23,7 @@
 
   function initializeView() {
     window.app.windowSize = new window.app.WindowSize();
+    window.app.fonts = new window.app.Fonts();
     window.app.flavors = new window.app.Flavors();
     window.app.view = new window.app.AppView();
   }

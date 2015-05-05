@@ -13,6 +13,8 @@
     this.graph = new window.app.Graph();
     this.timesList = new window.app.TimesList();
 
+    this.averages.on('needsLayout', this._childNeedsLayout.bind(this));
+
     this._$contents.append([this.averages, this.graph, this.timesList]);
     this.graph.setVisible(false);
     this.averages.setVisible(false);
@@ -39,6 +41,12 @@
     }
   };
 
+  Stats.prototype._childNeedsLayout = function() {
+    if (window.app.view.footer.visible()) {
+      this.layout();
+    }
+  };
+
   Stats.prototype._handleIconChanged = function() {
     var iconName = window.app.store.getActivePuzzle().icon;
     var iconPath = 'images/gray_puzzles/' + iconName + '.png';
@@ -62,7 +70,7 @@
     if (width < AVERAGES_MIN_WIDTH) {
       this.graph.setVisible(false);
       this.averages.setVisible(false);
-      this.timesList.layout(contentWidth);
+      this.timesList.layout(width);
     } else if (width < GRAPH_MIN_WIDTH) {
       this.graph.setVisible(false);
       this.averages.setVisible(true);

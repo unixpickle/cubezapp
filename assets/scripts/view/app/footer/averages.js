@@ -1,26 +1,34 @@
 (function() {
 
-  var DEFAULT_WIDTH = 200;
-
   function Averages() {
+    window.app.EventEmitter.call(this);
     this._$element = $('#footer .stats-contents .averages');
+    this._$overview = null;
+    this._$table = null;
+    this._minWidth = 0;
     this._showStats(window.app.store.getStats());
+    this._registerModelEvents();
+    
+    window.app.fonts.on('load', this.emit.bind(this, 'needsLayout'));
   }
+  
+  Averages.prototype = Object.create(window.app.EventEmitter.prototype);
 
   Averages.prototype.layout = function(width) {
     if ('undefined' !== typeof width) {
       this._$element.css({width: width});
       return;
     }
-
-    this._$element.css({width: DEFAULT_WIDTH});
+    
+    var minWidth = this._minimumWidth();
+    this._$element.css({width: minWidth});
 
     // Deal with a potential scrollbar.
     var clientWidth = this._$element[0].clientWidth ||
       this._$element.width();
     var difference = this._$element.width() - clientWidth;
     if (difference > 0) {
-      this._$element.css({width: DEFAULT_WIDTH + difference});
+      this._$element.css({width: minWidth + difference});
     }
   };
 
@@ -32,9 +40,17 @@
     return this._$element.width();
   };
   
+  Averages.prototype._minimumWidth = function() {
+    var tableWidth = this._$table.width();
+    this._$overview.css({display: 'inline-block'});
+    var overviewWidth = this._$overview.width();
+    this._$overview.css({display: 'block'});
+    return Math.max(tableWidth, overviewWidth);
+  };
+  
   Averages.prototype._registerModelEvents = function(events) {
     window.app.store.on('computedStats', this._showStats.bind(this));
-    // TODO: register loadingStats and empty table if stats are gone for too
+    // TODO: register loadingStats and empty the table if stats are gone for too
     // long.
   };
   
@@ -43,16 +59,33 @@
     if (stats === null) {
       return;
     }
-    var solvesField = '<div class="solves-field"><label>Solves:</label>' +
+    this._$overview = generateOverview(stats);
+    this._$table = generateTable(stats);
+    this._$element.append([this._$overview, this._$table]);
+    
+    this.emit('needsLayout');
+  };
+  
+  function generateOverview(stats) {
+    var solvesField = '<div class="left-field"><label>Solves:</label>' +
       stats.count + '</div>';
-    var avgField = '<div class="avg-field"><label>Mean:</label>' +
+    
+    if (stats.count === 0) {
+      return $('<div class="overview"><div class="row">' + solvesField +
+        '</div></div>');
+    }
+    
+    var meanField = '<div class="right-field"><label>Mean:</label>' +
       window.app.formatTime(stats.mean) + '</div>';
-    var topRow = '<div class="top-info">' + solvesField + avgField + '</div>';
-    // TODO: show + for solve time.
-    var secondRow = '<div class="lower-info"><label>Best:</label>' +
+    var topRow = '<div class="row">' + solvesField + meanField + '</div>';
+    var secondRow = '<div class="row"><label>Best:</label>' +
       window.app.formatTime(window.app.solveTime(stats.best)) + '</div>';
-    var $table = $('<table><tr><td></td><td>Last avg</td>' +
-      '<td>Best avg</td></tr></table>');
+    return $('<div class="overview">' + topRow + secondRow + '</div>');
+  }
+  
+  function generateTable(stats) {
+    var $table = $('<table><tr><th class="left"></th><th class="middle">' +
+      'Last avg</th><th class="right">Best avg</th></tr></table>');
     for (var i = 0, len = stats.averages.length; i < len; ++i) {
       var average = stats.averages[i];
       var last = (average.last === null ? '' :
@@ -60,12 +93,13 @@
       var best = (average.best === null ? '' :
         window.app.formatTime(average.best.time));
       // TODO: the row should have mouse hover events, etc.
-      var row = '<tr><td>' + average.name + '</td><td>' + last + '</td><td>' +
-        best + '</td></tr>';
+      var row = '<tr><td class="left">' + average.name +
+        '</td><td class="middle">' + last + '</td><td class="right">' + best +
+        '</td></tr>';
       $table.append($(row));
     }
-    this._$element.append([$(topRow + secondRow), $table]);
-  };
+    return $table;
+  }
 
   window.app.Averages = Averages;
 
