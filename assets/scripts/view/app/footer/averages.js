@@ -1,8 +1,5 @@
 (function() {
 
-  var OVERVIEW_PADDING = 10;
-  var OVERVIEW_FLOAT_SPACING = 15;
-
   function Averages() {
     window.app.EventEmitter.call(this);
     this._$element = $('#footer .stats-contents .averages');
