@@ -131,6 +131,26 @@
 
 #footer .stats-not-empty > .averages {
   right: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#footer .stats-not-empty > .averages > .top-info,
+#footer .stats-not-empty > .averages > .lower-info {
+  height: 20px;
+}
+
+#footer .stats-not-empty > .averages > .top-info > div > label,
+#footer .stats-not-empty > .averages > .lower-info > label {
+  margin-right: 3px;
+}
+
+#footer .stats-not-empty > .averages > .top-info > .solves-field {
+  float: left;
+}
+
+#footer .stats-not-empty > .averages > .top-info > .avg-field {
+  float: right;
 }
 
 #footer .settings-contents {

@@ -102,7 +102,6 @@
     if (isNaN(average)) {
       return null;
     }
-    console.log('stddev', this.standardDeviation());
     return {
       beat: this.timeToBeat(),
       solves: this.solveExcludeValues(),
