@@ -19,14 +19,32 @@
     this._solves = new LinkedList();
   }
 
+  AverageComputer.prototype.average = function() {
+    return this._center.average();
+  };
+
   AverageComputer.prototype.pushSolve = function(solve) {
     if (this._filter && solve.dnf) {
       return;
     }
     var time = solve.dnf ? Infinity : window.app.solveTime(solve);
     this._center.pushValue(time);
-    this._solves.shift();
     this._solves.push(solve);
+    this._solves.shift();
+  };
+
+  AverageComputer.prototype.standardDeviation = function() {
+    return this._center.standardDeviation();
+  };
+
+  AverageComputer.prototype.timeToBeat = function() {
+    var beat = this.average() - 1;
+    var time = this._center.valueNeededForAverage(beat);
+    if (isNaN(time) || time < 0) {
+      return NaN;
+    } else {
+      return Math.floor(time);
+    }
   };
 
   function LinkedList() {
