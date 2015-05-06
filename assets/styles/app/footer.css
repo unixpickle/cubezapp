@@ -129,6 +129,10 @@
   background-color: white;
 }
 
+#footer .stats-not-empty > .times {
+  overflow-y: scroll;
+}
+
 #footer .stats-not-empty > .times .row {
   width: 100%;
   height: 40px;
@@ -216,11 +220,6 @@
 #footer .stats-not-empty > .averages .left,
 #footer .stats-not-empty > .averages .middle {
   border-right: 2px solid #f0f0f0;
-}
-
-#footer .stats-not-empty > .averages .middle,
-#footer .stats-not-empty > .averages .right {
-
 }
 
 #footer .settings-contents {
