@@ -7,6 +7,7 @@
   var RECTANGULAR_FIELD_HEIGHT = 30;
   var RECTANGULAR_FIELD_WIDTH = 160;
   var BUTTON_HEIGHT = 35;
+  var BUTTON_WIDTH = 160;
 
   // These constants determine how spaced out things can get.
   var MINIMUM_ROW_SPACE = 10;
@@ -465,16 +466,9 @@
     $button.css({
       fontSize: FONT_SIZE + 'px',
       height: BUTTON_HEIGHT,
-      padding: '0 20px 0 20px'
+      width: BUTTON_WIDTH
     });
     $button.text(title);
-
-    // Compute the button's width.
-    $button.css({visibility: 'hidden', position: 'fixed'});
-    $(document.body).append($button);
-    this._width = Math.floor($button.outerWidth()) + 1;
-    $button.detach();
-    $button.css({visibility: '', position: ''});
 
     this._$button = $button;
     this._$element = $('<div class="field button-field"></div>');
@@ -500,7 +494,7 @@
 
   // width returns the width of the button.
   ButtonField.prototype.width = function() {
-    return this._width;
+    return BUTTON_WIDTH;
   };
 
   // A LabelField is a field which contains a label and nothing else.
