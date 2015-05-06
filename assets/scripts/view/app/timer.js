@@ -247,10 +247,10 @@
       return;
     }
 
-    var pbSolve = window.app.solveIsPB(latestSolve);
+    var pbSolve = window.app.showSolveAsPB(latestSolve);
     var pbAverage = false;
     for (var i = 0, len = stats.averages.length; i < len; ++i) {
-      if (stats.averages[i].lastWasPB) {
+      if (window.app.showAverageAsPB(stats.averages[i])) {
         pbAverage = true;
       }
     }

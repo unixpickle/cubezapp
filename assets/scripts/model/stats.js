@@ -4,6 +4,8 @@
 // and worst times before computing the mean.
 (function() {
 
+  var AVERAGE_PB_MINIMUM_COUNT = 5;
+
   // FILTER_DNF_CUTOFF is the first average size for which DNFs should be
   // completely ignored.
   var FILTER_DNF_CUTOFF = 50;
@@ -100,7 +102,7 @@
   AverageComputer.prototype.average = function() {
     return this._center.average();
   };
-  
+
   AverageComputer.prototype.averageCount = function() {
     return this._averageCount;
   };
