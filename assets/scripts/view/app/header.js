@@ -334,6 +334,11 @@
       this._$deleteButtons.eq(i).animate({left: deleteLeft});
       puzzleLeft += SPACING + PUZZLE_WIDTH;
     }
+    setTimeout(function() {
+      this._$contents.find('.visible-content').css({
+        width: this._puzzleElements.length*(PUZZLE_WIDTH+SPACING) + SPACING
+      });
+    }.bind(this), 400);
   };
 
   Dropdown.prototype._resizeForScrollbar = function() {
