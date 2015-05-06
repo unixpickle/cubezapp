@@ -96,6 +96,7 @@ The **Stats** object stores averages, PBs, and other information about the user'
  * **best** - [Solve](#solve-object) - the user's best timed solve. If no solve times are available, this is -1.
  * **averages** - array - the averages table. Every element in this table will have the following fields:
    * **name** - string - usually, this is a numeric string like "5", but it may also be "mo3".
+   * **count** - int - the number of these averages that have been taken. This will start as 0 and increase by 1 for every valid average that exists in the set of times. For instance, if this is the average of 5 and the user has 16 solves (and no DNFs), the count will be 12.
    * **last** - [AverageInfo](#average-info-object) - the most recent average of this size or null if no average exists.
    * **best** - [AverageInfo](#average-info-object) - the best average of this size or null if no average exists.
    * **lastWasPB** - bool - if this is true, *last* is equal to *best*.

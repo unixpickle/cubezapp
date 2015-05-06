@@ -16,6 +16,7 @@
     this._computers = [];
     this._best = [];
     this._lastWasPB = [];
+    this._averageCounts = [];
 
     this._count = 0;
     this._nonDNF = 0;
@@ -29,6 +30,7 @@
         size >= FILTER_DNF_CUTOFF);
       this._best[i] = null;
       this._lastWasPB[i] = false;
+      this._averageCounts[i] = 0;
     }
   }
 
@@ -56,6 +58,7 @@
       var best = this._best[i];
       averages.push({
         name: NAMES[i],
+        count: computer.averageCount(),
         last: computer.averageInfo(),
         best: (best === null ? null : best.averageInfo()),
         lastWasPB: this._lastWasPB[i]
@@ -91,10 +94,15 @@
     this._filter = filter;
     this._center = new window.averagejs.CenterAverage(size, numRemove);
     this._solves = new LinkedList();
+    this._averageCount = 0;
   }
 
   AverageComputer.prototype.average = function() {
     return this._center.average();
+  };
+  
+  AverageComputer.prototype.averageCount = function() {
+    return this._averageCount;
   };
 
   AverageComputer.prototype.averageInfo = function() {
@@ -117,6 +125,7 @@
     res._filter = this._filter;
     res._center = this._center.copy();
     res._solves = this._solves.copy();
+    res._averageCount = this._averageCount;
     return res;
   };
 
@@ -129,6 +138,9 @@
     this._solves.push(solve);
     if (this._solves.count() > this._size) {
       this._solves.shift();
+    }
+    if (!isNaN(this.average())) {
+      ++this._averageCount;
     }
   };
 
