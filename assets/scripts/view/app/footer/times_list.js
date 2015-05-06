@@ -47,7 +47,14 @@
 
   function generateRowForSolve(solve) {
     var time = window.app.solveTime(solve);
-    var row = '<div class="row"><label>' + window.app.formatTime(time) +
+    var timeText = window.app.formatTime(time);
+    if (solve.plus2) {
+      timeText += '+';
+    }
+    if (solve.dnf) {
+      timeText = '<s>' + timeText + '</s>';
+    }
+    var row = '<div class="row"><label>' + timeText +
       '</label><button class="delete"></button></div>';
     var $row = $(row);
     $row.find('.delete').click(function() {
