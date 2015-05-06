@@ -1,5 +1,7 @@
 (function() {
 
+  var OVERVIEW_PADDING = 35;
+
   function Averages() {
     window.app.EventEmitter.call(this);
     this._$element = $('#footer .stats-contents .averages');
@@ -45,9 +47,12 @@
     var tableWidth = this._$table.width();
     this._$table.css({width: '100%'});
 
-    this._$overview.css({display: 'inline-block'});
-    var overviewWidth = this._$overview.width();
-    this._$overview.css({display: 'block'});
+    var $rows = this._$overview.find('.row');
+    var overviewWidth = 0;
+    $rows.each(function(i, obj) {
+      overviewWidth = Math.max($(obj).width() + OVERVIEW_PADDING,
+        overviewWidth);
+    });
 
     return Math.max(tableWidth, overviewWidth);
   };
@@ -75,7 +80,7 @@
       '</div>';
 
     if (stats.count === 0) {
-      return $('<div class="overview">' + solvesField + '</div>');
+      return $('<div class="overview">' + solvesRow + '</div>');
     }
 
     var meanRow = '<div class="row"><label>Mean:</label>' +
