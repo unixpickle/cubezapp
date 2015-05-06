@@ -44,7 +44,7 @@
       this._visible = false;
       return;
     }
-    
+
     this._visible = true;
 
     // Use the attributes to layout the footer.
@@ -78,7 +78,7 @@
       this._lastHeight = attrs.footerHeight;
     }
   };
-  
+
   Footer.prototype.visible = function() {
     return this._visible;
   };

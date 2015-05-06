@@ -56,7 +56,6 @@
   Stats.prototype._handleSolveChanged = function() {
     var showing = (window.app.store.getLatestSolve() !== null);
     var animate = false;
-    // TODO: figure out a way to know whether or not we should animate.
     this._setShowingStats(showing, animate);
   };
 
