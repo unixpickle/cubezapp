@@ -99,6 +99,7 @@ The **Stats** object stores averages, PBs, and other information about the user'
    * **count** - int - the number of these averages that have been taken. This will start as 0 and increase by 1 for every valid average that exists in the set of times. For instance, if this is the average of 5 and the user has 16 solves (and no DNFs), the count will be 12.
    * **last** - [AverageInfo](#average-info-object) - the most recent average of this size or null if no average exists.
    * **best** - [AverageInfo](#average-info-object) - the best average of this size or null if no average exists.
+   * **size** - int - the number of solves required for this average to exist.
    * **lastWasPB** - bool - if this is true, *last* is equal to *best*.
 
 <a name="average-info-object"></a>

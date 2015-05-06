@@ -196,7 +196,7 @@
 }
 
 #footer .stats-not-empty > .averages th {
-  border-top: 2px solid #f0f0f0;
+  white-space: nowrap;
 }
 
 #footer .stats-not-empty > .averages td,

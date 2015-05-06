@@ -60,6 +60,7 @@
       var best = this._best[i];
       averages.push({
         name: NAMES[i],
+        size: SIZES[i],
         count: computer.averageCount(),
         last: computer.averageInfo(),
         best: (best === null ? null : best.averageInfo()),

@@ -70,7 +70,7 @@
     }
     this._$overview = generateOverview(stats);
     this._$table = generateTable(stats);
-    this._$element.append([this._$overview, this._$table]);
+    this._$element.append([this._$table, this._$overview]);
 
     this.emit('needsLayout');
   };
@@ -92,13 +92,23 @@
   }
 
   function generateTable(stats) {
+    var size = window.app.store.getSolveCount();
+    
+    if (size < 3) {
+      return $();
+    }
+    
     var $table = $('<table><tr><th class="left"></th><th class="middle">' +
       'Last avg</th><th class="right">Best avg</th></tr></table>');
     for (var i = 0, len = stats.averages.length; i < len; ++i) {
+      if (stats.averages[i].size > size) {
+        continue;
+      }
+      
       var average = stats.averages[i];
-      var last = (average.last === null ? '' :
+      var last = (average.last === null ? 'DNF' :
         window.app.formatTime(average.last.time));
-      var best = (average.best === null ? '' :
+      var best = (average.best === null ? 'DNF' :
         window.app.formatTime(average.best.time));
       // TODO: the row should have mouse hover events, etc.
       var row = '<tr><td class="left">' + average.name +
