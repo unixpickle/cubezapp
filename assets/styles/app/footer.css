@@ -139,6 +139,8 @@
   line-height: 40px;
   padding-left: 7px;
   font-family: Roboto, sans-serif;
+  color: #999;
+  font-size: 18px;
 }
 
 #footer .stats-not-empty > .times .row > button.delete {
