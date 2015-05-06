@@ -18,7 +18,7 @@
   SettingsController.prototype._changeName = function() {
     var popup = new window.app.RenamePopup();
     popup.on('rename', function() {
-      var name = popup.name();
+      var name = popup.name().trim();
       if (!isNameValid(name)) {
         popup.shakeInput();
       } else {

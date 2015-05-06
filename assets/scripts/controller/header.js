@@ -12,7 +12,7 @@
   HeaderController.prototype._addPuzzle = function() {
     var popup = new window.app.AddPopup();
     popup.on('create', function() {
-      var name = popup.name();
+      var name = popup.name().trim();
       if (name === '' || puzzleNameExists(name)) {
         popup.shakeName();
         return;
