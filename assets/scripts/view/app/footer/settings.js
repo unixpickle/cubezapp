@@ -357,6 +357,7 @@
     var field = this._getField('timerInput');
     if (mode === null) {
       field.enabled = false;
+      field.dropdown().setSelectedValue('Regular');
     } else {
       field.enabled = true;
       field.dropdown().setSelectedValue(mode);
