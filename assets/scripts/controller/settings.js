@@ -71,6 +71,19 @@
   SettingsController.prototype._scramblerChanged = function() {
     var scrambler = this._view.scrambler();
     var type = this._view.scrambleType();
+
+    // Use the default type if the view's type is invalid.
+    var types = ['None'];
+    if (scrambler !== 'None') {
+      types = window.puzzlejs.scrambler.scramblersForPuzzle(scrambler);
+      for (var i = 0, len = types.length; i < len; ++i) {
+        types[i] = types[i].name;
+      }
+    }
+    if (types.indexOf(type) < 0) {
+      type = types[0];
+    }
+
     window.app.store.modifyPuzzle({scrambler: scrambler, scrambleType: type});
   };
 

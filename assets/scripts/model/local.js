@@ -321,7 +321,7 @@
 
   LocalStore.prototype._loadLegacy = function() {
     this._puzzles = JSON.parse(localStorage.puzzles);
-    
+
     // All of the solves in the old Cubezapp were in the opposite order.
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       var solves = this._puzzles[i].solves;
@@ -331,7 +331,7 @@
       }
       this._puzzles[i].solves = revSolves;
     }
-    
+
     this._fillInMissingPuzzleFields();
     this._fillInMissingSolveFields();
 

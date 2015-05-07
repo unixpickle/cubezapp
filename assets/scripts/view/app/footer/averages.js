@@ -93,18 +93,18 @@
 
   function generateTable(stats) {
     var size = window.app.store.getSolveCount();
-    
+
     if (size < 3) {
       return $();
     }
-    
+
     var $table = $('<table><tr><th class="left"></th><th class="middle">' +
       'Last avg</th><th class="right">Best avg</th></tr></table>');
     for (var i = 0, len = stats.averages.length; i < len; ++i) {
       if (stats.averages[i].size > size) {
         continue;
       }
-      
+
       var average = stats.averages[i];
       var last = (average.last === null ? 'DNF' :
         window.app.formatTime(average.last.time));
