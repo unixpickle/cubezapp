@@ -4564,6 +4564,134 @@
   exports.solve = solve;
 
 })();
+// This is the compiled bigcube API.
+(function() {
+
+  var exports;
+  if ('undefined' !== typeof window) {
+    // Browser
+    if (!window.puzzlejs) {
+      window.puzzlejs = {bigcube: {}};
+    } else if (!window.puzzlejs.bigcube) {
+      window.puzzlejs.bigcube = {};
+    }
+    exports = window.puzzlejs.bigcube;
+  } else if ('undefined' !== typeof self) {
+    // WebWorker
+    if (!self.puzzlejs) {
+      self.puzzlejs = {bigcube: {}};
+    } else if (!self.puzzlejs.bigcube) {
+      self.puzzlejs.bigcube = {};
+    }
+    exports = self.puzzlejs.bigcube;
+  } else if ('undefined' !== typeof module) {
+    // Node.js
+    if (!module.exports) {
+      module.exports = {};
+    }
+    exports = module.exports;
+  }
+
+  function includeAPI(name) {
+    if ('undefined' !== typeof window) {
+      return window.puzzlejs[name];
+    } else if ('undefined' !== typeof self) {
+      return self.puzzlejs[name];
+    } else if ('function' === typeof require) {
+      return require('./' + name + '.js');
+    } else {
+      throw new Error('Unable to include: ' + name);
+    }
+  }
+
+  // A WCAMove represents a wide turn on an NxNxN cube.
+  function WCAMove(face, width, turns) {
+    this.face = face;
+    this.width = width;
+    this.turns = turns;
+  }
+
+  // axis returns 0 for R and L, 1 for U and D, and 2 for F and B.
+  WCAMove.prototype.axis = function() {
+    return {
+      'R': 0,
+      'L': 0,
+      'U': 1,
+      'D': 1,
+      'F': 2,
+      'B': 2
+    }[this.face];
+  };
+
+  // toString converts this move to a WCA move string.
+  WCAMove.prototype.toString = function() {
+    var turnsStr = ['', '2', "'"][this.turns - 1];
+    if (this.width === 1) {
+      return this.face + turnsStr;
+    }
+    return this.width + this.face + 'w' + turnsStr;
+  };
+
+  function wcaMoveBasis(size) {
+    if (size < 2) {
+      throw new Error('cube is too small');
+    }
+
+    var maxWidth = (size >>> 1);
+    var threeGen = ((size & 1) === 0);
+    var primaryFacesForAxes = ['R', 'U', 'F'];
+    var secondaryFacesForAxes = ['L', 'D', 'B'];
+
+    var basis = [];
+    for (var width = 1; width <= maxWidth; ++width) {
+      for (var turns = 1; turns <= 3; ++turns) {
+        for (var axis = 0; axis < 3; ++axis) {
+          basis.push(new WCAMove(primaryFacesForAxes[axis], width, turns));
+          if (!threeGen) {
+            basis.push(new WCAMove(secondaryFacesForAxes[axis], width, turns));
+          }
+        }
+      }
+    }
+    return basis;
+  }
+
+  function wcaMovesToString(moves) {
+    return moves.join(' ');
+  }
+
+  exports.WCAMove = WCAMove;
+  exports.wcaMoveBasis = wcaMoveBasis;
+  exports.wcaMovesToString = wcaMovesToString;
+  // wcaMoveScramble generates a move scramble for a big cube.
+  function wcaMoveScramble(cubeSize, moveCount) {
+    var basis = wcaMoveBasis(cubeSize);
+    var currentBasis = basis.slice();
+    var scramble = [];
+    var lastAxis = -1;
+    for (var i = 0; i < moveCount; ++i) {
+      var move = currentBasis[Math.floor(Math.random() * currentBasis.length)];
+      scramble.push(move);
+
+      if (move.axis() !== lastAxis) {
+        currentBasis = basis.slice();
+        lastAxis = move.axis();
+      }
+
+      for (var j = 0; j < currentBasis.length; ++j) {
+        var aMove = currentBasis[j];
+        if (aMove.face === move.face && aMove.width === move.width) {
+          currentBasis.splice(j, 1);
+          --j;
+        }
+      }
+    }
+    return scramble;
+  }
+
+  exports.wcaMoveScramble = wcaMoveScramble;
+
+})();
 // This is the compiled scrambler API.
 (function() {
 
@@ -4604,9 +4732,29 @@
     }
   }
 
+  function wcaMoves4x4(count) {
+    return bigcubeWCAMoves(4, count);
+  }
+
+  function wcaMoves5x5(count) {
+    return bigcubeWCAMoves(5, count);
+  }
+
+  function wcaMoves6x6(count) {
+    return bigcubeWCAMoves(6, count);
+  }
+
+  function wcaMoves7x7(count) {
+    return bigcubeWCAMoves(7, count);
+  }
+
+  function bigcubeWCAMoves(size, count) {
+    return bigcube.wcaMovesToString(bigcube.wcaMoveScramble(size, count));
+  }
   var rubik = includeAPI('rubik');
   var skewb = includeAPI('skewb');
   var pocketcube = includeAPI('pocketcube');
+  var bigcube = includeAPI('bigcube');
   var pocketHeuristic = null;
 
   function pocketMoves(count) {
@@ -4741,6 +4889,46 @@
             f: rubikEdges,
             moves: false,
             name: "Edges"
+          }
+        ]
+      },
+      {
+        name: "4x4x4",
+        scramblers: [
+          {
+            f: wcaMoves4x4,
+            moves: true,
+            name: "WCA Moves"
+          }
+        ]
+      },
+      {
+        name: "5x5x5",
+        scramblers: [
+          {
+            f: wcaMoves5x5,
+            moves: true,
+            name: "WCA Moves"
+          }
+        ]
+      },
+      {
+        name: "6x6x6",
+        scramblers: [
+          {
+            f: wcaMoves6x6,
+            moves: true,
+            name: "WCA Moves"
+          }
+        ]
+      },
+      {
+        name: "7x7x7",
+        scramblers: [
+          {
+            f: wcaMoves7x7,
+            moves: true,
+            name: "WCA Moves"
           }
         ]
       },

@@ -6,7 +6,11 @@
   var SCRAMBLE_LENGTHS = {
     '3x3x3  Moves': 25,
     '2x2x2  Moves': 25,
-    'Skewb  Moves': 25
+    'Skewb  Moves': 25,
+    '4x4x4  WCA Moves': 40,
+    '5x5x5  WCA Moves': 60,
+    '6x6x6  WCA Moves': 80,
+    '7x7x7  WCA Moves': 100
   };
 
   // A ScrambleStream generates scrambles for the current puzzle.
