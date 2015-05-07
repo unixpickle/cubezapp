@@ -127,10 +127,9 @@
   };
 
   LocalStore.prototype.modifyGlobalSettings = function(attrs) {
-    for (var key in attrs) {
-      if (!attrs.hasOwnProperty(key)) {
-        continue;
-      }
+    var keys = Object.keys(attrs);
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
       this._globalSettings[key] = attrs[key];
     }
     this._save();
@@ -138,10 +137,9 @@
   };
 
   LocalStore.prototype.modifyPuzzle = function(attrs) {
-    for (var key in attrs) {
-      if (!attrs.hasOwnProperty(key)) {
-        continue;
-      }
+    var keys = Object.keys(attrs);
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
       this._active[key] = attrs[key];
     }
     this._save();
@@ -161,10 +159,10 @@
     if (solve === null) {
       throw new Error('solve not found: ' + id);
     }
-    for (var key in attrs) {
-      if (!attrs.hasOwnProperty(key)) {
-        solve[key] = attrs[key];
-      }
+    var keys = Object.keys(attrs);
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
+      solve[key] = attrs[key];
     }
     recomputeLastPBs(solves, solveIndex+1);
     this._recomputeStatsFromScratch();
