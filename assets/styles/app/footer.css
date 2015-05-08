@@ -179,7 +179,6 @@
 
 #footer .stats-not-empty > .averages > .overview {
   padding: 5px 10px 10px 10px;
-  overflow: auto;
 }
 
 #footer .stats-not-empty > .averages > .overview label {
