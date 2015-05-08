@@ -11,10 +11,10 @@
   var TITLE_HEIGHT = 50;
 
   // FOOTER_HEIGHT is the height of a dialog's footer in pixels.
-  var FOOTER_HEIGHT = 60;
+  var FOOTER_HEIGHT = 55;
 
   // SIDE_PADDING is the space on the left and right of a dialog.
-  var SIDE_PADDING = 20;
+  var SIDE_PADDING = 12;
 
   // Middle_PADDING is the space on the top and bottom of the content of a
   // dialog.

@@ -16,19 +16,18 @@
 
 .popup-dialog > .title {
   height: 50px;
-  margin-left: 20px;
-  width: calc(100% - 40px);
+  margin-left: 12px;
+  width: calc(100% - 24px);
   border-bottom: 2px solid #d5d5d5;
 }
 
 .popup-dialog > .title label {
   float: left;
-  margin-top: 6px;
 
   color: #999999;
-  height: 44px;
-  line-height: 44px;
-  font-size: 25px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 20px;
 }
 
 .popup-dialog > .title button {
@@ -36,7 +35,7 @@
   width: 16px;
   height: 16px;
 
-  margin-top: 20px;
+  margin-top: 17px;
 
   cursor: pointer;
 
@@ -58,42 +57,42 @@
 .popup-dialog > .content {
   position: absolute;
   top: 65px;
-  left: 20px;
+  left: 12px;
 }
 
 .popup-dialog > .footer {
   position: absolute;
   bottom: 0;
-  width: calc(100% - 40px);
-  left: 20px;
+  width: calc(100% - 24px);
+  left: 12px;
   border-top: 2px solid #d5d5d5;
-  height: 60px;
+  height: 55px;
 }
 
 .popup-dialog > .footer button.done {
   float: right;
-  width: 130px;
-  height: 35px;
+  width: 100px;
+  height: 30px;
   border: none;
 
   margin-top: 12px;
 
   color: white;
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
 }
 
 .popup-dialog > .footer button.other {
   float: right;
-  width: 130px;
-  height: 35px;
+  width: 100px;
+  height: 30px;
   border: none;
 
   margin-top: 12px;
   margin-right: 10px;
 
   color: white;
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
 
   background-color: #aaaaaa;

@@ -1,6 +1,6 @@
 (function() {
 
-  var FIELD_WIDTH = 170;
+  var FIELD_WIDTH = 160;
   var FIELD_HEIGHT = 30;
   var CONTENT_HEIGHT = 200;
 
