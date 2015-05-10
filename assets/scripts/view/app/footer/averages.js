@@ -9,7 +9,7 @@
   var BLURB_MIN_X = 10;
   var BLURB_ARROW_MIN_MARGIN = 10;
 
-  function Averages() {
+  function Averages(footer) {
     window.app.EventEmitter.call(this);
     this._$element = $('#footer .stats-contents .averages');
     this._$overview = null;
@@ -21,14 +21,11 @@
     this._showStats(window.app.store.getStats());
     this._registerModelEvents();
 
+    footer.on('hidden', this._cancelBlurb.bind(this));
     window.app.fonts.on('load', this.emit.bind(this, 'needsLayout'));
   }
 
   Averages.prototype = Object.create(window.app.EventEmitter.prototype);
-
-  Averages.prototype.hidden = function() {
-    this._cancelBlurb();
-  };
 
   Averages.prototype.layout = function(width) {
     if ('undefined' !== typeof width) {

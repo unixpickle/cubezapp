@@ -73,10 +73,6 @@
     return this._getField('flavor').dropdown().value();
   };
 
-  Settings.prototype.hidden = function() {
-    this._closeAllDropdowns();
-  };
-
   Settings.prototype.iconName = function() {
     return this._getField('icon').dropdown().value();
   };
@@ -116,15 +112,6 @@
   Settings.prototype._addField = function(name, field) {
     this._fields.push(field);
     this._fieldMap[name] = field;
-  };
-
-  Settings.prototype._closeAllDropdowns = function() {
-    for (var i = 0, len = this._fields.length; i < len; ++i) {
-      var field = this._fields[i];
-      if ('function' === typeof field.dropdown) {
-        field.dropdown().hide();
-      }
-    }
   };
 
   Settings.prototype._contentHeight = function() {

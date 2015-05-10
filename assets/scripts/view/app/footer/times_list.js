@@ -8,10 +8,6 @@
     this._refillAll();
   }
 
-  TimesList.prototype.hidden = function() {
-    // TODO: hide any popup menus here...
-  };
-
   TimesList.prototype.layout = function(width) {
     this._$element.css({width: width || LIST_WIDTH});
   };

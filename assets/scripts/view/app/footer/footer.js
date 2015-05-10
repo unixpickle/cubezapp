@@ -4,13 +4,15 @@
 (function() {
 
   function Footer() {
+    window.app.EventEmitter.call(this);
+
     // Get/create views and set them as instance variables.
     this._$element = $('#footer');
     this._top = new FooterTop();
     this._$bottom = this._$element.find('.bottom');
     this._visible = false;
     this.settings = new window.app.Settings();
-    this.stats = new window.app.Stats();
+    this.stats = new window.app.Stats(this);
 
     // Blank event handlers.
     this.onResize = null;
@@ -34,6 +36,8 @@
     }.bind(this);
   }
 
+  Footer.prototype = Object.create(window.app.EventEmitter.prototype);
+
   Footer.prototype.closedHeight = function() {
     return this._top.height();
   };
@@ -45,13 +49,15 @@
       this._$element.css({display: 'none'});
       this._visible = false;
       if (wasVisible) {
-        this.stats.hidden();
-        this.settings.hidden();
+        this.emit('hidden');
       }
       return;
     }
 
     this._visible = true;
+    if (!wasVisible) {
+      this.emit('shown');
+    }
 
     // Use the attributes to layout the footer.
     this._$element.css({

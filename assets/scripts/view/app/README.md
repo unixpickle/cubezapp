@@ -39,7 +39,14 @@ An instance of Footer has the following properties:
  * **settings** - the [Settings](#settings-object) instance
  * **stats** - the [Stats](#stats-object) instance
 
-Footer has no methods which you should need to call.
+The footer implements the following method:
+
+ * **visible**() - returns a boolean indicating whether or not the footer is currently visible.
+
+The footer implements the [EventEmitter interface](../event_emitter.md) and fires the following events:
+
+ * **hidden**() - the footer is now invisible
+ * **shown**() - the footer is now visible
 
 <a name="settings-object"></a>
 ## Settings

@@ -4,12 +4,12 @@
   var AVERAGES_MIN_WIDTH = 300;
   var COLUMN_PADDING = 3;
 
-  function Stats() {
+  function Stats(footer) {
     this._$movingPane = $('#footer .stats-moving-pane');
     this._$grayPuzzleIcon = $('#footer .stats-empty > .gray-icon');
     this._$contents = $('#footer .stats-not-empty');
 
-    this.averages = new window.app.Averages();
+    this.averages = new window.app.Averages(footer);
     this.graph = new window.app.Graph();
     this.timesList = new window.app.TimesList();
 
@@ -23,12 +23,6 @@
     this._registerModelEvents();
     this._initializeUI();
   }
-
-  Stats.prototype.hidden = function() {
-    this.averages.hidden();
-    this.graph.hidden();
-    this.timesList.hidden();
-  };
 
   Stats.prototype.layout = function() {
     this._layoutContent();
