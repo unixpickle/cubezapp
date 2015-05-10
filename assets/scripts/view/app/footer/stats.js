@@ -3,12 +3,13 @@
   var GRAPH_MIN_WIDTH = 500;
   var AVERAGES_MIN_WIDTH = 300;
   var COLUMN_PADDING = 3;
-  
+
   var BLURB_FONT_SIZE = 18;
   var BLURB_TEXT_COLOR = '#999';
   var BLURB_FONT_FAMILY = 'Oxygen, sans-serif';
   var BLURB_ARROW_HEIGHT = 12;
   var BLURB_MIN_X = 10;
+  var BLURB_ARROW_MIN_MARGIN = 10;
 
   function Stats() {
     this._$movingPane = $('#footer .stats-moving-pane');
@@ -118,82 +119,6 @@
       }
     }
   };
-  
-  function Blurb(stdDev, timeToBeat, x, y, parentWidth, parentHeight) {
-    var stdDevCode = '<label>&sigma; = ' + window.app.formatTime(stdDev) +
-      '</label>';
-    this._$stdDev = $(stdDevCode).css({
-      color: BLURB_TEXT_COLOR,
-      fontSize: BLURB_FONT_SIZE + 'px',
-      fontFamily: BLURB_FONT_FAMILY
-    });
-    if (isNaN(timeToBeat)) {
-      this._$timeToBeat = null;
-    } else {
-      this._$timeToBeat = $('<label>Need ' + window.app.formatTime(timeToBeat) +
-        '</label>');
-    }
-    this._width = 0;
-    this._height = 0;
-    this._computeSize();
-    
-    var canvasHeight = this._height + BLURB_ARROW_HEIGHT;
-    var canvas = $('<canvas></canvas>').css({
-      width: this._width,
-      height: canvasHeight,
-      position: 'absolute',
-      top: 0,
-      left: 0
-    });
-    var pixelRatio = window.crystal.getRatio();
-    canvas.width = Math.floor(pixelRatio * this._width);
-    canvas.height = Math.floor(pixelRatio * canvasHeight);
-    
-    var blurbX = Math.floor(x - this._width/2);
-    var blurbY = y;
-    var arrowOnTop = true;
-    if (blurbX < BLURB_MIN_X) {
-      blurbX = BLURB_MIN_X;
-    } else if (blurbX+this._width > parentWidth-BLURB_MIN_X) {
-      blurbX = parentWidth - BLURB_MIN_X - this.width;
-    }
-    if (blurbY+canvasHeight > parentHeight) {
-      arrowOnTop = false;
-      blurbY = y - canvasHeight;
-    }
-  }
-  
-  Blurb.prototype._computeSize = function() {
-    var stdDevSize = elementWidthAndHeight(this._$stdDev);
-    if (this._$timeToBeat === null) {
-      this._width = stdDevSize.width;
-      this._height = stdDevSize.height;
-    } else {
-      var ttbSize = elementWidthAndHeight(this._$timeToBeat);
-      this._width = Math.max(ttbSize.width, stdDevSize.width);
-      this._height = Math.max(ttbSize.height, stdDevSize.height);
-    }
-  };
-  
-  function elementWidthAndHeight($element) {
-    $element.css({
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      visibility: 'hidden'
-    });
-    var res = {
-      width: $element.width(),
-      height: $element.height()
-    };
-    $element.css({
-      position: '',
-      top: '',
-      left: '',
-      visibility: ''
-    });
-    return res;
-  }
 
   window.app.Stats = Stats;
 
