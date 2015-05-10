@@ -45,6 +45,7 @@
       return;
     }
 
+    var wasVisible = this._visible;
     this._visible = true;
 
     // Use the attributes to layout the footer.
@@ -58,7 +59,7 @@
     this._top.setClosedness(attrs.footerClosedness);
 
     // Layout all the sub-views if necessary.
-    if (this._lastWidth !== window.app.windowSize.width) {
+    if (this._lastWidth !== window.app.windowSize.width || !wasVisible) {
       this._top.layout();
 
       // If the browser width was changed, we may need to re-position the bottom
@@ -68,7 +69,7 @@
         this._$bottom.css({left: -window.app.windowSize.width});
       }
     }
-    if (this._lastWidth !== window.app.windowSize.width ||
+    if (this._lastWidth !== window.app.windowSize.width || !wasVisible ||
         this._lastHeight !== attrs.footerHeight) {
       this.stats.layout();
       this.settings.layout();

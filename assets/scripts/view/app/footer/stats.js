@@ -8,6 +8,7 @@
   var BLURB_TEXT_COLOR = '#999';
   var BLURB_FONT_FAMILY = 'Oxygen, sans-serif';
   var BLURB_ARROW_HEIGHT = 12;
+  var BLURB_MIN_X = 10;
 
   function Stats() {
     this._$movingPane = $('#footer .stats-moving-pane');
@@ -118,7 +119,7 @@
     }
   };
   
-  function Blurb(stdDev, timeToBeat, x, y) {
+  function Blurb(stdDev, timeToBeat, x, y, parentWidth, parentHeight) {
     var stdDevCode = '<label>&sigma; = ' + window.app.formatTime(stdDev) +
       '</label>';
     this._$stdDev = $(stdDevCode).css({
@@ -139,11 +140,27 @@
     var canvasHeight = this._height + BLURB_ARROW_HEIGHT;
     var canvas = $('<canvas></canvas>').css({
       width: this._width,
-      height: canvasHeight
+      height: canvasHeight,
+      position: 'absolute',
+      top: 0,
+      left: 0
     });
     var pixelRatio = window.crystal.getRatio();
     canvas.width = Math.floor(pixelRatio * this._width);
     canvas.height = Math.floor(pixelRatio * canvasHeight);
+    
+    var blurbX = Math.floor(x - this._width/2);
+    var blurbY = y;
+    var arrowOnTop = true;
+    if (blurbX < BLURB_MIN_X) {
+      blurbX = BLURB_MIN_X;
+    } else if (blurbX+this._width > parentWidth-BLURB_MIN_X) {
+      blurbX = parentWidth - BLURB_MIN_X - this.width;
+    }
+    if (blurbY+canvasHeight > parentHeight) {
+      arrowOnTop = false;
+      blurbY = y - canvasHeight;
+    }
   }
   
   Blurb.prototype._computeSize = function() {
