@@ -248,19 +248,31 @@
     }
 
     var pbSolve = window.app.showSolveAsPB(latestSolve);
-    var pbAverage = false;
+    var pbAverages = [];
     for (var i = 0, len = stats.averages.length; i < len; ++i) {
       if (window.app.showAverageAsPB(stats.averages[i])) {
-        pbAverage = true;
+        pbAverages.push(stats.averages[i].name);
       }
     }
 
+    var pbAverage = (pbAverages.length > 0);
+    var pbAverageName = '';
+    if (pbAverages.length === 1) {
+      if (pbAverages[0] === 'mo3') {
+        pbAverageName = 'mean of 3';
+      } else {
+        pbAverageName = 'average of ' + pbAverages[0];
+      }
+    } else {
+      pbAverageName = 'averages';
+    }
+
     if (pbAverage && pbSolve) {
-      this._appView.setPB('New PB time and average');
+      this._appView.setPB('PB single and ' + pbAverageName);
     } else if (pbAverage) {
-      this._appView.setPB('New PB average');
+      this._appView.setPB('PB ' + pbAverageName);
     } else if (pbSolve) {
-      this._appView.setPB('New PB');
+      this._appView.setPB('PB single');
     }
   };
 
