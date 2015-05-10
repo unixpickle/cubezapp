@@ -1,20 +1,7 @@
 (function() {
 
   var OVERVIEW_PADDING = 35;
-
   var MOUSE_RIGHT_CLICK = 3;
-
-  var BLURB_FONT_SIZE = 18;
-  var BLURB_TEXT_COLOR = '#999';
-  var BLURB_FONT_FAMILY = 'Oxygen, sans-serif';
-  var BLURB_FONT_WEIGHT = 'lighter';
-  var BLURB_ARROW_HEIGHT = 10;
-  var BLURB_MIN_X = 10;
-  var BLURB_ARROW_MIN_MARGIN = 10 + BLURB_ARROW_HEIGHT;
-  var BLURB_CONTENT_PADDING = 10;
-  var BLURB_SHADOW_INSET = 3;
-  var BLURB_SHADOW_BLUR = 3;
-  var BLURB_SHADOW_COLOR = 'rgba(0, 0, 0, 0.5)';
 
   function Averages(footer) {
     window.app.EventEmitter.call(this);
@@ -120,18 +107,9 @@
 
   Averages.prototype._registerBlurbEventsForCell = function($td, averageInfo) {
     var showBlurb = function() {
-      var offset = $td.offset();
-      var elementOffset = this._$element.offset();
-      offset.top -= elementOffset.top;
-      offset.left -= elementOffset.left;
-      offset.top += Math.round($td.outerHeight() * 0.7);
-      offset.left += Math.round($td.outerWidth() / 2);
-
       this._cancelBlurb();
-      this._blurb = new Blurb(averageInfo.stdDev, averageInfo.beat,
-        offset.left, offset.top, this._$element.width(),
-        this._$element.height());
-      this._blurb.showInElement(this._$element);
+      this._blurb = new Blurb(averageInfo, this._$element, $td);
+      this._blurb.show();
     }.bind(this);
     $td.mousedown(function(e) {
       if (e.which === MOUSE_RIGHT_CLICK) {
@@ -166,53 +144,30 @@
     this.emit('needsLayout');
   };
 
-  function Blurb(stdDev, timeToBeat, x, y, parentWidth, parentHeight) {
-    var labelCSS = {
-      color: BLURB_TEXT_COLOR,
-      fontSize: BLURB_FONT_SIZE + 'px',
-      fontFamily: BLURB_FONT_FAMILY,
-      fontWeight: BLURB_FONT_WEIGHT,
-      whiteSpace: 'nowrap'
-    };
+  function Blurb(averageInfo, $container, $td) {
+    this._$container = $container;
 
-    var stdDevCode = '<label>&sigma; = ' + window.app.formatTime(stdDev) +
-      '</label>';
-    this._$stdDev = $(stdDevCode).css(labelCSS);
-    if (isNaN(timeToBeat)) {
-      this._$timeToBeat = null;
-    } else {
-      this._$timeToBeat = $('<label>Need ' + window.app.formatTime(timeToBeat) +
-        ' to beat</label>').css(labelCSS);
-    }
+    this._createLabels(averageInfo);
     this._computeSize();
-    this._generateCanvas();
-    this._computePosition(x, y, parentWidth, parentHeight);
-    this._drawBlurb();
-
-    var labels = [this._$stdDev[0]];
-    if (this._$timeToBeat !== null) {
-      labels.push(this._$timeToBeat[0]);
-    }
-    $(labels).css({
-      display: 'block',
-      textAlign: 'center',
-      position: 'relative'
-    });
-
-    var topOffset = (this._arrowOnTop ? BLURB_ARROW_HEIGHT : 0);
-    this._$stdDev.css({marginTop: topOffset + BLURB_CONTENT_PADDING});
-
-    this._$element = $('<div class="averages-blurb"></div>').css({
-      position: 'absolute',
-      top: this._y,
-      left: this._x,
-      width: this._width,
-      height: this._height,
-      pointerEvents: 'none'
-    }).append(this._$canvas).append(labels);
-
+    this._computePosition($td);
+    this._createCanvas();
+    this._drawBlurbInCanvas();
+    this._positionLabels();
+    this._createElement();
     this._disableContextMenus();
   }
+
+  Blurb.ARROW_HEIGHT = 10;
+  Blurb.ARROW_MIN_DIST_FROM_EDGE = 10 + Blurb.ARROW_HEIGHT;
+  Blurb.CONTENT_PADDING = 10;
+  Blurb.FONT_FAMILY = 'Oxygen, sans-serif';
+  Blurb.FONT_SIZE = 18;
+  Blurb.FONT_WEIGHT = 'lighter';
+  Blurb.MIN_X = 10;
+  Blurb.SHADOW_BLUR = 3;
+  Blurb.SHADOW_COLOR = 'rgba(0, 0, 0, 0.5)';
+  Blurb.SHADOW_INSET = 3;
+  Blurb.TEXT_COLOR = '#999999';
 
   Blurb.prototype.hide = function() {
     this._$element.fadeOut(function() {
@@ -220,45 +175,118 @@
     }.bind(this));
   };
 
-  Blurb.prototype.showInElement = function(element) {
-    this._$element.css({display: 'none'});
-    element.append(this._$element);
+  Blurb.prototype.show = function() {
+    this._$element.css({
+      display: 'none',
+      top: this._$container.scrollTop() + this._y
+    });
+    this._$container.append(this._$element);
     this._$element.fadeIn();
   };
 
-  Blurb.prototype._computePosition = function(x, y, parentWidth, parentHeight) {
-    var blurbX = Math.floor(x - this._width/2);
-    var blurbY = y;
-    var arrowOnTop = true;
-    if (blurbX < BLURB_MIN_X) {
-      blurbX = BLURB_MIN_X;
-    } else if (blurbX+this._width > parentWidth-BLURB_MIN_X) {
-      blurbX = parentWidth - BLURB_MIN_X - this._width;
-    }
-    if (blurbY+this._height > parentHeight) {
-      arrowOnTop = false;
-      blurbY = y - this._height;
+  Blurb.prototype._computePosition = function($td) {
+    this._arrowOnTop = true;
+
+    // We should point somewhere near the middle of $td.
+    var offset = $td.offset();
+    var containerOffset = this._$container.offset();
+    offset.top -= containerOffset.top;
+    offset.left -= containerOffset.left;
+    offset.top += Math.round($td.outerHeight() * 0.7);
+    offset.left += Math.round($td.outerWidth() / 2);
+    var pointX = offset.left;
+    var pointY = offset.top;
+
+    var containerWidth = this._$container.width();
+    var containerHeight = this._$container.height();
+
+    this._x = Math.floor(pointX - this._width/2);
+    if (this._x < Blurb.MIN_X) {
+      this._x = Blurb.MIN_X;
+    } else if (this._x+this._width > containerWidth-Blurb.MIN_X) {
+      this._x = containerWidth - Blurb.MIN_X - this._width;
     }
 
-    this._x = blurbX;
-    this._y = blurbY;
-    this._arrowOnTop = arrowOnTop;
-    this._arrowX = Math.min(Math.max(x-blurbX, BLURB_ARROW_MIN_MARGIN),
-      this._width-BLURB_ARROW_MIN_MARGIN);
+    this._y = pointY;
+    if (this._y+this._height > containerHeight) {
+      this._arrowOnTop = false;
+      this._y = pointY - this._height;
+    }
+
+    this._arrowX = pointX - this._x;
+    if (this._arrowX < Blurb.ARROW_MIN_DIST_FROM_EDGE) {
+      this._arrowX = Blurb.ARROW_MIN_DIST_FROM_EDGE;
+    } else if (this._arrowX > this._width-Blurb.ARROW_MIN_DIST_FROM_EDGE) {
+      this._arrowX = this._width - Blurb.ARROW_MIN_DIST_FROM_EDGE;
+    }
   };
 
   Blurb.prototype._computeSize = function() {
-    var stdDevSize = elementWidthAndHeight(this._$stdDev);
+    var stdDevSize = calculateElementSize(this._$stdDev);
     if (this._$timeToBeat === null) {
       this._width = stdDevSize.width;
       this._height = stdDevSize.height;
     } else {
-      var ttbSize = elementWidthAndHeight(this._$timeToBeat);
+      var ttbSize = calculateElementSize(this._$timeToBeat);
       this._width = Math.max(ttbSize.width, stdDevSize.width);
       this._height = ttbSize.height + stdDevSize.height;
     }
-    this._height += BLURB_ARROW_HEIGHT + BLURB_CONTENT_PADDING*2;
-    this._width += BLURB_CONTENT_PADDING * 2;
+    this._height += Blurb.ARROW_HEIGHT + Blurb.CONTENT_PADDING*2;
+    this._width += Blurb.CONTENT_PADDING * 2;
+  };
+
+  Blurb.prototype._createCanvas = function() {
+    var $canvas = $('<canvas></canvas>').css({
+      width: this._width,
+      height: this._height,
+      position: 'absolute',
+      top: 0,
+      left: 0
+    });
+    var pixelRatio = Math.ceil(window.crystal.getRatio());
+    $canvas[0].width = pixelRatio * this._width;
+    $canvas[0].height = pixelRatio * this._height;
+    this._$canvas = $canvas;
+    this._canvasScale = pixelRatio;
+  };
+
+  Blurb.prototype._createElement = function() {
+    this._$element = $('<div class="averages-blurb"></div>').css({
+      position: 'absolute',
+      left: this._x,
+      width: this._width,
+      height: this._height,
+      pointerEvents: 'none'
+    }).append([this._$canvas[0], this._$stdDev[0]]);
+    if (this._$timeToBeat !== null) {
+      this._$element.append(this._$timeToBeat);
+    }
+  };
+
+  Blurb.prototype._createLabels = function(averageInfo) {
+    var stdDev = averageInfo.stdDev;
+    var timeToBeat = averageInfo.beat;
+
+    var labelStyle = {
+      color: Blurb.TEXT_COLOR,
+      fontSize: Blurb.FONT_SIZE + 'px',
+      fontFamily: Blurb.FONT_FAMILY,
+      fontWeight: Blurb.FONT_WEIGHT,
+      whiteSpace: 'nowrap',
+      display: 'block',
+      textAlign: 'center',
+      position: 'relative'
+    };
+
+    var stdDevCode = '<label>&sigma; = ' + window.app.formatTime(stdDev) +
+      '</label>';
+    this._$stdDev = $(stdDevCode).css(labelStyle);
+    if (isNaN(timeToBeat)) {
+      this._$timeToBeat = null;
+    } else {
+      this._$timeToBeat = $('<label>Need ' + window.app.formatTime(timeToBeat) +
+        ' to beat</label>').css(labelStyle);
+    }
   };
 
   Blurb.prototype._disableContextMenus = function() {
@@ -272,21 +300,21 @@
     }.bind(this));
   };
 
-  Blurb.prototype._drawBlurb = function() {
+  Blurb.prototype._drawBlurbInCanvas = function() {
     // Bogus code to draw a color in the bg.
     var context = this._$canvas[0].getContext('2d');
 
     var canvasWidth = this._$canvas[0].width;
     var canvasHeight = this._$canvas[0].height;
 
-    context.shadowBlur = BLURB_SHADOW_BLUR;
-    context.shadowColor = BLURB_SHADOW_COLOR;
+    context.shadowBlur = Blurb.SHADOW_BLUR;
+    context.shadowColor = Blurb.SHADOW_COLOR;
     context.fillStyle = 'white';
 
     context.beginPath();
 
-    var arrowHeight = BLURB_ARROW_HEIGHT * this._canvasScale;
-    var shadowInset = BLURB_SHADOW_INSET * this._canvasScale;
+    var arrowHeight = Blurb.ARROW_HEIGHT * this._canvasScale;
+    var shadowInset = Blurb.SHADOW_INSET * this._canvasScale;
 
     var boxY = shadowInset + (this._arrowOnTop ? arrowHeight : 0);
     context.rect(shadowInset, boxY, canvasWidth - shadowInset*2,
@@ -309,22 +337,14 @@
     context.fill();
   };
 
-  Blurb.prototype._generateCanvas = function() {
-    var canvas = $('<canvas></canvas>').css({
-      width: this._width,
-      height: this._height,
-      position: 'absolute',
-      top: 0,
-      left: 0
-    });
-    var pixelRatio = Math.ceil(window.crystal.getRatio());
-    canvas[0].width = pixelRatio * this._width;
-    canvas[0].height = pixelRatio * this._height;
-    this._$canvas = canvas;
-    this._canvasScale = pixelRatio;
+  Blurb.prototype._positionLabels = function() {
+    var topOffset = (this._arrowOnTop ? Blurb.ARROW_HEIGHT : 0);
+    this._$stdDev.css({marginTop: topOffset + Blurb.CONTENT_PADDING});
   };
 
-  function elementWidthAndHeight($element) {
+  function calculateElementSize($element) {
+    var oldCSS = $element.css(['position', 'top', 'left', 'visibility']);
+
     $element.css({
       position: 'fixed',
       top: 0,
@@ -336,12 +356,8 @@
       width: $element.width(),
       height: $element.height()
     };
-    $element.detach().css({
-      position: '',
-      top: '',
-      left: '',
-      visibility: ''
-    });
+
+    $element.detach().css(oldCSS);
     return res;
   }
 
