@@ -2,12 +2,22 @@
 
   var OVERVIEW_PADDING = 35;
 
+  var BLURB_FONT_SIZE = 18;
+  var BLURB_TEXT_COLOR = '#999';
+  var BLURB_FONT_FAMILY = 'Oxygen, sans-serif';
+  var BLURB_ARROW_HEIGHT = 12;
+  var BLURB_MIN_X = 10;
+  var BLURB_ARROW_MIN_MARGIN = 10;
+
   function Averages() {
     window.app.EventEmitter.call(this);
     this._$element = $('#footer .stats-contents .averages');
     this._$overview = null;
     this._$table = null;
-    this._minWidth = 0;
+
+    this._blurb = null;
+    this._blurbTimeout = null;
+
     this._showStats(window.app.store.getStats());
     this._registerModelEvents();
 
@@ -15,6 +25,10 @@
   }
 
   Averages.prototype = Object.create(window.app.EventEmitter.prototype);
+
+  Averages.prototype.hidden = function() {
+    this._cancelBlurb();
+  };
 
   Averages.prototype.layout = function(width) {
     if ('undefined' !== typeof width) {
@@ -42,6 +56,16 @@
     return this._$element.width();
   };
 
+  Averages.prototype._cancelBlurb = function() {
+    if (this._blurb) {
+      this._blurb.hide();
+      this._blurb = null;
+    } else if (this._blurbTimeout) {
+      clearTimeout(this._blurbTimeout);
+      this._blurbTimeout = null;
+    }
+  };
+
   Averages.prototype._minimumWidth = function() {
     this._$table.css({width: 'auto'});
     var tableWidth = this._$table.width();
@@ -64,6 +88,8 @@
   };
 
   Averages.prototype._showStats = function(stats) {
+    this._cancelBlurb();
+
     this._$element.empty();
     if (stats === null) {
       return;
@@ -71,10 +97,9 @@
     this._$overview = generateOverview(stats);
     this._$table = generateTable(stats);
     this._$element.append([this._$table, this._$overview]);
-
     this.emit('needsLayout');
   };
-  
+
   function Blurb(stdDev, timeToBeat, x, y, parentWidth, parentHeight) {
     var stdDevCode = '<label>&sigma; = ' + window.app.formatTime(stdDev) +
       '</label>';

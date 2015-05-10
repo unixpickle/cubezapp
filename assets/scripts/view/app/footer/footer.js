@@ -39,13 +39,18 @@
   };
 
   Footer.prototype.layout = function(attrs) {
+    var wasVisible = this._visible;
+
     if (attrs.footerOpacity === 0) {
       this._$element.css({display: 'none'});
       this._visible = false;
+      if (wasVisible) {
+        this.stats.hidden();
+        this.settings.hidden();
+      }
       return;
     }
 
-    var wasVisible = this._visible;
     this._visible = true;
 
     // Use the attributes to layout the footer.

@@ -4,13 +4,6 @@
   var AVERAGES_MIN_WIDTH = 300;
   var COLUMN_PADDING = 3;
 
-  var BLURB_FONT_SIZE = 18;
-  var BLURB_TEXT_COLOR = '#999';
-  var BLURB_FONT_FAMILY = 'Oxygen, sans-serif';
-  var BLURB_ARROW_HEIGHT = 12;
-  var BLURB_MIN_X = 10;
-  var BLURB_ARROW_MIN_MARGIN = 10;
-
   function Stats() {
     this._$movingPane = $('#footer .stats-moving-pane');
     this._$grayPuzzleIcon = $('#footer .stats-empty > .gray-icon');
@@ -30,6 +23,12 @@
     this._registerModelEvents();
     this._initializeUI();
   }
+
+  Stats.prototype.hidden = function() {
+    this.averages.hidden();
+    this.graph.hidden();
+    this.timesList.hidden();
+  };
 
   Stats.prototype.layout = function() {
     this._layoutContent();
