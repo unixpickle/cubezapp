@@ -109,6 +109,7 @@
   };
 
   Averages.prototype._registerBlurbEventsForCell = function($td, averageInfo) {
+    $td.css({cursor: 'pointer'});
     var showBlurb = function() {
       this._cancelBlurb();
       this._blurb = new Blurb(averageInfo, this._$element, $td);

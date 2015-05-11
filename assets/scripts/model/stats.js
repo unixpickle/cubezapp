@@ -56,15 +56,14 @@
   OfflineAverages.prototype.stats = function() {
     var averages = [];
     for (var i = 0, len = this._computers.length; i < len; ++i) {
-      var computer = this._computers[i];
+      var last = this._computers[i];
       var best = this._best[i];
-      var lastAverage = computer.average();
       averages.push({
         name: NAMES[i],
         size: SIZES[i],
-        count: computer.averageCount(),
-        last: computer.averageInfo(lastAverage),
-        best: (best === null ? null : best.averageInfo(lastAverage)),
+        count: last.averageCount(),
+        last: last.averageInfo(last),
+        best: (best === null ? null : best.averageInfo(last)),
         lastWasPB: this._lastWasPB[i]
       });
     }
@@ -109,13 +108,13 @@
     return this._averageCount;
   };
 
-  AverageComputer.prototype.averageInfo = function(currentAverage) {
+  AverageComputer.prototype.averageInfo = function(lastComputer) {
     var average = this.average();
     if (isNaN(average)) {
       return null;
     }
     return {
-      beat: (isNaN(currentAverage) ? NaN : this.timeToBeat(currentAverage)),
+      beat: lastComputer.timeToBeat(average),
       solves: this.solveExcludeValues(),
       stdDev: this.standardDeviation(),
       time: average
