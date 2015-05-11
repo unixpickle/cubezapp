@@ -2,6 +2,9 @@
 
   var OVERVIEW_PADDING = 35;
   var MOUSE_RIGHT_CLICK = 3;
+  
+  var HOVER_BLURB_TIMEOUT = 750;
+  var HOVER_CELL_BG = '#f0f0f0';
 
   function Averages(footer) {
     window.app.EventEmitter.call(this);
@@ -119,6 +122,15 @@
         return false;
       }
     }.bind(this));
+    $td.mouseenter(function() {
+      $td.css({backgroundColor: HOVER_CELL_BG});
+      this._cancelBlurb();
+      this._blurbTimeout = setTimeout(showBlurb, HOVER_BLURB_TIMEOUT);
+    }.bind(this));
+    $td.mouseleave(function() {
+      $td.css({backgroundColor: ''});
+      this._cancelBlurb();
+    }.bind(this));
     $td.on('contextmenu', function(e) {
       e.preventDefault();
       return false;
@@ -157,6 +169,7 @@
     this._disableContextMenus();
   }
 
+  Blurb.ANIMATION_TIME = 200;
   Blurb.ARROW_HEIGHT = 10;
   Blurb.ARROW_MIN_DIST_FROM_EDGE = 10 + Blurb.ARROW_HEIGHT;
   Blurb.CONTENT_PADDING = 10;
@@ -170,7 +183,7 @@
   Blurb.TEXT_COLOR = '#999999';
 
   Blurb.prototype.hide = function() {
-    this._$element.fadeOut(function() {
+    this._$element.fadeOut(Blurb.ANIMATION_TIME, function() {
       this._$element.remove();
     }.bind(this));
   };
@@ -181,7 +194,7 @@
       top: this._$container.scrollTop() + this._y
     });
     this._$container.append(this._$element);
-    this._$element.fadeIn();
+    this._$element.fadeIn(Blurb.ANIMATION_TIME);
   };
 
   Blurb.prototype._computePosition = function($td) {

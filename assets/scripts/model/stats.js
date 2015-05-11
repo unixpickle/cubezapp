@@ -58,12 +58,13 @@
     for (var i = 0, len = this._computers.length; i < len; ++i) {
       var computer = this._computers[i];
       var best = this._best[i];
+      var lastAverage = computer.average();
       averages.push({
         name: NAMES[i],
         size: SIZES[i],
         count: computer.averageCount(),
-        last: computer.averageInfo(),
-        best: (best === null ? null : best.averageInfo()),
+        last: computer.averageInfo(lastAverage),
+        best: (best === null ? null : best.averageInfo(lastAverage)),
         lastWasPB: this._lastWasPB[i]
       });
     }
@@ -108,13 +109,13 @@
     return this._averageCount;
   };
 
-  AverageComputer.prototype.averageInfo = function() {
+  AverageComputer.prototype.averageInfo = function(currentAverage) {
     var average = this.average();
     if (isNaN(average)) {
       return null;
     }
     return {
-      beat: this.timeToBeat(),
+      beat: (isNaN(currentAverage) ? NaN : this.timeToBeat(currentAverage)),
       solves: this.solveExcludeValues(),
       stdDev: this.standardDeviation(),
       time: average
@@ -176,9 +177,16 @@
   AverageComputer.prototype.standardDeviation = function() {
     return this._center.standardDeviation();
   };
-
-  AverageComputer.prototype.timeToBeat = function() {
-    var beat = this.average() - 1;
+  
+  AverageComputer.prototype.timeToBeat = function(average) {
+    // Find the first average that would *appear* lower than the current
+    // average. For instance, If we have 1111 milliseconds, we want to get 1109 
+    // milliseconds or lower 1109.
+    var beat = average - (average%10) - 1;
+    if (beat < 0) {
+      return NaN;
+    }
+    
     var time = this._center.valueNeededForAverage(beat);
     if (isNaN(time) || time < 0) {
       return NaN;
