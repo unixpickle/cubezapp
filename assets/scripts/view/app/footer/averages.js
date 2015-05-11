@@ -223,6 +223,7 @@
 
     this._y = pointY;
     if (this._y+this._height > containerHeight) {
+      pointY -= Math.round($td.outerHeight() * 0.4);
       this._arrowOnTop = false;
       this._y = pointY - this._height;
     }
