@@ -9,6 +9,7 @@
 
 #footer .stats-not-empty > .averages > .overview {
   padding: 5px 10px 10px 10px;
+  display: table;
 }
 
 #footer .stats-not-empty > .averages > .overview label {
@@ -20,6 +21,7 @@
   float: left;
   margin-right: 15px;
   margin-top: 5px;
+  display: table-row;
 }
 
 #footer .stats-not-empty > .averages > table {
