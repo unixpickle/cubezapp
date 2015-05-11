@@ -3,7 +3,7 @@
   var OVERVIEW_PADDING = 35;
   var MOUSE_RIGHT_CLICK = 3;
 
-  var HOVER_BLURB_TIMEOUT = 750;
+  var HOVER_BLURB_TIMEOUT = 300;
   var HOVER_CELL_BG = '#f0f0f0';
 
   function Averages(footer) {
@@ -170,7 +170,7 @@
     this._disableContextMenus();
   }
 
-  Blurb.ANIMATION_TIME = 200;
+  Blurb.ANIMATION_TIME = 0;
   Blurb.ARROW_HEIGHT = 10;
   Blurb.ARROW_MIN_DIST_FROM_EDGE = 10 + Blurb.ARROW_HEIGHT;
   Blurb.CONTENT_PADDING = 10;
