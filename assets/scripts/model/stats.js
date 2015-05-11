@@ -176,7 +176,7 @@
   AverageComputer.prototype.standardDeviation = function() {
     return this._center.standardDeviation();
   };
-  
+
   AverageComputer.prototype.timeToBeat = function(average) {
     // Find the first average that would *appear* lower than the current
     // average. For instance, If we have 1111 milliseconds, we want to get 1109 
@@ -185,7 +185,7 @@
     if (beat < 0) {
       return NaN;
     }
-    
+
     var time = this._center.valueNeededForAverage(beat);
     if (isNaN(time) || time < 0) {
       return NaN;

@@ -2,7 +2,7 @@
 
   var OVERVIEW_PADDING = 35;
   var MOUSE_RIGHT_CLICK = 3;
-  
+
   var HOVER_BLURB_TIMEOUT = 750;
   var HOVER_CELL_BG = '#f0f0f0';
 

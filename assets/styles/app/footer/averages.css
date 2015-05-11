@@ -1,0 +1,52 @@
+#footer .stats-not-empty > .averages {
+  right: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  color: #999;
+  font-size: 17px;
+  font-weight: lighter;
+}
+
+#footer .stats-not-empty > .averages > .overview {
+  padding: 5px 10px 10px 10px;
+}
+
+#footer .stats-not-empty > .averages > .overview label {
+  margin-right: 5px;
+  font-weight: normal;
+}
+
+#footer .stats-not-empty > .averages > .overview > .row {
+  float: left;
+  margin-right: 15px;
+  margin-top: 5px;
+}
+
+#footer .stats-not-empty > .averages > table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#footer .stats-not-empty > .averages th {
+  white-space: nowrap;
+}
+
+#footer .stats-not-empty > .averages td,
+#footer .stats-not-empty > .averages th {
+  text-align: center;
+  font-weight: lighter;
+  padding: 4px 20px 4px 20px;
+  margin: 0;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+#footer .stats-not-empty > .averages .left {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#footer .stats-not-empty > .averages .left,
+#footer .stats-not-empty > .averages .middle {
+  border-right: 2px solid #f0f0f0;
+}
