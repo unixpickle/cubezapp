@@ -35,6 +35,7 @@
     this._element.style.border = BORDER_THICKNESS + 'px solid ' + BORDER_COLOR;
     this._element.style.backgroundColor = 'white';
     this._element.style.display = 'inline-block';
+    this._element.style.cursor = 'pointer';
 
     // Clicking changes the checkbox.
     this._element.onclick = function() {
