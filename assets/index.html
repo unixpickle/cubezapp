@@ -22,8 +22,8 @@
     <link rel="stylesheet" type="text/css" href="styles/app/footer/footer.css">
     <link rel="stylesheet" type="text/css"
          href="styles/app/footer/settings.css">
-    <link rel="stylesheet" type="text/css"
-         href="styles/app/footer/times_list.css">
+    <link rel="stylesheet" type="text/css" href="styles/app/footer/stats.css">
+    <link rel="stylesheet" type="text/css" href="styles/app/footer/times.css">
     <link rel="stylesheet" type="text/css" href="styles/app/header.css">
     <link rel="stylesheet" type="text/css" href="styles/app/load.css">
     <link rel="stylesheet" type="text/css" href="styles/app/middle.css">
@@ -148,22 +148,22 @@
       </div>
       <div class="bottom">
         <!-- This constitutes the "Stats" tab -->
-        <div class="stats-contents">
-          <div class="stats-moving-pane">
-            <div class="stats-empty">
+        <div id="stats-contents">
+          <div id="stats-moving-pane">
+            <div id="stats-empty">
               <div class="gray-icon"></div>
               <label>No Solves</label>
             </div>
-            <div class="stats-not-empty">
-              <div class="times"></div>
-              <div class="graph"></div>
-              <div class="averages"></div>
+            <div id="stats-not-empty">
+              <div id="times"></div>
+              <div id="graph"></div>
+              <div id="averages"></div>
             </div>
           </div>
         </div>
 
         <!-- The settings tab is populated by JavaScript -->
-        <div class="settings-contents">
+        <div id="settings-contents">
         </div>
       </div>
     </div>

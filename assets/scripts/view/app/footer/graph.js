@@ -1,7 +1,7 @@
 (function() {
 
   function Graph() {
-    this._$element = $('#footer .stats-contents .graph');
+    this._$element = $('#graph');
   }
 
   Graph.prototype.layout = function(left, width) {

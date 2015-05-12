@@ -46,10 +46,11 @@
     this._$puzzleName = $('<label></label>');
     this._$puzzle.append([this._$puzzleIcon, this._$puzzleName]);
 
+    // TODO: figure out if there's a reason for using this class...
     this._$contents = $('<div class="settings-contents-contents"></div>');
     this._$contents.append(this._$puzzle);
 
-    this._$element = $('#footer .settings-contents');
+    this._$element = $('#settings-contents');
     this._$element.append(this._$contents);
 
     for (var i = 0, len = this._fields.length; i < len; ++i) {

@@ -3,7 +3,7 @@
   var LIST_WIDTH = 150;
 
   function TimesList() {
-    this._$element = $('#footer .stats-contents .times');
+    this._$element = $('#times');
     this._registerModelEvents();
     this._refillAll();
   }

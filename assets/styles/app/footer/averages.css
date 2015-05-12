@@ -1,4 +1,4 @@
-#footer .stats-not-empty > .averages {
+#averages {
   right: 0;
   overflow-x: hidden;
   overflow-y: auto;
@@ -7,35 +7,34 @@
   font-weight: lighter;
 }
 
-#footer .stats-not-empty > .averages > .overview {
+#averages-overview {
   padding: 5px 10px 10px 10px;
   display: table;
 }
 
-#footer .stats-not-empty > .averages > .overview label {
+#averages-overview label {
   margin-right: 5px;
   font-weight: normal;
 }
 
-#footer .stats-not-empty > .averages > .overview > .row {
+#averages-overview .row {
   float: left;
   margin-right: 15px;
   margin-top: 5px;
   display: table-row;
 }
 
-#footer .stats-not-empty > .averages > table {
+#averages table {
   border-spacing: 0;
   border-collapse: collapse;
   width: 100%;
 }
 
-#footer .stats-not-empty > .averages th {
+#averages th {
   white-space: nowrap;
 }
 
-#footer .stats-not-empty > .averages td,
-#footer .stats-not-empty > .averages th {
+#averages td, #averages th {
   text-align: center;
   font-weight: lighter;
   padding: 4px 20px 4px 20px;
@@ -43,12 +42,11 @@
   border-bottom: 2px solid #f0f0f0;
 }
 
-#footer .stats-not-empty > .averages .left {
+#averages .left {
   padding-left: 10px;
   padding-right: 10px;
 }
 
-#footer .stats-not-empty > .averages .left,
-#footer .stats-not-empty > .averages .middle {
+#averages .left, #averages .middle {
   border-right: 2px solid #f0f0f0;
 }

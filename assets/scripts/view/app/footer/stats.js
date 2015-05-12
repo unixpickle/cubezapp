@@ -5,9 +5,9 @@
   var COLUMN_PADDING = 3;
 
   function Stats(footer) {
-    this._$movingPane = $('#footer .stats-moving-pane');
-    this._$grayPuzzleIcon = $('#footer .stats-empty > .gray-icon');
-    this._$contents = $('#footer .stats-not-empty');
+    this._$movingPane = $('#stats-moving-pane');
+    this._$grayPuzzleIcon = $('#stats-empty > .gray-icon');
+    this._$contents = $('#stats-not-empty');
 
     this.averages = new window.app.Averages(footer);
     this.graph = new window.app.Graph();

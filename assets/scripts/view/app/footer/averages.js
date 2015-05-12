@@ -8,7 +8,7 @@
 
   function Averages(footer) {
     window.app.EventEmitter.call(this);
-    this._$element = $('#footer .stats-contents .averages');
+    this._$element = $('#averages');
     this._$overview = null;
     this._$table = null;
 
@@ -385,14 +385,14 @@
       '</div>';
 
     if (stats.count === 0) {
-      return $('<div class="overview">' + solvesRow + '</div>');
+      return $('<div id="averages-overview">' + solvesRow + '</div>');
     }
 
     var meanRow = '<div class="row"><label>Mean:</label>' +
       window.app.formatTime(stats.mean) + '</div>';
     var bestRow = '<div class="row"><label>Best:</label>' +
       window.app.formatTime(window.app.solveTime(stats.best)) + '</div>';
-    return $('<div class="overview">' + solvesRow + meanRow + bestRow +
+    return $('<div id="averages-overview">' + solvesRow + meanRow + bestRow +
       '</div>');
   }
 
