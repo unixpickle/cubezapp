@@ -19,6 +19,8 @@
   // LABEL_PADDING is the minimum space between a label and its corresponding
   // input.
   var LABEL_PADDING = 10;
+  
+  var PADDING_RIGHT = 10;
 
   function Settings() {
     window.app.EventEmitter.call(this);
@@ -46,8 +48,7 @@
     this._$puzzleName = $('<label></label>');
     this._$puzzle.append([this._$puzzleIcon, this._$puzzleName]);
 
-    // TODO: figure out if there's a reason for using this class...
-    this._$contents = $('<div class="settings-contents-contents"></div>');
+    this._$contents = $('<div id="settings-contents-contents"></div>');
     this._$contents.append(this._$puzzle);
 
     this._$element = $('#settings-contents');
@@ -183,6 +184,9 @@
 
     if (this._contentHeight() < height) {
       this._layoutFields(animate);
+    } else {
+      this._$contents.css({width: left + currentColumn.width() +
+        PADDING_RIGHT});
     }
   };
 

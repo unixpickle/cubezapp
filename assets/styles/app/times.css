@@ -20,7 +20,7 @@
 }
 
 #times .row > button.delete {
-  background-image: url('../../../images/x.png');
+  background-image: url('../../images/x.png');
   background-size: 100% 100%;
   float: right;
   margin: 12px 12px 0 0;
@@ -33,7 +33,7 @@
 }
 
 #times .row > button.delete:hover {
-  background-image: url('../../../images/x_hover.png');
+  background-image: url('../../images/x_hover.png');
 }
 
 #times .row:hover > button.delete {

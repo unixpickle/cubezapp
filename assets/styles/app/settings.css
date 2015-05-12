@@ -1,9 +1,17 @@
-#footer .settings-contents {
+#settings-contents {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  width: 50%;
+
+  background-color: white;
+  
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-#footer .settings-contents-contents {
+#settings-contents-contents {
   position: relative;
   top: 0;
   left: 0;
@@ -11,7 +19,7 @@
   /* The width is set dynamically */
 }
 
-#footer .settings-contents-contents > .puzzle {  
+#settings-contents-contents > .puzzle {  
   position: absolute;
   top: calc(50% - 80px);
   left: 20px;
@@ -23,7 +31,7 @@
   background-color: #f0f0f0;
 }
 
-#footer .settings-contents-contents > .puzzle .icon {
+#settings-contents-contents > .puzzle .icon {
   display: inline-block;
 
   width: calc(100% - 12px);
@@ -37,7 +45,7 @@
   text-align: center;
 }
 
-#footer .settings-contents-contents > .puzzle label {
+#settings-contents-contents > .puzzle label {
   display: block;
   pointer-events: none;
   position: absolute;
@@ -55,16 +63,16 @@
   white-space: nowrap;
 }
 
-#footer .settings-contents-contents > .field {
+#settings-contents-contents > .field {
   position: absolute;
 }
 
-#footer .settings-contents-contents > .field > label {
+#settings-contents-contents > .field > label {
   float: left;
   color: #999;
 }
 
-#footer .settings-contents-contents > .input-field > input {
+#settings-contents-contents > .input-field > input {
   float: right;
 
   padding: 0 5px 0 5px;
@@ -73,25 +81,25 @@
   color: #999;
 }
 
-#footer .settings-contents-contents > .dropdown-field > div {
+#settings-contents-contents > .dropdown-field > div {
   float: right;
 }
 
-#footer .settings-contents-contents > .check-field > div {
+#settings-contents-contents > .check-field > div {
   float: right;
   margin-top: 5px;
 }
 
-#footer .settings-contents-contents > .button-field {
+#settings-contents-contents > .button-field {
   text-align: center;
 }
 
-#footer .settings-contents-contents > .button-field > button {
+#settings-contents-contents > .button-field > button {
   border: none;
   cursor: pointer;
   color: white;
 }
 
-#footer .settings-contents-contents > .scramble-field > div {
+#settings-contents-contents > .scramble-field > div {
   float: right;
 }
