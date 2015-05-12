@@ -20,8 +20,8 @@
     Grape: {
       color: [0xad, 0x75, 0xc5]
     },
-    Cherry: {
-      color: [0xb9, 0x4e, 0x4e]
+    Strawberry: {
+      color: [0xe3, 0x6a, 0x8f]
     },
     Peach: {
       color: [0xf1, 0x9e, 0x4d]
@@ -29,8 +29,11 @@
     Pineapple: {
       color: [0xd9, 0xa9, 0x17]
     },
-    Kiwi: {
-      color: [0x27, 0xba, 0x92]
+    Banana: {
+      color: [0xde, 0xc4, 0x32]
+    },
+    Pear: {
+      color: [0x33, 0xbe, 0x6e]
     },
     Oreo: {
       color: [0x1c, 0x1c, 0x1c]
@@ -45,10 +48,11 @@
   var COLOR_FLAVOR_NAMES = [
     'Blueberry',
     'Grape',
-    'Cherry',
+    'Strawberry',
     'Peach',
     'Pineapple',
-    'Kiwi',
+    'Banana',
+    'Pear',
     'Oreo',
     'Chocolate'
   ];

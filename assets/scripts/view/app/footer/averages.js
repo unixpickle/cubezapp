@@ -86,7 +86,11 @@
         this._registerBlurbEventsForCell($row.find('.middle'), average.last);
       }
       if (average.best !== null) {
-        this._registerBlurbEventsForCell($row.find('.right'), average.best);
+        var $right = $row.find('.right');
+        if (average.lastWasPB) {
+          $right.addClass('flavor-text').css({fontWeight: 'normal'});
+        }
+        this._registerBlurbEventsForCell($right, average.best);
       }
       $table.append($row);
     }

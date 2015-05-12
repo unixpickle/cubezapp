@@ -7,12 +7,15 @@
   height: 40px;
 }
 
+#footer .stats-not-empty > .times .row > label.not-pb {
+  color: #999;
+}
+
 #footer .stats-not-empty > .times .row > label {
   height: 40px;
   line-height: 40px;
   padding-left: 7px;
   font-family: Roboto, sans-serif;
-  color: #999;
   font-size: 18px;
 }
 

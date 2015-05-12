@@ -57,6 +57,11 @@
     var row = '<div class="row"><label>' + timeText +
       '</label><button class="delete"></button></div>';
     var $row = $(row);
+    if (window.app.showSolveAsPB(solve)) {
+      $row.find('label').addClass('flavor-text');
+    } else {
+      $row.find('label').addClass('not-pb');
+    }
     $row.find('.delete').click(function() {
       window.app.store.deleteSolve(solve.id);
     });

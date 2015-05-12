@@ -1,6 +1,6 @@
 (function() {
 
-  var PB_MIN_COUNT = 5;
+  var PB_MIN_COUNT = 0;
 
   function showAverageAsPB(average) {
     return average.lastWasPB && average.count >= PB_MIN_COUNT;
