@@ -75,12 +75,14 @@
   };
 
   Stats.prototype._layoutMovingPane = function(animate) {
-    var viewHeight = this._$panes.height();
-    var functionName = (animate ? 'animate' : 'css');
+    var top = 0;
     if (this._empty) {
-      this._$movingPane[functionName]({top: -viewHeight}, 'fast');
+      top = -this._$panes.height();
+    }
+    if (animate) {
+      this._$movingPane.animate({top: top}, 'fast');
     } else {
-      this._$movingPane[functionName]({top: 0}, 'fast');
+      this._$movingPane.css({top: top});
     }
   };
 
