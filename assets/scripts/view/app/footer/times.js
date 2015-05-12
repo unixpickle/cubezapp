@@ -2,26 +2,26 @@
 
   var LIST_WIDTH = 150;
 
-  function TimesList() {
+  function Times() {
     this._$element = $('#times');
     this._registerModelEvents();
     this._refillAll();
   }
 
-  TimesList.prototype.layout = function(width) {
+  Times.prototype.layout = function(width) {
     this._$element.css({width: width || LIST_WIDTH});
   };
 
-  TimesList.prototype.width = function() {
+  Times.prototype.width = function() {
     return this._$element.width();
   };
 
-  TimesList.prototype._addRowForSolve = function(solve) {
+  Times.prototype._addRowForSolve = function(solve) {
     var row = generateRowForSolve(solve);
     this._$element.prepend(row);
   };
 
-  TimesList.prototype._refillAll = function() {
+  Times.prototype._refillAll = function() {
     var count = window.app.store.getSolveCount();
     window.app.store.getSolves(0, count, function(err, solves) {
       if (err !== null) {
@@ -35,7 +35,7 @@
     }.bind(this));
   };
 
-  TimesList.prototype._registerModelEvents = function() {
+  Times.prototype._registerModelEvents = function() {
     window.app.store.on('addedSolve', this._addRowForSolve.bind(this));
     var reload = this._refillAll.bind(this);
     var events = ['addedPuzzle', 'deletedSolve', 'modifiedSolve',
@@ -68,6 +68,6 @@
     return $row;
   }
 
-  window.app.TimesList = TimesList;
+  window.app.Times = Times;
 
 })();

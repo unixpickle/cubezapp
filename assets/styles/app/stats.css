@@ -7,7 +7,7 @@
   overflow: hidden;
 }
 
-#stats-moving-pane {
+#stats-contents-contents {
   position: absolute;
   top: 0;
   left: 0;
@@ -24,10 +24,9 @@
   background-color: white;
 }
 
-#stats-empty > .gray-icon {
+#stats-empty > .icon {
   position: absolute;
   width: 100%;
-  top: 20px;
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -35,14 +34,11 @@
 #stats-empty > label {
   position: absolute;
   width: 100%;
-  bottom: 0;
-  font-size: 25px;
-  padding: 10px 0 10px 0;
   color: #d5d5d5;
   text-align: center;
 }
 
-#stats-not-empty {
+#stats-panes {
   position: absolute;
   top: 0;
   left: 0;
@@ -50,7 +46,7 @@
   height: 50%;
 }
 
-#stats-not-empty > div {
+.stats-pane {
   position: absolute;
   top: 0;
   height: 100%;

@@ -149,6 +149,12 @@
   };
 
   Averages.prototype._showStats = function(stats) {
+    // If there are no stats and stats have been displayed in the past, don't
+    // update anything or else a jump may occur during an animation.
+    if (window.app.store.getSolveCount() === 0 && this._$table !== null) {
+      return;
+    }
+    
     this._cancelBlurb();
 
     this._$element.empty();

@@ -1,116 +1,121 @@
 (function() {
 
-  var GRAPH_MIN_WIDTH = 500;
-  var AVERAGES_MIN_WIDTH = 300;
-  var COLUMN_PADDING = 3;
+  var MIN_GRAPH_WIDTH = 500;
+  var PANE_SPACING = 3;
+
+  var PUZZLE_LABEL_SIZE = 0.12;
+  var PUZZLE_ICON_SIZE = 0.7;
 
   function Stats(footer) {
-    this._$movingPane = $('#stats-moving-pane');
-    this._$grayPuzzleIcon = $('#stats-empty > .gray-icon');
-    this._$contents = $('#stats-not-empty');
+    this._$movingPane = $('#stats-contents-contents');
+    this._$empty = $('#stats-empty');
+    this._$icon = this._$empty.find('.icon');
+    this._$name = this._$empty.find('label');
+    this._$panes = $('#stats-panes');
+
+    this._empty = (window.app.store.getSolveCount() === 0);
 
     this.averages = new window.app.Averages(footer);
     this.graph = new window.app.Graph();
-    this.timesList = new window.app.TimesList();
+    this.times = new window.app.Times();
 
-    this.averages.on('needsLayout', this._childNeedsLayout.bind(this));
-
-    this._$contents.append([this.averages, this.graph, this.timesList]);
-    this.graph.setVisible(false);
-    this.averages.setVisible(false);
-
-    this._showingStats = false;
     this._registerModelEvents();
-    this._initializeUI();
+    this._registerUIEvents();
+    this._initializePuzzleInfo();
+    this.layout();
   }
 
-  Stats.prototype.layout = function() {
-    this._layoutContent();
+  Stats.prototype.layout = function(animate) {
+    this._layoutEmpty();
+    this._layoutPanes();
+    this._layoutMovingPane(animate || false);
+  };
 
-    var contentHeight = this._$movingPane.height() / 2;
-    var iconHeight = Math.floor(contentHeight - 70);
-    var iconWidth = Math.floor(iconHeight * (746/505));
-    this._$grayPuzzleIcon.css({
-      height: iconHeight,
-      backgroundSize: iconWidth + 'px ' + iconHeight + 'px'
+  Stats.prototype._handleEmptyChanged = function() {
+    var newEmpty = (window.app.store.getSolveCount() === 0);
+    if (newEmpty === this._empty) {
+      return;
+    }
+    this._empty = newEmpty;
+    this.layout(window.app.view.footer.visible());
+  };
+
+  Stats.prototype._handlePuzzleChanged = function() {
+    var puzzle = window.app.store.getActivePuzzle();
+    this._$name.text(puzzle.name);
+
+    var iconPath = 'images/gray_puzzles/' + puzzle.icon + '.png';
+    this._$icon.css({backgroundImage: 'url(' + iconPath + ')'});
+  };
+  
+  Stats.prototype._initializePuzzleInfo = function() {
+    var puzzle = window.app.store.getActivePuzzle();
+    this._$name.text(puzzle.name);
+    var iconPath = 'images/gray_puzzles/' + puzzle.icon + '.png';
+    this._$icon.css({backgroundImage: 'url(' + iconPath + ')'});
+  };
+
+  Stats.prototype._layoutEmpty = function() {
+    var viewHeight = this._$empty.height();
+    var padding = Math.floor(viewHeight * (1 - PUZZLE_LABEL_SIZE -
+      PUZZLE_ICON_SIZE) / 2);
+    var iconSize = Math.floor(PUZZLE_ICON_SIZE * viewHeight);
+    this._$icon.css({
+      top: padding,
+      height: iconSize,
+      backgroundSize: Math.floor(iconSize*746/505) + 'px ' + iconSize + 'px'
     });
+    var nameHeight = Math.floor(PUZZLE_LABEL_SIZE * viewHeight)
+    this._$name.css({
+      fontSize: nameHeight,
+      lineHeight: nameHeight + 'px',
+      height: nameHeight,
+      bottom: Math.round(padding / 2)
+    });
+  };
 
-    if (!this._showingStats) {
-      var newTop = -contentHeight;
-      this._$movingPane.css({top: newTop});
+  Stats.prototype._layoutMovingPane = function(animate) {
+    var viewHeight = this._$panes.height();
+    var functionName = (animate ? 'animate' : 'css');
+    if (this._empty) {
+      this._$movingPane[functionName]({top: -viewHeight}, 'fast');
+    } else {
+      this._$movingPane[functionName]({top: 0}, 'fast');
     }
   };
 
-  Stats.prototype._childNeedsLayout = function() {
-    if (window.app.view.footer.visible()) {
-      this.layout();
-    }
-  };
+  Stats.prototype._layoutPanes = function() {
+    var totalWidth = this._$panes.width();
 
-  Stats.prototype._handleIconChanged = function() {
-    var iconName = window.app.store.getActivePuzzle().icon;
-    var iconPath = 'images/gray_puzzles/' + iconName + '.png';
-    this._$grayPuzzleIcon.css({backgroundImage: 'url(' + iconPath + ')'});
-  };
+    this.averages.setVisible(true);
 
-  Stats.prototype._handleSolveChanged = function() {
-    var showing = (window.app.store.getLatestSolve() !== null);
-    var animate = false;
-    this._setShowingStats(showing, animate);
-  };
+    this.averages.layout();
+    this.times.layout();
 
-  Stats.prototype._initializeUI = function() {
-    this._handleIconChanged();
-    this._handleSolveChanged();
-  };
+    var averagesWidth = this.averages.width();
+    var timesWidth = this.times.width();
 
-  Stats.prototype._layoutContent = function() {
-    var width = this._$movingPane.width();
-    if (width < AVERAGES_MIN_WIDTH) {
-      this.graph.setVisible(false);
+    if (averagesWidth + timesWidth > totalWidth) {
       this.averages.setVisible(false);
-      this.timesList.layout(width);
-    } else if (width < GRAPH_MIN_WIDTH) {
       this.graph.setVisible(false);
-      this.averages.setVisible(true);
-      this.timesList.layout();
-      this.averages.layout(width - this.timesList.width() -
-        COLUMN_PADDING);
+    } else if (averagesWidth + timesWidth + MIN_GRAPH_WIDTH > totalWidth) {
+      this.graph.setVisible(false);
+      this.averages.layout(totalWidth - timesWidth);
     } else {
       this.graph.setVisible(true);
-      this.averages.setVisible(true);
-      this.timesList.layout();
-      this.averages.layout();
-      var left = this.timesList.width();
-      var graphWidth = width - (left + this.averages.width());
-      this.graph.layout(left+COLUMN_PADDING, graphWidth-COLUMN_PADDING*2);
+      this.graph.layout(timesWidth + PANE_SPACING,
+        totalWidth - averagesWidth - timesWidth - PANE_SPACING*2);
     }
   };
 
   Stats.prototype._registerModelEvents = function() {
-    window.app.observe.latestSolve('id', this._handleSolveChanged.bind(this));
-    window.app.observe.activePuzzle('icon', this._handleIconChanged.bind(this));
+    window.app.observe.activePuzzle(['icon', 'name'],
+      this._handlePuzzleChanged.bind(this));
+    window.app.observe.latestSolve('id', this._handleEmptyChanged.bind(this));
   };
 
-  Stats.prototype._setShowingStats = function(flag, animate) {
-    if (this._showingStats === flag) {
-      return;
-    }
-    this._showingStats = flag;
-    if (flag) {
-      if (animate) {
-        this._$movingPane.animate({top: 0});
-      } else {
-        this._$movingPane.css({top: 0});
-      }
-    } else {
-      var newTop = -this._$movingPane.height() / 2;
-      if (animate) {
-        this._$movingPane.animate({top: newTop});
-      } else {
-        this._$movingPane.css({top: newTop});
-      }
-    }
+  Stats.prototype._registerUIEvents = function() {
+    this.averages.on('needsLayout', this.layout.bind(this));
   };
 
   window.app.Stats = Stats;
