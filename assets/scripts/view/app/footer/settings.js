@@ -19,7 +19,7 @@
   // LABEL_PADDING is the minimum space between a label and its corresponding
   // input.
   var LABEL_PADDING = 10;
-  
+
   var PADDING_RIGHT = 10;
 
   function Settings() {

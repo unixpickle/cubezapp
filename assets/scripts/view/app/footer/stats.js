@@ -43,7 +43,7 @@
   Stats.prototype._handlePuzzleChanged = function() {
     this._updatePuzzleInformation();
   };
-  
+
   Stats.prototype._updatePuzzleInformation = function() {
     var puzzle = window.app.store.getActivePuzzle();
     this._$name.text(puzzle.name);

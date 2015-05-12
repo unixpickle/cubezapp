@@ -2,7 +2,7 @@
 
   var CHECK_INTERVAL = 50;
   var FAR_OFFSCREEN = -10000;
-  var FONT_LOAD_TIMEOUT = 2000;
+  var FONT_LOAD_TIMEOUT = 1000;
   var REFERENCE_FONT = 'serif';
   var TEST_FONT_SIZE = '40px';
   var TEST_TEXT = '0123456789:.abcdefghijklmnopqrstuvwxyz' +
@@ -11,10 +11,15 @@
 
   function Fonts() {
     window.app.EventEmitter.call(this);
+    this._loaded = false;
     this._listenForLoad();
   }
 
   Fonts.prototype = Object.create(window.app.EventEmitter.prototype);
+
+  Fonts.prototype.loaded = function() {
+    return this._loaded;
+  };
 
   Fonts.prototype._listenForLoad = function() {
     var waitingCount = WEB_FONTS.length;
@@ -22,6 +27,7 @@
       pollFontLoad(WEB_FONTS[i], function() {
         if (--waitingCount === 0) {
           this.emit('load');
+          this._loaded = true;
         }
       }.bind(this));
     }

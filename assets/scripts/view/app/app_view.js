@@ -46,8 +46,11 @@
     var memoVisible = (latestSolve && latestSolve.memo >= 0) ? true : false;
     this._initializeState(memoVisible);
     this._initializeAnimator();
-    this._loadAnimation();
-    this._layout(this._animator.current());
+
+    window.app.fonts.on('load', function() {
+      this._loadAnimation();
+      this._layout(this._animator.current());
+    }.bind(this));
   }
 
   AppView.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -60,7 +63,7 @@
   // loading returns true if the app is still loading and should not be updated
   // significantly.
   AppView.prototype.loading = function() {
-    return this._numLoadingAnimations > 0;
+    return window.app.fonts.loading() || this._numLoadingAnimations > 0;
   };
 
   // setTheaterMode enables or disables "theater" mode, in which everything is

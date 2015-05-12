@@ -19,7 +19,6 @@
     this._registerModelEvents();
 
     footer.on('hidden', this._cancelBlurb.bind(this));
-    window.app.fonts.on('load', this.emit.bind(this, 'needsLayout'));
   }
 
   Averages.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -154,7 +153,7 @@
     if (window.app.store.getSolveCount() === 0 && this._$table !== null) {
       return;
     }
-    
+
     this._cancelBlurb();
 
     this._$element.empty();
