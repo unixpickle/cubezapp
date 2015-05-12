@@ -21,7 +21,7 @@
 
     this._registerModelEvents();
     this._registerUIEvents();
-    this._initializePuzzleInfo();
+    this._updatePuzzleInformation();
     this.layout();
   }
 
@@ -41,14 +41,10 @@
   };
 
   Stats.prototype._handlePuzzleChanged = function() {
-    var puzzle = window.app.store.getActivePuzzle();
-    this._$name.text(puzzle.name);
-
-    var iconPath = 'images/gray_puzzles/' + puzzle.icon + '.png';
-    this._$icon.css({backgroundImage: 'url(' + iconPath + ')'});
+    this._updatePuzzleInformation();
   };
   
-  Stats.prototype._initializePuzzleInfo = function() {
+  Stats.prototype._updatePuzzleInformation = function() {
     var puzzle = window.app.store.getActivePuzzle();
     this._$name.text(puzzle.name);
     var iconPath = 'images/gray_puzzles/' + puzzle.icon + '.png';
