@@ -1,15 +1,16 @@
 (function() {
 
-  var LIST_WIDTH = 150;
-
   function Times() {
     this._$element = $('#times');
+    this._idToRow = {};
+
     this._registerModelEvents();
-    this._refillAll();
+    this._dataInvalidated();
   }
 
   Times.prototype.layout = function(width) {
-    this._$element.css({width: width || LIST_WIDTH});
+    // TODO: actually do something here.
+    this._$element.css({width: width || 150});
   };
 
   Times.prototype.width = function() {
@@ -17,56 +18,31 @@
   };
 
   Times.prototype._addRowForSolve = function(solve) {
-    var row = generateRowForSolve(solve);
-    this._$element.prepend(row);
+    // TODO: add a row here.
   };
 
-  Times.prototype._refillAll = function() {
-    var count = window.app.store.getSolveCount();
-    window.app.store.getSolves(0, count, function(err, solves) {
-      if (err !== null) {
-        return;
-      }
-      this._$element.empty();
-      for (var i = solves.length-1; i >= 0; --i) {
-        var row = generateRowForSolve(solves[i]);
-        this._$element.append(row);
-      }
-    }.bind(this));
+  Times.prototype._dataInvalidated = function() {
+    // TODO: reload everything here.
+  };
+
+  Times.prototype._deleteRowForSolve = function(id) {
+    // TODO: delete a row here.
   };
 
   Times.prototype._registerModelEvents = function() {
-    window.app.store.on('addedSolve', this._addRowForSolve.bind(this));
-    var reload = this._refillAll.bind(this);
-    var events = ['addedPuzzle', 'deletedSolve', 'modifiedSolve',
-      'remoteChange', 'switchedPuzzle'];
-    for (var i = 0, len = events.length; i < len; ++i) {
-      window.app.store.on(events[i], reload);
+    var invalidateHandler = this._dataInvalidated.bind(this);
+    var invalidateEvents = ['addedPuzzle', 'remoteChange', 'switchedPuzzle'];
+    for (var i = 0; i < invalidateEvents.length; ++i) {
+      window.app.store.on(invalidateEvents[i], invalidateHandler);
     }
+    window.app.store.on('deletedSolve', this._deleteRowForSolve.bind(this));
+    window.app.store.on('modifiedSolve', this._updateRowForSolve.bind(this));
+    window.app.store.on('addedSolve', this._addRowForSolve.bind(this));
   };
 
-  function generateRowForSolve(solve) {
-    var time = window.app.solveTime(solve);
-    var timeText = window.app.formatTime(time);
-    if (solve.plus2) {
-      timeText += '+';
-    }
-    if (solve.dnf) {
-      timeText = '<s>' + timeText + '</s>';
-    }
-    var row = '<div class="row"><label>' + timeText +
-      '</label><button class="delete"></button></div>';
-    var $row = $(row);
-    if (window.app.showSolveAsPB(solve)) {
-      $row.find('label').addClass('flavor-text');
-    } else {
-      $row.find('label').addClass('not-pb');
-    }
-    $row.find('.delete').click(function() {
-      window.app.store.deleteSolve(solve.id);
-    });
-    return $row;
-  }
+  Times.prototype._updateRowForSolve = function(id) {
+    // TODO: update a row here.
+  };
 
   window.app.Times = Times;
 
