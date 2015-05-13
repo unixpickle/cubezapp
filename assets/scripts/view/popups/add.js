@@ -53,25 +53,34 @@
 
   AddPopup.prototype = Object.create(window.app.EventEmitter.prototype);
 
-  AddPopup.prototype.bld = function() {
-    return this._bldCheck.checked();
-  };
-
   AddPopup.prototype.close = function() {
     this._dialog.close();
     this._handleClose();
   };
 
-  AddPopup.prototype.icon = function() {
-    return window.app.iconFiles[this._iconDropdown.selected()];
+  AddPopup.prototype.getBLD = function() {
+    return this._bldCheck.getChecked();
   };
 
-  AddPopup.prototype.name = function() {
+  AddPopup.prototype.getIcon = function() {
+    return window.app.iconFiles[this._iconDropdown.getSelected()];
+  };
+
+  AddPopup.prototype.getName = function() {
     return this._$nameInput.val();
   };
 
-  AddPopup.prototype.scrambler = function() {
-    return this._scrambleDropdown.value();
+  AddPopup.prototype.getScrambleType = function() {
+    var subscramblers = this._subscramblers();
+    if (subscramblers.length === 1) {
+      return subscramblers[0];
+    } else if (subscramblers.length > 1) {
+      return this._subscrambleDropdown.getValue();
+    }
+  };
+
+  AddPopup.prototype.getScrambler = function() {
+    return this._scrambleDropdown.getValue();
   };
 
   AddPopup.prototype.shakeName = function() {
@@ -83,29 +92,19 @@
     this._dialog.show();
   };
 
-  AddPopup.prototype.scrambleType = function() {
-    var subscramblers = this._subscramblers();
-    if (subscramblers.length === 1) {
-      return subscramblers[0];
-    } else if (subscramblers.length > 1) {
-      return this._subscrambleDropdown.value();
-    }
-  };
-
   AddPopup.prototype._changedIcon = function() {
     this._userChangedIcon = true;
 
-    var name = window.app.iconFiles[this._iconDropdown.selected()];
     this._$puzzleIcon.css({
-      backgroundImage: 'url(images/puzzles/' + name + '.png)'
+      backgroundImage: 'url(images/puzzles/' + this.getIcon() + '.png)'
     });
 
     // If we can change the scramble, try it. There's no harm in it.
     if (!this._userChangedScramble) {
-      var iconName = this._iconDropdown.value();
-      var lastIdx = this._scrambleDropdown.selected();
-      this._scrambleDropdown.setSelectedValue(iconName);
-      if (this._scrambleDropdown.selected() !== lastIdx) {
+      var iconName = this._iconDropdown.getValue();
+      var lastIdx = this._scrambleDropdown.getSelected();
+      this._scrambleDropdown.setValue(iconName);
+      if (this._scrambleDropdown.getSelected() !== lastIdx) {
         this._changedScramble();
         this._userChangedScramble = false;
       }
@@ -115,8 +114,8 @@
   AddPopup.prototype._changedName = function() {
     this._$puzzleName.text(this._$nameInput.val() || 'Name');
     if (!this._userChangedIcon) {
-      this._iconDropdown.setSelectedValue(this._$nameInput.val());
-      if (this._iconDropdown.value() === this._$nameInput.val()) {
+      this._iconDropdown.setValue(this._$nameInput.val());
+      if (this._iconDropdown.getValue() === this._$nameInput.val()) {
         this._changedIcon();
         this._userChangedIcon = false;
       }
@@ -256,9 +255,9 @@
 
   // _handleClose makes sure no dropdowns are open.
   AddPopup.prototype._handleClose = function() {
-    this._iconDropdown.hide();
-    this._scrambleDropdown.hide();
-    this._subscrambleDropdown.hide();
+    this._iconDropdown.close();
+    this._scrambleDropdown.close();
+    this._subscrambleDropdown.close();
     window.app.flavors.removeCheckbox(this._bldCheck);
   };
 
@@ -281,7 +280,7 @@
   };
 
   AddPopup.prototype._subscramblers = function() {
-    var puzzle = this._scrambleDropdown.value();
+    var puzzle = this._scrambleDropdown.getValue();
     if (puzzle === 'None') {
       return [];
     }

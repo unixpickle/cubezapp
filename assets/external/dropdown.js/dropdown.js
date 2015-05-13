@@ -1,6 +1,7 @@
+// dropdown.js version 3.0.0
 (function() {
 
-  var DEFAULT_BG_COLOR = [1, 1, 1];
+  var DEFAULT_BG_COLOR = '#ffffff';
   var DEFAULT_DROPDOWN_HEIGHT = 30;
   var DEFAULT_FONT_HEIGHT_RATIO = 18/30;
   var DOWN_MINIMUM_ITEMS = 4;
@@ -9,8 +10,6 @@
 
   // A Dropdown generates and controls the elements involved with a dropdown.
   function Dropdown(width, bgcolor, height, fontSize) {
-    bgcolor = bgcolor || DEFAULT_BG_COLOR;
-
     // This state can be changed later.
     this._optionNames = [];
     this._selected = 0;
@@ -33,33 +32,51 @@
     this._preview = $('<div class="dropdownjs-preview"></div>').css({
       width: width,
       height: this._height,
-      backgroundColor: colorToHTML(bgcolor)
+      backgroundColor: bgcolor || DEFAULT_BG_COLOR
     });
     this._preview.append([this._label, arrow]);
-    this._preview.click(this.show.bind(this));
+    this._preview.click(this.open.bind(this));
 
     this._menu = new Menu(this);
     this._menu.onChange = this._handleSelectionChange.bind(this);
   }
+
+  // close closes the dropdown if it was open.
+  Dropdown.prototype.close = function() {
+    this._menu.hide();
+  };
 
   // element returns an HTML element which can be displayed for the dropdown.
   Dropdown.prototype.element = function() {
     return this._preview[0];
   };
 
-  // fontSize returns the font size used by the dropdown.
-  Dropdown.prototype.fontSize = function() {
+  // getFontSize returns the font size used by the dropdown.
+  Dropdown.prototype.getFontSize = function() {
     return this._fontSize
   };
 
-  // height returns the height of the dropdown.
-  Dropdown.prototype.height = function() {
+  // getHeight returns the height of the dropdown.
+  Dropdown.prototype.getHeight = function() {
     return this._height;
   };
 
-  // hide closes the dropdown if it was open.
-  Dropdown.prototype.hide = function() {
-    this._menu.hide();
+  // getSelected returns the selected index.
+  Dropdown.prototype.getSelected = function() {
+    return this._selected;
+  };
+
+  // getValue returns the name of the selected element.
+  Dropdown.prototype.getValue = function() {
+    if (this._optionNames.length === 0) {
+      return '';
+    }
+    return this._optionNames[this._selected];
+  };
+
+  // getWidth returns the width of the dropdown.
+  Dropdown.prototype.getWidth = function() {
+    return this._width;
   };
 
   // isOpen returns true if the dropdown is open.
@@ -67,9 +84,12 @@
     return this._menu.isShowing();
   };
 
-  // selected returns the selected index.
-  Dropdown.prototype.selected = function() {
-    return this._selected;
+  // open opens the dropdown if it was not already open.
+  Dropdown.prototype.open = function() {
+    if (this._optionNames.length === 0) {
+      return;
+    }
+    this._menu.show();
   };
 
   // setOptions sets a list of options to show.
@@ -100,33 +120,12 @@
     this._menu.setSelected(idx);
   };
 
-  // setSelectedValue selects an index in the dropdown given its name.
-  Dropdown.prototype.setSelectedValue = function(value) {
+  // setValue selects an index in the dropdown given its name.
+  Dropdown.prototype.setValue = function(value) {
     var idx = this._optionNames.indexOf(value);
     if (idx >= 0) {
       this.setSelected(idx);
     }
-  };
-
-  // show opens the dropdown if it was not already open.
-  Dropdown.prototype.show = function() {
-    if (this._optionNames.length === 0) {
-      return;
-    }
-    this._menu.show();
-  };
-
-  // value returns the name of the selected element.
-  Dropdown.prototype.value = function() {
-    if (this._optionNames.length === 0) {
-      return '';
-    }
-    return this._optionNames[this._selected];
-  };
-
-  // width returns the width of the dropdown.
-  Dropdown.prototype.width = function() {
-    return this._width;
   };
 
   Dropdown.prototype._handleSelectionChange = function(idx) {
@@ -181,12 +180,12 @@
   Menu.prototype.setOptions = function(list) {
     this._menu.empty();
     this._options = $();
-    var rowHeight = this._dropdown.height();
+    var rowHeight = this._dropdown.getHeight();
     for (var i = 0, len = list.length; i < len; ++i) {
       var optionElement = $('<li></li>').css({
         height: rowHeight,
         lineHeight: rowHeight + 'px',
-        fontSize: this._dropdown.fontSize() + 'px',
+        fontSize: this._dropdown.getFontSize() + 'px',
         backgroundSize: rowHeight + 'px ' + rowHeight + 'px'
       }).text(list[i]);
       this._options = this._options.add(optionElement);
@@ -239,9 +238,9 @@
 
     var left = state.elementLeft;
     var top = 0;
-    var width = this._dropdown.width() + extraWidth;
+    var width = this._dropdown.getWidth() + extraWidth;
     var height = 0;
-    var contentHeight = this._options.length * this._dropdown.height();
+    var contentHeight = this._options.length * this._dropdown.getHeight();
 
     if (width + left > state.bodyWidth) {
       left -= extraWidth;
@@ -252,9 +251,9 @@
         contentHeight);
       top = state.elementTop;
     } else {
-      height = Math.min(contentHeight, this._dropdown.height() +
+      height = Math.min(contentHeight, this._dropdown.getHeight() +
         state.elementTop - PAGE_MARGIN);
-      top = state.elementTop + this._dropdown.height() - height;
+      top = state.elementTop + this._dropdown.getHeight() - height;
     }
 
     this._container.css({
@@ -266,12 +265,12 @@
   };
 
   Menu.prototype._shouldOpenDown = function() {
-    var dropdownHeight = this._dropdown.height();
+    var dropdownHeight = this._dropdown.getHeight();
 
     var state = this._changeTracker.getState();
-    var minimumDownHeight = DOWN_MINIMUM_ITEMS*this._dropdown.height();
+    var minimumDownHeight = DOWN_MINIMUM_ITEMS*this._dropdown.getHeight();
 
-    var upwardsSpace = state.elementTop + this._dropdown.height();
+    var upwardsSpace = state.elementTop + this._dropdown.getHeight();
     var downwardsSpace = state.bodyHeight - state.elementTop;
 
     return downwardsSpace - PAGE_MARGIN >= minimumDownHeight ||
@@ -376,11 +375,6 @@
     this._checkInterval = setInterval(this._check.bind(this),
       ChangeTracker.SLOW_INTERVAL);
   };
-
-  function colorToHTML(color) {
-    return 'rgba(' + Math.floor(color[0]*255) + ', ' +
-      Math.floor(color[1]*255) + ', ' + Math.floor(color[2]*255) + ', 1)';
-  }
 
   function scrollbarWidth() {
     // Generate a small scrolling element.

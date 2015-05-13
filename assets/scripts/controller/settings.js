@@ -18,7 +18,7 @@
   SettingsController.prototype._changeName = function() {
     var popup = new window.app.RenamePopup();
     popup.on('rename', function() {
-      var name = popup.name().trim();
+      var name = popup.getName().trim();
       if (!isNameValid(name)) {
         popup.shakeInput();
       } else {
@@ -30,12 +30,12 @@
   };
 
   SettingsController.prototype._flavorChanged = function() {
-    var flavorId = window.app.flavors.nameToId(this._view.flavorName());
+    var flavorId = window.app.flavors.nameToId(this._view.getFlavorName());
     window.app.store.modifyGlobalSettings({flavor: flavorId});
   };
 
   SettingsController.prototype._iconChanged = function() {
-    var iconName = this._view.iconName();
+    var iconName = this._view.getIconName();
     var iconIndex = window.app.iconNames.indexOf(iconName);
     var iconFile = window.app.iconFiles[iconIndex];
     window.app.store.modifyPuzzle({icon: iconFile});
@@ -43,12 +43,12 @@
 
   SettingsController.prototype._inputChanged = function() {
     var input = 0;
-    if (this._view.bld()) {
+    if (this._view.getBLD()) {
       input = window.app.TimerController.INPUT_BLD;
-    } else if (this._view.inspection()) {
+    } else if (this._view.getInspection()) {
       input = window.app.TimerController.INPUT_INSPECTION;
     } else {
-      var modeStr = this._view.timerInput();
+      var modeStr = this._view.getTimerInput();
       if (modeStr === 'Regular') {
         input = window.app.TimerController.INPUT_REGULAR;
       } else if (modeStr === 'Stackmat') {
@@ -61,16 +61,16 @@
   };
 
   SettingsController.prototype._rightyChanged = function() {
-    window.app.store.modifyGlobalSettings({righty: this._view.righty()});
+    window.app.store.modifyGlobalSettings({righty: this._view.getRighty()});
   };
 
   SettingsController.prototype._scrambleTypeChanged = function() {
-    window.app.store.modifyPuzzle({scrambleType: this._view.scrambleType()});
+    window.app.store.modifyPuzzle({scrambleType: this._view.getScrambleType()});
   };
 
   SettingsController.prototype._scramblerChanged = function() {
-    var scrambler = this._view.scrambler();
-    var type = this._view.scrambleType();
+    var scrambler = this._view.getScrambler();
+    var type = this._view.getScrambleType();
 
     // Use the default type if the view's type is invalid.
     var types = ['None'];
@@ -88,12 +88,14 @@
   };
 
   SettingsController.prototype._theaterModeChanged = function() {
-    var flag = this._view.theaterMode();
+    var flag = this._view.getTheaterMode();
     window.app.store.modifyGlobalSettings({theaterMode: flag});
   };
 
   SettingsController.prototype._updateChanged = function() {
-    window.app.store.modifyGlobalSettings({timerAccuracy: this._view.update()});
+    window.app.store.modifyGlobalSettings({
+      timerAccuracy: this._view.getUpdate()
+    });
   };
 
   function isNameValid(name) {

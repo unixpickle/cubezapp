@@ -39,7 +39,7 @@
 
     // Clicking changes the checkbox.
     this._element.onclick = function() {
-      this.setChecked(!this.checked());
+      this.setChecked(!this.getChecked());
       if ('function' === typeof this.onChange) {
         this.onChange();
       }
@@ -83,14 +83,24 @@
     this._updateResolution();
   }
 
-  // checked returns the checked state of the checkbox.
-  Checkbox.prototype.checked = function() {
-    return this._state.checked;
-  };
-
   // element returns an element for the checkbox.
   Checkbox.prototype.element = function() {
     return this._element;
+  };
+
+  // getChecked returns the checked state of the checkbox.
+  Checkbox.prototype.getChecked = function() {
+    return this._state.checked;
+  };
+  
+  // getColor returns the current color of the checkbox.
+  Checkbox.prototype.getColor = function() {
+    return this._color.slice();
+  };
+  
+  // getVisible returns whether or not the checkbox is visible.
+  Checkbox.prototype.getVisible = function() {
+    return this._visible;
   };
 
   // setChecked will change the state of the checkbox.

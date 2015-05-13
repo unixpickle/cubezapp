@@ -70,16 +70,16 @@ Remember that none of these events indicate whether or not the model has been mo
 
 The settings tab also implements the following methods to get options which the user has selected:
 
- * **bld**() - get the BLD setting the user has chosen.
- * **flavorName**() - get the name of the flavor the user has chosen.
- * **iconName**() - get the name of the icon the user has chosen.
- * **inspection**() - get whether the user has set inspection mode.
- * **righty**() - get the right handed setting the user has chosen.
- * **scrambleType**() - get the name of the scramble type the user has chosen.
- * **scrambler**() - get the name of the scrambler the user has chosen.
- * **theaterMode**() - get the theater mode flag the user has chosen.
- * **timerInput**() - either 'Regular', 'Manual Entry', or 'Stackmat'.
- * **update**() - get the integer value for the timer accuracy.
+ * **getBLD**() - get the BLD setting the user has chosen.
+ * **getFlavorName**() - get the name of the flavor the user has chosen.
+ * **getIconName**() - get the name of the icon the user has chosen.
+ * **getInspection**() - get whether the user has set inspection mode.
+ * **getRighty**() - get the right handed setting the user has chosen.
+ * **getScrambleType**() - get the name of the scramble type the user has chosen.
+ * **getScrambler**() - get the name of the scrambler the user has chosen.
+ * **getTheaterMode**() - get the theater mode flag the user has chosen.
+ * **getTimerInput**() - either 'Regular', 'Manual Entry', or 'Stackmat'.
+ * **getUpdate**() - get the integer value for the timer accuracy.
 
 <a name="stats-object"></a>
 ## Stats

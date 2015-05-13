@@ -67,48 +67,48 @@
 
   Settings.prototype = Object.create(window.app.EventEmitter.prototype);
 
-  Settings.prototype.bld = function() {
-    return this._getField('bld').checkbox().checked();
+  Settings.prototype.getBLD = function() {
+    return this._getField('bld').checkbox().getChecked();
   };
 
-  Settings.prototype.flavorName = function() {
-    return this._getField('flavor').dropdown().value();
+  Settings.prototype.getFlavorName = function() {
+    return this._getField('flavor').dropdown().getValue();
   };
 
-  Settings.prototype.iconName = function() {
-    return this._getField('icon').dropdown().value();
+  Settings.prototype.getIconName = function() {
+    return this._getField('icon').dropdown().getValue();
   };
 
-  Settings.prototype.inspection = function() {
-    return this._getField('inspection').checkbox().checked();
+  Settings.prototype.getInspection = function() {
+    return this._getField('inspection').checkbox().getChecked();
+  };
+
+  Settings.prototype.getRighty = function() {
+    return this._getField('righty').checkbox().getChecked();
+  }
+
+  Settings.prototype.getScrambleType = function() {
+    return this._getField('scrambleType').dropdown().getValue();
+  };
+
+  Settings.prototype.getScrambler = function() {
+    return this._getField('scrambler').dropdown().getValue();
+  };
+
+  Settings.prototype.getTheaterMode = function() {
+    return this._getField('theaterMode').checkbox().getChecked();
+  };
+
+  Settings.prototype.getTimerInput = function() {
+    return this._getField('timerInput').dropdown().getValue();
+  };
+
+  Settings.prototype.getUpdate = function() {
+    return this._getField('update').dropdown().getSelected();
   };
 
   Settings.prototype.layout = function() {
     this._layoutFields(false);
-  };
-
-  Settings.prototype.righty = function() {
-    return this._getField('righty').checkbox().checked();
-  }
-
-  Settings.prototype.scrambleType = function() {
-    return this._getField('scrambleType').dropdown().value();
-  };
-
-  Settings.prototype.scrambler = function() {
-    return this._getField('scrambler').dropdown().value();
-  };
-
-  Settings.prototype.theaterMode = function() {
-    return this._getField('theaterMode').checkbox().checked();
-  };
-
-  Settings.prototype.timerInput = function() {
-    return this._getField('timerInput').dropdown().value();
-  };
-
-  Settings.prototype.update = function() {
-    return this._getField('update').dropdown().selected();
   };
 
   Settings.prototype._addField = function(name, field) {
@@ -252,14 +252,14 @@
   };
 
   Settings.prototype._updateFlavor = function() {
-    this._getField('flavor').dropdown().setSelectedValue(
+    this._getField('flavor').dropdown().setValue(
       window.app.flavors.idToName(window.app.store.getGlobalSettings().flavor)
     );
   };
 
   Settings.prototype._updateIcon = function() {
     var fileName = window.app.store.getActivePuzzle().icon;
-    this._getField('icon').dropdown().setSelectedValue(
+    this._getField('icon').dropdown().setValue(
       window.app.iconFilesToNames[fileName]
     );
     this._$puzzleIcon.css({
@@ -295,14 +295,14 @@
   };
 
   Settings.prototype._updateScrambleType = function() {
-    this._getField('scrambleType').dropdown().setSelectedValue(
+    this._getField('scrambleType').dropdown().setValue(
       window.app.store.getActivePuzzle().scrambleType
     );
   };
 
   Settings.prototype._updateScrambleTypes = function(animate) {
     var scrambleTypes = [];
-    var scrambler = this.scrambler();
+    var scrambler = this.getScrambler();
     if (scrambler !== 'None') {
       var scramblers = window.puzzlejs.scrambler.scramblersForPuzzle(scrambler);
       for (var i = 0, len = scramblers.length; i < len; ++i) {
@@ -338,7 +338,7 @@
   };
 
   Settings.prototype._updateScrambler = function() {
-    this._getField('scrambler').dropdown().setSelectedValue(
+    this._getField('scrambler').dropdown().setValue(
       window.app.store.getActivePuzzle().scrambler
     );
   };
@@ -362,10 +362,10 @@
     var field = this._getField('timerInput');
     if (mode === null) {
       field.enabled = false;
-      field.dropdown().setSelectedValue('Regular');
+      field.dropdown().setValue('Regular');
     } else {
       field.enabled = true;
-      field.dropdown().setSelectedValue(mode);
+      field.dropdown().setValue(mode);
     }
     field.updateEnabled(animate);
   };
@@ -581,7 +581,7 @@
 
     // Create the dropdown element.
     this._dropdown = new window.dropdownjs.Dropdown(RECTANGULAR_FIELD_WIDTH,
-      [0xf0/0xff, 0xf0/0xff, 0xf0/0xff], RECTANGULAR_FIELD_HEIGHT, FONT_SIZE);
+      '#f0f0f0', RECTANGULAR_FIELD_HEIGHT, FONT_SIZE);
 
     // Create the field element.
     this._$element = $('<div class="field dropdown-field"></div>');

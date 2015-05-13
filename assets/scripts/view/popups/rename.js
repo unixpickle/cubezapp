@@ -24,7 +24,7 @@
     this._dialog.close();
   };
 
-  RenamePopup.prototype.name = function() {
+  RenamePopup.prototype.getName = function() {
     return this._$input.val();
   };
 

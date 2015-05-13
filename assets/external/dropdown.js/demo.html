@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="dropdown.css">
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="dropdown.js"></script>
+    <script type="text/javascript">
+    $(function() {
+      var heights = [30, 29, 28, 27, 26, 25];
+      var fontSizes = [18, 17, 17, 17, 17, 17];
+      var gray = '#f0f0f0';
+      var dropdowns = [];
+      for (var i = 0; i < heights.length; ++i) {
+        (function(height, fontSize) {
+          var dd = new window.dropdownjs.Dropdown(180, gray, height, fontSize);
+          dd.setOptions(['Skewb', '3x3x3', "Rubik's Clock", 'Feliks',
+            '4x4x4', '5x5x5', '6x6x6', '7x7x7', '2x2x2',
+            'This is a long option', 'This option is even longer']);
+          $(document.body).append(dd.element());
+          $(document.body).append($('<span>&nbsp;</span>'));
+          dd.onChange = function() {
+            $('#selected').text(dd.getValue());
+            for (var j = 0; j < dropdowns.length; ++j) {
+              dropdowns[j].setSelected(dd.getSelected());
+            }
+          };
+          dropdowns.push(dd);
+        })(heights[i], fontSizes[i]);
+      }
+    });
+    </script>
+  </head>
+  <body style="text-align: center; margin: 0; padding: 0">
+    Current option: <label id="selected">Skewb</label>
+    <br /><br /><br /><br />
+  </body>
+</html>
