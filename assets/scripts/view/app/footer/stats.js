@@ -1,6 +1,6 @@
 (function() {
 
-  var MIN_GRAPH_WIDTH = 500;
+  var MIN_GRAPH_WIDTH = 300;
   var PANE_SPACING = 3;
 
   var PUZZLE_LABEL_SIZE = 0.12;
@@ -93,12 +93,13 @@
     var averagesWidth = this.averages.width();
     var timesWidth = this.times.width();
 
-    if (averagesWidth + timesWidth > totalWidth) {
+    if (averagesWidth + timesWidth + PANE_SPACING > totalWidth) {
       this.averages.setVisible(false);
       this.graph.setVisible(false);
+      this.times.layout(totalWidth);
     } else if (averagesWidth + timesWidth + MIN_GRAPH_WIDTH > totalWidth) {
       this.graph.setVisible(false);
-      this.averages.layout(totalWidth - timesWidth);
+      this.averages.layout(totalWidth - timesWidth - PANE_SPACING);
     } else {
       this.graph.setVisible(true);
       this.graph.layout(timesWidth + PANE_SPACING,
