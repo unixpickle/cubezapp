@@ -4,7 +4,10 @@
   var DEFAULT_WINDOW_SIZE = 100;
   var LIST_FONT_SIZE = 18;
   var LIST_FONT_FAMILY = 'Roboto, sans-serif';
+  var LIST_PADDING_LEFT = 10;
+  var LIST_PADDING_RIGHT = 5;
   var LIST_ROW_HEIGHT = 30;
+  var LIST_TEXT_COLOR = '#999999';
 
   function Times() {
     window.app.EventEmitter.call(this);
@@ -38,8 +41,24 @@
   };
 
   Times.prototype._generateRow = function(solve) {
-    // TODO: this.
-    return $('<div style="height: 30px">Time</div>');
+    var $row = $('<div class="row"><label class="time"></label>' +
+      '<label class="plus2"></label></div>');
+    $row.css({
+      textAlign: 'right',
+      fontFamily: LIST_FONT_FAMILY,
+      fontSize: LIST_FONT_SIZE,
+      height: LIST_ROW_HEIGHT,
+      color: LIST_TEXT_COLOR,
+      lineHeight: LIST_ROW_HEIGHT + 'px'
+    });
+    $row.find('.time').css({textAlign: 'right'});
+    $row.find('.plus2').css({
+      textAlign: 'left',
+      display: 'inline-block',
+      width: this._textMetrics.plus2Space() + LIST_PADDING_RIGHT
+    });
+    this._updateRow($row, solve);
+    return $row;
   };
 
   Times.prototype._handleInvalidate = function() {
@@ -54,7 +73,10 @@
     if (!this._idsToRows.hasOwnProperty(solve.id)) {
       throw new Error('row does not exist');
     }
-    this._updateRow(solve);
+    this._updateRow(this._idsToRows[solve.id], solve);
+    if (this._updateWidth) {
+      this.emit('needsLayout');
+    }
   };
 
   Times.prototype._handleUpdate = function() {
@@ -102,16 +124,19 @@
     });
   };
 
-  Times.prototype._updateRow = function(solve) {
-    var $row = this._idsToRows[solve.id];
-    // TODO: this.
+  Times.prototype._updateRow = function($row, solve) {
+    $row.find('.time').text(window.app.formatTime(window.app.solveTime(solve)));
+    $row.find('.plus2').text(solve.plus2 ? '+' : '');
   };
 
   Times.prototype._updateVisibleRange = function() {
-    var scrollBottom = this._$element.scrollTop() + this._$element.height();
-    var visibleStart = Math.floor(this._$element.scrollTop() / LIST_ROW_HEIGHT);
-    var visibleEnd = Math.ceil(scrollBottom / LIST_ROW_HEIGHT);
-    this._dataWindow.setVisibleRange(visibleStart, visibleEnd);
+    var scrollTop = this._$element.scrollTop();
+    var scrollBottom = scrollTop + this._$element.height();
+    var count = window.app.store.getSolveCount();
+
+    var lastVisible = Math.ceil(count - scrollTop/LIST_ROW_HEIGHT - 1);
+    var firstVisible = Math.floor(count - scrollBottom/LIST_ROW_HEIGHT);
+    this._dataWindow.setVisibleRange(firstVisible, lastVisible);
   };
 
   Times.prototype._updateWidth = function() {
@@ -127,11 +152,12 @@
     for (var i = 0, len = solves.length; i < len; ++i) {
       var solve = solves[i];
       var solveWidth = this._textMetrics.plus2Space() +
-        this._textMetrics.widthOfTime(window.app.solveTime(solve));
+        this._textMetrics.widthOfTime(window.app.solveTime(solve)) +
+        LIST_PADDING_LEFT + LIST_PADDING_RIGHT;
       this._width = Math.max(this._width, solveWidth);
     }
     this._width += scrollbarWidth();
-    
+
     return oldWidth !== this._width;
   };
 
@@ -148,6 +174,8 @@
 
     this._firstVisible = 0;
     this._lastVisible = 0;
+    
+    this._registerModelEvents();
   }
 
   DataWindow.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -173,8 +201,6 @@
 
   DataWindow.prototype._invalidate = function() {
     this._invalid = true;
-    this._firstVisible = 0;
-    this._lastVisible = 0;
 
     if (this._ticket !== null) {
       this._ticket.cancel();
@@ -273,26 +299,34 @@
 
     // Fit the window around the visible region as evenly as possible.
     var midpoint = (this._firstVisible + this._lastVisible) / 2;
-    var start = Math.floor(midpoint - this._windowSize/2);
-    var end = Math.floor(midpoint + this._windowSize/2 + 1);
-    if (end > count) {
-      var overflow = end - count;
-      end -= overflow;
-      start -= overflow;
-    }
-    if (start < 0) {
-      var overflow = -start;
-      start += overflow;
-      end += overflow;
-    }
-    if (end > count) {
-      end = count;
+    var start = Math.round(midpoint - this._windowSize/2);
+    var end = Math.round(midpoint + this._windowSize/2);
+
+    // TODO: figure out if these rounding errors can actually occur.
+    if (end - start < this._windowSize) {
+      ++end;
+    } else if (end - start > this._windowSize) {
+      --end;
     }
 
-    var windowCount = Math.min(end - start, this._windowSize);
+    // TODO: rewrite this to be O(1) instead of O(this._windowSize).
+    while (end > count) {
+      --end;
+      if (start > 0) {
+        --start;
+      }
+    }
+    while (start < 0) {
+      ++start;
+      if (end < count) {
+        ++end;
+      }
+    }
+
+    var windowCount = end - start;
     if (forceUpdate || windowCount !== this._solves.length ||
         start !== this._start) {
-      window.app.store.getSolves(start, windowCount,
+      this._ticket = window.app.store.getSolves(start, windowCount,
         this._updateCallback.bind(this, start));
     }
   };
@@ -353,7 +387,7 @@
     $label.remove();
     this._plus2Space = this._widths['0.00+'] - this._widths['0.00'];
   };
-  
+
   function scrollbarWidth() {
     // Generate a small scrolling element.
     var element = $('<div></div>').css({

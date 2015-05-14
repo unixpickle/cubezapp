@@ -108,6 +108,7 @@
 
   Stats.prototype._registerUIEvents = function() {
     this.averages.on('needsLayout', this.layout.bind(this));
+    this.times.on('needsLayout', this.layout.bind(this));
   };
 
   Stats.prototype._updatePuzzleInformation = function() {
