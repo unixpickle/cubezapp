@@ -48,7 +48,7 @@
 
   ScrambleStream.prototype._emitScramble = function(scramble) {
     this._lastEmittedScramble = scramble;
-    if (!window.app.store.getGlobalSettings().righty &&  
+    if (!window.app.store.getGlobalSettings().righty &&
         this._currentScrambler.differentForLefty()) {
       this.emit('scramble', this._currentScrambler.makeLefty(scramble));
     } else {
@@ -76,17 +76,14 @@
     }
   };
 
+  ScrambleStream.prototype._queueHasEnough = function() {
+    return this._queue.count(this._currentScrambler) >= QUEUE_SIZE;
+  };
+
   ScrambleStream.prototype._registerModelEvents = function() {
     window.app.observe.activePuzzle(['id', 'scrambler', 'scrambleType'],
       this._modelChanged.bind(this));
     window.app.observe.globalSettings('righty', this._rightyChanged.bind(this));
-  };
-
-  ScrambleStream.prototype._rightyChanged = function() {
-    if (!this._paused && !this._needScramble &&
-        this._currentScrambler.differentForLefty) {
-      this._emitScramble(this._lastEmittedScramble);
-    }
   };
 
   ScrambleStream.prototype._replenishQueue = function() {
@@ -119,8 +116,11 @@
     }.bind(this));
   };
 
-  ScrambleStream.prototype._queueHasEnough = function() {
-    return this._queue.count(this._currentScrambler) >= QUEUE_SIZE;
+  ScrambleStream.prototype._rightyChanged = function() {
+    if (!this._paused && !this._needScramble &&
+        this._currentScrambler.differentForLefty) {
+      this._emitScramble(this._lastEmittedScramble);
+    }
   };
 
   // A ScrambleQueue can queue up scrambles for each scramble type.

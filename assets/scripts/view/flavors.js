@@ -210,16 +210,6 @@
     }
   };
 
-  Flavors.prototype._transitionToFlavor = function(name) {
-    if (name === ALTERNATION_FLAVOR) {
-      this._startAlternating();
-      return;
-    }
-
-    this._stopAlternating();
-    this._transitionToColorFlavor(name);
-  };
-
   Flavors.prototype._transitionToColorFlavor = function(name) {
     if (this._transition) {
       this._transition.cancel();
@@ -236,6 +226,16 @@
     }.bind(this);
 
     this._updateCheckboxColors();
+  };
+
+  Flavors.prototype._transitionToFlavor = function(name) {
+    if (name === ALTERNATION_FLAVOR) {
+      this._startAlternating();
+      return;
+    }
+
+    this._stopAlternating();
+    this._transitionToColorFlavor(name);
   };
 
   Flavors.prototype._updateCSS = function() {

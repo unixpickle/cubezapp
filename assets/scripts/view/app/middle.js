@@ -18,6 +18,34 @@
     this._time.blink();
   };
 
+  // computeConstraints uses the given arguments and some internal layout
+  // information to figure out both a "bare" and a "soft" minimum size.
+  // The "soft" minimum size represents the size which the middle can be while
+  // still showing everything.
+  // The "bare" minimum size represents the size which the middle can be while
+  // still allowing the footer to be visible.
+  // This returns an object with "soft" and "bare" properties.
+  Middle.prototype.computeConstraints = function(pb, scramble, memo) {
+    // Compute the minimum size wherein the footer can be visible.
+    var bareMinimum = MIN_TIME_SIZE;
+    if (memo) {
+      bareMinimum *= 1 + MEMO_SIZE_RATIO;
+    }
+    if (pb) {
+      bareMinimum += PB_SIZE_RATIO * MIN_TIME_SIZE;
+    }
+    bareMinimum += SCRAMBLE_PADDING*2;
+
+    // Compute the minimum size wherein everything can be visible.
+    var softMinimum = bareMinimum;
+    if (scramble) {
+      var scrambleHeight = this.scrambleHeight();
+      softMinimum += scrambleHeight + SCRAMBLE_PADDING;
+    }
+
+    return {bare: bareMinimum, soft: softMinimum};
+  };
+  
   // computeTimeLayout uses a size and a state to figure out the layout of the
   // view. It returns an object with a "timeY" and "timeSize" attribute. 
   Middle.prototype.computeTimeLayout = function(width, height, pb, scramble,
@@ -84,34 +112,6 @@
     }
 
     return {timeY: timeY, timeSize: timeSize};
-  };
-
-  // computeConstraints uses the given arguments and some internal layout
-  // information to figure out both a "bare" and a "soft" minimum size.
-  // The "soft" minimum size represents the size which the middle can be while
-  // still showing everything.
-  // The "bare" minimum size represents the size which the middle can be while
-  // still allowing the footer to be visible.
-  // This returns an object with "soft" and "bare" properties.
-  Middle.prototype.computeConstraints = function(pb, scramble, memo) {
-    // Compute the minimum size wherein the footer can be visible.
-    var bareMinimum = MIN_TIME_SIZE;
-    if (memo) {
-      bareMinimum *= 1 + MEMO_SIZE_RATIO;
-    }
-    if (pb) {
-      bareMinimum += PB_SIZE_RATIO * MIN_TIME_SIZE;
-    }
-    bareMinimum += SCRAMBLE_PADDING*2;
-
-    // Compute the minimum size wherein everything can be visible.
-    var softMinimum = bareMinimum;
-    if (scramble) {
-      var scrambleHeight = this.scrambleHeight();
-      softMinimum += scrambleHeight + SCRAMBLE_PADDING;
-    }
-
-    return {bare: bareMinimum, soft: softMinimum};
   };
 
   // layout updates attributes of various elements in the middle to reflect a

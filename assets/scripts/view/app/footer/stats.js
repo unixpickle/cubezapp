@@ -44,13 +44,6 @@
     this._updatePuzzleInformation();
   };
 
-  Stats.prototype._updatePuzzleInformation = function() {
-    var puzzle = window.app.store.getActivePuzzle();
-    this._$name.text(puzzle.name);
-    var iconPath = 'images/gray_puzzles/' + puzzle.icon + '.png';
-    this._$icon.css({backgroundImage: 'url(' + iconPath + ')'});
-  };
-
   Stats.prototype._layoutEmpty = function() {
     var viewHeight = this._$empty.height();
     var padding = Math.floor(viewHeight * (1 - PUZZLE_LABEL_SIZE -
@@ -115,6 +108,13 @@
 
   Stats.prototype._registerUIEvents = function() {
     this.averages.on('needsLayout', this.layout.bind(this));
+  };
+
+  Stats.prototype._updatePuzzleInformation = function() {
+    var puzzle = window.app.store.getActivePuzzle();
+    this._$name.text(puzzle.name);
+    var iconPath = 'images/gray_puzzles/' + puzzle.icon + '.png';
+    this._$icon.css({backgroundImage: 'url(' + iconPath + ')'});
   };
 
   window.app.Stats = Stats;

@@ -9,17 +9,17 @@
     $(document).keyup(this._keyup.bind(this));
   }
 
-  Keyboard.prototype.remove = function(element) {
-    var idx = this._handlers.indexOf(element);
-    this._handlers.splice(idx, 1);
-  };
-
   Keyboard.prototype.pop = function() {
     this._handlers.pop();
   };
 
   Keyboard.prototype.push = function(handler) {
     this._handlers.push(handler);
+  };
+  
+  Keyboard.prototype.remove = function(element) {
+    var idx = this._handlers.indexOf(element);
+    this._handlers.splice(idx, 1);
   };
 
   Keyboard.prototype._keydown = function(e) {

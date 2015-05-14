@@ -66,15 +66,6 @@
     return window.app.fonts.loading() || this._numLoadingAnimations > 0;
   };
 
-  // setTheaterMode enables or disables "theater" mode, in which everything is
-  // hidden but the time.
-  AppView.prototype.setTheaterMode = function(on) {
-    this._theaterMode = on;
-    var oldState = new State(this._state);
-    this._updateState();
-    this._animateStateChange(oldState);
-  };
-
   // setMemo updates the memo time. If the memo time is null, the memo time will
   // be hidden.
   AppView.prototype.setMemo = function(memo) {
@@ -125,6 +116,15 @@
     this._state.scrambleAvailable = hasScramble;
     this._updateState();
 
+    this._animateStateChange(oldState);
+  };
+
+  // setTheaterMode enables or disables "theater" mode, in which everything is
+  // hidden but the time.
+  AppView.prototype.setTheaterMode = function(on) {
+    this._theaterMode = on;
+    var oldState = new State(this._state);
+    this._updateState();
     this._animateStateChange(oldState);
   };
 
