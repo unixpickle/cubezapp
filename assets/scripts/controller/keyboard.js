@@ -16,7 +16,7 @@
   Keyboard.prototype.push = function(handler) {
     this._handlers.push(handler);
   };
-  
+
   Keyboard.prototype.remove = function(element) {
     var idx = this._handlers.indexOf(element);
     this._handlers.splice(idx, 1);

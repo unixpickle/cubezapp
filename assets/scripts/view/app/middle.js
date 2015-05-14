@@ -45,7 +45,7 @@
 
     return {bare: bareMinimum, soft: softMinimum};
   };
-  
+
   // computeTimeLayout uses a size and a state to figure out the layout of the
   // view. It returns an object with a "timeY" and "timeSize" attribute. 
   Middle.prototype.computeTimeLayout = function(width, height, pb, scramble,

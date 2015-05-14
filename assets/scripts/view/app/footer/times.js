@@ -20,15 +20,15 @@
   Times.prototype.width = function() {
     return this._$element.width();
   };
-  
+
   Times.prototype._handleInvalidate = function() {
     // TODO: this.
   };
-  
+
   Times.prototype._handleModification = function() {
     // TODO: this.
   };
-  
+
   Times.prototype._handleUpdate = function() {
     // TODO: this.
   };
