@@ -1,5 +1,6 @@
 (function() {
 
+  var DEFAULT_WINDOW_SIZE = 100;
   var LIST_FONT_SIZE = 18;
   var LIST_FONT_FAMILY = 'Roboto';
 
@@ -7,9 +8,8 @@
     this._$element = $('#times');
     this._idToRow = {};
     this._textMetrics = new TextMetrics();
-
-    this._registerModelEvents();
-    this._dataInvalidated();
+    this._dataWindow = new DataWindow(DEFAULT_WINDOW_SIZE);
+    this._registerDataWindowEvents();
   }
 
   Times.prototype.layout = function(width) {
@@ -21,20 +21,8 @@
     return this._$element.width();
   };
 
-  Times.prototype._addRowForSolve = function(solve) {
-    // TODO: add a row here.
-  };
-
-  Times.prototype._dataInvalidated = function() {
-    // TODO: reload everything here.
-  };
-
-  Times.prototype._deleteRowForSolve = function(id) {
-    // TODO: delete a row here.
-  };
-
-  Times.prototype._registerModelEvents = function() {
-
+  Times.prototype._registerDataWindowEvents = function() {
+    // TODO: this
   };
 
   Times.prototype._updateRowForSolve = function(id, attrs) {
@@ -50,6 +38,7 @@
     this._solves = [];
     this._idsToSolves = {};
     this._ticket = null;
+    this._invalid = true;
 
     this._firstVisible = 0;
     this._lastVisible = 0;
@@ -73,57 +62,41 @@
   DataWindow.prototype.visibleWindowChanged = function(first, last) {
     this._firstVisible = first;
     this._lastVisible = last;
-    this._updateBasedOnVisible();
+    this._update(false);
   };
 
-  DataWindow.prototype._addedSolve = function(solve) {
-    if (this.offsetFromEnd() === 1) {
-      var solveCopy = window.app.copySolve(solve);
-      this._solves.push(solveCopy);
-      this.emit('added', solveCopy);
-      if (this._solves.length > this._windowSize) {
-        var shifted = this._solves.shift();
-        ++this._start;
-        this.emit('shifted', shifted);
-      }
-    } else {
-      this.emit('addedButIgnored');
-    }
-  };
+  DataWindow.prototype._invalidate = function() {
+    this._invalid = true;
 
-  DataWindow.prototype._dataInvalidated = function() {
     if (this._ticket !== null) {
       this._ticket.cancel();
+      this._ticket = null;
     }
 
     var count = window.app.store.getSolveCount();
     if (count === 0) {
-      this._ticket = null;
       this._solves = [];
       this._start = 0;
       this._idsToSolves = {};
-      this.emit('invalidated');
+      this._invalid = false;
+      this.emit('invalidate');
       return;
     }
 
     var start = Math.max(count - this._windowSize, 0);
     this._ticket = window.app.store.getSolves(start, count,
-      this._solvesCallback.bind(this, start));
+      this._invalidateCallback.bind(this, start));
   };
 
-  DataWindow.prototype._deletedSolve = function(id) {
-    if (!this._idsToSolves.hasOwnProperty(id)) {
+  DataWindow.prototype._invalidateCallback = function(start, err, solves) {
+    this._ticket = null;
+    if (err !== null) {
+      this.emit('error', err);
       return;
     }
-    delete this._idsToSolves[id];
-    for (var i = 0; i < this._solves.length; ++i) {
-      if (this._solves[i].id === id) {
-        this._solves.splice(i, 1);
-        break;
-      }
-    }
-    this.emit('deleted', id);
-    this._updateBasedOnVisible();
+    this._invalid = false;
+    this._populate(start, solves);
+    this._emit('invalidate');
   };
 
   DataWindow.prototype._modifiedSolve = function(id, attrs) {
@@ -139,24 +112,7 @@
     this.emit('modified', id);
   };
 
-  DataWindow.prototype._registerModelEvents = function() {
-    var invalidateHandler = this._dataInvalidated.bind(this);
-    var invalidateEvents = ['addedPuzzle', 'remoteChange', 'switchedPuzzle'];
-    for (var i = 0; i < invalidateEvents.length; ++i) {
-      window.app.store.on(invalidateEvents[i], invalidateHandler);
-    }
-    window.app.store.on('deletedSolve', this._deletedSolve.bind(this));
-    window.app.store.on('modifiedSolve', this._modifiedSolve.bind(this));
-    window.app.store.on('addedSolve', this._addedSolve.bind(this));
-  };
-
-  DataWindow.prototype._solvesCallback = function(start, err, solves) {
-    this._ticket = null;
-    if (err !== null) {
-      this.emit('error', err);
-      return;
-    }
-
+  DataWindow.prototype._populate = function(start, solves) {
     this._solves = [];
     this._idsToSolves = {};
     this._start = start;
@@ -165,13 +121,44 @@
       this._solves[i] = solve;
       this._idsToSolves[solve.id] = solve;
     }
-
-    this._emit('invalidated');
   };
 
-  DataWindow.prototype._updateBasedOnVisible = function() {
+  DataWindow.prototype._registerModelEvents = function() {
+    var invalidateEvents = ['addedPuzzle', 'remoteChange', 'switchedPuzzle'];
+    for (var i = 0; i < invalidateEvents.length; ++i) {
+      window.app.store.on(invalidateEvents[i], this._invalidate.bind(this));
+    }
+
+    window.app.store.on('addedSolve', this._update.bind(this, false));
+    window.app.store.on('modifiedSolve', this._modifiedSolve.bind(this));
+
+    // When a solve is deleted, we must force an update because the indices have
+    // probably shifted and the count was changed. Thus, most likely, the window
+    // has been shifted.
+    window.app.store.on('deletedSolve', this._update.bind(this, true));
+  };
+
+  DataWindow.prototype._update = function(forceUpdate) {
+    if (this._invalid) {
+      if (this._ticket === null) {
+        this._invalidate();
+      }
+      return;
+    }
+
+    if (this._ticket) {
+      this._ticket.cancel();
+      this._ticket = null;
+    }
+
     var count = window.app.store.getSolveCount();
     if (count === 0) {
+      if (forceUpdate) {
+        this._solves = [];
+        this._start = 0;
+        this._idsToSolves = {};
+        this.emit('update');
+      }
       return;
     }
 
@@ -194,29 +181,21 @@
     }
 
     var windowCount = Math.min(end - start, this._windowSize);
-    if (start !== this._start || windowCount === this._solves.length) {
+    if (forceUpdate || windowCount !== this._solves.length ||
+        start !== this._start) {
       window.app.store.getSolves(start, windowCount,
-        this._updateSolvesCallback.bind(this, start));
+        this._updateCallback.bind(this, start));
     }
   };
 
-  DataWindow.prototype._updateSolvesCallback = function(start, err, solves) {
+  DataWindow.prototype._updateCallback = function(start, err, solves) {
     this._ticket = null;
     if (err !== null) {
       this.emit('error', err);
       return;
     }
-
-    this._solves = [];
-    this._idsToSolves = {};
-    this._start = start;
-    for (var i = 0, len = solves.length; ++i) {
-      var solve = window.app.copySolve(solves[i]);
-      this._solves[i] = solve;
-      this._idsToSolves[solve.id] = solve;
-    }
-
-    this.emit('moved');
+    this._populate(start, solves);
+    this.emit('update');
   };
 
   function TextMetrics() {
