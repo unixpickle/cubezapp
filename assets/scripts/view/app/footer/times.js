@@ -20,13 +20,23 @@
   Times.prototype.width = function() {
     return this._$element.width();
   };
-
-  Times.prototype._registerDataWindowEvents = function() {
-    // TODO: this
+  
+  Times.prototype._handleInvalidate = function() {
+    // TODO: this.
+  };
+  
+  Times.prototype._handleModification = function() {
+    // TODO: this.
+  };
+  
+  Times.prototype._handleUpdate = function() {
+    // TODO: this.
   };
 
-  Times.prototype._updateRowForSolve = function(id, attrs) {
-    // TODO: update a row here.
+  Times.prototype._registerDataWindowEvents = function() {
+    this._dataWindow.on('invalidate', this._handleInvalidate.bind(this));
+    this._dataWindow.on('modification', this._handleModification.bind(this));
+    this._dataWindow.on('update', this._handleUpdate.bind(this));
   };
 
   // A DataWindow loads solves dynamically to show in the list. It keeps track
@@ -51,12 +61,12 @@
     return window.app.store.getSolveCount() - indexAfterLastSolve;
   };
 
-  DataWindow.prototype.startIndex = function() {
-    return this._start;
-  };
-
   DataWindow.prototype.solves = function() {
     return this.solves;
+  };
+
+  DataWindow.prototype.startIndex = function() {
+    return this._start;
   };
 
   DataWindow.prototype.visibleWindowChanged = function(first, last) {
@@ -109,7 +119,7 @@
       var key = keys[i];
       solve[key] = attrs[key];
     }
-    this.emit('modified', id);
+    this.emit('modification', id);
   };
 
   DataWindow.prototype._populate = function(start, solves) {
