@@ -1,6 +1,14 @@
 (function() {
 
-  var MINIMUM_SOLVE_COUNT_FOR_PB = 5;
+  function copySolve(solve) {
+    var res = {};
+    var keys = Object.keys(solve);
+    for (var i = 0; i < keys.length; ++i) {
+      var key = keys[i];
+      res[key] = solve[key];
+    }
+    return res;
+  }
 
   function solveIsPB(solve) {
     if (solve.lastPB === -1) {
@@ -8,11 +16,6 @@
     } else {
       return Math.floor(solveTime(solve) / 10) < Math.floor(solve.lastPB / 10);
     }
-  }
-
-  function solveShouldShowAsPB(solve) {
-    return window.app.store.getSolveCount() >= MINIMUM_SOLVE_COUNT_FOR_PB && 
-      solveIsPB(solve);
   }
 
   function solveTime(solve) {
@@ -23,8 +26,8 @@
     }
   }
 
+  window.app.copySolve = copySolve;
   window.app.solveIsPB = solveIsPB;
-  window.app.solveShouldShowAsPB = solveShouldShowAsPB;
   window.app.solveTime = solveTime;
 
 })();

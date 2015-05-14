@@ -82,8 +82,10 @@ The **Solve** object stores all the information for a single recorded time. Here
 
 The store also provides some helper functions for solves:
 
+ * window.app.copySolve(solve) - get a copy of a solve object.
  * window.app.solveIsPB(solve) - get a boolean indicating whether a solve is a PB. This does not look at milliseconds; it complies with the WCA regulations.
  * window.app.solveTime(solve) - get the time of a solve, counting penalties.
+ 
 
 <a name="stats-object"></a>
 ## Stats
