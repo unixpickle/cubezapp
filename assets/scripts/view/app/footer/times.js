@@ -5,9 +5,11 @@
   var LIST_FONT_SIZE = 18;
   var LIST_FONT_FAMILY = 'Roboto, sans-serif';
   var LIST_PADDING_LEFT = 10;
-  var LIST_PADDING_RIGHT = 5;
+  var LIST_PADDING_RIGHT = 10;
   var LIST_ROW_HEIGHT = 30;
   var LIST_TEXT_COLOR = '#999999';
+  var HOVER_BACKGROUND = '#f0f0f0';
+  var HOVER_BACKGROUND_RGB = '240, 240, 240';
 
   function Times() {
     window.app.EventEmitter.call(this);
@@ -20,6 +22,8 @@
     this._$bottomMargin = $('<div></div>').css({height: 0});
     this._$middleContent = $('<div></div>').css({width: '100%'});
     this._$element.append(this._$topMargin).append(this._$bottomMargin);
+
+    this._moreButton = new MoreButton();
 
     this._rows = [];
     this._idsToRows = {};
@@ -49,15 +53,23 @@
       fontSize: LIST_FONT_SIZE,
       height: LIST_ROW_HEIGHT,
       color: LIST_TEXT_COLOR,
-      lineHeight: LIST_ROW_HEIGHT + 'px'
+      lineHeight: LIST_ROW_HEIGHT + 'px',
+      position: 'relative',
+      cursor: 'pointer'
     });
-    $row.find('.time').css({textAlign: 'right'});
+    $row.find('.time').css({textAlign: 'right', pointerEvents: 'none'});
     $row.find('.plus2').css({
       textAlign: 'left',
       display: 'inline-block',
-      width: this._textMetrics.plus2Space() + LIST_PADDING_RIGHT
+      width: this._textMetrics.plus2Space() + LIST_PADDING_RIGHT,
+      pointerEvents: 'none'
     });
     this._updateRow($row, solve);
+
+    $row.mouseenter(this._mouseEnterRow.bind(this, $row, solve));
+    $row.mouseleave(this._mouseLeaveRow.bind(this, $row, solve));
+    $row.click(this._rowClicked.bind(this, $row, solve));
+
     return $row;
   };
 
@@ -81,7 +93,9 @@
 
   Times.prototype._handleUpdate = function() {
     this._$middleContent.detach();
-    this._$middleContent.empty();
+    this._$middleContent.children().each(function(i, element) {
+      $(element).detach();
+    });
 
     var oldIdsToRows = this._idsToRows;
     this._idsToRows = {};
@@ -105,6 +119,17 @@
     }
   };
 
+  Times.prototype._mouseEnterRow = function($row, solve) {
+    this._moreButton.element().detach();
+    $row.append(this._moreButton.element());
+    $row.css({backgroundColor: HOVER_BACKGROUND});
+  };
+
+  Times.prototype._mouseLeaveRow = function($row, solve) {
+    this._moreButton.element().detach();
+    $row.css({backgroundColor: ''});
+  };
+
   Times.prototype._registerDataWindowEvents = function() {
     this._dataWindow.on('invalidate', this._handleInvalidate.bind(this));
     this._dataWindow.on('modification', this._handleModification.bind(this));
@@ -113,6 +138,10 @@
 
   Times.prototype._registerUIEvents = function() {
     this._$element.scroll(this._updateVisibleRange.bind(this));
+  };
+
+  Times.prototype._rowClicked = function($row, solve) {
+    // TODO: this.
   };
 
   Times.prototype._updateMargins = function() {
@@ -174,7 +203,7 @@
 
     this._firstVisible = 0;
     this._lastVisible = 0;
-    
+
     this._registerModelEvents();
   }
 
@@ -386,6 +415,62 @@
     }
     $label.remove();
     this._plus2Space = this._widths['0.00+'] - this._widths['0.00'];
+  };
+
+  function MoreButton() {
+    this._$canvas = $('<canvas></canvas>').css({
+      width: MoreButton.GRADIENT_WIDTH + MoreButton.MARGIN_LEFT +
+        MoreButton.MARGIN_RIGHT + MoreButton.DOT_SIZE,
+      height: LIST_ROW_HEIGHT,
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      pointerEvents: 'none'
+    });
+    this._drawCanvas();
+    window.crystal.addListener(this._drawCanvas.bind(this));
+  }
+
+  MoreButton.GRADIENT_WIDTH = 12;
+  MoreButton.MARGIN_LEFT = 0;
+  MoreButton.MARGIN_RIGHT = 8;
+  MoreButton.DOT_SIZE = 4;
+  MoreButton.MARGIN_TOP_BOTTOM = 7;
+
+  MoreButton.prototype.element = function() {
+    return this._$canvas;
+  };
+
+  MoreButton.prototype._drawCanvas = function() {
+    var scale = Math.ceil(window.crystal.getRatio());
+    var width = (MoreButton.GRADIENT_WIDTH + MoreButton.DOT_SIZE +
+      MoreButton.MARGIN_LEFT + MoreButton.MARGIN_RIGHT) * scale;
+    var height = LIST_ROW_HEIGHT * scale;
+    this._$canvas[0].width = width;
+    this._$canvas[0].height = height;
+
+    var context = this._$canvas[0].getContext('2d');
+
+    var gradient = context.createLinearGradient(0, 0,
+      MoreButton.GRADIENT_WIDTH * scale, 0);
+    gradient.addColorStop(0, 'rgba(' + HOVER_BACKGROUND_RGB + ', 0)');
+    gradient.addColorStop(1, 'rgba(' + HOVER_BACKGROUND_RGB + ', 1)');
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, width, height);
+
+    context.fillStyle = '#999999';
+    var dotsTop = MoreButton.MARGIN_TOP_BOTTOM * scale;
+    var dotsSpacing = scale * (LIST_ROW_HEIGHT - (MoreButton.DOT_SIZE * 3) -
+      MoreButton.MARGIN_TOP_BOTTOM*2) / 2;
+    var dotHeight = MoreButton.DOT_SIZE * scale;
+    var dotX = (MoreButton.GRADIENT_WIDTH + MoreButton.MARGIN_LEFT) * scale;
+    for (var i = 0; i < 3; ++i) {
+      var y = dotsTop + (dotsSpacing+dotHeight)*i;
+      context.beginPath();
+      context.arc(dotX+dotHeight/2, y+dotHeight/2, dotHeight/2, 0, Math.PI*2);
+      context.fill();
+      //context.fillRect(dotX, y, dotHeight, dotHeight);
+    }
   };
 
   function scrollbarWidth() {
