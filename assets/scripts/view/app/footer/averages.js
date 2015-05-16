@@ -325,7 +325,6 @@
   };
 
   Blurb.prototype._drawBlurbInCanvas = function() {
-    // Bogus code to draw a color in the bg.
     var context = this._$canvas[0].getContext('2d');
 
     var canvasWidth = this._$canvas[0].width;
