@@ -4,8 +4,9 @@
   var DEFAULT_WINDOW_SIZE = 100;
   var LIST_FONT_SIZE = 18;
   var LIST_FONT_FAMILY = 'Roboto, sans-serif';
+  var LIST_FONT_WEIGHT = 'lighter';
   var LIST_PADDING_LEFT = 10;
-  var LIST_PADDING_RIGHT = 5;
+  var LIST_PADDING_RIGHT = 10;
   var LIST_ROW_HEIGHT = 30;
   var LIST_TEXT_COLOR = '#999999';
   var HOVER_BACKGROUND = '#f0f0f0';
@@ -43,17 +44,23 @@
   };
 
   Times.prototype._generateRow = function(solve) {
-    var $row = $('<div class="row"><label class="time"></label>' +
-      '<label class="plus2"></label></div>');
+    var $row = $('<div class="row"><div class="row-content">' +
+      '<label class="time"></label><label class="plus2"></label>' +
+      '</div></div>');
     $row.css({
-      textAlign: 'right',
+      textAlign: 'center',
       fontFamily: LIST_FONT_FAMILY,
       fontSize: LIST_FONT_SIZE,
+      fontWeight: LIST_FONT_WEIGHT,
       height: LIST_ROW_HEIGHT,
       color: LIST_TEXT_COLOR,
       lineHeight: LIST_ROW_HEIGHT + 'px',
-      position: 'relative',
       cursor: 'pointer'
+    });
+    $row.find('.row-content').css({
+      display: 'inline-block',
+      textAlign: 'right',
+      width: this._width
     });
     $row.find('.time').css({textAlign: 'right', pointerEvents: 'none'});
     $row.find('.plus2').css({
@@ -182,7 +189,11 @@
     }
     this._width += scrollbarWidth();
 
-    return oldWidth !== this._width;
+    var changed = (oldWidth !== this._width);
+    if (changed) {
+      this._$middleContent.find('.row-content').css({width: this._width});
+    }
+    return changed;
   };
 
   // A DataWindow loads solves dynamically to show in the list. It keeps track
@@ -398,6 +409,7 @@
     var $label = $('<label></label>').css({
       fontSize: LIST_FONT_SIZE,
       fontFamily: LIST_FONT_FAMILY,
+      fontWeight: LIST_FONT_WEIGHT,
       position: 'absolute',
       visibility: 'hidden'
     });
