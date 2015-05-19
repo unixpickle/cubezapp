@@ -9,6 +9,8 @@
   function initializeController() {
     window.app.settingsController =
       new window.app.SettingsController(window.app.view.footer.settings);
+    window.app.timesController =
+      new window.app.TimesController(window.app.view.footer.stats.times);
     window.app.headerController =
       new window.app.HeaderController(window.app.view.header);
     window.app.view.on('load', function() {

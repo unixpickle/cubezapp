@@ -158,6 +158,20 @@
       new window.contextjs.TextRow("Add Comment"),
       new window.contextjs.ExpandableRow("Move To")
     ]);
+    mainPage.onClick = function(itemIndex) {
+      switch (itemIndex) {
+      case 0:
+        this.emit('delete', solve);
+      case 2:
+        this.emit('viewScramble', solve);
+      case 3:
+        this.emit('addComment', solve);
+      default:
+        this._currentContextMenu.hide();
+        this._currentContextMenu = null;
+        break;
+      }
+    }.bind(this);
     var context = new window.contextjs.Context($row, $('#footer'));
     this._currentContextMenu = new window.contextjs.Menu(context, mainPage);
     this._currentContextMenu.show();
