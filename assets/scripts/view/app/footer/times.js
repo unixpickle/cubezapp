@@ -12,7 +12,7 @@
   var HOVER_BACKGROUND = '#f0f0f0';
   var HOVER_BACKGROUND_RGB = '240, 240, 240';
 
-  function Times() {
+  function Times(footer) {
     window.app.EventEmitter.call(this);
 
     this._$element = $('#times');
@@ -27,9 +27,10 @@
     this._rows = [];
     this._idsToRows = {};
     this._width = DEFAULT_WIDTH;
+    this._currentContextMenu = null;
 
     this._registerDataWindowEvents();
-    this._registerUIEvents();
+    this._registerUIEvents(footer);
   }
 
   Times.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -138,12 +139,44 @@
     this._dataWindow.on('update', this._handleUpdate.bind(this));
   };
 
-  Times.prototype._registerUIEvents = function() {
+  Times.prototype._registerUIEvents = function(footer) {
     this._$element.scroll(this._updateVisibleRange.bind(this));
+    footer.on('hidden', function() {
+      if (this._currentContextMenu !== null) {
+        this._currentContextMenu.hide();
+        this._currentContextMenu = null;
+      }
+    }.bind(this));
   };
 
   Times.prototype._rowClicked = function($row, solve) {
-    // TODO: this.
+    this._scrollToRow($row);
+    var mainPage = new window.contextjs.Page([
+      new window.contextjs.TextRow("Delete Time"),
+      new window.contextjs.ExpandableRow("Add Pentalty"),
+      new window.contextjs.TextRow("View Scramble"),
+      new window.contextjs.TextRow("Add Comment"),
+      new window.contextjs.ExpandableRow("Move To")
+    ]);
+    var context = new window.contextjs.Context($row, $('#footer'));
+    this._currentContextMenu = new window.contextjs.Menu(context, mainPage);
+    this._currentContextMenu.show();
+  };
+
+  Times.prototype._scrollToRow = function($row) {
+    var rowTop = $row.offset().top;
+    
+    if (rowTop + LIST_ROW_HEIGHT > window.app.windowSize.height) {
+      this._$element.scrollTop(this._$element.scrollTop() + rowTop +
+        LIST_ROW_HEIGHT - window.app.windowSize.height);
+      return;
+    }
+    
+    var elementTop = this._$element.offset().top;
+    if (rowTop < elementTop) {
+      this._$element.scrollTop(this._$element.scrollTop() + rowTop -
+        elementTop);
+    }
   };
 
   Times.prototype._updateMargins = function() {

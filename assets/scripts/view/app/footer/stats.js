@@ -17,7 +17,7 @@
 
     this.averages = new window.app.Averages(footer);
     this.graph = new window.app.Graph();
-    this.times = new window.app.Times();
+    this.times = new window.app.Times(footer);
 
     this._registerModelEvents();
     this._registerUIEvents();
