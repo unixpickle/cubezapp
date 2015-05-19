@@ -81,7 +81,8 @@
       memo: -1,
       notes: '',
       plus2: false,
-      time: millis
+      time: millis,
+      scramble: this._scramble
     });
   };
 

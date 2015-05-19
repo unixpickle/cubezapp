@@ -151,27 +151,62 @@
 
   Times.prototype._rowClicked = function($row, solve) {
     this._scrollToRow($row);
+
     var mainPage = new window.contextjs.Page([
-      new window.contextjs.TextRow("Delete Time"),
-      new window.contextjs.ExpandableRow("Add Pentalty"),
-      new window.contextjs.TextRow("View Scramble"),
-      new window.contextjs.TextRow("Add Comment"),
-      new window.contextjs.ExpandableRow("Move To")
+      new window.contextjs.TextRow('Delete Time'),
+      new window.contextjs.ExpandableRow('Add Penalty'),
+      new window.contextjs.TextRow('View Scramble'),
+      new window.contextjs.TextRow('Add Comment'),
+      new window.contextjs.ExpandableRow('Move To')
     ]);
+    var pentaltyPage = new window.contextjs.Page([
+      new window.contextjs.BackRow('Add Penalty'),
+      new window.contextjs.CheckRow((!solve.dnf && !solve.plus2), 'None'),
+      new window.contextjs.CheckRow(solve.plus2, '+2'),
+      new window.contextjs.CheckRow(solve.dnf, 'DNF')
+    ]);
+
     mainPage.onClick = function(itemIndex) {
       switch (itemIndex) {
       case 0:
         this.emit('delete', solve);
+        break;
+      case 1:
+        this._currentContextMenu.pushPage(pentaltyPage);
+        return;
       case 2:
         this.emit('viewScramble', solve);
+        break;
       case 3:
         this.emit('addComment', solve);
-      default:
-        this._currentContextMenu.hide();
-        this._currentContextMenu = null;
+        break;
+      case 5:
+        // TODO: this.
+        return;
+      }
+      this._currentContextMenu.hide();
+      this._currentContextMenu = null;
+    }.bind(this);
+
+    pentaltyPage.onClick = function(itemIndex) {
+      switch (itemIndex) {
+      case 0:
+        this._currentContextMenu.popPage();
+        return;
+      case 1:
+        this.emit('removePenalty', solve);
+        break;
+      case 2:
+        this.emit('plus2', solve);
+        break;
+      case 3:
+        this.emit('dnf', solve);
         break;
       }
+      this._currentContextMenu.hide();
+      this._currentContextMenu = null;
     }.bind(this);
+
     var context = new window.contextjs.Context($row, $('#footer'));
     this._currentContextMenu = new window.contextjs.Menu(context, mainPage);
     this._currentContextMenu.show();
@@ -179,13 +214,13 @@
 
   Times.prototype._scrollToRow = function($row) {
     var rowTop = $row.offset().top;
-    
+
     if (rowTop + LIST_ROW_HEIGHT > window.app.windowSize.height) {
       this._$element.scrollTop(this._$element.scrollTop() + rowTop +
         LIST_ROW_HEIGHT - window.app.windowSize.height);
       return;
     }
-    
+
     var elementTop = this._$element.offset().top;
     if (rowTop < elementTop) {
       this._$element.scrollTop(this._$element.scrollTop() + rowTop -
@@ -203,7 +238,9 @@
   };
 
   Times.prototype._updateRow = function($row, solve) {
-    $row.find('.time').text(window.app.formatTime(window.app.solveTime(solve)));
+    $row.find('.time').css({
+      textDecoration: solve.dnf ? 'line-through' : 'none'
+    }).text(window.app.formatTime(window.app.solveTime(solve)));
     $row.find('.plus2').text(solve.plus2 ? '+' : '');
   };
 
@@ -317,15 +354,18 @@
   };
 
   DataWindow.prototype._modifiedSolve = function(id, attrs) {
-    if (!this._idsToSolve.hasOwnProperty(id)) {
+    if (!this._idsToSolves.hasOwnProperty(id)) {
       return;
     }
-    var solve = this._idsToSolve[id];
+    var solve = this._idsToSolves[id];
     var keys = Object.keys(attrs);
     for (var i = 0, len = keys.length; i < len; ++i) {
       var key = keys[i];
       solve[key] = attrs[key];
     }
+
+    // TODO: go through the solves above this and also check them...
+
     this.emit('modification', solve);
   };
 
