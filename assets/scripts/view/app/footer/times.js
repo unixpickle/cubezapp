@@ -11,6 +11,7 @@
   var LIST_TEXT_COLOR = '#999999';
   var HOVER_BACKGROUND = '#f0f0f0';
   var HOVER_BACKGROUND_RGB = '240, 240, 240';
+  var SCROLL_SHOW_CONTEXT_DELAY = 500;
 
   function Times(footer) {
     window.app.EventEmitter.call(this);
@@ -150,82 +151,97 @@
   };
 
   Times.prototype._rowClicked = function($row, solve) {
-    this._scrollToRow($row);
+    this._scrollToRow($row, function() {
+      var mainPage = new window.contextjs.Page([
+        new window.contextjs.TextRow('Delete Time'),
+        new window.contextjs.ExpandableRow('Add Penalty'),
+        new window.contextjs.TextRow('View Scramble'),
+        new window.contextjs.TextRow('Add Comment'),
+        new window.contextjs.ExpandableRow('Move To')
+      ]);
+      var pentaltyPage = new window.contextjs.Page([
+        new window.contextjs.BackRow('Add Penalty'),
+        new window.contextjs.CheckRow((!solve.dnf && !solve.plus2), 'None'),
+        new window.contextjs.CheckRow(solve.plus2, '+2'),
+        new window.contextjs.CheckRow(solve.dnf, 'DNF')
+      ]);
 
-    var mainPage = new window.contextjs.Page([
-      new window.contextjs.TextRow('Delete Time'),
-      new window.contextjs.ExpandableRow('Add Penalty'),
-      new window.contextjs.TextRow('View Scramble'),
-      new window.contextjs.TextRow('Add Comment'),
-      new window.contextjs.ExpandableRow('Move To')
-    ]);
-    var pentaltyPage = new window.contextjs.Page([
-      new window.contextjs.BackRow('Add Penalty'),
-      new window.contextjs.CheckRow((!solve.dnf && !solve.plus2), 'None'),
-      new window.contextjs.CheckRow(solve.plus2, '+2'),
-      new window.contextjs.CheckRow(solve.dnf, 'DNF')
-    ]);
+      mainPage.onClick = function(itemIndex) {
+        switch (itemIndex) {
+        case 0:
+          this.emit('delete', solve);
+          break;
+        case 1:
+          this._currentContextMenu.pushPage(pentaltyPage);
+          return;
+        case 2:
+          this.emit('viewScramble', solve);
+          break;
+        case 3:
+          this.emit('addComment', solve);
+          break;
+        case 5:
+          // TODO: this.
+          return;
+        }
+        this._currentContextMenu.hide();
+        this._currentContextMenu = null;
+      }.bind(this);
 
-    mainPage.onClick = function(itemIndex) {
-      switch (itemIndex) {
-      case 0:
-        this.emit('delete', solve);
-        break;
-      case 1:
-        this._currentContextMenu.pushPage(pentaltyPage);
-        return;
-      case 2:
-        this.emit('viewScramble', solve);
-        break;
-      case 3:
-        this.emit('addComment', solve);
-        break;
-      case 5:
-        // TODO: this.
-        return;
-      }
-      this._currentContextMenu.hide();
-      this._currentContextMenu = null;
-    }.bind(this);
+      pentaltyPage.onClick = function(itemIndex) {
+        switch (itemIndex) {
+        case 0:
+          this._currentContextMenu.popPage();
+          return;
+        case 1:
+          this.emit('removePenalty', solve);
+          break;
+        case 2:
+          this.emit('plus2', solve);
+          break;
+        case 3:
+          this.emit('dnf', solve);
+          break;
+        }
+        this._currentContextMenu.hide();
+        this._currentContextMenu = null;
+      }.bind(this);
 
-    pentaltyPage.onClick = function(itemIndex) {
-      switch (itemIndex) {
-      case 0:
-        this._currentContextMenu.popPage();
-        return;
-      case 1:
-        this.emit('removePenalty', solve);
-        break;
-      case 2:
-        this.emit('plus2', solve);
-        break;
-      case 3:
-        this.emit('dnf', solve);
-        break;
-      }
-      this._currentContextMenu.hide();
-      this._currentContextMenu = null;
-    }.bind(this);
-
-    var context = new window.contextjs.Context($row, $('#footer'));
-    this._currentContextMenu = new window.contextjs.Menu(context, mainPage);
-    this._currentContextMenu.show();
+      var context = new window.contextjs.Context($row, $('#footer'));
+      this._currentContextMenu = new window.contextjs.Menu(context, mainPage);
+      this._currentContextMenu.show();
+    }.bind(this));
   };
 
-  Times.prototype._scrollToRow = function($row) {
+  Times.prototype._scrollToRow = function($row, callback) {
     var rowTop = $row.offset().top;
+    var newScrollTop = -1;
 
     if (rowTop + LIST_ROW_HEIGHT > window.app.windowSize.height) {
-      this._$element.scrollTop(this._$element.scrollTop() + rowTop +
-        LIST_ROW_HEIGHT - window.app.windowSize.height);
+      newScrollTop = this._$element.scrollTop() + rowTop + LIST_ROW_HEIGHT -
+        window.app.windowSize.height;
+    } else {
+      var elementTop = this._$element.offset().top;
+      if (rowTop < elementTop) {
+        newScrollTop = this._$element.scrollTop() + rowTop - elementTop;
+      }
+    }
+    if (newScrollTop < 0) {
+      callback();
       return;
     }
-
-    var elementTop = this._$element.offset().top;
-    if (rowTop < elementTop) {
-      this._$element.scrollTop(this._$element.scrollTop() + rowTop -
-        elementTop);
-    }
+    
+    var timeout;
+    var handler;
+    handler = function() {
+      clearTimeout(timeout);
+      this._$element.off('scroll', handler);
+      callback();
+    }.bind(this);
+    this._$element.scroll(handler);
+    timeout = setTimeout(handler, SCROLL_SHOW_CONTEXT_DELAY);
+    
+    this._$element.scrollTop(newScrollTop);
   };
 
   Times.prototype._updateMargins = function() {
