@@ -7,14 +7,13 @@
   function Timer() {
     window.app.EventEmitter.call(this);
 
+    // Create the hidden class before calling this.reset().
+    this._updateInterval = null;
     this._state = Timer.STATE_NOT_RUNNING;
     this._startTime = 0;
-    this._updateInterval = null;
-
     this._deviceTime = 0;
     this._manualTime = 0;
-
-    this._memoTime = 0;
+    this._memoTime = -1;
     this._totalTime = 0;
     this._inspectionTime = 0;
 
@@ -65,6 +64,20 @@
     this._state = STATE_TIMING_DONE_MEMO;
     this._memoTime = this.getTime();
     this.emit('doneMemo');
+  };
+
+  Timer.prototype.generateSolve = function() {
+    // TODO: here, have an actual scramble.
+    return {
+      date: new Date().getTime(),
+      dnf: false,
+      inspection: this._inspectionTime,
+      memo: this._memoTime,
+      notes: '',
+      plus2: false,
+      time: this._totalTime,
+      scramble: 'No scrambles yet'
+    };
   };
 
   Timer.prototype.getDeviceTime = function() {
@@ -146,7 +159,7 @@
     this._startTime = 0;
     this._deviceTime = 0;
     this._manualTime = 0;
-    this._memoTime = 0;
+    this._memoTime = -1;
     this._totalTime = 0;
     this._inspectionTime = 0;
     this.emit('reset');
