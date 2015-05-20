@@ -230,7 +230,7 @@
       callback();
       return;
     }
-    
+
     var timeout;
     var handler;
     handler = function() {
@@ -240,7 +240,7 @@
     }.bind(this);
     this._$element.scroll(handler);
     timeout = setTimeout(handler, SCROLL_SHOW_CONTEXT_DELAY);
-    
+
     this._$element.scrollTop(newScrollTop);
   };
 

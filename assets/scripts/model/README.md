@@ -132,7 +132,12 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
  * **scrambler** - string - the type of puzzle.js scrambler to use
  * **scrambleType** - string - the subtype of the scrambler to use
  * **lastUsed** - int - the UNIX time in milliseconds that the user last modified or switched to this puzzle
- * **timerInput** - int - an enum for the input method. The values of this setting are given meaning by the view and controller.
+ * **timerInput** - int - an enum for the input method.
+   * 0 - INPUT_REGULAR - the timer is a normal.
+   * 1 - INPUT_INSPECTION - inspection time is used.
+   * 2 - INPUT_BLD - blindfolded (two-stage) mode.
+   * 3 - INPUT_STACKMAT - an external stackmat is used.
+   * 4 - INPUT_ENTRY - manual entry is used.
  * **id** - string - the unique identifier of the puzzle. **This field will not be present if the puzzle has not been added to the store.**
 
 <a name="global-settings-object"></a>

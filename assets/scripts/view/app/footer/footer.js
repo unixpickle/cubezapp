@@ -41,7 +41,7 @@
   Footer.prototype.closedHeight = function() {
     return this._top.height();
   };
-  
+
   Footer.prototype.height = function() {
     return this._$element.height();
   };
