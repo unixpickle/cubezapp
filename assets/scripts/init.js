@@ -19,8 +19,8 @@
   }
 
   function initializeModel() {
-    var store = new window.app.LocalStore();
-    window.app.store = store;
+    window.app.store = new window.app.LocalStore();
+    window.app.timer = new window.app.Timer();
   }
 
   function initializeView() {

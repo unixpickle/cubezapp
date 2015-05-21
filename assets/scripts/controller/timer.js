@@ -8,10 +8,7 @@
 
   function TimerController() {
     this._inputMode = window.app.store.getActivePuzzle().timerInput;
-    this._manualText = '';
     this._session = null;
-    this._lastScramble = null;
-
     this._stackmatRunning = false;
     this._stackmat = new window.app.Stackmat();
 
@@ -25,65 +22,44 @@
 
   TimerController.prototype.keydown = function(e) {
     // Forward backspace to this.keypress().
-    if (this._inputMode === TimerController.INPUT_ENTRY &&
+    if (this._inputMode === window.app.Timer.INPUT_ENTRY &&
         e.which === BACKSPACE_KEY) {
-      this.keypress(e);
-      return false;
+      return this.keypress(e);
     }
     return true;
   };
 
   TimerController.prototype.keypress = function(e) {
-    if (this._inputMode !== TimerController.INPUT_ENTRY) {
+    if (this._inputMode !== window.app.Timer.INPUT_ENTRY) {
       return true;
     }
 
     if (e.which === BACKSPACE_KEY) {
-      this._manualText = this._manualText.substring(0,
-        this._manualText.length-1);
+      var oldTime = window.app.timer.getManualTime();
+      window.app.timer.setManualTime(oldTime.substring(0, oldTime.length-1));
     } else if (e.which >= NUM0_KEY && e.which <= NUM9_KEY) {
-      if (this._manualText.length < 7) {
-        this._manualText = this._manualText + (e.which - 0x30);
+      var oldTime = window.app.timer.getManualTime();
+      // NOTE: typing leading zeroes is pointless, so I ignore them.
+      if ((oldTime.length !== 0 || e.which !== NUM0_KEY) &&
+          oldTime.length < 7) {
+        window.app.timer.setManualTime(oldTime + (e.which - 0x30));
       }
     } else if (e.which === ENTER_KEY) {
-      if (this._manualText.length > 0) {
-        this._scramble = window.app.view.timer.currentScramble();
-        this._addRegularSolve(parseManualEntry(this._manualText));
-        window.app.view.timer.newScramble();
+      if (window.app.timer.getManualTime().length > 0) {
+        window.app.timer.saveTime();
+        window.app.timer.reset();
       }
-      this._manualText = '';
     } else {
       // Unknown keys should be ignored.
       return true;
     }
 
-    // There is no point of typing a leading zero.
-    if (this._manualText === '0') {
-      this._manualText = '';
-    }
-
-    // Give the user the authentic experience of entering text.
-    window.app.view.blinkTime();
-    window.app.view.setTime(formatManualEntry(this._manualText));
     return false;
   };
 
   TimerController.prototype.keyup = function(e) {
     // Ignore the event.
     return true;
-  };
-
-  TimerController.prototype._addRegularSolve = function(millis) {
-    window.app.store.addSolve({
-      date: new Date().getTime(),
-      dnf: false,
-      inspection: 0,
-      memo: -1,
-      notes: '',
-      plus2: false,
-      time: millis,
-      scramble: this._scramble
-    });
   };
 
   TimerController.prototype._controlCancel = function() {
@@ -167,70 +143,58 @@
       return;
     }
     this._stackmatRunning = false;
-    window.app.view.timer.cancel();
+    window.app.timer.reset();
     this._updateInputMethodIfChanged();
   };
 
   TimerController.prototype._stackmatDone = function(t) {
     if (this._stackmatRunning) {
       this._stackmatRunning = false;
-      window.app.view.timer.updateDone(t, false);
-      window.app.store.addSolve({
-        date: new Date().getTime(),
-        dnf: false,
-        inspection: 0,
-        memo: -1,
-        notes: '',
-        plus2: false,
-        time: t
-      });
-      window.app.view.timer.stop();
+      window.app.timer.done();
+      window.app.timer.saveTime();
+      window.app.timer.reset();
       this._updateInputMethodIfChanged();
     }
   };
 
   TimerController.prototype._stackmatReady = function() {
     if (this._stackmatRunning) {
-      window.app.view.setTime('Ready');
+      window.app.timer.phaseReady();
     }
   };
 
   TimerController.prototype._stackmatTime = function(millis) {
     if (this._stackmatRunning) {
-      window.app.view.timer.updateTime(millis);
+      window.app.timer.setTime(millis);
     }
   };
 
   TimerController.prototype._stackmatWait = function() {
     if (!this._stackmatRunning) {
       this._stackmatRunning = true;
-      this._lastScramble = window.app.view.timer.currentScramble();
-      window.app.view.timer.start();
-      window.app.view.setTime('Wait');
+      window.app.timer.phaseWaiting();
     }
   };
 
   TimerController.prototype._updateInputMethod = function() {
     this._inputMode = window.app.store.getActivePuzzle().timerInput;
-    this._manualText = '';
+ 
     switch (this._inputMode) {
-    case TimerController.INPUT_ENTRY:
-      window.app.view.timer.setManualEntry(true);
+    case window.app.Timer.INPUT_ENTRY:
+      this._stackmat.disconnect();
       window.app.view.timer.controls.disable();
-      this._manualText = '';
-      window.app.view.setTime('0.00');
       break;
-    case TimerController.INPUT_STACKMAT:
-      window.app.view.timer.setManualEntry(false);
+    case window.app.Timer.INPUT_STACKMAT:
       this._stackmat.connect();
       window.app.view.timer.controls.disable();
       break;
     default:
-      window.app.view.timer.setManualEntry(false);
       this._stackmat.disconnect();
       window.app.view.timer.controls.enable();
       break;
     }
+    
+    window.app.timer.updateInputMethod();
   };
 
   TimerController.prototype._updateInputMethodIfChanged = function() {
@@ -239,12 +203,6 @@
       this._updateInputMethod();
     }
   };
-
-  TimerController.INPUT_REGULAR = 0;
-  TimerController.INPUT_INSPECTION = 1;
-  TimerController.INPUT_BLD = 2;
-  TimerController.INPUT_STACKMAT = 3;
-  TimerController.INPUT_ENTRY = 4;
 
   // A Session handles the process of recording a time using the space bar
   // or touchscreen.
@@ -261,12 +219,12 @@
 
   // begin is called right after the object is constructed.
   Session.prototype.begin = function() {
-    window.app.view.timer.start();
+    window.app.timer.phaseReady();
   };
 
   // cancel stops the session prematurely.
   Session.prototype.cancel = function() {
-    window.app.view.timer.cancel();
+    window.app.timer.reset();
     if (this._timerInterval !== null) {
       clearInterval(this._timerInterval);
     }
@@ -278,34 +236,13 @@
     if (this._timerInterval === null) {
       throw new Error('down event with no timer interval');
     }
-
-    this._result = this.generateSolve();
-    clearInterval(this._timerInterval);
-    this._timerInterval = null;
-
-    window.app.view.timer.updateDone(this._result.time, this._result.plus2);
-  };
-
-  // generateSolve is called when the timer is stopped in order to get a usable
-  // record to store in a database.
-  Session.prototype.generateSolve = function() {
-    var time = Math.max(new Date().getTime() - this._startTime, 0);
-    return {
-      date: new Date().getTime(),
-      dnf: false,
-      inspection: 0,
-      memo: -1,
-      notes: '',
-      plus2: false,
-      time: time,
-      scramble: this._scramble
-    };
+    window.app.timer.phaseDone();
   };
 
   // timerTick is called by this._timerInterval to update the timer text.
   Session.prototype.timerTick = function() {
-    var time = Math.max(new Date().getTime() - this._startTime, 0);
-    window.app.view.timer.update(time, false);
+    var time = Math.max(new Date().getTime()-this._startTime, 0);
+    window.app.timer.setTime(time);
   };
 
   // up is called when the user releases the space bar or lifts their finger.
@@ -320,8 +257,8 @@
   };
 
   Session.prototype._done = function() {
-    window.app.store.addSolve(this._result);
-    window.app.view.timer.stop();
+    window.app.timer.saveTime();
+    window.app.timer.reset();
     this.emit('done');
   };
 
@@ -336,25 +273,22 @@
   function BLDSession(accuracy) {
     Session.call(this, accuracy);
     this._memoDown = false;
-    this._memoTime = null;
   }
 
   BLDSession.prototype = Object.create(Session.prototype);
 
   BLDSession.prototype.down = function() {
-    if (this._memoTime === null) {
-      this._memoDown = true;
-      this._memoTime = Math.max(new Date().getTime() - this._startTime, 0);
-      window.app.view.timer.updateMemo(this._memoTime);
-    } else {
+    if (window.app.timer.getState() ===
+        window.app.Timer.STATE_TIMING_DONE_MEMO) {
       Session.prototype.down.call(this);
-    }
-  };
+    } else {
+      this._memoDown = true;
 
-  BLDSession.prototype.generateSolve = function() {
-    var res = Session.prototype.generateSolve.call(this);
-    res.memo = this._memoTime;
-    return res;
+      // NOTE: we do this.timerTick() to make sure the memo time is accurate.
+      this.timerTick();
+
+      window.app.timer.phaseDoneMemo();
+    }
   };
 
   BLDSession.prototype.up = function() {
@@ -366,20 +300,18 @@
     }
   };
 
-  // InspectionSession is a Session subclass for MODE_INSPECTION.
+  // InspectionSession is a Session subclass for inspection mode.
   function InspectionSession(accuracy) {
     Session.call(this, accuracy);
     this._downOnInspection = false;
     this._inspectionStart = null;
     this._inspectionInterval = null;
-    this._inspectionTime = null;
   }
 
   InspectionSession.prototype = Object.create(Session.prototype);
 
   InspectionSession.prototype.begin = function() {
-    Session.prototype.begin.call(this);
-    window.app.view.timer.updateInspection('15');
+    window.app.timer.phaseInspectionReady();
   }
 
   InspectionSession.prototype.cancel = function() {
@@ -394,27 +326,15 @@
     // space or touched their screen while inspection was running. This way the
     // corresponding up() event doesn't stop the timer if they exceed inspection
     // time.
-    if (this._inspectionTime === null) {
+    if (window.app.timer.getState() === Timer.STATE_INSPECTION) {
       this._downOnInspection = true;
     } else {
       Session.prototype.down.call(this);
     }
   };
 
-  InspectionSession.prototype.generateSolve = function() {
-    var res = Session.prototype.generateSolve.call(this);
-    res.inspection = this._inspectionTime;
-    res.plus2 = (this._inspectionTime > 15000);
-    return res;
-  };
-
-  InspectionSession.prototype.timerTick = function() {
-    var time = Math.max(new Date().getTime() - this._startTime, 0);
-    window.app.view.timer.update(time, this._inspectionTime > 15000);
-  };
-
   InspectionSession.prototype.up = function() {
-    if (this._inspectionTime !== null) {
+    if (window.app.timer.getState() === Timer.STATE_TIMING) {
       // If the down() event happened during inspection, the up() event should
       // do nothing.
       if (this._downOnInspection) {
@@ -443,67 +363,19 @@
     clearInterval(this._inspectionInterval);
     this._inspectionInterval = null;
 
-    // Running Session.prototype.up will start the regular timer.
+    // Running super.up() will start the regular timer.
     Session.prototype.up.call(this);
   };
 
   InspectionSession.prototype._interval = function() {
-    var time = Math.max(new Date().getTime() - this._inspectionStart, 0);
+    var time = Math.max(new Date().getTime()-this._inspectionStart, 0);
     if (time > 17000) {
+      window.app.timer.setTime(17000);
       this._endInspection();
     } else {
-      window.app.view.timer.updateInspection(time);
+      window.app.timer.setTime(time);
     }
   };
-
-  // formatManualEntry returns a time with ':' and '.' inserted at the right
-  // places given a piece of user input.
-  function formatManualEntry(raw) {
-    // I know, I know, this looks like it's probably not the best way to format
-    // the time. My response: it works. Who looks like a fool now? Mwahaha.
-    switch (raw.length) {
-    case 0:
-      return '0.00';
-    case 1:
-      return '0.0' + raw;
-    case 2:
-      return '0.' + raw;
-    case 3:
-      return raw[0] + '.' + raw.substring(1);
-    case 4:
-      return raw.substring(0, 2) + '.' + raw.substring(2);
-    case 5:
-      return raw[0] + ':' + raw.substring(1, 3) + '.' + raw.substring(3);
-    case 6:
-      return raw.substring(0, 2) + ':' + raw.substring(2, 4) + '.' +
-      raw.substring(4);
-    case 7:
-      return raw[0] + ':' + raw.substring(1, 3) + ':' + raw.substring(3, 5) +
-        '.' + raw.substring(5);
-    default:
-      return '';
-    }
-  }
-
-  // parseManualEntry takes the raw user input and turns it into a time in
-  // milliseconds. For example, parseTimeInput('123') yields 1230.
-  function parseManualEntry(raw) {
-    // Pad the time with zeroes so we can use substrings without fear.
-    var toParse = raw;
-    while (toParse.length < 7) {
-      toParse = '0' + toParse;
-    }
-
-    // Get the time components.
-    var hour = parseInt(toParse[0]);
-    var minute = parseInt(toParse.substring(1, 3));
-    var second = parseInt(toParse.substring(3, 5));
-    var centisecond = parseInt(toParse.substring(5));
-
-    // Generate milliseconds and cap it at 9:59:59.99
-    var millis = centisecond*10 + second*1000 + minute*60000 + hour*3600000;
-    return Math.min(millis, 35999990);
-  }
 
   window.app.TimerController = TimerController;
 

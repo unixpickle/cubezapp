@@ -1,7 +1,5 @@
 (function() {
 
-  var INSPECTION_THRESHOLD = -2000;
-  var UPDATE_INTERVAL = Math.floor(1000 / 24);
   var WCA_INSPECTION_TIME = 15000;
 
   function Timer() {
@@ -48,6 +46,10 @@
 
   Timer.prototype.getMemoTime = function() {
     return this._memoTime;
+  };
+
+  Timer.prototype.getPlus2 = function() {
+    return this._inspectionTime > WCA_INSPECTION_TIME;
   };
 
   Timer.prototype.getScrambleStream = function() {
@@ -111,7 +113,6 @@
   };
 
   Timer.prototype.reset = function() {
-    this._assertStates([Timer.STATE_DONE, Timer.STATE_MANUAL_ENTRY]);
     if (window.app.store.getActivePuzzle().timerInput === Timer.INPUT_ENTRY) {
       this._state = Timer.STATE_MANUAL_ENTRY;
     } else {
@@ -135,14 +136,22 @@
   // timer.
   Timer.prototype.saveTime = function() {
     this._didSave = true;
+
+    var time = 0;
+    if (this._state === Timer.STATE_MANUAL_ENTRY) {
+      time = parseManualEntry(this._manualTime);
+    } else {
+      time = this._time;
+    }
+
     window.app.store.addSolve({
       date: new Date().getTime(),
       dnf: false,
       inspection: this._inspectionTime,
       memo: this._memoTime,
       notes: '',
-      plus2: (this._inspectionTime > WCA_INSPECTION_TIME),
-      time: this._time,
+      plus2: this.getPlus2(),
+      time: time,
       scramble: 'No scrambles yet'
     });
   };
@@ -166,6 +175,19 @@
     this._time = time;
     this.emit('time');
   };
+  
+  Timer.prototype.updateInputMethod = function() {
+    this._assertStates([Timer.STATE_NOT_RUNNING, Timer.STATE_MANUAL_ENTRY]);
+    var oldState = this._state;
+    if (window.app.store.getActivePuzzle().timerInput === Timer.INPUT_ENTRY) {
+      this._state = Timer.STATE_MANUAL_ENTRY;
+    } else {
+      this._state = Timer.STATE_NOT_RUNNING;
+    }
+    if (oldState !== this._state) {
+      this.emit('reset');
+    }
+  };
 
   Timer.prototype._assertState = function(state) {
     if (this._state !== state) {
@@ -178,5 +200,27 @@
       throw new Error('invalid state: ' + state);
     }
   };
+
+  // parseManualEntry takes the raw user input and turns it into a time in
+  // milliseconds. For example, parseTimeInput('123') yields 1230.
+  function parseManualEntry(raw) {
+    // Pad the time with zeroes so we can use substrings without fear.
+    var toParse = raw;
+    while (toParse.length < 7) {
+      toParse = '0' + toParse;
+    }
+
+    // Get the time components.
+    var hour = parseInt(toParse[0]);
+    var minute = parseInt(toParse.substring(1, 3));
+    var second = parseInt(toParse.substring(3, 5));
+    var centisecond = parseInt(toParse.substring(5));
+
+    // Generate milliseconds and cap it at 9:59:59.99
+    var millis = centisecond*10 + second*1000 + minute*60000 + hour*3600000;
+    return Math.min(millis, 35999990);
+  }
+
+  window.app.Timer = Timer;
 
 })();

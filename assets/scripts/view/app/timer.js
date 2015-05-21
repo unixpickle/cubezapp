@@ -383,6 +383,35 @@
       this.emit('up');
     }
   };
+  
+  // formatManualEntry returns a time with ':' and '.' inserted at the right
+  // places given a piece of user input.
+  function formatManualEntry(raw) {
+    // I know, I know, this looks like it's probably not the best way to format
+    // the time. My response: it works. Who looks like a fool now? Mwahaha.
+    switch (raw.length) {
+    case 0:
+      return '0.00';
+    case 1:
+      return '0.0' + raw;
+    case 2:
+      return '0.' + raw;
+    case 3:
+      return raw[0] + '.' + raw.substring(1);
+    case 4:
+      return raw.substring(0, 2) + '.' + raw.substring(2);
+    case 5:
+      return raw[0] + ':' + raw.substring(1, 3) + '.' + raw.substring(3);
+    case 6:
+      return raw.substring(0, 2) + ':' + raw.substring(2, 4) + '.' +
+      raw.substring(4);
+    case 7:
+      return raw[0] + ':' + raw.substring(1, 3) + ':' + raw.substring(3, 5) +
+        '.' + raw.substring(5);
+    default:
+      return '';
+    }
+  }
 
   window.app.TimerView = TimerView;
 
