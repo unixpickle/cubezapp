@@ -7,15 +7,19 @@
   function Timer() {
     window.app.EventEmitter.call(this);
 
-    // Create the hidden class before calling this.reset().
-    this._updateInterval = null;
+    this._scrambleStream = new window.app.ScrambleStream();
+
+    // Create the hidden class. Performance is critical whenever the user's
+    // times are concerned, so we don't want V8 or any other JS engine messing
+    // with us.
     this._state = Timer.STATE_NOT_RUNNING;
-    this._startTime = 0;
-    this._deviceTime = 0;
-    this._manualTime = 0;
+    this._manualTime = '';
+    this._time = -1;
     this._memoTime = -1;
-    this._totalTime = 0;
-    this._inspectionTime = 0;
+    this._inspectionTime = -1;
+
+    // NOTE: we set this._didSave to true so that reset() uses a new scramble.
+    this._didSave = true;
 
     this.reset();
   }
@@ -36,34 +40,18 @@
   Timer.STATE_READY = 5;
   Timer.STATE_TIMING = 6;
   Timer.STATE_TIMING_DONE_MEMO = 7;
-  Timer.STATE_DEVICE_TIMING = 8;
-  Timer.STATE_DONE = 9;
+  Timer.STATE_DONE = 8;
 
-  Timer.prototype.deviceTiming = function(time) {
-    this._assertStates([Timer.STATE_READY, Timer.STATE_DEVICE_TIMING]);
-    this._state = Timer.STATE_DEVICE_TIMING;
-    this._deviceTime = time;
-    this.emit('deviceTiming');
+  Timer.prototype.getManualTime = function() {
+    return this._manualTime;
   };
 
-  Timer.prototype.done = function() {
-    this._assertStates([Timer.STATE_TIMING, Timer.STATE_DEVICE_TIMING]);
-    if (this._updateInterval) {
-      clearInterval(this._updateInterval);
-      this._updateInterval = null;
-    }
-    if (this._state === Timer.STATE_TIMING) {
-      this._totalTime = this.getTime();
-    } else {
-      this._totalTime = this.getDeviceTime();
-    }
+  Timer.prototype.getMemoTime = function() {
+    return this._memoTime;
   };
 
-  Timer.prototype.doneMemo = function() {
-    this._assertState(Timer.STATE_TIMER);
-    this._state = STATE_TIMING_DONE_MEMO;
-    this._memoTime = this.getTime();
-    this.emit('doneMemo');
+  Timer.prototype.getScrambleStream = function() {
+    return this._scrambleStream;
   };
 
   Timer.prototype.getState = function() {
@@ -71,113 +59,112 @@
   };
 
   Timer.prototype.getTime = function() {
-    switch (this._state) {
-    case Timer.STATE_TIMING:
-    case Timer.STATE_TIMING_AFTER_MEMO:
-      return new Date().getTime() - this._startTime;
-    case Timer.STATE_MANUAL_ENTRY:
-      return this._manualTime;
-    case Timer.STATE_INSPECTION:
-      var elapsed = new Date().getTime() - this._startTime;
-      return WCA_INSPECTION_TIME - elapsed;
-    case Timer.STATE_INSPECTION_READY:
-      return WCA_INSPECTION_TIME;
-    case Timer.STATE_DEVICE_TIMING:
-      return this._deviceTime;
-    case Timer.STATE_DONE:
-      return this._totalTime;
-    default:
-      return 0;
-    }
+    return this._time;
   };
 
-  Timer.prototype.inspection = function() {
+  Timer.prototype.phaseDone = function() {
+    this._assertStates([Timer.STATE_TIMING, Timer.STATE_TIMING_DONE_MEMO]);
+    this._state = Timer.STATE_DONE;
+  };
+
+  Timer.prototype.phaseDoneMemo = function() {
+    this._assertState(Timer.STATE_TIMING);
+    this._memoTime = this._time;
+    this._state = Timer.STATE_TIMING_DONE_MEMO;
+    this.emit('doneMemo');
+  };
+
+  Timer.prototype.phaseInspection = function() {
     this._assertState(Timer.STATE_INSPECTION_READY);
-
-    this._startTime = new Date().getTime();
-    this._updateInterval = setInterval(function() {
-      if (this.getInspectionTime() < INSPECTION_THRESHOLD) {
-        this.timing();
-      } else {
-        this.emit('inspection');
-      }
-    }.bind(this), UPDATE_INTERVAL);
-
     this._state = Timer.STATE_INSPECTION;
     this.emit('inspection');
   };
 
-  Timer.prototype.inspectionReady = function() {
+  Timer.prototype.phaseInspectionReady = function() {
     this._assertState(Timer.STATE_NOT_RUNNING);
     this._state = Timer.STATE_INSPECTION_READY;
+    this._scrambleStream.pause();
+    this._time = 0;
     this.emit('inspectionReady');
   };
 
-  Timer.prototype.manualTime = function(time) {
-    this._assertState(Timer.STATE_MANUAL_ENTRY);
-    this._manualTime = time;
-    this.emit('manualTime');
-  };
-
-  Timer.prototype.ready = function() {
-    this._assertStates([Timer.STATE_NOT_RUNNING, Timer.STATE_WAITING]);
+  Timer.prototype.phaseReady = function() {
+    this._assertStates([Timer.STATE_WAITING, Timer.STATE_NOT_RUNNING]);
     this._state = Timer.STATE_READY;
+    this._scrambleStream.pause();
+    this._time = 0;
     this.emit('ready');
   };
 
+  Timer.prototype.phaseTiming = function() {
+    this._assertState(Timer.STATE_READY);
+    this._state = Timer.STATE_TIMING;
+    this.emit('timing');
+  };
+
+  Timer.prototype.phaseWaiting = function() {
+    this._assertState(Timer.STATE_NOT_RUNNING);
+    this._state = Timer.STATE_WAITING;
+    this._scrambleStream.pause();
+    this._time = 0;
+    this.emit('waiting');
+  };
+
   Timer.prototype.reset = function() {
+    this._assertStates([Timer.STATE_DONE, Timer.STATE_MANUAL_ENTRY]);
     if (window.app.store.getActivePuzzle().timerInput === Timer.INPUT_ENTRY) {
       this._state = Timer.STATE_MANUAL_ENTRY;
     } else {
       this._state = Timer.STATE_NOT_RUNNING;
     }
-    this._startTime = 0;
-    this._deviceTime = 0;
-    this._manualTime = 0;
+    this._manualTime = '';
+    this._time = -1;
     this._memoTime = -1;
-    this._totalTime = 0;
-    this._inspectionTime = 0;
+    this._inspectionTime = -1;
     this.emit('reset');
+
+    if (this._didSave) {
+      this._scrambleStream.resume();
+      this._didSave = false;
+    } else {
+      this._scrambleStream.resumeReuseScramble();
+    }
   };
 
-  Timer.prototype.saveSolve = function() {
+  // saveTime adds a solve to the store which reflects the current state of the
+  // timer.
+  Timer.prototype.saveTime = function() {
+    this._didSave = true;
     window.app.store.addSolve({
       date: new Date().getTime(),
       dnf: false,
       inspection: this._inspectionTime,
       memo: this._memoTime,
       notes: '',
-      plus2: false,
-      time: this.getTime(),
+      plus2: (this._inspectionTime > WCA_INSPECTION_TIME),
+      time: this._time,
       scramble: 'No scrambles yet'
     });
   };
 
-  Timer.prototype.timing = function() {
-    this._assertStates([Timer.STATE_INSPECTION, Timer.STATE_READY]);
+  // setManualTime sets a string which represents the numbers the user has
+  // entered thus far. This cannot be a number because the user may enter a time
+  // in a number of ways (i.e. 90.00 vs 1:30.00).
+  Timer.prototype.setManualTime = function(str) {
+    this._assertState(Timer.STATE_MANUAL_ENTRY);
+    this._manualTime = str;
+    this.emit('manualTime');
+  }
 
-    if (this._updateInterval !== null) {
-      clearInterval(this._updateInterval);
-    }
-
-    var now = new Date().getTime();
-
-    if (this._state === Timer.STATE_INSPECTION) {
-      this._inspectionTime = now - this._startTime;
-    }
-
-    this._startTime = now;
-    this._state = Timer.STATE_TIMING;
-    this.emit('timing');
-
-    this._updateInterval = setInterval(this.emit.bind(this, 'timing'),
-      UPDATE_INTERVAL);
-  };
-
-  Timer.prototype.waiting = function() {
-    this._assertState(Timer.STATE_NOT_RUNNING);
-    this._state = Timer.STATE_WAITING;
-    this.emit('waiting');
+  // setTime sets the time. This will have a different meaning depending on the
+  // current state. If the timer is in inspection mode, this will set the amount
+  // of inspection time that has been used so far. If it is in timing mode, it
+  // will set the amount of time elapsed.
+  Timer.prototype.setTime = function(time) {
+    this._assertStates([Timer.STATE_TIMING, Timer.STATE_TIMING_DONE_MEMO,
+      Timer.STATE_INSPECTION]);
+    this._time = time;
+    this.emit('time');
   };
 
   Timer.prototype._assertState = function(state) {
