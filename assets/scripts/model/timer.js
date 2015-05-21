@@ -66,40 +66,6 @@
     this.emit('doneMemo');
   };
 
-  Timer.prototype.generateSolve = function() {
-    // TODO: here, have an actual scramble.
-    return {
-      date: new Date().getTime(),
-      dnf: false,
-      inspection: this._inspectionTime,
-      memo: this._memoTime,
-      notes: '',
-      plus2: false,
-      time: this._totalTime,
-      scramble: 'No scrambles yet'
-    };
-  };
-
-  Timer.prototype.getDeviceTime = function() {
-    return this._deviceTime;
-  };
-
-  Timer.prototype.getInspectionTime = function() {
-    switch (this._state) {
-    case Timer.STATE_INSPECTION:
-      var elapsed = new Date().getTime() - this._startTime;
-      return WCA_INSPECTION_TIME - elapsed;
-    case Timer.STATE_DONE:
-      return this._inspectionTime;
-    default:
-      return 0;
-    }
-  };
-
-  Timer.prototype.getManualTime = function() {
-    return this._manualTime;
-  };
-
   Timer.prototype.getState = function() {
     return this._state;
   };
@@ -109,6 +75,15 @@
     case Timer.STATE_TIMING:
     case Timer.STATE_TIMING_AFTER_MEMO:
       return new Date().getTime() - this._startTime;
+    case Timer.STATE_MANUAL_ENTRY:
+      return this._manualTime;
+    case Timer.STATE_INSPECTION:
+      var elapsed = new Date().getTime() - this._startTime;
+      return WCA_INSPECTION_TIME - elapsed;
+    case Timer.STATE_INSPECTION_READY:
+      return WCA_INSPECTION_TIME;
+    case Timer.STATE_DEVICE_TIMING:
+      return this._deviceTime;
     case Timer.STATE_DONE:
       return this._totalTime;
     default:
@@ -163,6 +138,19 @@
     this._totalTime = 0;
     this._inspectionTime = 0;
     this.emit('reset');
+  };
+
+  Timer.prototype.saveSolve = function() {
+    window.app.store.addSolve({
+      date: new Date().getTime(),
+      dnf: false,
+      inspection: this._inspectionTime,
+      memo: this._memoTime,
+      notes: '',
+      plus2: false,
+      time: this.getTime(),
+      scramble: 'No scrambles yet'
+    });
   };
 
   Timer.prototype.timing = function() {
