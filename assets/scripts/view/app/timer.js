@@ -6,22 +6,13 @@
   // The TimerView is responsible for presenting the timer to the user.
   function TimerView(appView) {
     this._appView = appView;
-    this._manualEntry = false;
-    this._settingsChangedWhileRunning = false;
-    this._timerRunning = false;
-
-    this._currentScramble = null;
-    this._scrambleStream = new window.app.ScrambleStream();
-    this._scrambleStream.on('scramble', this._showScramble.bind(this));
-    this._scrambleStream.on('softTimeout',
-      this._showScramble.bind(this, 'Loading...'));
 
     this.controls = new Controls();
 
     // Setup the hidden class before running this._updateSettings().
+    this._settingsChangedWhileRunning = false;
     this._theaterMode = false;
     this._accuracy = 0;
-    this._updateSettings();
 
     this._registerModelEvents();
 
@@ -36,156 +27,26 @@
   TimerView.ACCURACY_NONE = 2;
   TimerView.ACCURACY_NAMES = ['Centiseconds', 'Seconds', 'None'];
 
-  TimerView.prototype.cancel = function() {
-    this._assertRunning();
-    this._timerRunning = false;
-
-    this._showLatestSolve();
-    this._scrambleStream.resumeReuseScramble();
-    if (this._theaterMode) {
-      this._appView.setTheaterMode(false);
-    }
-    this._showPBLabel();
-    if (this._settingsChangedWhileRunning) {
-      this._settingsChangedWhileRunning = false;
-      this._updateSettings();
-    }
-  };
-
-  TimerView.prototype.currentScramble = function() {
-    return this._currentScramble;
-  };
-
-  TimerView.prototype.newScramble = function() {
-    this._scrambleStream.pause();
-    this._scrambleStream.resume();
-  };
-
-  TimerView.prototype.setManualEntry = function(flag) {
-    this._assertNotRunning();
-    if (this._manualEntry === flag) {
-      return;
-    }
-    this._manualEntry = flag;
-    if (!flag) {
-      this._showLatestSolve();
-      this._appView.setTimeBlinking(false);
-    } else {
-      this._appView.setTimeBlinking(true);
-      this._appView.setMemo(null);
-    }
-  };
-
-  TimerView.prototype.start = function() {
-    this._assertNotRunning();
-    this._timerRunning = true;
-
-    if (this._theaterMode) {
-      this._appView.setTheaterMode(true);
-    }
-    this._appView.setMemo(null);
-    this._appView.setPB(null);
-    if (this._accuracy === TimerView.ACCURACY_NONE) {
-      this._appView.setTime('Ready');
-    } else if (this._accuracy === TimerView.ACCURACY_SECONDS) {
-      this._appView.setTime('0');
-    } else {
-      this._appView.setTime('0.00');
-    }
-    this._scrambleStream.pause();
-    this._showScramble(null);
-  };
-
-  TimerView.prototype.stop = function() {
-    this._assertRunning();
-    this._timerRunning = false;
-
-    this._scrambleStream.resume();
-    if (this._theaterMode) {
-      this._appView.setTheaterMode(false);
-    }
-    this._showPBLabel();
-    if (this._settingsChangedWhileRunning) {
-      this._settingsChangedWhileRunning = false;
-      this._updateSettings();
-    }
-  };
-
-  TimerView.prototype.update = function(millis, addTwo) {
-    this._assertRunning();
-
-    if (this._accuracy === TimerView.ACCURACY_NONE) {
-      this._appView.setTime('Timing');
-      return;
-    }
-
-    var showMillis = (addTwo ? millis + 2000 : millis);
-    var suffix = (addTwo ? '+' : '');
-
-    if (this._accuracy === TimerView.ACCURACY_SECONDS) {
-      this._appView.setTime(window.app.formatSeconds(showMillis) + suffix);
-    } else {
-      this._appView.setTime(window.app.formatTime(showMillis) + suffix);
-    }
-  };
-
-  TimerView.prototype.updateDone = function(millis, addTwo) {
-    this._assertRunning();
-    var showMillis = (addTwo ? millis + 2000 : millis);
-    var suffix = (addTwo ? '+' : '');
-    this._appView.setTime(window.app.formatTime(showMillis) + suffix);
-  };
-
-  TimerView.prototype.updateInspection = function(inspection) {
-    this._assertRunning();
-    if (inspection > 15000) {
-      this._appView.setTime('+2');
-    } else {
-      this._appView.setTime('' + (15 - Math.floor(inspection / 1000)));
-    }
-  };
-
-  TimerView.prototype.updateMemo = function(memo) {
-    this._assertRunning();
-    this._appView.setMemo(window.app.formatTime(memo));
-  };
-
   TimerView.prototype._appLoaded = function() {
-    this._scrambleStream.resume();
+    window.app.timer.getScrambleStream().resume();
     this._showPBLabel();
-  };
-
-  TimerView.prototype._assertNotRunning = function() {
-    if (this._timerRunning) {
-      throw new Error('timer cannot be running');
-    }
-  };
-
-  TimerView.prototype._assertRunning = function() {
-    if (!this._timerRunning) {
-      throw new Error('timer is not running');
-    }
   };
 
   TimerView.prototype._handleLatestSolveChanged = function() {
-    if (!this._timerRunning) {
-      this._showPBLabel();
-      if (!this._manualEntry) {
-        this._showLatestSolve();
-      }
+    if (window.app.timer.getState() === Timer.STATE_DONE ||
+        window.app.timer.getState() === Timer.STATE_NOT_RUNNING) {
+      this._showLatestSolve();
     }
   };
 
   TimerView.prototype._handleSettingsChanged = function() {
-    if (this._timerRunning) {
-      this._settingsChangedWhileRunning = true;
-    } else {
+    if (!isTimerRunning()) {
       this._updateSettings();
     }
   };
 
   TimerView.prototype._handleStatsComputed = function() {
-    if (!this._timerRunning) {
+    if (!isTimerRunning()) {
       this._showPBLabel();
     }
   };
@@ -193,18 +54,24 @@
   TimerView.prototype._handleStatsLoading = function() {
     this._appView.setPB(null);
   };
-
-  TimerView.prototype._handleTimerInputChanged = function() {
-    // In some situations, this function is necessary to change "Hit Space" to
-    // "Stackmat" or vice versa.
-    // NOTE: we can't use this._manualEntry because _handleTimerInputChanged
-    // may be called by the observer before setManualEntry() is called by the
-    // controller.
-    var isManual = window.app.store.getActivePuzzle().timerInput ===
-      window.app.TimerController.INPUT_ENTRY;
-    if (!this._timerRunning && !isManual) {
-      this._showLatestSolve();
+  
+  TimerView.prototype._handleTimerDoneMemo = function() {
+    this._appView.setMemo(
+      window.app.formatTime(window.app.timer.getMemoTime())
+    );
+  };
+  
+  TimerView.prototype._handleTimerInspection = function() {
+    var elapsed = window.app.timer.getTime();
+    if (elapsed > Timer.WCA_INSPECTION_TIME) {
+      this._appView.setTime('+2');
+    } else {
+      this._appView.setTime(Math.ceil(elapsed / 1000));
     }
+  };
+  
+  TimerView.prototype._handleTimerInspectionReady = function() {
+    this._appView.setTime(Math.ceil(Timer.WCA_INSPECTION_TIME / 1000));
   };
 
   TimerView.prototype._registerModelEvents = function() {
@@ -212,10 +79,14 @@
       this._handleSettingsChanged.bind(this));
     window.app.observe.activePuzzle('timerInput',
       this._handleTimerInputChanged.bind(this));
-    window.app.observe.latestSolve(['time', 'memo'],
+    window.app.observe.latestSolve(['time', 'memo', 'plus2', 'dnf'],
       this._handleLatestSolveChanged.bind(this));
     window.app.store.on('computedStats', this._handleStatsComputed.bind(this));
     window.app.store.on('loadingStats', this._handleStatsLoading.bind(this));
+    
+    var stream = new window.app.timer.getScrambleStream();
+    stream.on('scramble', this._showScramble.bind(this));
+    stream.on('softTimeout', this._showScramble.bind(this, 'Loading...'));
   };
 
   TimerView.prototype._showLatestSolve = function() {
@@ -278,11 +149,6 @@
 
   TimerView.prototype._showScramble = function(scramble) {
     this._appView.setScramble(scramble);
-    if (scramble ===  'Loading...' || scramble === null) {
-      this._currentScramble = null;
-    } else {
-      this._currentScramble = scramble;
-    }
   };
 
   TimerView.prototype._updateSettings = function() {
@@ -410,6 +276,16 @@
         '.' + raw.substring(5);
     default:
       return '';
+    }
+  }
+  
+  function isTimerRunning() {
+    switch (window.app.timer.getState()) {
+    case window.app.Timer.STATE_NOT_RUNNING:
+    case window.app.Timer.STATE_MANUAL_ENTRY:
+      return false;
+    default:
+      return true;
     }
   }
 

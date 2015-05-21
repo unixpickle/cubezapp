@@ -1,7 +1,5 @@
 (function() {
 
-  var WCA_INSPECTION_TIME = 15000;
-
   function Timer() {
     window.app.EventEmitter.call(this);
 
@@ -15,11 +13,9 @@
     this._time = -1;
     this._memoTime = -1;
     this._inspectionTime = -1;
+    this._didSave = false;
 
-    // NOTE: we set this._didSave to true so that reset() uses a new scramble.
-    this._didSave = true;
-
-    this.reset();
+    this.updateInputMethod();
   }
 
   Timer.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -39,6 +35,8 @@
   Timer.STATE_TIMING = 6;
   Timer.STATE_TIMING_DONE_MEMO = 7;
   Timer.STATE_DONE = 8;
+  
+  Timer.WCA_INSPECTION_TIME = 15000;
 
   Timer.prototype.getManualTime = function() {
     return this._manualTime;
@@ -49,7 +47,7 @@
   };
 
   Timer.prototype.getPlus2 = function() {
-    return this._inspectionTime > WCA_INSPECTION_TIME;
+    return this._inspectionTime > Timer.WCA_INSPECTION_TIME;
   };
 
   Timer.prototype.getScrambleStream = function() {
@@ -118,18 +116,22 @@
     } else {
       this._state = Timer.STATE_NOT_RUNNING;
     }
+
     this._manualTime = '';
     this._time = -1;
     this._memoTime = -1;
     this._inspectionTime = -1;
-    this.emit('reset');
-
+    
+    // NOTE: we do this before emitting 'reset' because the reset handler could
+    // theoretically do something to pause the scramble stream.
     if (this._didSave) {
       this._scrambleStream.resume();
       this._didSave = false;
     } else {
       this._scrambleStream.resumeReuseScramble();
     }
+
+    this.emit('reset');
   };
 
   // saveTime adds a solve to the store which reflects the current state of the
@@ -175,7 +177,7 @@
     this._time = time;
     this.emit('time');
   };
-  
+
   Timer.prototype.updateInputMethod = function() {
     this._assertStates([Timer.STATE_NOT_RUNNING, Timer.STATE_MANUAL_ENTRY]);
     var oldState = this._state;
