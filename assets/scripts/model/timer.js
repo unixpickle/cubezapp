@@ -4,6 +4,7 @@
     window.app.EventEmitter.call(this);
 
     this._scrambleStream = new window.app.ScrambleStream();
+    this._scrambleStream.on('scramble', this._gotScramble.bind(this));
 
     // Create the hidden class. Performance is critical whenever the user's
     // times are concerned, so we don't want V8 or any other JS engine messing
@@ -13,6 +14,7 @@
     this._time = -1;
     this._memoTime = -1;
     this._inspectionTime = -1;
+    this._lastScramble = null;
     this._didSave = false;
 
     this.updateInputMethod();
@@ -33,10 +35,19 @@
   Timer.STATE_INSPECTION = 4;
   Timer.STATE_READY = 5;
   Timer.STATE_TIMING = 6;
-  Timer.STATE_TIMING_DONE_MEMO = 7;
-  Timer.STATE_DONE = 8;
+  Timer.STATE_DONE = 7;
 
   Timer.WCA_INSPECTION_TIME = 15000;
+
+  Timer.prototype.doneMemo = function() {
+    this._assertState(Timer.STATE_TIMING);
+    this._memoTime = this._time;
+    this.emit('doneMemo');
+  };
+
+  Timer.prototype.getInspectionTime = function() {
+    return this._inspectionTime;
+  };
 
   Timer.prototype.getManualTime = function() {
     return this._manualTime;
@@ -61,18 +72,15 @@
   Timer.prototype.getTime = function() {
     return this._time;
   };
+  
+  Timer.prototype.hasMemoTime = function() {
+    return this._memoTime >= 0;
+  };
 
   Timer.prototype.phaseDone = function() {
     this._assertStates([Timer.STATE_TIMING, Timer.STATE_TIMING_DONE_MEMO]);
     this._state = Timer.STATE_DONE;
     this.emit('done');
-  };
-
-  Timer.prototype.phaseDoneMemo = function() {
-    this._assertState(Timer.STATE_TIMING);
-    this._memoTime = this._time;
-    this._state = Timer.STATE_TIMING_DONE_MEMO;
-    this.emit('doneMemo');
   };
 
   Timer.prototype.phaseInspection = function() {
@@ -131,6 +139,7 @@
     this._time = -1;
     this._memoTime = -1;
     this._inspectionTime = -1;
+    this._lastScramble = null;
 
     // NOTE: we do this before emitting 'reset' because the reset handler could
     // theoretically do something to pause the scramble stream.
@@ -164,8 +173,14 @@
       notes: '',
       plus2: this.getPlus2(),
       time: time,
-      scramble: 'No scrambles yet'
+      scramble: this._lastScramble
     });
+  };
+
+  Timer.prototype.setInspectionTime = function(time) {
+    this._assertState(Timer.STATE_INSPECTION);
+    this._inspectionTime = time;
+    this.emit('inspectionTime');
   };
 
   // setManualTime sets a string which represents the numbers the user has
@@ -177,10 +192,6 @@
     this.emit('manualTime');
   }
 
-  // setTime sets the time. This will have a different meaning depending on the
-  // current state. If the timer is in inspection mode, this will set the amount
-  // of inspection time that has been used so far. If it is in timing mode, it
-  // will set the amount of time elapsed.
   Timer.prototype.setTime = function(time) {
     this._assertStates([Timer.STATE_TIMING, Timer.STATE_TIMING_DONE_MEMO,
       Timer.STATE_INSPECTION]);
@@ -188,6 +199,8 @@
     this.emit('time');
   };
 
+  // updateInputMethod resets the timer if the input method has change to or
+  // from manual entry.
   Timer.prototype.updateInputMethod = function() {
     this._assertStates([Timer.STATE_NOT_RUNNING, Timer.STATE_MANUAL_ENTRY]);
     var oldState = this._state;
@@ -211,6 +224,10 @@
     if (states.indexOf(this._state) < 0) {
       throw new Error('invalid state: ' + this._state);
     }
+  };
+
+  Timer.prototype._gotScramble = function(scramble) {
+    this._lastScramble = scramble;
   };
 
   // parseManualEntry takes the raw user input and turns it into a time in

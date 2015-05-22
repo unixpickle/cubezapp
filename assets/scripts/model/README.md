@@ -75,7 +75,7 @@ The **Solve** object stores all the information for a single recorded time. Here
  * **memo** - int - the number of milliseconds the user took to memorize the cube for a blindfolded solve
  * **notes** - string - user-added notes
  * **plus2** - bool - whether or not the solve was a +2. If this is true, the extra two seconds should be *added* to `time`.
- * **scramble** - string - the scramble that was given
+ * **scramble** - string - the scramble that was given. If no scramble was given, this is null.
  * **time** - int - the number of milliseconds that the solve physically took.
  * **lastPB** - int - the number of milliseconds for the most recent personal best before this solve. For the first solve, this is -1. This can be used to tell if a given solve is a PB, because all PBs will have times less than the last PB. **This field will not be present if the solve has not been added to the store. The store maintains this field automatically.**
  * **id** - string - the unique identifier of the solve. **This field will not be present if the solve has not been added to the store.**

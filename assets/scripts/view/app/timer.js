@@ -39,7 +39,7 @@
       this._handleTimerManualTime();
     }
   };
-  
+
   TimerView.prototype._handleInputChanged = function() {
     // NOTE: this is necessary to change the text when there are no solves. It
     // may be "Stackmat", "Hit Space" or "Tap Screen".
@@ -92,6 +92,16 @@
       1000));
   };
 
+  TimerView.prototype._handleTimerInspectionTime = function() {
+    var elapsed = window.app.timer.getInspectionTime();
+    if (elapsed > window.app.Timer.WCA_INSPECTION_TIME) {
+      this._appView.setTime('+2');
+    } else {
+      this._appView.setTime(Math.ceil((window.app.Timer.WCA_INSPECTION_TIME - 
+        elapsed) / 1000));
+    }
+  };
+
   TimerView.prototype._handleTimerManualTime = function() {
     this._appView.setTime(formatManualEntry(window.app.timer.getManualTime()));
     this._appView.blinkTime();
@@ -126,16 +136,7 @@
   };
 
   TimerView.prototype._handleTimerTime = function() {
-    if (window.app.timer.getState() === window.app.Timer.STATE_INSPECTION) {
-      var elapsed = window.app.timer.getTime();
-      if (elapsed > window.app.Timer.WCA_INSPECTION_TIME) {
-        this._appView.setTime('+2');
-      } else {
-        this._appView.setTime(Math.ceil((window.app.Timer.WCA_INSPECTION_TIME - 
-          elapsed) / 1000));
-      }
-      return;
-    } else if (this._accuracy === TimerView.ACCURACY_NONE) {
+    if (this._accuracy === TimerView.ACCURACY_NONE) {
       this._appView.setTime('Timing');
       return;
     }
@@ -175,8 +176,8 @@
     stream.on('scramble', this._showScramble.bind(this));
     stream.on('softTimeout', this._showScramble.bind(this, 'Loading...'));
 
-    var timerEvents = ['doneMemo', 'inspectionReady', 'ready', 'active',
-      'timing', 'waiting', 'reset', 'time', 'manualTime'];
+    var timerEvents = ['doneMemo', 'inspectionReady', 'inspectionTime', 'time',
+      'ready', 'active', 'timing', 'waiting', 'reset', 'manualTime'];
     for (var i = 0; i < timerEvents.length; ++i) {
       var event = timerEvents[i];
       var handlerName = '_handleTimer' + event.charAt(0).toUpperCase() +

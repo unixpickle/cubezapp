@@ -281,16 +281,16 @@
   BLDSession.prototype = Object.create(Session.prototype);
 
   BLDSession.prototype.down = function() {
-    if (window.app.timer.getState() ===
-        window.app.Timer.STATE_TIMING_DONE_MEMO) {
+    if (window.app.timer.hasMemoTime()) {
       Session.prototype.down.call(this);
     } else {
       this._memoDown = true;
 
-      // NOTE: we do this.timerTick() to make sure the memo time is accurate.
+      // Need to do this.timerTick() to make sure the memo time is as accurate
+      // as possible.
       this.timerTick();
 
-      window.app.timer.phaseDoneMemo();
+      window.app.timer.doneMemo();
     }
   };
 
@@ -364,7 +364,8 @@
 
   InspectionSession.prototype._endInspection = function() {
     var delay = new Date().getTime() - this._inspectionStart;
-    window.app.timer.setTime(Math.min(Math.max(delay, 0), TOO_MUCH_INSPECTION));
+    window.app.timer.setInspectionTime(Math.min(Math.max(delay, 0),
+      TOO_MUCH_INSPECTION));
 
     clearInterval(this._inspectionInterval);
     this._inspectionInterval = null;
@@ -378,7 +379,7 @@
     if (time > TOO_MUCH_INSPECTION) {
       this._endInspection();
     } else {
-      window.app.timer.setTime(time);
+      window.app.timer.setInspectionTime(time);
     }
   };
 
