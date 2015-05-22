@@ -130,8 +130,11 @@
 
   // setTime sets the time's text contents.
   AppView.prototype.setTime = function(time) {
-    // TODO: say "Tap Screen" if this is a mobile device.
-    this._middle.setTime(time || noTimesLabel());
+    if ('string' === typeof time || 'number' === typeof time) {
+      this._middle.setTime(time + '');
+    } else {
+      this._middle.setTime(noTimesLabel());
+    }
   };
 
   // setTimeBlinking sets whether the time blinker is blinking.
@@ -548,7 +551,7 @@
     if ('ontouchstart' in window) {
       return 'Tap Screen';
     } else if (window.app.store.getActivePuzzle().timerInput ===
-        window.app.TimerController.INPUT_STACKMAT) {
+        window.app.Timer.INPUT_STACKMAT) {
       return 'Stackmat';
     } else {
       return 'Hit Space';
@@ -557,7 +560,7 @@
 
   function usingInputEntry() {
     var timerInput = window.app.store.getActivePuzzle().timerInput;
-    return timerInput === window.app.TimerController.INPUT_ENTRY;
+    return timerInput === window.app.Timer.INPUT_ENTRY;
   }
 
   window.app.AppView = AppView;

@@ -5,6 +5,7 @@
   var ENTER_KEY = 13;
   var NUM0_KEY = 0x30;
   var NUM9_KEY = 0x39;
+  var TOO_MUCH_INSPECTION = 17000;
 
   function TimerController() {
     this._inputMode = window.app.store.getActivePuzzle().timerInput;
@@ -76,13 +77,13 @@
       this._session.down();
     } else {
       switch (this._inputMode) {
-      case TimerController.INPUT_REGULAR:
+      case window.app.Timer.INPUT_REGULAR:
         this._session = new Session();
         break;
-      case TimerController.INPUT_BLD:
+      case window.app.Timer.INPUT_BLD:
         this._session = new BLDSession();
         break;
-      case TimerController.INPUT_INSPECTION:
+      case window.app.Timer.INPUT_INSPECTION:
         this._session = new InspectionSession();
         break;
       default:
@@ -165,6 +166,9 @@
 
   TimerController.prototype._stackmatTime = function(millis) {
     if (this._stackmatRunning) {
+      if (window.app.timer.getState() === window.app.Timer.STATE_READY) {
+        window.app.timer.phaseTiming();
+      }
       window.app.timer.setTime(millis);
     }
   };
@@ -178,7 +182,7 @@
 
   TimerController.prototype._updateInputMethod = function() {
     this._inputMode = window.app.store.getActivePuzzle().timerInput;
- 
+
     switch (this._inputMode) {
     case window.app.Timer.INPUT_ENTRY:
       this._stackmat.disconnect();
@@ -193,7 +197,7 @@
       window.app.view.timer.controls.enable();
       break;
     }
-    
+
     window.app.timer.updateInputMethod();
   };
 
@@ -209,10 +213,8 @@
   // This is a base class and can only be used for MODE_REGULAR.
   function Session() {
     window.app.EventEmitter.call(this);
-    this._result = null;
     this._startTime = null;
     this._timerInterval = null;
-    this._scramble = window.app.view.timer.currentScramble();
   }
 
   Session.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -237,6 +239,8 @@
       throw new Error('down event with no timer interval');
     }
     window.app.timer.phaseDone();
+    clearInterval(this._timerInterval);
+    this._timerInterval = null;
   };
 
   // timerTick is called by this._timerInterval to update the timer text.
@@ -247,12 +251,10 @@
 
   // up is called when the user releases the space bar or lifts their finger.
   Session.prototype.up = function() {
-    if (this._timerInterval === null && this._result === null) {
+    if (this._startTime === null) {
       this._startTimer();
-    } else if (this._result !== null) {
-      this._done();
     } else {
-      throw new Error('invalid state at up()');
+      this._done();
     }
   };
 
@@ -266,6 +268,7 @@
     this._startTime = new Date().getTime();
     this._timerInterval = setInterval(this.timerTick.bind(this),
       TIME_INTERVAL);
+    window.app.timer.phaseTiming();
     this.timerTick();
   };
 
@@ -326,7 +329,7 @@
     // space or touched their screen while inspection was running. This way the
     // corresponding up() event doesn't stop the timer if they exceed inspection
     // time.
-    if (window.app.timer.getState() === Timer.STATE_INSPECTION) {
+    if (window.app.timer.getState() === window.app.Timer.STATE_INSPECTION) {
       this._downOnInspection = true;
     } else {
       Session.prototype.down.call(this);
@@ -334,7 +337,7 @@
   };
 
   InspectionSession.prototype.up = function() {
-    if (window.app.timer.getState() === Timer.STATE_TIMING) {
+    if (window.app.timer.getState() === window.app.Timer.STATE_TIMING) {
       // If the down() event happened during inspection, the up() event should
       // do nothing.
       if (this._downOnInspection) {
@@ -345,6 +348,8 @@
     } else if (this._inspectionInterval !== null) {
       this._endInspection();
       this._downOnInspection = false;
+    } else if (window.app.timer.getState() === window.app.Timer.STATE_DONE) {
+      Session.prototype.up.call(this);
     } else {
       this._beginInspection();
     }
@@ -354,11 +359,12 @@
     this._inspectionStart = new Date().getTime();
     this._inspectionInterval = setInterval(this._interval.bind(this),
       TIME_INTERVAL);
+    window.app.timer.phaseInspection();
   };
 
   InspectionSession.prototype._endInspection = function() {
     var delay = new Date().getTime() - this._inspectionStart;
-    this._inspectionTime = Math.max(delay, 0);
+    window.app.timer.setTime(Math.min(Math.max(delay, 0), TOO_MUCH_INSPECTION));
 
     clearInterval(this._inspectionInterval);
     this._inspectionInterval = null;
@@ -369,8 +375,7 @@
 
   InspectionSession.prototype._interval = function() {
     var time = Math.max(new Date().getTime()-this._inspectionStart, 0);
-    if (time > 17000) {
-      window.app.timer.setTime(17000);
+    if (time > TOO_MUCH_INSPECTION) {
       this._endInspection();
     } else {
       window.app.timer.setTime(time);

@@ -44,17 +44,17 @@
   SettingsController.prototype._inputChanged = function() {
     var input = 0;
     if (this._view.getBLD()) {
-      input = window.app.TimerController.INPUT_BLD;
+      input = window.app.Timer.INPUT_BLD;
     } else if (this._view.getInspection()) {
-      input = window.app.TimerController.INPUT_INSPECTION;
+      input = window.app.Timer.INPUT_INSPECTION;
     } else {
       var modeStr = this._view.getTimerInput();
       if (modeStr === 'Regular') {
-        input = window.app.TimerController.INPUT_REGULAR;
+        input = window.app.Timer.INPUT_REGULAR;
       } else if (modeStr === 'Stackmat') {
-        input = window.app.TimerController.INPUT_STACKMAT;
+        input = window.app.Timer.INPUT_STACKMAT;
       } else {
-        input = window.app.TimerController.INPUT_ENTRY;
+        input = window.app.Timer.INPUT_ENTRY;
       }
     }
     window.app.store.modifyPuzzle({timerInput: input});

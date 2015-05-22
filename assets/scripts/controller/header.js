@@ -21,8 +21,8 @@
       popup.close();
       this._view.close();
 
-      var input = popup.getBLD() ? window.app.TimerController.INPUT_BLD :
-        window.app.TimerController.INPUT_REGULAR;
+      var input = popup.getBLD() ? window.app.Timer.INPUT_BLD :
+        window.app.Timer.INPUT_REGULAR;
       window.app.store.addPuzzle({
         name: name,
         icon: popup.getIcon(),

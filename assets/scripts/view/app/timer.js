@@ -13,6 +13,7 @@
     this._settingsChangedWhileRunning = false;
     this._theaterMode = false;
     this._accuracy = 0;
+    this._updateSettings();
 
     this._registerModelEvents();
 
@@ -29,12 +30,28 @@
 
   TimerView.prototype._appLoaded = function() {
     window.app.timer.getScrambleStream().resume();
+    this._updateSettings();
     this._showPBLabel();
+    if (window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY) {
+      this._appView.setTimeBlinking(
+        window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY
+      );
+      this._handleTimerManualTime();
+    }
+  };
+  
+  TimerView.prototype._handleInputChanged = function() {
+    // NOTE: this is necessary to change the text when there are no solves. It
+    // may be "Stackmat", "Hit Space" or "Tap Screen".
+    if (window.app.timer.getState() === window.app.Timer.STATE_NOT_RUNNING &&
+        window.app.store.getLatestSolve() === null) {
+      this._appView.setTime(null);
+    }
   };
 
   TimerView.prototype._handleLatestSolveChanged = function() {
-    if (window.app.timer.getState() === Timer.STATE_DONE ||
-        window.app.timer.getState() === Timer.STATE_NOT_RUNNING) {
+    if (window.app.timer.getState() === window.app.Timer.STATE_DONE ||
+        window.app.timer.getState() === window.app.Timer.STATE_NOT_RUNNING) {
       this._showLatestSolve();
     }
   };
@@ -54,39 +71,121 @@
   TimerView.prototype._handleStatsLoading = function() {
     this._appView.setPB(null);
   };
-  
+
+  TimerView.prototype._handleTimerActive = function() {
+    if (this._theaterMode) {
+      this._appView.setTheaterMode(true);
+    }
+    this._appView.setScramble(null);
+    this._appView.setPB(null);
+    this._appView.setMemo(null);
+  };
+
   TimerView.prototype._handleTimerDoneMemo = function() {
     this._appView.setMemo(
       window.app.formatTime(window.app.timer.getMemoTime())
     );
   };
-  
-  TimerView.prototype._handleTimerInspection = function() {
-    var elapsed = window.app.timer.getTime();
-    if (elapsed > Timer.WCA_INSPECTION_TIME) {
-      this._appView.setTime('+2');
+
+  TimerView.prototype._handleTimerInspectionReady = function() {
+    this._appView.setTime(Math.ceil(window.app.Timer.WCA_INSPECTION_TIME /
+      1000));
+  };
+
+  TimerView.prototype._handleTimerManualTime = function() {
+    this._appView.setTime(formatManualEntry(window.app.timer.getManualTime()));
+    this._appView.blinkTime();
+  };
+
+  TimerView.prototype._handleTimerReady = function() {
+    if (this._accuracy === TimerView.ACCURACY_NONE) {
+      this._appView.setTime('Ready');
+    } else if (this._accuracy === TimerView.ACCURACY_SECONDS) {
+      this._appView.setTime('0');
     } else {
-      this._appView.setTime(Math.ceil(elapsed / 1000));
+      this._appView.setTime('0.00');
     }
   };
-  
-  TimerView.prototype._handleTimerInspectionReady = function() {
-    this._appView.setTime(Math.ceil(Timer.WCA_INSPECTION_TIME / 1000));
+
+  TimerView.prototype._handleTimerReset = function() {
+    if (this._theaterMode) {
+      this._appView.setTheaterMode(false);
+    }
+
+    this._updateSettings();
+    this._showPBLabel();
+
+    this._appView.setTimeBlinking(
+      window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY
+    );
+    if (window.app.timer.getState() !== window.app.Timer.STATE_MANUAL_ENTRY) {
+      this._showLatestSolve();
+    } else {
+      this._handleTimerManualTime();
+    }
+  };
+
+  TimerView.prototype._handleTimerTime = function() {
+    if (window.app.timer.getState() === window.app.Timer.STATE_INSPECTION) {
+      var elapsed = window.app.timer.getTime();
+      if (elapsed > window.app.Timer.WCA_INSPECTION_TIME) {
+        this._appView.setTime('+2');
+      } else {
+        this._appView.setTime(Math.ceil((window.app.Timer.WCA_INSPECTION_TIME - 
+          elapsed) / 1000));
+      }
+      return;
+    } else if (this._accuracy === TimerView.ACCURACY_NONE) {
+      this._appView.setTime('Timing');
+      return;
+    }
+
+    var addTwo = window.app.timer.getPlus2();
+    var millis = window.app.timer.getTime();
+
+    var showMillis = (addTwo ? millis + 2000 : millis);
+    var suffix = (addTwo ? '+' : '');
+
+    if (this._accuracy === TimerView.ACCURACY_SECONDS) {
+      this._appView.setTime(window.app.formatSeconds(showMillis) + suffix);
+    } else {
+      this._appView.setTime(window.app.formatTime(showMillis) + suffix);
+    }
+  };
+
+  TimerView.prototype._handleTimerTiming = function() {
+    this._handleTimerTime();
+  };
+
+  TimerView.prototype._handleTimerWaiting = function() {
+    this._appView.setTime('Waiting');
   };
 
   TimerView.prototype._registerModelEvents = function() {
     window.app.observe.globalSettings(['theaterMode', 'timerAccuracy'],
       this._handleSettingsChanged.bind(this));
-    window.app.observe.activePuzzle('timerInput',
-      this._handleTimerInputChanged.bind(this));
     window.app.observe.latestSolve(['time', 'memo', 'plus2', 'dnf'],
       this._handleLatestSolveChanged.bind(this));
+    window.app.observe.activePuzzle('timerInput',
+      this._handleInputChanged.bind(this));
     window.app.store.on('computedStats', this._handleStatsComputed.bind(this));
     window.app.store.on('loadingStats', this._handleStatsLoading.bind(this));
-    
-    var stream = new window.app.timer.getScrambleStream();
+
+    var stream = window.app.timer.getScrambleStream();
     stream.on('scramble', this._showScramble.bind(this));
     stream.on('softTimeout', this._showScramble.bind(this, 'Loading...'));
+
+    var timerEvents = ['doneMemo', 'inspectionReady', 'ready', 'active',
+      'timing', 'waiting', 'reset', 'time', 'manualTime'];
+    for (var i = 0; i < timerEvents.length; ++i) {
+      var event = timerEvents[i];
+      var handlerName = '_handleTimer' + event.charAt(0).toUpperCase() +
+        event.substring(1);
+      if ('undefined' === typeof this[handlerName]) {
+        throw new Error('no handler for: ' + event);
+      }
+      window.app.timer.on(event, this[handlerName].bind(this));
+    }
   };
 
   TimerView.prototype._showLatestSolve = function() {
@@ -249,7 +348,7 @@
       this.emit('up');
     }
   };
-  
+
   // formatManualEntry returns a time with ':' and '.' inserted at the right
   // places given a piece of user input.
   function formatManualEntry(raw) {
@@ -278,7 +377,7 @@
       return '';
     }
   }
-  
+
   function isTimerRunning() {
     switch (window.app.timer.getState()) {
     case window.app.Timer.STATE_NOT_RUNNING:

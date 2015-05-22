@@ -35,7 +35,7 @@
   Timer.STATE_TIMING = 6;
   Timer.STATE_TIMING_DONE_MEMO = 7;
   Timer.STATE_DONE = 8;
-  
+
   Timer.WCA_INSPECTION_TIME = 15000;
 
   Timer.prototype.getManualTime = function() {
@@ -65,6 +65,7 @@
   Timer.prototype.phaseDone = function() {
     this._assertStates([Timer.STATE_TIMING, Timer.STATE_TIMING_DONE_MEMO]);
     this._state = Timer.STATE_DONE;
+    this.emit('done');
   };
 
   Timer.prototype.phaseDoneMemo = function() {
@@ -86,18 +87,26 @@
     this._scrambleStream.pause();
     this._time = 0;
     this.emit('inspectionReady');
+    this.emit('active');
   };
 
   Timer.prototype.phaseReady = function() {
     this._assertStates([Timer.STATE_WAITING, Timer.STATE_NOT_RUNNING]);
+    var wasWaiting = (this._state === Timer.STATE_WAITING);
     this._state = Timer.STATE_READY;
     this._scrambleStream.pause();
     this._time = 0;
     this.emit('ready');
+    if (!wasWaiting) {
+      this.emit('active');
+    }
   };
 
   Timer.prototype.phaseTiming = function() {
-    this._assertState(Timer.STATE_READY);
+    this._assertStates([Timer.STATE_READY, Timer.STATE_INSPECTION]);
+    if (this._state === Timer.STATE_INSPECTION) {
+      this._inspectionTime = this._time;
+    }
     this._state = Timer.STATE_TIMING;
     this.emit('timing');
   };
@@ -108,6 +117,7 @@
     this._scrambleStream.pause();
     this._time = 0;
     this.emit('waiting');
+    this.emit('active');
   };
 
   Timer.prototype.reset = function() {
@@ -121,7 +131,7 @@
     this._time = -1;
     this._memoTime = -1;
     this._inspectionTime = -1;
-    
+
     // NOTE: we do this before emitting 'reset' because the reset handler could
     // theoretically do something to pause the scramble stream.
     if (this._didSave) {
@@ -199,7 +209,7 @@
 
   Timer.prototype._assertStates = function(states) {
     if (states.indexOf(this._state) < 0) {
-      throw new Error('invalid state: ' + state);
+      throw new Error('invalid state: ' + this._state);
     }
   };
 

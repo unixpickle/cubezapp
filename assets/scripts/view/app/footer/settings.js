@@ -247,7 +247,7 @@
 
   Settings.prototype._updateBLD = function() {
     var input = window.app.store.getActivePuzzle().timerInput;
-    var bld = (input === window.app.TimerController.INPUT_BLD);
+    var bld = (input === window.app.Timer.INPUT_BLD);
     this._getField('bld').checkbox().setChecked(bld);
   };
 
@@ -271,10 +271,10 @@
     var field = this._getField('inspection');
     var checkbox = field.checkbox();
     var input = window.app.store.getActivePuzzle().timerInput;
-    if (input === window.app.TimerController.INPUT_BLD) {
+    if (input === window.app.Timer.INPUT_BLD) {
       checkbox.setChecked(false);
       field.enabled = false;
-    } else if (input === window.app.TimerController.INPUT_INSPECTION) {
+    } else if (input === window.app.Timer.INPUT_INSPECTION) {
       checkbox.setChecked(true);
       field.enabled = true;
     } else {
@@ -352,11 +352,11 @@
   Settings.prototype._updateTimerInput = function(animate) {
     var input = window.app.store.getActivePuzzle().timerInput;
     var mode = null;
-    if (input === window.app.TimerController.INPUT_REGULAR) {
+    if (input === window.app.Timer.INPUT_REGULAR) {
       mode = 'Regular';
-    } else if (input === window.app.TimerController.INPUT_ENTRY) {
+    } else if (input === window.app.Timer.INPUT_ENTRY) {
       mode = 'Manual Entry';
-    } else if (input === window.app.TimerController.INPUT_STACKMAT) {
+    } else if (input === window.app.Timer.INPUT_STACKMAT) {
       mode = 'Stackmat';
     }
     var field = this._getField('timerInput');
