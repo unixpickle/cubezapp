@@ -23,12 +23,7 @@
   TimerView.prototype._appLoaded = function() {
     window.app.timer.getScrambleStream().resume();
     this._showPBLabel();
-    if (window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY) {
-      this._appView.setTimeBlinking(
-        window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY
-      );
-      this._handleTimerManualTime();
-    }
+    this._updateManualEntryUI();
   };
 
   TimerView.prototype._handleInputChanged = function() {
@@ -106,13 +101,9 @@
     this._appView.setTheaterMode(false);
     this._showPBLabel();
 
-    this._appView.setTimeBlinking(
-      window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY
-    );
+    this._updateManualEntryUI();
     if (window.app.timer.getState() !== window.app.Timer.STATE_MANUAL_ENTRY) {
       this._showLatestSolve();
-    } else {
-      this._handleTimerManualTime();
     }
   };
 
@@ -237,6 +228,16 @@
 
   TimerView.prototype._showScramble = function(scramble) {
     this._appView.setScramble(scramble);
+  };
+  
+  TimerView.prototype._updateManualEntryUI = function() {
+    if (window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY) {
+      this._appView.setMemo(null);
+      this._appView.setTimeBlinking(true);
+      this._handleTimerManualTime();
+    } else {
+      this._appView.setTimeBlinking(false);
+    }
   };
 
   // Controls handles keyboard and/or touchscreen events for starting and
