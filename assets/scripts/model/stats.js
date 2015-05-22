@@ -80,6 +80,7 @@
     var computer = this._computers[computerIdx];
     var average = computer.average();
     if (isNaN(average)) {
+      this._lastWasPB[computerIdx] = false;
       return;
     }
     var best = this._best[computerIdx];

@@ -73,10 +73,6 @@
     });
     this._updateRow($row, solve);
 
-    $row.mouseenter(this._mouseEnterRow.bind(this, $row, solve));
-    $row.mouseleave(this._mouseLeaveRow.bind(this, $row, solve));
-    $row.click(this._rowClicked.bind(this, $row, solve));
-
     return $row;
   };
 
@@ -235,7 +231,7 @@
     var handler;
     handler = function() {
       clearTimeout(timeout);
-      this._$element.off('scroll', handler);
+      this._$element.unbind('scroll', handler);
       callback();
     }.bind(this);
     this._$element.scroll(handler);
@@ -258,6 +254,13 @@
       textDecoration: solve.dnf ? 'line-through' : 'none'
     }).text(window.app.formatTime(window.app.solveTime(solve)));
     $row.find('.plus2').text(solve.plus2 ? '+' : '');
+    
+    // We must register event handlers whenever the row is updated so that the
+    // solve object gets updated (since it is bound as an argument).
+    $row.unbind('mouseenter').unbind('mouseleave').unbind('click');
+    $row.mouseenter(this._mouseEnterRow.bind(this, $row, solve));
+    $row.mouseleave(this._mouseLeaveRow.bind(this, $row, solve));
+    $row.click(this._rowClicked.bind(this, $row, solve));
   };
 
   Times.prototype._updateVisibleRange = function() {
