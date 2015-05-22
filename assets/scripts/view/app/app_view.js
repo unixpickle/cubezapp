@@ -35,7 +35,12 @@
         time += 2000;
         suffix = '+';
       }
-      this.setTime(window.app.formatTime(time) + suffix);
+      var timeString = window.app.formatTime(time) + suffix;
+      if (latestSolve.dnf) {
+        this.setTimeDNF(timeString);
+      } else {
+        this.setTime(timeString);
+      }
       if (latestSolve.memo >= 0) {
         this._middle.setMemo(window.app.formatTime(latestSolve.memo));
       }
@@ -122,6 +127,9 @@
   // setTheaterMode enables or disables "theater" mode, in which everything is
   // hidden but the time.
   AppView.prototype.setTheaterMode = function(on) {
+    if (this._theaterMode === on) {
+      return;
+    }
     this._theaterMode = on;
     var oldState = new State(this._state);
     this._updateState();
@@ -135,12 +143,19 @@
     } else {
       this._middle.setTime(noTimesLabel());
     }
+    this._middle.setDNF(false);
   };
 
   // setTimeBlinking sets whether the time blinker is blinking.
   AppView.prototype.setTimeBlinking = function(flag) {
     this._middle.setTimeBlinking(flag);
-  }
+  };
+  
+  // setTimeDNF sets a time and makes it appears as a DNF.
+  AppView.prototype.setTimeDNF = function(time) {
+    this.setTime(time);
+    this._middle.setDNF(true);
+  };
 
   // _animateStateChange animates the transition between an old state and the
   // current state.

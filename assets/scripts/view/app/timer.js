@@ -6,17 +6,9 @@
   // The TimerView is responsible for presenting the timer to the user.
   function TimerView(appView) {
     this._appView = appView;
-
     this.controls = new Controls();
 
-    // Setup the hidden class before running this._updateSettings().
-    this._settingsChangedWhileRunning = false;
-    this._theaterMode = false;
-    this._accuracy = 0;
-    this._updateSettings();
-
     this._registerModelEvents();
-
     appView.on('load', this._appLoaded.bind(this));
 
     // NOTE: we do not run this._showLatestSolve() here because the AppView does
@@ -30,7 +22,6 @@
 
   TimerView.prototype._appLoaded = function() {
     window.app.timer.getScrambleStream().resume();
-    this._updateSettings();
     this._showPBLabel();
     if (window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY) {
       this._appView.setTimeBlinking(
@@ -56,12 +47,6 @@
     }
   };
 
-  TimerView.prototype._handleSettingsChanged = function() {
-    if (!isTimerRunning()) {
-      this._updateSettings();
-    }
-  };
-
   TimerView.prototype._handleStatsComputed = function() {
     if (!isTimerRunning()) {
       this._showPBLabel();
@@ -73,7 +58,7 @@
   };
 
   TimerView.prototype._handleTimerActive = function() {
-    if (this._theaterMode) {
+    if (window.app.store.getGlobalSettings().theaterMode) {
       this._appView.setTheaterMode(true);
     }
     this._appView.setScramble(null);
@@ -97,7 +82,7 @@
     if (elapsed > window.app.Timer.WCA_INSPECTION_TIME) {
       this._appView.setTime('+2');
     } else {
-      this._appView.setTime(Math.ceil((window.app.Timer.WCA_INSPECTION_TIME - 
+      this._appView.setTime(Math.ceil((window.app.Timer.WCA_INSPECTION_TIME -
         elapsed) / 1000));
     }
   };
@@ -118,11 +103,7 @@
   };
 
   TimerView.prototype._handleTimerReset = function() {
-    if (this._theaterMode) {
-      this._appView.setTheaterMode(false);
-    }
-
-    this._updateSettings();
+    this._appView.setTheaterMode(false);
     this._showPBLabel();
 
     this._appView.setTimeBlinking(
@@ -136,7 +117,9 @@
   };
 
   TimerView.prototype._handleTimerTime = function() {
-    if (this._accuracy === TimerView.ACCURACY_NONE) {
+    var accuracy = window.app.store.getGlobalSettings().timerAccuracy;
+
+    if (accuracy === TimerView.ACCURACY_NONE) {
       this._appView.setTime('Timing');
       return;
     }
@@ -147,7 +130,7 @@
     var showMillis = (addTwo ? millis + 2000 : millis);
     var suffix = (addTwo ? '+' : '');
 
-    if (this._accuracy === TimerView.ACCURACY_SECONDS) {
+    if (accuracy === TimerView.ACCURACY_SECONDS) {
       this._appView.setTime(window.app.formatSeconds(showMillis) + suffix);
     } else {
       this._appView.setTime(window.app.formatTime(showMillis) + suffix);
@@ -163,8 +146,6 @@
   };
 
   TimerView.prototype._registerModelEvents = function() {
-    window.app.observe.globalSettings(['theaterMode', 'timerAccuracy'],
-      this._handleSettingsChanged.bind(this));
     window.app.observe.latestSolve(['time', 'memo', 'plus2', 'dnf'],
       this._handleLatestSolveChanged.bind(this));
     window.app.observe.activePuzzle('timerInput',
@@ -201,7 +182,14 @@
         time += 2000;
         suffix = '+';
       }
-      this._appView.setTime(window.app.formatTime(time) + suffix);
+
+      var timeString = window.app.formatTime(time) + suffix;
+      if (solve.dnf) {
+        this._appView.setTimeDNF(timeString);
+      } else {
+        this._appView.setTime(timeString);
+      }
+
       if (solve.memo >= 0) {
         this._appView.setMemo(window.app.formatTime(solve.memo));
       } else {
@@ -249,12 +237,6 @@
 
   TimerView.prototype._showScramble = function(scramble) {
     this._appView.setScramble(scramble);
-  };
-
-  TimerView.prototype._updateSettings = function() {
-    var settings = window.app.store.getGlobalSettings();
-    this._theaterMode = settings.theaterMode;
-    this._accuracy = settings.timerAccuracy;
   };
 
   // Controls handles keyboard and/or touchscreen events for starting and

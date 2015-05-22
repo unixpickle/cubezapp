@@ -112,9 +112,6 @@
 
   Timer.prototype.phaseTiming = function() {
     this._assertStates([Timer.STATE_READY, Timer.STATE_INSPECTION]);
-    if (this._state === Timer.STATE_INSPECTION) {
-      this._inspectionTime = this._time;
-    }
     this._state = Timer.STATE_TIMING;
     this.emit('timing');
   };

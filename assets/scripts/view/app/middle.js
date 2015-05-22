@@ -47,7 +47,7 @@
   };
 
   // computeTimeLayout uses a size and a state to figure out the layout of the
-  // view. It returns an object with a "timeY" and "timeSize" attribute. 
+  // view. It returns an object with a "timeY" and "timeSize" attribute.
   Middle.prototype.computeTimeLayout = function(width, height, pb, scramble,
     memo) {
     // The "usageHeight" and "usableY" variables represent the space which can
@@ -116,7 +116,7 @@
 
   // layout updates attributes of various elements in the middle to reflect a
   // set of supplied animator attributes.
-  Middle.prototype.layout = function(attrs) {    
+  Middle.prototype.layout = function(attrs) {
     // Memo label.
     if (attrs.memoOpacity === 0) {
       this._$memoTime.css({display: 'none'});
@@ -168,6 +168,11 @@
       throw new Error('invalid scrambleHeight: ' + height);
     }
     return height;
+  };
+
+  // setDNF determines whether or not the time has a strike through it.
+  Middle.prototype.setDNF = function(flag) {
+    this._time.setDNF(flag);
   };
 
   // setMemo sets the memo time's text contents.

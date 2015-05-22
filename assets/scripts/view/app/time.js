@@ -80,6 +80,14 @@
     }.bind(this), 500);
   };
 
+  Time.prototype.setDNF = function(flag) {
+    if (flag) {
+      this._$label.css({textDecoration: 'line-through'});
+    } else {
+      this._$label.css({textDecoration: 'none'});
+    }
+  };
+
   Time.prototype.text = function(text) {
     this._text = text;
     this._$label.text(text);
