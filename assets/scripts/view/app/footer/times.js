@@ -31,6 +31,7 @@
     this._currentContextMenu = null;
 
     this._registerDataWindowEvents();
+    this._registerTimerEvents();
     this._registerUIEvents(footer);
   }
 
@@ -85,6 +86,8 @@
   };
 
   Times.prototype._handleModification = function(solve) {
+    this._hideContextMenu();
+    
     if (!this._idsToRows.hasOwnProperty(solve.id)) {
       throw new Error('row does not exist');
     }
@@ -95,6 +98,8 @@
   };
 
   Times.prototype._handleUpdate = function() {
+    this._hideContextMenu();
+    
     this._$middleContent.detach();
     this._$middleContent.children().each(function(i, element) {
       $(element).detach();
@@ -121,6 +126,14 @@
       this.emit('needsLayout');
     }
   };
+  
+  Times.prototype._hideContextMenu = function() {
+    if (this._currentContextMenu === null) {
+      return;
+    }
+    this._currentContextMenu.hide();
+    this._currentContextMenu = null;
+  };
 
   Times.prototype._mouseEnterRow = function($row, solve) {
     $row.css({backgroundColor: HOVER_BACKGROUND});
@@ -135,15 +148,16 @@
     this._dataWindow.on('modification', this._handleModification.bind(this));
     this._dataWindow.on('update', this._handleUpdate.bind(this));
   };
+  
+  Times.prototype._registerTimerEvents = function() {
+    var boundHide = this._hideContextMenu.bind(this);
+    window.app.timer.on('active', boundHide);
+    window.app.timer.on('manualTime', boundHide);
+  };
 
   Times.prototype._registerUIEvents = function(footer) {
     this._$element.scroll(this._updateVisibleRange.bind(this));
-    footer.on('hidden', function() {
-      if (this._currentContextMenu !== null) {
-        this._currentContextMenu.hide();
-        this._currentContextMenu = null;
-      }
-    }.bind(this));
+    footer.on('hidden', this._hideContextMenu.bind(this));
   };
 
   Times.prototype._rowClicked = function($row, solve) {
@@ -180,8 +194,7 @@
           // TODO: this.
           return;
         }
-        this._currentContextMenu.hide();
-        this._currentContextMenu = null;
+        this._hideContextMenu();
       }.bind(this);
 
       pentaltyPage.onClick = function(itemIndex) {
@@ -199,10 +212,10 @@
           this.emit('dnf', solve);
           break;
         }
-        this._currentContextMenu.hide();
-        this._currentContextMenu = null;
+        this._hideContextMenu();
       }.bind(this);
 
+      this._hideContextMenu();
       var context = new window.contextjs.Context($row, $('#footer'));
       this._currentContextMenu = new window.contextjs.Menu(context, mainPage);
       this._currentContextMenu.show();
