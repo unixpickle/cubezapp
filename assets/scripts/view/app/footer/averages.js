@@ -392,10 +392,16 @@
       return $('<div id="averages-overview">' + solvesRow + '</div>');
     }
 
-    var meanRow = '<div class="row"><label>Mean:</label>' +
-      window.app.formatTime(stats.mean) + '</div>';
-    var bestRow = '<div class="row"><label>Best:</label>' +
-      window.app.formatTime(window.app.solveTime(stats.best)) + '</div>';
+    var meanRow = '';
+    if (!isNaN(stats.mean)) {
+      meanRow = '<div class="row"><label>Mean:</label>' +
+        window.app.formatTime(stats.mean) + '</div>';
+    }
+    var bestRow = '';
+    if (stats.best !== null) {
+      bestRow = '<div class="row"><label>Best:</label>' +
+        window.app.formatTime(window.app.solveTime(stats.best)) + '</div>';
+    }
     return $('<div id="averages-overview">' + solvesRow + meanRow + bestRow +
       '</div>');
   }

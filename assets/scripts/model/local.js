@@ -398,20 +398,28 @@
     }
 
     var lastPB = -1;
-    if (startIndex === 1) {
-      lastPB = window.app.solveTime(solves[startIndex - 1]);
-    } else if (startIndex > 1) {
-      lastPB = Math.min(solves[startIndex - 1].lastPB,
-        window.app.solveTime(solves[startIndex - 1]));
+    
+    if (startIndex > 0) {
+      var previousSolve = solves[startIndex - 1];
+      if (previousSolve.dnf) {
+        lastPB = previousSolve.lastPB;
+      } else if (previousSolve.lastPB === -1) {
+        lastPB = window.app.solveTime(previousSolve);
+      } else {
+        lastPB = Math.min(window.app.solveTime(previousSolve),
+          previousSolve.lastPB);
+      }
     }
 
     for (var i = startIndex, len = solves.length; i < len; ++i) {
       var solve = solves[i];
       solve.lastPB = lastPB;
-      if (lastPB < 0) {
-        lastPB = window.app.solveTime(solve);
-      } else {
-        lastPB = Math.min(lastPB, window.app.solveTime(solve));
+      if (!solve.dnf) {
+        if (lastPB < 0) {
+          lastPB = window.app.solveTime(solve);
+        } else {
+          lastPB = Math.min(lastPB, window.app.solveTime(solve));
+        }
       }
     }
   };

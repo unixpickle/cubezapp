@@ -11,7 +11,9 @@
   }
 
   function solveIsPB(solve) {
-    if (solve.lastPB === -1) {
+    if (solve.dnf) {
+      return false;
+    } else if (solve.lastPB === -1) {
       return true;
     } else {
       return Math.floor(solveTime(solve) / 10) < Math.floor(solve.lastPB / 10);
