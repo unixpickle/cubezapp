@@ -28,6 +28,7 @@
     this._rows = [];
     this._idsToRows = {};
     this._width = DEFAULT_WIDTH;
+    this._rowWidth = DEFAULT_WIDTH;
     this._currentContextMenu = null;
 
     this._registerDataWindowEvents();
@@ -63,7 +64,7 @@
     $row.find('.row-content').css({
       display: 'inline-block',
       textAlign: 'right',
-      width: this._width
+      width: this._rowWidth
     });
     $row.find('.time').css({textAlign: 'right', pointerEvents: 'none'});
     $row.find('.plus2').css({
@@ -289,22 +290,24 @@
       return false;
     }
 
-    var oldWidth = this._width;
-    this._width = 0;
+    var oldRowWidth = this._rowWidth;
+    this._rowWidth = 0;
     for (var i = 0, len = solves.length; i < len; ++i) {
       var solve = solves[i];
       var solveWidth = this._textMetrics.plus2Space() +
         this._textMetrics.widthOfTime(window.app.solveTime(solve)) +
         LIST_PADDING_LEFT + LIST_PADDING_RIGHT;
-      this._width = Math.max(this._width, solveWidth);
+      this._rowWidth = Math.max(this._rowWidth, solveWidth);
     }
-    this._width += scrollbarWidth();
+    
+    var oldWidth = this._width;
+    this._width = this._rowWidth + scrollbarWidth();
 
-    var changed = (oldWidth !== this._width);
-    if (changed) {
-      this._$middleContent.find('.row-content').css({width: this._width});
+    if (oldRowWidth !== this._rowWidth) {
+      this._$middleContent.find('.row-content').css({width: this._rowWidth});
     }
-    return changed;
+    
+    return oldWidth !== this._width;
   };
 
   // A DataWindow loads solves dynamically to show in the list. It keeps track
