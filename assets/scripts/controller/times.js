@@ -32,7 +32,6 @@
   };
 
   TimesController.prototype._viewScramble = function(solve) {
-    console.log(solve);
     alert('Your scramble was: ' + solve.scramble + '. Sorry, I know this ' +
       'popup is hideous and will give you nightmares.');
   };
