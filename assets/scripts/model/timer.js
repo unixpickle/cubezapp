@@ -72,7 +72,7 @@
   Timer.prototype.getTime = function() {
     return this._time;
   };
-  
+
   Timer.prototype.hasMemoTime = function() {
     return this._memoTime >= 0;
   };

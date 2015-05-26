@@ -299,14 +299,14 @@
         LIST_PADDING_LEFT + LIST_PADDING_RIGHT;
       this._rowWidth = Math.max(this._rowWidth, solveWidth);
     }
-    
+
     var oldWidth = this._width;
     this._width = this._rowWidth + scrollbarWidth();
 
     if (oldRowWidth !== this._rowWidth) {
       this._$middleContent.find('.row-content').css({width: this._rowWidth});
     }
-    
+
     return oldWidth !== this._width;
   };
 

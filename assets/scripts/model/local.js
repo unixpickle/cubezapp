@@ -398,7 +398,7 @@
     }
 
     var lastPB = -1;
-    
+
     if (startIndex > 0) {
       var previousSolve = solves[startIndex - 1];
       if (previousSolve.dnf) {

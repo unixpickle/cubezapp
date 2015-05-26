@@ -229,7 +229,7 @@
   TimerView.prototype._showScramble = function(scramble) {
     this._appView.setScramble(scramble);
   };
-  
+
   TimerView.prototype._updateManualEntryUI = function() {
     if (window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY) {
       this._appView.setMemo(null);

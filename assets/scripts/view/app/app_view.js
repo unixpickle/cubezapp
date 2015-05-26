@@ -150,7 +150,7 @@
   AppView.prototype.setTimeBlinking = function(flag) {
     this._middle.setTimeBlinking(flag);
   };
-  
+
   // setTimeDNF sets a time and makes it appears as a DNF.
   AppView.prototype.setTimeDNF = function(time) {
     this.setTime(time);
