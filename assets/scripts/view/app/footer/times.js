@@ -85,21 +85,9 @@
     this._handleUpdate();
   };
 
-  Times.prototype._handleModification = function(solve) {
-    this._hideContextMenu();
-    
-    if (!this._idsToRows.hasOwnProperty(solve.id)) {
-      throw new Error('row does not exist');
-    }
-    this._updateRow(this._idsToRows[solve.id], solve);
-    if (this._updateWidth) {
-      this.emit('needsLayout');
-    }
-  };
-
   Times.prototype._handleUpdate = function() {
     this._hideContextMenu();
-    
+
     this._$middleContent.detach();
     this._$middleContent.children().each(function(i, element) {
       $(element).detach();
@@ -114,6 +102,8 @@
       var $row = oldIdsToRows[solve.id];
       if (!$row) {
         $row = this._generateRow(solve);
+      } else {
+        this._updateRow($row, solve);
       }
       this._idsToRows[solve.id] = $row;
       this._$middleContent.append($row);
@@ -126,7 +116,7 @@
       this.emit('needsLayout');
     }
   };
-  
+
   Times.prototype._hideContextMenu = function() {
     if (this._currentContextMenu === null) {
       return;
@@ -145,10 +135,9 @@
 
   Times.prototype._registerDataWindowEvents = function() {
     this._dataWindow.on('invalidate', this._handleInvalidate.bind(this));
-    this._dataWindow.on('modification', this._handleModification.bind(this));
     this._dataWindow.on('update', this._handleUpdate.bind(this));
   };
-  
+
   Times.prototype._registerTimerEvents = function() {
     var boundHide = this._hideContextMenu.bind(this);
     window.app.timer.on('active', boundHide);
@@ -267,7 +256,13 @@
       textDecoration: solve.dnf ? 'line-through' : 'none'
     }).text(window.app.formatTime(window.app.solveTime(solve)));
     $row.find('.plus2').text(solve.plus2 ? '+' : '');
-    
+
+    if (window.app.solveIsPB(solve)) {
+      $row.addClass('flavor-text').css({color: ''});
+    } else {
+      $row.removeClass('flavor-text').css({color: LIST_TEXT_COLOR});
+    }
+
     // We must register event handlers whenever the row is updated so that the
     // solve object gets updated (since it is bound as an argument).
     $row.unbind('mouseenter').unbind('mouseleave').unbind('click');
@@ -337,6 +332,9 @@
   };
 
   DataWindow.prototype.setVisibleRange = function(first, last) {
+    if (this._firstVisible === first && this._lastVisible === last) {
+      return;
+    }
     this._firstVisible = first;
     this._lastVisible = last;
     this._update(false);
@@ -419,7 +417,11 @@
     }
 
     window.app.store.on('addedSolve', this._update.bind(this, false));
-    window.app.store.on('modifiedSolve', this._modifiedSolve.bind(this));
+
+    // When a solve is modified, we must force an update because the indices are
+    // most likely the same but solves may be changed (i.e. whether or not they
+    // are PBs).
+    window.app.store.on('modifiedSolve', this._update.bind(this, true));
 
     // When a solve is deleted, we must force an update because the indices have
     // probably shifted and the count was changed. Thus, most likely, the window
@@ -436,6 +438,8 @@
     }
 
     if (this._ticket) {
+      // By cancelling an old update, we are agreeing to perform another update.
+      forceUpdate = true;
       this._ticket.cancel();
       this._ticket = null;
     }
