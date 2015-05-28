@@ -238,6 +238,8 @@
     if (this._timerInterval === null) {
       throw new Error('down event with no timer interval');
     }
+    // Make sure the time is accurate.
+    this.timerTick();
     window.app.timer.phaseDone();
     clearInterval(this._timerInterval);
     this._timerInterval = null;
