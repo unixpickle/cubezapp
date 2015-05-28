@@ -15,6 +15,8 @@
     this._memoTime = -1;
     this._inspectionTime = -1;
     this._lastScramble = null;
+    this._lastScrambler = null;
+    this._lastScrambleType = null;
     this._didSave = false;
 
     this.updateInputMethod();
@@ -165,12 +167,13 @@
     window.app.store.addSolve({
       date: new Date().getTime(),
       dnf: false,
-      inspection: this._inspectionTime,
       memo: this._memoTime,
       notes: '',
       plus2: this.getPlus2(),
       time: time,
-      scramble: this._lastScramble
+      scramble: this._lastScramble,
+      scrambler: this._lastScrambler,
+      scrambleType: this._lastScrambleType
     });
   };
 
@@ -223,8 +226,10 @@
     }
   };
 
-  Timer.prototype._gotScramble = function(scramble) {
+  Timer.prototype._gotScramble = function(scramble, scrambler, scrambleType) {
     this._lastScramble = scramble;
+    this._lastScrambler = scrambler;
+    this._lastScrambleType = scrambleType;
   };
 
   // parseManualEntry takes the raw user input and turns it into a time in

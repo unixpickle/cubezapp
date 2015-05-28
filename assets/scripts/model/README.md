@@ -189,7 +189,7 @@ window.app.observe.latestSolve('time', function() {
 <a name="observation-object"></a>
 ## Observation
 
-An Observation object is returned by a call to `window.app.observe`. The object controls that particular observation. By default, the observation is running, meaning that a callback will be triggered when changes occur.
+An Observation object is returned by calls to functions on `window.app.observe`. The object controls that particular observation. By default, the observation is running, meaning that a callback will be triggered when changes occur.
 
 An instance of Observation implements the following methods:
 

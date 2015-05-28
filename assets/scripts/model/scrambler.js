@@ -13,7 +13,9 @@
     '7x7x7  WCA Moves': 100
   };
 
-  // A ScrambleStream generates scrambles for the current puzzle.
+  // A ScrambleStream generates scrambles for the current puzzle. It emits these
+  // scrambles in a stream-like fashion, making it easy to get new scrambles as
+  // needed.
   function ScrambleStream() {
     window.app.EventEmitter.call(this);
 
@@ -22,7 +24,10 @@
     this._queue = new ScrambleQueue();
     this._paused = true;
 
+    this._lastEmittedScrambleRighty = null;
     this._lastEmittedScramble = null;
+    this._lastEmittedScrambler = null;
+    this._lastEmittedScrambleType = null;
     this._currentScrambler = Scrambler.current();
 
     this._registerModelEvents();
@@ -43,17 +48,25 @@
   ScrambleStream.prototype.resumeReuseScramble = function() {
     this._paused = false;
     this._replenishQueue();
-    this._emitScramble(this._lastEmittedScramble);
+    this.emit('scramble', this._lastEmittedScramble, this._lastEmittedScrambler,
+      this._lastEmittedScrambleType);
   };
 
-  ScrambleStream.prototype._emitScramble = function(scramble) {
-    this._lastEmittedScramble = scramble;
+  ScrambleStream.prototype._emitScramble = function(rightyScramble) {
+    this._lastEmittedScrambleRighty = rightyScramble;
+    this._lastEmittedScrambler = this._currentScrambler.getName();
+    this._lastEmittedScrambleType = this._currentScrambler.getType();
+
     if (!window.app.store.getGlobalSettings().righty &&
         this._currentScrambler.differentForLefty()) {
-      this.emit('scramble', this._currentScrambler.makeLefty(scramble));
+      this._lastEmittedScramble =
+        this._currentScrambler.makeLefty(rightyScramble);
     } else {
-      this.emit('scramble', scramble);
+      this._lastEmittedScramble = rightyScramble;
     }
+
+    this.emit('scramble', this._lastEmittedScramble,
+      this._lastEmittedScrambler, this._lastEmittedScrambleType);
   }
 
   ScrambleStream.prototype._generateOrDequeue = function() {
@@ -68,7 +81,11 @@
   };
 
   ScrambleStream.prototype._modelChanged = function() {
-    this._currentScrambler = Scrambler.current();
+    var current = Scrambler.current();
+    if (current.equals(this._currentScrambler)) {
+      return;
+    }
+    this._currentScrambler = current;
     if (this._paused) {
       this._replenishQueue();
     } else {
@@ -118,8 +135,8 @@
 
   ScrambleStream.prototype._rightyChanged = function() {
     if (!this._paused && !this._needScramble &&
-        this._currentScrambler.differentForLefty) {
-      this._emitScramble(this._lastEmittedScramble);
+        this._currentScrambler.differentForLefty()) {
+      this._emitScramble(this._lastEmittedScrambleRighty);
     }
   };
 
@@ -225,6 +242,14 @@
 
     window.puzzlejs.webscrambler.generateScramble(this._name, this._type,
       length, cb);
+  };
+
+  Scrambler.prototype.getName = function() {
+    return this._name;
+  };
+
+  Scrambler.prototype.getType = function() {
+    return this._type;
   };
 
   Scrambler.prototype.hash = function() {

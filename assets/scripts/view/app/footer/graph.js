@@ -37,7 +37,7 @@
       height: SETTINGS_HEADER_HEIGHT,
       width: '100%'
     });
-    
+
     this._$modeTitle = $('<label></label>').css({
       display: 'block',
       float: 'left',
@@ -52,9 +52,9 @@
       color: 'white',
       fontSize: 22
     });
-    
+
     this._$modeTitle.text('Standard');
-    
+
     this._$header.append(this._$modeTitle);
 
     this._$element.append(this._$header);

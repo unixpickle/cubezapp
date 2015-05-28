@@ -258,8 +258,16 @@
   LocalStore.prototype._fillInMissingSolveFields = function() {
     var puzzles = this._puzzles;
     for (var i = 0, len = puzzles.length; i < len; ++i) {
-      var solves = puzzles[i].solves;
+      var puzzle = puzzles[i];
+      var solves = puzzle.solves;
       recomputeLastPBs(solves, 0);
+      for (var j = 0, len1 = solves.length; j < len1; ++j) {
+        var solve = solves[j];
+        if (!solve.scrambler) {
+          solve.scrambler = puzzle.scrambler;
+          solve.scrambleType = puzzle.scrambleType;
+        }
+      }
     }
   };
 
