@@ -2,6 +2,7 @@
 
   var SETTINGS_BACKGROUND = '#e6e6e6';
   var SETTINGS_HEADER_HEIGHT = 40;
+  var SETTINGS_MODE_ARROW_SIZE = 30;
   var SETTINGS_WIDTH = 170;
 
   function Graph() {
@@ -36,6 +37,25 @@
       height: SETTINGS_HEADER_HEIGHT,
       width: '100%'
     });
+    
+    this._$modeTitle = $('<label></label>').css({
+      display: 'block',
+      float: 'left',
+      height: SETTINGS_HEADER_HEIGHT,
+      lineHeight: SETTINGS_HEADER_HEIGHT + 'px',
+      paddingRight: SETTINGS_MODE_ARROW_SIZE,
+      paddingLeft: 10,
+      backgroundImage: 'url(images/downarrow.png)',
+      backgroundSize: '20px 20px',
+      backgroundPosition: 'right center',
+      backgroundRepeat: 'no-repeat',
+      color: 'white',
+      fontSize: 22
+    });
+    
+    this._$modeTitle.text('Standard');
+    
+    this._$header.append(this._$modeTitle);
 
     this._$element.append(this._$header);
   }
