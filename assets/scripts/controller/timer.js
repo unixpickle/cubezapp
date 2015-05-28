@@ -8,17 +8,17 @@
   var TOO_MUCH_INSPECTION = 17000;
 
   function TimerController() {
-    this._inputMode = window.app.store.getActivePuzzle().timerInput;
-    this._session = null;
-    this._stackmatRunning = false;
     this._stackmat = new window.app.Stackmat();
 
-    this._settingsChangedWhileRunning = false;
+    this._inputMode = 0;
+    this._interval = null;
+    this._intervalStartTime = null;
+    this._inputModeChanged = true;
 
+    this._updateInputMode();
     this._registerModelEvents();
     this._registerStackmatEvents();
     this._registerUIEvents();
-    this._updateInputMethod();
   }
 
   TimerController.prototype.keydown = function(e) {
@@ -40,7 +40,7 @@
       window.app.timer.setManualTime(oldTime.substring(0, oldTime.length-1));
     } else if (e.which >= NUM0_KEY && e.which <= NUM9_KEY) {
       var oldTime = window.app.timer.getManualTime();
-      // NOTE: typing leading zeroes is pointless, so I ignore them.
+      // Typing leading zeroes is pointless, so I ignore them.
       if ((oldTime.length !== 0 || e.which !== NUM0_KEY) &&
           oldTime.length < 7) {
         window.app.timer.setManualTime(oldTime + (e.which - 0x30));
@@ -51,7 +51,7 @@
         window.app.timer.reset();
       }
     } else {
-      // Unknown keys should be ignored.
+      // Unknown keys should be propagated.
       return true;
     }
 
@@ -59,67 +59,107 @@
   };
 
   TimerController.prototype.keyup = function(e) {
-    // Ignore the event.
+    // Allow the event to propagate.
     return true;
   };
 
   TimerController.prototype._controlCancel = function() {
-    if (this._session === null) {
-      return;
-    }
-    this._session.cancel();
-    this._session = null;
-    this._updateInputMethodIfChanged();
+    this._stopInterval();
+    window.app.timer.reset();
+    this._updateInputMode();
   };
 
   TimerController.prototype._controlDown = function() {
-    if (this._session !== null) {
-      this._session.down();
-    } else {
-      switch (this._inputMode) {
-      case window.app.Timer.INPUT_REGULAR:
-        this._session = new Session();
-        break;
-      case window.app.Timer.INPUT_BLD:
-        this._session = new BLDSession();
-        break;
-      case window.app.Timer.INPUT_INSPECTION:
-        this._session = new InspectionSession();
-        break;
-      default:
-        break;
+    switch (window.app.timer.getState()) {
+    case window.app.Timer.STATE_NOT_RUNNING:
+      if (this._inputMode === window.app.Timer.INPUT_INSPECTION) {
+        window.app.timer.phaseInspectionReady();
+      } else {
+        window.app.timer.phaseReady();
       }
-      this._session.on('done', this._sessionDone.bind(this));
-      this._session.begin();
+      break;
+    case window.app.Timer.STATE_INSPECTION:
+      // NOTE: inspection keeps running until they release the spacebar or
+      // lift their finger.
+      break;
+    case window.app.Timer.STATE_TIMING:
+      window.app.timer.setTime(this._elapsedTime());
+      if (this._inputMode === window.app.Timer.INPUT_BLD &&
+          !window.app.timer.hasMemoTime()) {
+        window.app.timer.doneMemo();
+      } else {
+        window.app.timer.phaseDone();
+        this._stopInterval();
+      }
+      break;
+    default:
+      throw new Error('unexpected state: ' + window.app.timer.getState());
     }
   };
 
   TimerController.prototype._controlUp = function() {
-    if (this._session !== null) {
-      this._session.up();
+    switch (window.app.timer.getState()) {
+    case window.app.Timer.STATE_INSPECTION_READY:
+      window.app.timer.phaseInspection();
+      this._startInterval();
+      break;
+    case window.app.Timer.STATE_INSPECTION:
+      window.app.timer.setInspectionTime(this._elapsedTime());
+      this._stopInterval();
+    case window.app.Timer.STATE_READY:
+      window.app.timer.phaseTiming();
+      this._startInterval();
+      break;
+    case window.app.Timer.STATE_DONE:
+      window.app.timer.saveTime();
+      window.app.timer.reset();
+      break;
+    case window.app.Timer.STATE_TIMING:
+      // NOTE: this will occur if they just finished recording the memo time and
+      // are now lifting their finger or releasing the spacebar.
+      // This may also occur if they press space or touch the screen while
+      // inspection is running, then don't release until inspection goes over
+      // and forces the timer to start.
+      break;
+    default:
+      throw new Error('unexpected state: ' + window.app.timer.getState());
     }
   };
 
-  TimerController.prototype._externalAction = function() {
-    this._controlCancel();
-    this._stackmatCancel();
+  TimerController.prototype._elapsedTime = function() {
+    if (this._intervalStartTime === null) {
+      throw new Error('cannot get elapsed time');
+    }
+    return Math.max(new Date().getTime() - this._intervalStartTime, 0);
   };
 
-  TimerController.prototype._handleInputChanged = function() {
-    if (this._session || this._stackmatRunning) {
-      this._settingsChangedWhileRunning = true;
-    } else {
-      this._updateInputMethod();
+  // _externalAction is called when the user clicks anywhere on the page in
+  // order to notify the timer to cancel.
+  TimerController.prototype._externalAction = function() {
+    if (window.app.timer.getState() === window.app.Timer.STATE_NOT_RUNNING) {
+      return;
+    }
+    if (this._inputMode === window.app.Timer.INPUT_STACKMAT) {
+      this._stackmatCancel();
+    } else if (this._inputMode !== window.app.Timer.INPUT_ENTRY) {
+      this._controlCancel();
+    }
+  };
+
+  TimerController.prototype._handleInputModeChanged = function() {
+    this._inputModeChanged = true;
+    if (!window.app.timer.isActive()) {
+      this._updateInputMode();
     }
   };
 
   TimerController.prototype._registerModelEvents = function() {
     window.app.observe.activePuzzle('timerInput',
-      this._handleInputChanged.bind(this));
+      this._handleInputModeChanged.bind(this));
   };
 
   TimerController.prototype._registerStackmatEvents = function() {
-    this._stackmat.on('wait', this._stackmatWait.bind(this));
+    this._stackmat.on('wait', this._stackmatWaiting.bind(this));
     this._stackmat.on('ready', this._stackmatReady.bind(this));
     this._stackmat.on('time', this._stackmatTime.bind(this));
     this._stackmat.on('done', this._stackmatDone.bind(this));
@@ -134,255 +174,83 @@
     window.app.view.timer.controls.on('cancel', this._controlCancel.bind(this));
   };
 
-  TimerController.prototype._sessionDone = function(result) {
-    this._session = null;
-    this._updateInputMethodIfChanged();
-  };
-
   TimerController.prototype._stackmatCancel = function() {
-    if (!this._stackmatRunning) {
-      return;
-    }
-    this._stackmatRunning = false;
     window.app.timer.reset();
-    this._updateInputMethodIfChanged();
+    this._updateInputMode();
   };
 
   TimerController.prototype._stackmatDone = function(t) {
-    if (this._stackmatRunning) {
-      this._stackmatRunning = false;
-      window.app.timer.done();
-      window.app.timer.saveTime();
-      window.app.timer.reset();
-      this._updateInputMethodIfChanged();
-    }
+    window.app.timer.phaseDone();
+    window.app.timer.saveTime();
+    window.app.timer.reset();
+    this._updateInputMode();
   };
 
   TimerController.prototype._stackmatReady = function() {
-    if (this._stackmatRunning) {
-      window.app.timer.phaseReady();
-    }
-  };
-
-  TimerController.prototype._stackmatTime = function(millis) {
-    if (this._stackmatRunning) {
-      if (window.app.timer.getState() === window.app.Timer.STATE_READY) {
-        window.app.timer.phaseTiming();
-      }
-      window.app.timer.setTime(millis);
-    }
-  };
-
-  TimerController.prototype._stackmatWait = function() {
-    if (!this._stackmatRunning) {
-      this._stackmatRunning = true;
-      window.app.timer.phaseWaiting();
-    }
-  };
-
-  TimerController.prototype._updateInputMethod = function() {
-    this._inputMode = window.app.store.getActivePuzzle().timerInput;
-
-    switch (this._inputMode) {
-    case window.app.Timer.INPUT_ENTRY:
-      this._stackmat.disconnect();
-      window.app.view.timer.controls.disable();
-      break;
-    case window.app.Timer.INPUT_STACKMAT:
-      this._stackmat.connect();
-      window.app.view.timer.controls.disable();
-      break;
-    default:
-      this._stackmat.disconnect();
-      window.app.view.timer.controls.enable();
-      break;
-    }
-
-    window.app.timer.updateInputMethod();
-  };
-
-  TimerController.prototype._updateInputMethodIfChanged = function() {
-    if (this._settingsChangedWhileRunning) {
-      this._settingsChangedWhileRunning = false;
-      this._updateInputMethod();
-    }
-  };
-
-  // A Session handles the process of recording a time using the space bar
-  // or touchscreen.
-  // This is a base class and can only be used for MODE_REGULAR.
-  function Session() {
-    window.app.EventEmitter.call(this);
-    this._startTime = null;
-    this._timerInterval = null;
-  }
-
-  Session.prototype = Object.create(window.app.EventEmitter.prototype);
-
-  // begin is called right after the object is constructed.
-  Session.prototype.begin = function() {
     window.app.timer.phaseReady();
   };
 
-  // cancel stops the session prematurely.
-  Session.prototype.cancel = function() {
-    window.app.timer.reset();
-    if (this._timerInterval !== null) {
-      clearInterval(this._timerInterval);
+  TimerController.prototype._stackmatTime = function(millis) {
+    if (window.app.timer.getState() === window.app.Timer.STATE_READY) {
+      window.app.timer.phaseTiming();
     }
+    window.app.timer.setTime(millis);
   };
 
-  // down is called when the user pushes down the space bar or touches the
-  // screen.
-  Session.prototype.down = function() {
-    if (this._timerInterval === null) {
-      throw new Error('down event with no timer interval');
-    }
-    // Make sure the time is accurate.
-    this.timerTick();
-    window.app.timer.phaseDone();
-    clearInterval(this._timerInterval);
-    this._timerInterval = null;
+  TimerController.prototype._stackmatWaiting = function() {
+    window.app.timer.phaseWaiting();
   };
 
-  // timerTick is called by this._timerInterval to update the timer text.
-  Session.prototype.timerTick = function() {
-    var time = Math.max(new Date().getTime()-this._startTime, 0);
-    window.app.timer.setTime(time);
-  };
-
-  // up is called when the user releases the space bar or lifts their finger.
-  Session.prototype.up = function() {
-    if (this._startTime === null) {
-      this._startTimer();
-    } else {
-      this._done();
-    }
-  };
-
-  Session.prototype._done = function() {
-    window.app.timer.saveTime();
-    window.app.timer.reset();
-    this.emit('done');
-  };
-
-  Session.prototype._startTimer = function() {
-    this._startTime = new Date().getTime();
-    this._timerInterval = setInterval(this.timerTick.bind(this),
-      TIME_INTERVAL);
-    window.app.timer.phaseTiming();
-    this.timerTick();
-  };
-
-  // BLDSession is a Session subclass for MODE_BLD.
-  function BLDSession(accuracy) {
-    Session.call(this, accuracy);
-    this._memoDown = false;
-  }
-
-  BLDSession.prototype = Object.create(Session.prototype);
-
-  BLDSession.prototype.down = function() {
-    if (window.app.timer.hasMemoTime()) {
-      Session.prototype.down.call(this);
-    } else {
-      this._memoDown = true;
-
-      // Need to do this.timerTick() to make sure the memo time is as accurate
-      // as possible.
-      this.timerTick();
-
-      window.app.timer.doneMemo();
-    }
-  };
-
-  BLDSession.prototype.up = function() {
-    // If this up() corresponds to the first down(), it shouldn't do anything.
-    if (this._memoDown) {
-      this._memoDown = false;
-    } else {
-      Session.prototype.up.call(this);
-    }
-  };
-
-  // InspectionSession is a Session subclass for inspection mode.
-  function InspectionSession(accuracy) {
-    Session.call(this, accuracy);
-    this._downOnInspection = false;
-    this._inspectionStart = null;
-    this._inspectionInterval = null;
-  }
-
-  InspectionSession.prototype = Object.create(Session.prototype);
-
-  InspectionSession.prototype.begin = function() {
-    window.app.timer.phaseInspectionReady();
-  }
-
-  InspectionSession.prototype.cancel = function() {
-    if (this._inspectionInterval) {
-      clearInterval(this._inspectionInterval);
-    }
-    Session.prototype.cancel.call(this);
-  };
-
-  InspectionSession.prototype.down = function() {
-    // If the inspection time is running, we make sure to note that the user hit
-    // space or touched their screen while inspection was running. This way the
-    // corresponding up() event doesn't stop the timer if they exceed inspection
-    // time.
-    if (window.app.timer.getState() === window.app.Timer.STATE_INSPECTION) {
-      this._downOnInspection = true;
-    } else {
-      Session.prototype.down.call(this);
-    }
-  };
-
-  InspectionSession.prototype.up = function() {
-    if (window.app.timer.getState() === window.app.Timer.STATE_TIMING) {
-      // If the down() event happened during inspection, the up() event should
-      // do nothing.
-      if (this._downOnInspection) {
-        this._downOnInspection = false;
+  TimerController.prototype._startInterval = function() {
+    this._intervalStartTime = new Date().getTime();
+    this._interval = setInterval(function() {
+      var elapsed = this._elapsedTime();
+      if (window.app.timer.getState() === window.app.Timer.STATE_TIMING) {
+        window.app.timer.setTime(elapsed);
       } else {
-        Session.prototype.up.call(this);
+        var maxInspection = window.app.Timer.WCA_INSPECTION_TIME + 2000;
+        window.app.timer.setInspectionTime(Math.min(elapsed, maxInspection));
+
+        // If inspection runs over, force the timer to start.
+        if (elapsed >= maxInspection) {
+          var overInspectTime = elapsed - maxInspection;
+          this._intervalStartTime = new Date().getTime() - overInspectTime;
+          window.app.timer.phaseTiming();
+        }
       }
-    } else if (this._inspectionInterval !== null) {
-      this._endInspection();
-      this._downOnInspection = false;
-    } else if (window.app.timer.getState() === window.app.Timer.STATE_DONE) {
-      Session.prototype.up.call(this);
-    } else {
-      this._beginInspection();
+    }.bind(this), TIME_INTERVAL);
+  };
+
+  TimerController.prototype._stopInterval = function() {
+    if (this._interval !== null) {
+      clearInterval(this._interval);
+      this._interval = null;
+      this._intervalStartTime = null;
     }
   };
 
-  InspectionSession.prototype._beginInspection = function() {
-    this._inspectionStart = new Date().getTime();
-    this._inspectionInterval = setInterval(this._interval.bind(this),
-      TIME_INTERVAL);
-    window.app.timer.phaseInspection();
-  };
-
-  InspectionSession.prototype._endInspection = function() {
-    var delay = new Date().getTime() - this._inspectionStart;
-    window.app.timer.setInspectionTime(Math.min(Math.max(delay, 0),
-      TOO_MUCH_INSPECTION));
-
-    clearInterval(this._inspectionInterval);
-    this._inspectionInterval = null;
-
-    // Running super.up() will start the regular timer.
-    Session.prototype.up.call(this);
-  };
-
-  InspectionSession.prototype._interval = function() {
-    var time = Math.max(new Date().getTime()-this._inspectionStart, 0);
-    if (time > TOO_MUCH_INSPECTION) {
-      this._endInspection();
-    } else {
-      window.app.timer.setInspectionTime(time);
+  TimerController.prototype._updateInputMode = function() {
+    if (!this._inputModeChanged) {
+      return;
     }
+
+    this._inputModeChanged = false;
+    this._inputMode = window.app.store.getActivePuzzle().timerInput;
+
+    if (this._inputMode !== window.app.Timer.INPUT_STACKMAT) {
+      this._stackmat.disconnect();
+    } else {
+      this._stackmat.connect();
+    }
+
+    if (this._inputMode === window.app.timer.INPUT_MANUAL ||
+        this._inputMode === window.app.timer.INPUT_STACKMAT) {
+      window.app.view.timer.controls.disable();
+    } else {
+      window.app.view.timer.controls.enable();
+    }
+
+    window.app.timer.updateInputMode();
   };
 
   window.app.TimerController = TimerController;

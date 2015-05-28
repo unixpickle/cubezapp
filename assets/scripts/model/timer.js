@@ -19,7 +19,7 @@
     this._lastScrambleType = null;
     this._didSave = false;
 
-    this.updateInputMethod();
+    this.updateInputMode();
   }
 
   Timer.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -78,6 +78,11 @@
   Timer.prototype.hasMemoTime = function() {
     return this._memoTime >= 0;
   };
+  
+  Timer.prototype.isActive = function() {
+    return this._state !== Timer.STATE_NOT_RUNNING &&
+      this._state !== Timer.STATE_MANUAL_ENTRY;
+  };
 
   Timer.prototype.phaseDone = function() {
     this._assertStates([Timer.STATE_TIMING, Timer.STATE_TIMING_DONE_MEMO]);
@@ -95,6 +100,7 @@
     this._assertState(Timer.STATE_NOT_RUNNING);
     this._state = Timer.STATE_INSPECTION_READY;
     this._scrambleStream.pause();
+    this._inspectionTime = 0;
     this._time = 0;
     this.emit('inspectionReady');
     this.emit('active');
@@ -139,6 +145,8 @@
     this._memoTime = -1;
     this._inspectionTime = -1;
     this._lastScramble = null;
+    this._lastScrambler = null;
+    this._lastScrambleType = null;
 
     // NOTE: we do this before emitting 'reset' because the reset handler could
     // theoretically do something to pause the scramble stream.
@@ -199,18 +207,15 @@
     this.emit('time');
   };
 
-  // updateInputMethod resets the timer if the input method has change to or
-  // from manual entry.
-  Timer.prototype.updateInputMethod = function() {
+  // updateInputMode resets the timer if the input method has changed to/from
+  // manual entry.
+  Timer.prototype.updateInputMode = function() {
     this._assertStates([Timer.STATE_NOT_RUNNING, Timer.STATE_MANUAL_ENTRY]);
-    var oldState = this._state;
-    if (window.app.store.getActivePuzzle().timerInput === Timer.INPUT_ENTRY) {
-      this._state = Timer.STATE_MANUAL_ENTRY;
-    } else {
-      this._state = Timer.STATE_NOT_RUNNING;
-    }
-    if (oldState !== this._state) {
-      this.emit('reset');
+    var wasManual = (this._state === Timer.STATE_MANUAL_ENTRY);
+    var isManual = (window.app.store.getActivePuzzle().timerInput ===
+      Timer.INPUT_ENTRY);
+    if (wasManual !== isManual) {
+      this.reset();
     }
   };
 

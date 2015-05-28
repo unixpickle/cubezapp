@@ -68,7 +68,7 @@
   };
 
   TimerView.prototype._handleTimerInspectionReady = function() {
-    this._appView.setTime(Math.ceil(window.app.Timer.WCA_INSPECTION_TIME /
+    this._appView.setTime(Math.round(window.app.Timer.WCA_INSPECTION_TIME /
       1000));
   };
 
