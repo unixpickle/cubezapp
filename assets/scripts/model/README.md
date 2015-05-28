@@ -71,13 +71,14 @@ The **Solve** object stores all the information for a single recorded time. Here
 
  * **date** - int - the UNIX time in milliseconds when the timer was stopped
  * **dnf** - bool - whether or not the solve was a DNF
- * **inspection** - int - the number of milliseconds of inspection time used
- * **memo** - int - the number of milliseconds the user took to memorize the cube for a blindfolded solve
- * **notes** - string - user-added notes
+ * **memo** - int - the number of milliseconds the user took to memorize the cube for a blindfolded solve. If the solve was not a blindfolded solve, this is -1.
+ * **notes** - string - user-added notes. By default, this should be the empty string.
  * **plus2** - bool - whether or not the solve was a +2. If this is true, the extra two seconds should be *added* to `time`.
  * **scramble** - string - the scramble that was given. If no scramble was given, this is null.
+ * **scrambler** - string - the type of puzzle.js scrambler to use. If no scrambler was used for this time, this is "None".
+ * **scrambleType** - string - the subtype of scrambler. For the "None" scrambler, the value of this field should be ignored.
  * **time** - int - the number of milliseconds that the solve physically took.
- * **lastPB** - int - the number of milliseconds for the most recent personal best before this solve. For the first solve, this is -1. This can be used to tell if a given solve is a PB, because all PBs will have times less than the last PB. **This field will not be present if the solve has not been added to the store. The store maintains this field automatically.**
+ * **lastPB** - int - the number of milliseconds for the most recent personal best before this solve. For all solves up to and including the first non-DNF solve, this is -1. This can be used to tell if a given solve is a PB, because all PBs will have times less than the last PB. **This field will not be present if the solve has not been added to the store. The store maintains this field automatically.**
  * **id** - string - the unique identifier of the solve. **This field will not be present if the solve has not been added to the store.**
 
 The store also provides some helper functions for solves:
@@ -85,7 +86,6 @@ The store also provides some helper functions for solves:
  * window.app.copySolve(solve) - get a copy of a solve object.
  * window.app.solveIsPB(solve) - get a boolean indicating whether a solve is a PB. This does not look at milliseconds; it complies with the WCA regulations.
  * window.app.solveTime(solve) - get the time of a solve, counting penalties.
- 
 
 <a name="stats-object"></a>
 ## Stats
