@@ -59,6 +59,11 @@
 
     this._$element.append(this._$header);
   }
+  
+  GraphSettings.MODE_STANDARD = 'Standard';
+  GraphSettings.MODE_MEAN = 'Mean';
+  GraphSettings.MODE_HISTOGRAM = 'Histogram';
+  GraphSettings.MODE_STREAK = 'Streak';
 
   GraphSettings.prototype.element = function() {
     return this._$element;
