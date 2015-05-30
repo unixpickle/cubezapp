@@ -1,4 +1,4 @@
-// dropdown.js version 3.0.0
+// dropdown.js version 4.0.0
 (function() {
 
   var DEFAULT_BG_COLOR = '#ffffff';
@@ -142,15 +142,7 @@
     this._showing = false;
     this._down = false;
     this._changeTracker = null;
-
-    this._shielding = $('<div></div>').css({
-      position: 'fixed',
-      left: 0,
-      top: 0,
-      width: '100%',
-      height: '100%'
-    });
-    this._shielding.click(this.hide.bind(this));
+    this._clickThruHandler = this._clickThru.bind(this);
 
     this._options = $();
     this._menu = $('<ul class="dropdownjs-menu"></ul>');
@@ -169,8 +161,9 @@
     this._changeTracker.stop();
     this._changeTracker = null;
 
-    this._shielding.detach();
     this._container.detach();
+
+    window.clickthru.removeListener(this._clickThruHandler);
   };
 
   Menu.prototype.isShowing = function() {
@@ -216,9 +209,15 @@
       this._relayout.bind(this));
     this._layout();
 
-    // Add the elements to the DOM.
-    $(document.body).append(this._shielding);
     $(document.body).append(this._container);
+
+    window.clickthru.addListener(this._clickThruHandler);
+  };
+
+  Menu.prototype._clickThru = function(e) {
+    if (!e.inElement(this._container[0])) {
+      this.hide();
+    }
   };
 
   Menu.prototype._layout = function() {

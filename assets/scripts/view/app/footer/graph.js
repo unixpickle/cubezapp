@@ -38,6 +38,8 @@
       }.bind(this, i));
     }
     this._showingDropdown = false;
+    
+    this._boundClickThru = this._clickThru.bind(this);
 
     // TODO: use the last page the user was in.
     this._currentPage = 0;
@@ -59,6 +61,13 @@
   GraphSettings.prototype.element = function() {
     return this._$element;
   };
+  
+  GraphSettings.prototype._clickThru = function(e) {
+    if (!e.inElement(this._$modeDropdown[0]) &&
+        !e.inElement(this._$modeLabel[0])) {
+      this._setShowingDropdown(false);
+    }
+  };
 
   GraphSettings.prototype._modeLabelClicked = function() {
     this._setShowingDropdown(!this._showingDropdown);
@@ -71,8 +80,10 @@
     this._showingDropdown = x;
     if (x) {
       this._$modeDropdown.stop(true, true).css({display: 'block', opacity: 1});
+      window.clickthru.addListener(this._boundClickThru);
     } else {
       this._$modeDropdown.fadeOut(GraphSettings.ANIMATION_DURATION);
+      window.clickthru.removeListener(this._boundClickThru);
     }
   }
   

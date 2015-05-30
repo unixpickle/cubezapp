@@ -50,7 +50,7 @@
 #graph-settings .mode-dropdown > li {
   display: block;
   height: 30px;
-  padding: 0 7px 0 7px;
+  padding: 0 10px 0 30px;
 
   line-height: 30px;
   font-size: 19px;
@@ -60,10 +60,8 @@
   cursor: pointer;
 
   background-image: none;
-  background-size: 20px 20px;
-  background-position: right center;
+  background-size: 30px 30px;
   background-repeat: no-repeat;
-  background-origin: content-box;
 }
 
 #graph-settings .mode-dropdown > li:hover {

@@ -1,10 +1,10 @@
 # dropdown.js
 
-This is a nice, beautiful dropdown UI component for websites. It is uncompleted as of yet.
+This is a nice, beautiful dropdown UI component for websites. It is fairly complete, although it could use some minor improvements.
 
 # Dependencies
 
-This depends on [jQuery](https://jquery.com). You must include the jQuery source code before using dropdown.js.
+This depends on [jQuery](https://jquery.com) and [clickthru.js](https://github.com/unixpickle/clickthru.js). You must include both source files before dropdown.js.
 
 # Usage
 
