@@ -1,10 +1,5 @@
 (function() {
 
-  var SETTINGS_BACKGROUND = '#e6e6e6';
-  var SETTINGS_HEADER_HEIGHT = 40;
-  var SETTINGS_MODE_ARROW_SIZE = 30;
-  var SETTINGS_WIDTH = 170;
-
   function Graph() {
     this._$element = $('#graph');
     this._settings = new GraphSettings();
@@ -23,43 +18,15 @@
   };
 
   function GraphSettings() {
-    this._$element = $('<div></div>').css({
-      height: '100%',
-      width: SETTINGS_WIDTH,
-      backgroundColor: SETTINGS_BACKGROUND,
-      position: 'absolute'
-    });
+    this._$element = $('<div id="graph-settings"></div>');
+    this._$header = $('<div class="title flavor-background"></div>');
+    this._$modeLabel = $('<label></label>');
 
-    this._$header = $('<div></div>').addClass('flavor-background').css({
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      height: SETTINGS_HEADER_HEIGHT,
-      width: '100%'
-    });
-
-    this._$modeTitle = $('<label></label>').css({
-      display: 'block',
-      float: 'left',
-      height: SETTINGS_HEADER_HEIGHT,
-      lineHeight: SETTINGS_HEADER_HEIGHT + 'px',
-      paddingRight: SETTINGS_MODE_ARROW_SIZE,
-      paddingLeft: 10,
-      backgroundImage: 'url(images/downarrow.png)',
-      backgroundSize: '20px 20px',
-      backgroundPosition: 'right center',
-      backgroundRepeat: 'no-repeat',
-      color: 'white',
-      fontSize: 22
-    });
-
-    this._$modeTitle.text('Standard');
-
-    this._$header.append(this._$modeTitle);
-
+    this._$modeLabel.text('Standard');
+    this._$header.append(this._$modeLabel);
     this._$element.append(this._$header);
   }
-  
+
   GraphSettings.MODE_STANDARD = 'Standard';
   GraphSettings.MODE_MEAN = 'Mean';
   GraphSettings.MODE_HISTOGRAM = 'Histogram';
