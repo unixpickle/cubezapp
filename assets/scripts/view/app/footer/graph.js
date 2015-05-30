@@ -27,13 +27,21 @@
     this._$modeDropdown = $('<ul class="mode-dropdown"></ul>').css({
       display: 'none'
     });
-    for (var i = 0, len = GraphSettings.MODES.length; i < len; ++i) {
-      this._$modeDropdown.append($('<li></li>').text(GraphSettings.MODES[i]));
+    this._dropdownOptions = [];
+    for (var i = 0, len = GraphSettings.MODE_NAMES.length; i < len; ++i) {
+      var $option = $('<li></li>').text(GraphSettings.MODE_NAMES[i]);
+      this._$modeDropdown.append($option);
+      this._dropdownOptions.push($option);
+      $option.click(function(index) {
+        this._switchToPage(index);
+        this._setShowingDropdown(false);
+      }.bind(this, i));
     }
     this._showingDropdown = false;
 
-    // TODO: switch to the page the user was last on.
-    this._$modeLabel.text('Standard');
+    // TODO: use the last page the user was in.
+    this._currentPage = 0;
+    this._switchToPage(0);
 
     // NOTE: we need to add the dropdown after the header so the shadow of the
     // dropdown is covered.
@@ -42,11 +50,11 @@
   }
 
   GraphSettings.ANIMATION_DURATION = 150;
-  GraphSettings.MODES = ['Standard', 'Mean', 'Histogram', 'Streak'];
-  GraphSettings.MODE_STANDARD = 'Standard';
-  GraphSettings.MODE_MEAN = 'Mean';
-  GraphSettings.MODE_HISTOGRAM = 'Histogram';
-  GraphSettings.MODE_STREAK = 'Streak';
+  GraphSettings.MODE_NAMES = ['Standard', 'Mean', 'Histogram', 'Streak'];
+  GraphSettings.MODE_STANDARD = 0;
+  GraphSettings.MODE_MEAN = 1;
+  GraphSettings.MODE_HISTOGRAM = 2;
+  GraphSettings.MODE_STREAK = 3;
 
   GraphSettings.prototype.element = function() {
     return this._$element;
@@ -67,6 +75,13 @@
       this._$modeDropdown.fadeOut(GraphSettings.ANIMATION_DURATION);
     }
   }
+  
+  GraphSettings.prototype._switchToPage = function(pageIdx) {
+    this._dropdownOptions[this._currentPage].removeClass('selected');
+    this._currentPage = pageIdx;
+    this._dropdownOptions[pageIdx].addClass('selected');
+    this._$modeLabel.text(GraphSettings.MODE_NAMES[pageIdx]);
+  };
 
   window.app.Graph = Graph;
 
