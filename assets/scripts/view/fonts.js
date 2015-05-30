@@ -7,7 +7,7 @@
   var TEST_FONT_SIZE = '40px';
   var TEST_TEXT = '0123456789:.abcdefghijklmnopqrstuvwxyz' +
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  var WEB_FONTS = ['Oxygen', 'Roboto'];
+  var WEB_FONTS = ['Roboto'];
 
   function Fonts() {
     window.app.EventEmitter.call(this);

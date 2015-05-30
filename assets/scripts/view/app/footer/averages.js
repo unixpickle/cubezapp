@@ -183,7 +183,7 @@
   Blurb.ARROW_HEIGHT = 10;
   Blurb.ARROW_MIN_DIST_FROM_EDGE = 10 + Blurb.ARROW_HEIGHT;
   Blurb.CONTENT_PADDING = 10;
-  Blurb.FONT_FAMILY = 'Oxygen, sans-serif';
+  Blurb.FONT_FAMILY = 'Roboto, sans-serif';
   Blurb.FONT_SIZE = 18;
   Blurb.FONT_WEIGHT = 'lighter';
   Blurb.MIN_X = 10;
