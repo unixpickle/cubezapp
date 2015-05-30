@@ -330,7 +330,7 @@
     var canvasWidth = this._$canvas[0].width;
     var canvasHeight = this._$canvas[0].height;
 
-    context.shadowBlur = Blurb.SHADOW_BLUR;
+    context.shadowBlur = Blurb.SHADOW_BLUR * this._canvasScale;
     context.shadowColor = Blurb.SHADOW_COLOR;
     context.fillStyle = 'white';
 
