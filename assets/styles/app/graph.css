@@ -35,6 +35,31 @@
   cursor: pointer;
 }
 
+#graph-settings .page {
+  position: absolute;
+  top: 40px;
+  left: 10px;
+  width: calc(100% - 20px);
+}
+
+#graph-settings .two-sided-label {
+  margin-top: 10px;
+  display: inline-block;
+  width: 100%;
+  font-weight: lighter;
+  font-size: 17px;
+}
+
+#graph-settings .left-label {
+  float: left;
+  color: #777;
+}
+
+#graph-settings .right-label {
+  float: right;
+  color: #777;
+}
+
 #graph-settings .mode-dropdown {
   position: absolute;
   top: 40px;
