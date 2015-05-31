@@ -12,8 +12,6 @@
   var MAX_FOOTER_SIZE = 400;
 
   function AppView() {
-    window.app.EventEmitter.call(this);
-
     this._animator = new window.app.Animator();
     this.footer = new window.app.Footer();
     this.header = new window.app.Header();
@@ -57,8 +55,6 @@
       this._layout(this._animator.current());
     }.bind(this));
   }
-
-  AppView.prototype = Object.create(window.app.EventEmitter.prototype);
 
   // blinkTime causes the time blinker to blink if the time is in editing mode.
   AppView.prototype.blinkTime = function() {
