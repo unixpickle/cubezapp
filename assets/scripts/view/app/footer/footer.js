@@ -3,16 +3,17 @@
 // controlled by a parent view that can handle browser resizing.
 (function() {
 
-  function Footer() {
-    window.app.EventEmitter.call(this);
+  var STATE_HIDDEN = 0;
+  var STATE_PARTLY_VISIBLE = 1;
+  var STATE_FULLY_VISIBLE = 2;
 
+  function Footer() {
     // Get/create views and set them as instance variables.
     this._$element = $('#footer');
     this._top = new FooterTop();
     this._$bottom = this._$element.find('.bottom');
-    this._visible = false;
     this.settings = new window.app.Settings();
-    this.stats = new window.app.Stats(this);
+    this.stats = new window.app.Stats();
 
     // Blank event handlers.
     this.onResize = null;
@@ -25,6 +26,7 @@
     // event.
     this._lastWidth = -1;
     this._lastHeight = -1;
+    this._visibilityState = STATE_HIDDEN;
 
     // Setup events which are triggered by the top bar.
     this._setupResizing();
@@ -36,8 +38,6 @@
     }.bind(this);
   }
 
-  Footer.prototype = Object.create(window.app.EventEmitter.prototype);
-
   Footer.prototype.closedHeight = function() {
     return this._top.height();
   };
@@ -46,21 +46,39 @@
     return this._$element.height();
   };
 
+  Footer.prototype.isFullyVisible = function() {
+    return this._visibilityState === STATE_FULLY_VISIBLE;
+  };
+
+  Footer.prototype.isHidden = function() {
+    return this._visibilityState === STATE_HIDDEN;
+  };
+
+  Footer.prototype.isPartlyVisible = function() {
+    return this._visibilityState === STATE_PARTLY_VISIBLE;
+  };
+
   Footer.prototype.layout = function(attrs) {
-    var wasVisible = this._visible;
+    var lastVisibilityState = this._visibilityState;
+    var wasHidden = this.isHidden();
 
     if (attrs.footerOpacity === 0) {
-      this._$element.css({display: 'none'});
-      this._visible = false;
-      if (wasVisible) {
-        this.emit('hidden');
+      if (lastVisibilityState !== STATE_HIDDEN) {
+        this._$element.css({display: 'none'});
+        this._visibilityState = STATE_HIDDEN;
+        window.app.viewEvents.emitFooterHidden();
       }
       return;
     }
 
-    this._visible = true;
-    if (!wasVisible) {
-      this.emit('shown');
+    if (this._visibilityState !== STATE_PARTLY_VISIBLE &&
+        attrs.footerOpacity < 1) {
+      this._visibilityState = STATE_PARTLY_VISIBLE;
+      window.app.viewEvents.emitFooterPartlyVisible();
+    } else if (this._visibilityState !== STATE_FULLY_VISIBLE &&
+               attrs.footerOpacity === 1) {
+      this._visibilityState = STATE_FULLY_VISIBLE;
+      window.app.viewEvents.emitFooterFullyVisible();
     }
 
     // Use the attributes to layout the footer.
@@ -73,8 +91,7 @@
     });
     this._top.setClosedness(attrs.footerClosedness);
 
-    // Layout all the sub-views if necessary.
-    if (this._lastWidth !== window.app.windowSize.width || !wasVisible) {
+    if (this._lastWidth !== window.app.windowSize.width || wasHidden) {
       this._top.layout();
 
       // If the browser width was changed, we may need to re-position the bottom
@@ -84,19 +101,14 @@
         this._$bottom.css({left: -window.app.windowSize.width});
       }
     }
-    if (this._lastWidth !== window.app.windowSize.width || !wasVisible ||
+
+    if (this._lastWidth !== window.app.windowSize.width || wasHidden ||
         this._lastHeight !== attrs.footerHeight) {
       this.stats.layout();
       this.settings.layout();
-
-      // Update the cached width/height.
       this._lastWidth = window.app.windowSize.width;
       this._lastHeight = attrs.footerHeight;
     }
-  };
-
-  Footer.prototype.visible = function() {
-    return this._visible;
   };
 
   Footer.prototype._setupResizing = function() {

@@ -13,7 +13,7 @@
   var HOVER_BACKGROUND_RGB = '240, 240, 240';
   var SCROLL_SHOW_CONTEXT_DELAY = 500;
 
-  function Times(footer) {
+  function Times() {
     window.app.EventEmitter.call(this);
 
     this._$element = $('#times');
@@ -33,7 +33,8 @@
 
     this._registerDataWindowEvents();
     this._registerTimerEvents();
-    this._registerUIEvents(footer);
+    this._registerUIEvents();
+    this._registerViewEvents();
   }
 
   Times.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -145,9 +146,14 @@
     window.app.timer.on('manualTime', boundHide);
   };
 
-  Times.prototype._registerUIEvents = function(footer) {
+  Times.prototype._registerUIEvents = function() {
     this._$element.scroll(this._updateVisibleRange.bind(this));
-    footer.on('hidden', this._hideContextMenu.bind(this));
+  };
+
+  Times.prototype._registerViewEvents = function() {
+    var handler = this._hideContextMenu.bind(this);
+    window.app.viewEvents.on('footer.hidden', handler);
+    window.app.viewEvents.on('footer.partlyVisible', handler);
   };
 
   Times.prototype._rowClicked = function($row, solve) {

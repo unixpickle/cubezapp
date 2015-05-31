@@ -6,7 +6,7 @@
   var PUZZLE_LABEL_SIZE = 0.12;
   var PUZZLE_ICON_SIZE = 0.7;
 
-  function Stats(footer) {
+  function Stats() {
     this._$movingPane = $('#stats-contents-contents');
     this._$empty = $('#stats-empty');
     this._$icon = this._$empty.find('.icon');
@@ -15,9 +15,9 @@
 
     this._empty = (window.app.store.getSolveCount() === 0);
 
-    this.averages = new window.app.Averages(footer);
+    this.averages = new window.app.Averages();
     this.graph = new window.app.Graph();
-    this.times = new window.app.Times(footer);
+    this.times = new window.app.Times();
 
     this._registerModelEvents();
     this._registerUIEvents();
@@ -37,7 +37,7 @@
       return;
     }
     this._empty = newEmpty;
-    this.layout(window.app.view.footer.visible());
+    this.layout(window.app.view.footer.isFullyVisible());
   };
 
   Stats.prototype._handlePuzzleChanged = function() {

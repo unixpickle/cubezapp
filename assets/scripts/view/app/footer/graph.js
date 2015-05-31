@@ -176,7 +176,7 @@
       height: Slider.BULB_SIZE,
       marginTop: 5
     }).append(this._$background, this._$filledPart, this._$bulb);
-    
+
     this._registerUIEvents();
   }
 
@@ -239,7 +239,7 @@
     this._value = v;
     this.layout();
   };
-  
+
   Slider.prototype._registerUIEvents = function() {
     var clicked = false;
     var update = function(e) {
@@ -251,7 +251,7 @@
       this.setValue(percent*(this._maximumValue-this._minimumValue) +
         this._minimumValue);
     }.bind(this);
-    
+
     this._$element.mousedown(function(e) {
       clicked = true;
       update(e);

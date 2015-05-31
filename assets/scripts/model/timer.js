@@ -78,7 +78,7 @@
   Timer.prototype.hasMemoTime = function() {
     return this._memoTime >= 0;
   };
-  
+
   Timer.prototype.isActive = function() {
     return this._state !== Timer.STATE_NOT_RUNNING &&
       this._state !== Timer.STATE_MANUAL_ENTRY;

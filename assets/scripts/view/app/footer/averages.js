@@ -6,7 +6,7 @@
   var HOVER_BLURB_TIMEOUT = 300;
   var HOVER_CELL_BG = '#f0f0f0';
 
-  function Averages(footer) {
+  function Averages() {
     window.app.EventEmitter.call(this);
     this._$element = $('#averages');
     this._$overview = null;
@@ -17,8 +17,7 @@
 
     this._showStats(window.app.store.getStats());
     this._registerModelEvents();
-
-    footer.on('hidden', this._cancelBlurb.bind(this));
+    this._registerViewEvents();
   }
 
   Averages.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -141,10 +140,17 @@
     }.bind(this));
   };
 
-  Averages.prototype._registerModelEvents = function(events) {
+  Averages.prototype._registerModelEvents = function() {
     window.app.store.on('computedStats', this._showStats.bind(this));
+    window.app.timer.on('active', this._cancelBlurb.bind(this));
     // TODO: register loadingStats and empty the table if stats are gone for too
     // long.
+  };
+
+  Averages.prototype._registerViewEvents = function() {
+    var handler = this._cancelBlurb.bind(this);
+    window.app.viewEvents.on('footer.hidden', handler);
+    window.app.viewEvents.on('footer.partlyVisible', handler);
   };
 
   Averages.prototype._showStats = function(stats) {
