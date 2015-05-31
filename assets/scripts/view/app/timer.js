@@ -5,12 +5,9 @@
 
   // The TimerView is responsible for presenting the timer to the user.
   function TimerView(appView) {
-    this._appView = appView;
     this.controls = new Controls();
-
-    this._registerModelEvents();
-    appView.on('load', this._appLoaded.bind(this));
-
+    window.app.viewEvents.on('app.load', this._appLoaded.bind(this));
+    
     // NOTE: we do not run this._showLatestSolve() here because the AppView does
     // it as part of the loading process.
   }
@@ -21,9 +18,18 @@
   TimerView.ACCURACY_NAMES = ['Centiseconds', 'Seconds', 'None'];
 
   TimerView.prototype._appLoaded = function() {
+    this._registerModelEvents();
+
     window.app.timer.getScrambleStream().resume();
     this._showPBLabel();
     this._updateManualEntryUI();
+
+    // If the user did another solve while the load animation was playing, it
+    // is necessary to update the information about the latest solve. Note,
+    // however, that this is a rare race condition.
+    if (window.app.timer.getState() !== window.app.Timer.STATE_MANUAL_ENTRY) {
+      this._showLatestSolve();
+    }
   };
 
   TimerView.prototype._handleInputChanged = function() {
@@ -31,7 +37,7 @@
     // may be "Stackmat", "Hit Space" or "Tap Screen".
     if (window.app.timer.getState() === window.app.Timer.STATE_NOT_RUNNING &&
         window.app.store.getLatestSolve() === null) {
-      this._appView.setTime(null);
+      window.app.view.setTime(null);
     }
   };
 
@@ -49,56 +55,58 @@
   };
 
   TimerView.prototype._handleStatsLoading = function() {
-    this._appView.setPB(null);
+    window.app.view.setPB(null);
   };
 
   TimerView.prototype._handleTimerActive = function() {
     if (window.app.store.getGlobalSettings().theaterMode) {
-      this._appView.setTheaterMode(true);
+      window.app.view.setTheaterMode(true);
     }
-    this._appView.setScramble(null);
-    this._appView.setPB(null);
-    this._appView.setMemo(null);
+    window.app.view.setScramble(null);
+    window.app.view.setPB(null);
+    window.app.view.setMemo(null);
   };
 
   TimerView.prototype._handleTimerDoneMemo = function() {
-    this._appView.setMemo(
+    window.app.view.setMemo(
       window.app.formatTime(window.app.timer.getMemoTime())
     );
   };
 
   TimerView.prototype._handleTimerInspectionReady = function() {
-    this._appView.setTime(Math.round(window.app.Timer.WCA_INSPECTION_TIME /
+    window.app.view.setTime(Math.round(window.app.Timer.WCA_INSPECTION_TIME /
       1000));
   };
 
   TimerView.prototype._handleTimerInspectionTime = function() {
     var elapsed = window.app.timer.getInspectionTime();
     if (elapsed > window.app.Timer.WCA_INSPECTION_TIME) {
-      this._appView.setTime('+2');
+      window.app.view.setTime('+2');
     } else {
-      this._appView.setTime(Math.ceil((window.app.Timer.WCA_INSPECTION_TIME -
+      window.app.view.setTime(Math.ceil((window.app.Timer.WCA_INSPECTION_TIME -
         elapsed) / 1000));
     }
   };
 
   TimerView.prototype._handleTimerManualTime = function() {
-    this._appView.setTime(formatManualEntry(window.app.timer.getManualTime()));
-    this._appView.blinkTime();
+    window.app.view.setTime(
+      formatManualEntry(window.app.timer.getManualTime())
+    );
+    window.app.view.blinkTime();
   };
 
   TimerView.prototype._handleTimerReady = function() {
     if (this._accuracy === TimerView.ACCURACY_NONE) {
-      this._appView.setTime('Ready');
+      window.app.view.setTime('Ready');
     } else if (this._accuracy === TimerView.ACCURACY_SECONDS) {
-      this._appView.setTime('0');
+      window.app.view.setTime('0');
     } else {
-      this._appView.setTime('0.00');
+      window.app.view.setTime('0.00');
     }
   };
 
   TimerView.prototype._handleTimerReset = function() {
-    this._appView.setTheaterMode(false);
+    window.app.view.setTheaterMode(false);
     this._showPBLabel();
 
     this._updateManualEntryUI();
@@ -111,7 +119,7 @@
     var accuracy = window.app.store.getGlobalSettings().timerAccuracy;
 
     if (accuracy === TimerView.ACCURACY_NONE) {
-      this._appView.setTime('Timing');
+      window.app.view.setTime('Timing');
       return;
     }
 
@@ -122,9 +130,9 @@
     var suffix = (addTwo ? '+' : '');
 
     if (accuracy === TimerView.ACCURACY_SECONDS) {
-      this._appView.setTime(window.app.formatSeconds(showMillis) + suffix);
+      window.app.view.setTime(window.app.formatSeconds(showMillis) + suffix);
     } else {
-      this._appView.setTime(window.app.formatTime(showMillis) + suffix);
+      window.app.view.setTime(window.app.formatTime(showMillis) + suffix);
     }
   };
 
@@ -133,7 +141,7 @@
   };
 
   TimerView.prototype._handleTimerWaiting = function() {
-    this._appView.setTime('Waiting');
+    window.app.view.setTime('Waiting');
   };
 
   TimerView.prototype._registerModelEvents = function() {
@@ -164,8 +172,8 @@
   TimerView.prototype._showLatestSolve = function() {
     var solve = window.app.store.getLatestSolve();
     if (solve === null) {
-      this._appView.setTime(null);
-      this._appView.setMemo(null);
+      window.app.view.setTime(null);
+      window.app.view.setMemo(null);
     } else {
       var time = solve.time;
       var suffix = '';
@@ -176,15 +184,15 @@
 
       var timeString = window.app.formatTime(time) + suffix;
       if (solve.dnf) {
-        this._appView.setTimeDNF(timeString);
+        window.app.view.setTimeDNF(timeString);
       } else {
-        this._appView.setTime(timeString);
+        window.app.view.setTime(timeString);
       }
 
       if (solve.memo >= 0) {
-        this._appView.setMemo(window.app.formatTime(solve.memo));
+        window.app.view.setMemo(window.app.formatTime(solve.memo));
       } else {
-        this._appView.setMemo(null);
+        window.app.view.setMemo(null);
       }
     }
   };
@@ -193,7 +201,7 @@
     var stats = window.app.store.getStats();
     var latestSolve = window.app.store.getLatestSolve();
     if (stats === null || latestSolve === null) {
-      this._appView.setPB(null);
+      window.app.view.setPB(null);
       return;
     }
 
@@ -218,25 +226,25 @@
     }
 
     if (pbAverage && pbSolve) {
-      this._appView.setPB('PB single and ' + pbAverageName);
+      window.app.view.setPB('PB single and ' + pbAverageName);
     } else if (pbAverage) {
-      this._appView.setPB('PB ' + pbAverageName);
+      window.app.view.setPB('PB ' + pbAverageName);
     } else if (pbSolve) {
-      this._appView.setPB('PB single');
+      window.app.view.setPB('PB single');
     }
   };
 
   TimerView.prototype._showScramble = function(scramble) {
-    this._appView.setScramble(scramble);
+    window.app.view.setScramble(scramble);
   };
 
   TimerView.prototype._updateManualEntryUI = function() {
     if (window.app.timer.getState() === window.app.Timer.STATE_MANUAL_ENTRY) {
-      this._appView.setMemo(null);
-      this._appView.setTimeBlinking(true);
+      window.app.view.setMemo(null);
+      window.app.view.setTimeBlinking(true);
       this._handleTimerManualTime();
     } else {
-      this._appView.setTimeBlinking(false);
+      window.app.view.setTimeBlinking(false);
     }
   };
 

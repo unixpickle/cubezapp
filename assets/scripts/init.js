@@ -13,7 +13,7 @@
       new window.app.TimesController(window.app.view.footer.stats.times);
     window.app.headerController =
       new window.app.HeaderController(window.app.view.header);
-    window.app.view.on('load', function() {
+    window.app.viewEvents.on('app.load', function() {
       window.app.timerController = new window.app.TimerController();
     });
   }

@@ -65,8 +65,7 @@
     this._middle.blinkTime();
   };
 
-  // loading returns true if the app is still loading and should not be updated
-  // significantly.
+  // loading returns true if the app is still loading and should not be updated.
   AppView.prototype.loading = function() {
     return window.app.fonts.loading() || this._numLoadingAnimations > 0;
   };
@@ -349,7 +348,7 @@
         element.style.webkitAnimationName = 'none';
         if (--this._numLoadingAnimations === 0) {
           $('body').css({pointerEvents: 'auto'});
-          this.emit('load');
+          window.app.viewEvents.emitAppLoad();
         }
       }.bind(this, element);
       element.addEventListener('animationend', cb);
