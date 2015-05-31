@@ -7,7 +7,7 @@
   function TimerView(appView) {
     this.controls = new Controls();
     window.app.viewEvents.on('app.load', this._appLoaded.bind(this));
-    
+
     // NOTE: we do not run this._showLatestSolve() here because the AppView does
     // it as part of the loading process.
   }

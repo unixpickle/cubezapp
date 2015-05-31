@@ -158,6 +158,12 @@
     this._transitionToColorFlavor(COLOR_FLAVOR_NAMES[this._alternationIndex]);
   };
 
+  Flavors.prototype._emitColor = function() {
+    var color = this._currentColorFlavor.color;
+    var hex = hexForColor(color);
+    emitFlavorColor(hex);
+  };
+
   Flavors.prototype._initializeFlavor = function(name) {
     this._currentName = name;
     if (name === ALTERNATION_FLAVOR) {
@@ -165,6 +171,7 @@
     } else {
       this._currentColorFlavor = COLOR_FLAVORS[name];
       this._updateCSS();
+      this._emitColor();
     }
   };
 
@@ -198,6 +205,7 @@
     } else if (this._currentColorFlavor === null) {
       this._currentColorFlavor = newColorFlavor;
       this._updateCSS();
+      this._emitColor();
     } else {
       this._transitionToColorFlavor(newColorFlavorName);
     }
@@ -223,6 +231,7 @@
     this._transition.onDone = function() {
       this._transition = null;
       this._updateCSS();
+      this._emitColor();
     }.bind(this);
 
     this._updateCheckboxColors();
@@ -244,7 +253,6 @@
     var pressed = [color[0]*0.8, color[1]*0.8, color[2]*0.8];
     var pressedHex = hexForColor(pressed);
     setFlavorStyle(hex, pressedHex);
-    emitFlavorColor(hex);
   };
 
   Flavors.prototype._updateCheckboxColors = function() {
