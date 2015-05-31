@@ -215,6 +215,7 @@
     }
 
     this.emit('remoteChange');
+    this._recomputeStatsFromScratch();
   };
 
   // _fillInMissingPuzzleFields makes it easier to add new puzzle fields in the
