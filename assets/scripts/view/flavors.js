@@ -244,6 +244,7 @@
     var pressed = [color[0]*0.8, color[1]*0.8, color[2]*0.8];
     var pressedHex = hexForColor(pressed);
     setFlavorStyle(hex, pressedHex);
+    emitFlavorColor(hex);
   };
 
   Flavors.prototype._updateCheckboxColors = function() {
@@ -315,6 +316,7 @@
     var color = this._intermediateColor(percent);
     this._updateColors.css({color: color});
     this._updateBg.css({backgroundColor: color});
+    emitFlavorColor(color);
 
     this._requestFrame();
   };
@@ -332,6 +334,10 @@
       res[i] = val;
     }
     return res;
+  }
+
+  function emitFlavorColor(color) {
+    window.app.viewEvents.emitFlavorColor(color);
   }
 
   function handleColorHashtagURLs() {
