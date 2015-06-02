@@ -84,7 +84,27 @@ The settings tab also implements the following methods to get options which the 
 <a name="stats-object"></a>
 ## Stats
 
-This tab will allow the user to do a number of things. However, it is not implemented yet.
+This tab has several sub-panes. These can be accessed via these properties:
+
+ * **times** - the [Times](#times-object) instance
+ * **graph** - the [Graph](#graph-object) instance
+
+<a name="times-object"></a>
+
+<a name="graph-object"></a>
+### Graph
+
+The graph has this property:
+
+ * **settings** - the [GraphSettings](#graph-settings-object) instance
+
+<a name="graph-settings-object">
+#### GraphSettings
+
+This view allows the user to control the configuration of the graph. It emits the following events:
+
+ * **settingChanged**(settingName, newValue) - emitted when a setting (given by settingName) has been set to newValue. The setting should be updated on the current puzzle.
+ * **modeChanged**(modeIndex) - emitted when the user attempts to switch the mode for the graph.
 
 <a name="timer-view-object"></a>
 # TimerView

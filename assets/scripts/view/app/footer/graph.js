@@ -5,11 +5,11 @@
 
   function Graph() {
     this._$element = $('#graph');
-    this._settings = new GraphSettings();
+    this.settings = new GraphSettings();
 
     // For now, we show the settings all the time for debugging.
-    this._settings.element().css({position: 'absolute', right: 0});
-    this._$element.append(this._settings.element());
+    this.settings.element().css({position: 'absolute', right: 0});
+    this._$element.append(this.settings.element());
   }
 
   Graph.prototype.layout = function(left, width) {
@@ -21,6 +21,8 @@
   };
 
   function GraphSettings() {
+    window.app.EventEmitter.call(this);
+
     this._$element = $('<div id="graph-settings"></div>');
     this._$header = $('<div class="title flavor-background"></div>');
 
@@ -43,8 +45,9 @@
 
     this._boundClickThru = this._clickThru.bind(this);
 
-    // NOTE: we need to add the dropdown after the header so the shadow of the
-    // dropdown is covered.
+    // NOTE: we need to add the dropdown before the header so the shadow of the
+    // dropdown is covered by the header. I could just use z-index, but that's
+    // always a bad idea.
     this._$header.append(this._$modeLabel);
     this._$element.append(this._$modeDropdown, this._$header);
 
@@ -52,6 +55,8 @@
     this._registerModelEvents();
     this._updatePageFromModel();
   }
+
+  GraphSettings.prototype = Object.create(window.app.EventEmitter.prototype);
 
   GraphSettings.ANIMATION_DURATION = 150;
   GraphSettings.MODE_NAMES = ['Standard', 'Mean', 'Histogram', 'Streak'];
@@ -77,7 +82,7 @@
       this._$modeDropdown.append($option);
       this._dropdownOptions.push($option);
       $option.click(function(index) {
-        window.app.store.modifyPuzzle({graphMode: index});
+        this.emit('modeChanged', index);
         this._setShowingDropdown(false);
       }.bind(this, i));
     }
@@ -93,7 +98,7 @@
     var $content = $('<div class="page-content"></div>');
 
     var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
-    var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphMeanScale',
+    var scale = new ManagedSlider(this, scaleSlider, 'Scale', 'graphMeanScale',
       formatScale.bind(null, 'means'));
 
     $content.append(scale.element());
@@ -104,13 +109,13 @@
   GraphSettings.prototype._generateStandard = function() {
     var $element = $('<div></div>');
 
-    $element.append(new VisualModePicker().element());
+    $element.append(new VisualModePicker(this).element());
 
     var $content = $('<div class="page-content"></div>');
 
     var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
-    var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphStandardScale',
-      formatScale.bind(null, 'solves'));
+    var scale = new ManagedSlider(this, scaleSlider, 'Scale',
+      'graphStandardScale', formatScale.bind(null, 'solves'));
     $content.append(scale.element());
 
     $element.append($content);
@@ -122,8 +127,8 @@
     var $content = $('<div class="page-content"></div>');
 
     var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
-    var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphStreakScale',
-      formatScale.bind(null, 'days'));
+    var scale = new ManagedSlider(this, scaleSlider, 'Scale',
+      'graphStreakScale', formatScale.bind(null, 'days'));
     $content.append(scale.element());
 
     $element.append($content);
@@ -290,7 +295,8 @@
   // updates a label indicating its current value.
   //
   // A ManagedSlider is its own controller. It modifies the model itself.
-  function ManagedSlider(slider, name, modelKey, valueToLabel) {
+  function ManagedSlider(emitter, slider, name, modelKey, valueToLabel) {
+    this._emitter = emitter;
     this._slider = slider;
     this._modelKey = modelKey;
     this._valueToLabel = valueToLabel;
@@ -318,9 +324,8 @@
   };
 
   ManagedSlider.prototype._sliderChanged = function() {
-    var obj = {};
-    obj[this._modelKey] = this._slider.getValue();
-    window.app.store.modifyPuzzle(obj);
+    this._emitter.emit('settingChanged', this._modelKey,
+      this._slider.getValue());
   };
 
   ManagedSlider.prototype._updateFromModel = function() {
@@ -344,7 +349,8 @@
   //
   // A VisualModePicker is its own controller. It updates the model
   // automatically.
-  function VisualModePicker() {
+  function VisualModePicker(emitter) {
+    this._emitter = emitter;
     this._$element = $('<div class="view-modes"></div>');
     this._svgs = [];
     var images = [LINE_GRAPH_IMAGE, BAR_GRAPH_IMAGE, DOT_GRAPH_IMAGE];
@@ -379,7 +385,7 @@
   }
 
   VisualModePicker.prototype._handleClick = function(index) {
-    window.app.store.modifyPuzzle({graphStandardType: index});
+    this._emitter.emit('settingChanged', 'graphStandardType', index);
   };
 
   VisualModePicker.prototype._registerEvents = function() {
@@ -397,6 +403,38 @@
         this._colorSVG(i, '#d5d5d5');
       }
     }
+  };
+
+  function ManagedCheckbox(emitter, name, modelKey) {
+    this._emitter = emitter;
+    this._modelKey = modelKey;
+    this._checkbox = window.app.flavors.makeCheckbox();
+    this._$element = $('<div class="labeled-checkbox"></div>');
+    this._$nameLabel = $('<label></label>');
+    this._$element.append(this._$nameLabel, this._checkbox.element());
+
+    this._checkbox.onClick = this._handleChange.bind(this);
+    this._updateFromModel(first);
+    this._registerModelEvents();
+  }
+
+  ManagedCheckbox.prototype.element = function() {
+    return this._$element;
+  };
+
+  ManagedCheckbox.prototype._handleChange = function() {
+    this._emitter.emit('settingChanged', this._modelKey,
+      this._checkbox.getChecked());
+  };
+
+  ManagedCheckbox.prototype._registerModelEvents = function() {
+    window.app.observe.activePuzzle(this._modelKey,
+      this._updateFromModel.bind(this));
+  };
+
+  ManagedCheckbox.prototype._updateFromModel = function() {
+    var flag = window.app.store.getActivePuzzle()[this._modelKey];
+    this._checkbox.setChecked(flag);
   };
 
   function formatScale(unit, value) {
