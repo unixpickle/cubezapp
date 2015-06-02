@@ -57,6 +57,8 @@
     'Chocolate'
   ];
 
+  var lastEmittedColor = '#000000';
+
   // Flavors is the flavor manager. It must be created after the model is
   // loaded.
   function Flavors() {
@@ -93,6 +95,13 @@
     // background color.
     document.body.className = 'flavor-background';
   }
+
+  // getLastEmittedColor returns the last hex color code that was emitted as the
+  // flavor color. This is useful for determining the hex color to use for a new
+  // custom element.
+  Flavors.prototype.getLastEmittedColor = function() {
+    return lastEmittedColor;
+  };
 
   // idToName converts a flavor ID to a flavor name.
   Flavors.prototype.idToName = function(id) {
@@ -345,6 +354,7 @@
   }
 
   function emitFlavorColor(color) {
+    lastEmittedColor = color;
     window.app.viewEvents.emitFlavorColor(color);
   }
 

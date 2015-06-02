@@ -48,9 +48,9 @@
     this._$header.append(this._$modeLabel);
     this._$element.append(this._$modeDropdown, this._$header);
 
-    // TODO: use the last page the user was in.
     this._currentPage = 0;
-    this._switchToPage(0);
+    this._registerModelEvents();
+    this._updatePageFromModel();
   }
 
   GraphSettings.ANIMATION_DURATION = 150;
@@ -77,7 +77,7 @@
       this._$modeDropdown.append($option);
       this._dropdownOptions.push($option);
       $option.click(function(index) {
-        this._switchToPage(index);
+        window.app.store.modifyPuzzle({graphMode: index});
         this._setShowingDropdown(false);
       }.bind(this, i));
     }
@@ -94,7 +94,7 @@
 
     var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
     var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphMeanScale',
-      formatScale.bind(null, 'Means'));
+      formatScale.bind(null, 'means'));
 
     $content.append(scale.element());
     $element.append($content);
@@ -104,21 +104,13 @@
   GraphSettings.prototype._generateStandard = function() {
     var $element = $('<div></div>');
 
-    var $viewModes = $('<div class="view-modes"></div>');
-    var images = [LINE_GRAPH_IMAGE, BAR_GRAPH_IMAGE, DOT_GRAPH_IMAGE];
-    for (var i = 0; i < 3; ++i) {
-      var $viewMode = $('<div class="view-mode"></div>');
-      $viewMode.addClass('view-mode-' + i);
-      $viewMode.append($(images[i]));
-      $viewModes.append($viewMode);
-    }
-    $element.append($viewModes);
+    $element.append(new VisualModePicker().element());
 
     var $content = $('<div class="page-content"></div>');
 
     var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
     var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphStandardScale',
-      formatScale.bind(null, 'Solves'));
+      formatScale.bind(null, 'solves'));
     $content.append(scale.element());
 
     $element.append($content);
@@ -131,7 +123,7 @@
 
     var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
     var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphStreakScale',
-      formatScale.bind(null, 'Days'));
+      formatScale.bind(null, 'days'));
     $content.append(scale.element());
 
     $element.append($content);
@@ -140,6 +132,11 @@
 
   GraphSettings.prototype._modeLabelClicked = function() {
     this._setShowingDropdown(!this._showingDropdown);
+  };
+
+  GraphSettings.prototype._registerModelEvents = function() {
+    window.app.observe.activePuzzle('graphMode',
+      this._updatePageFromModel.bind(this));
   };
 
   GraphSettings.prototype._setShowingDropdown = function(x) {
@@ -156,7 +153,8 @@
     }
   }
 
-  GraphSettings.prototype._switchToPage = function(pageIdx) {
+  GraphSettings.prototype._updatePageFromModel = function() {
+    var pageIdx = window.app.store.getActivePuzzle().graphMode;
     this._dropdownOptions[this._currentPage].removeClass('selected');
     this._pageElements[this._currentPage].detach();
     this._currentPage = pageIdx;
@@ -341,6 +339,66 @@
     this._$valueLabel.text(this._valueToLabel(this._slider.getValue()));
   };
 
+  // A VisualModePicker allows the user to choose between a bar graph, a line
+  // graph and a dot graph.
+  //
+  // A VisualModePicker is its own controller. It updates the model
+  // automatically.
+  function VisualModePicker() {
+    this._$element = $('<div class="view-modes"></div>');
+    this._svgs = [];
+    var images = [LINE_GRAPH_IMAGE, BAR_GRAPH_IMAGE, DOT_GRAPH_IMAGE];
+    for (var i = 0; i < 3; ++i) {
+      var $viewMode = $('<div class="view-mode"></div>');
+      var $svg = $(images[i]);
+      $viewMode.addClass('view-mode-' + i);
+      $viewMode.append($svg);
+      this._svgs.push($svg);
+      this._$element.append($viewMode);
+      $viewMode.click(this._handleClick.bind(this, i));
+    }
+
+    this._updateFromModel();
+    this._registerEvents();
+  }
+
+  VisualModePicker.prototype.element = function() {
+    return this._$element;
+  };
+
+  VisualModePicker.prototype._colorSVG = function(i, color) {
+    var doc = this._svgs[i][0];
+    var fills = doc.getElementsByClassName('color-fill');
+    for (var i = 0, len = fills.length; i < len; ++i) {
+      fills[i].setAttribute('fill', color);
+    }
+    var strokes = doc.getElementsByClassName('color-stroke');
+    for (var i = 0, len = strokes.length; i < len; ++i) {
+      strokes[i].setAttribute('stroke', color);
+    }
+  }
+
+  VisualModePicker.prototype._handleClick = function(index) {
+    window.app.store.modifyPuzzle({graphStandardType: index});
+  };
+
+  VisualModePicker.prototype._registerEvents = function() {
+    window.app.observe.activePuzzle('graphStandardType',
+      this._updateFromModel.bind(this));
+    window.app.viewEvents.on('flavor.color', this._updateFromModel.bind(this));
+  };
+
+  VisualModePicker.prototype._updateFromModel = function() {
+    var value = window.app.store.getActivePuzzle().graphStandardType;
+    for (var i = 0; i < 3; ++i) {
+      if (i === value) {
+        this._colorSVG(i, window.app.flavors.getLastEmittedColor());
+      } else {
+        this._colorSVG(i, '#d5d5d5');
+      }
+    }
+  };
+
   function formatScale(unit, value) {
     return Math.round(value) + ' ' + unit;
   }
@@ -352,7 +410,7 @@
     'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
     'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
     'preserveAspectRatio="xMidYMid meet" xml:space="preserve">' +
-    '<g id="barGraphImage">' +
+    '<g id="barGraphImage" class="color-fill">' +
     '<rect x="64.8" y="358.3" width="229.2" height="475"/>' +
     '<rect x="369.3" y="101.4" width="229.2" height="731.9"/>' +
     '<rect x="675.1" y="201" width="229.2" height="632.8"/>' +
@@ -366,7 +424,7 @@
     'preserveAspectRatio="xMidYMid meet" xml:space="preserve">' +
     '<g id="dotGraphImage">' +
     '<g><g>' +
-    '<path fill-rule="evenodd" clip-rule="evenodd" '+
+    '<path class="color-fill" fill-rule="evenodd" clip-rule="evenodd" '+
     'd="M160.5,355.7c-46.9,0-84.9,38-84.9,84.9s38,84.9,84.9,84.9s84.9-38,' +
     '84.9-84.9 S207.4,355.7,160.5,355.7z M432.1,304.8c-46.9,0-84.9,38-84.9,' +
     '84.9s38,84.9,84.9,84.9s84.9-38,84.9-84.9S479,304.8,432.1,304.8z' +
@@ -382,7 +440,7 @@
     'preserveAspectRatio="xMidYMid meet" xml:space="preserve">' +
     '<g id="Layer_1">' +
     '<path fill-rule="evenodd" clip-rule="evenodd" fill="none" ' +
-    'stroke="#000000" stroke-width="70" stroke-miterlimit="10" d="' +
+    'class="color-stroke" stroke-width="70" stroke-miterlimit="10" d="' +
     'M85.9,261c0,0,138.3,327.3,426.6,244.2S911,667.3,914.1,677.3"/>' +
     '</g></svg>';
 

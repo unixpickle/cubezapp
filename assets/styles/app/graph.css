@@ -146,7 +146,13 @@
 
 #graph-settings .view-mode {
   float: left;
+  width: 66px;
   height: 100%;
+}
+
+#graph-settings .view-mode:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
 }
 
 #graph-settings .view-mode svg {
@@ -155,15 +161,9 @@
 }
 
 #graph-settings .view-mode-0 {
-  width: 65px;
   border-right: 1px solid #f0f0f0;
 }
 
-#graph-settings .view-mode-1 {
-  width: 66px;
-}
-
 #graph-settings .view-mode-2 {
-  width: 65px;
   border-left: 1px solid #f0f0f0;
 }
