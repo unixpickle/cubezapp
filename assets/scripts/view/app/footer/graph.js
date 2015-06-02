@@ -40,14 +40,14 @@
 
     this._boundClickThru = this._clickThru.bind(this);
 
-    // TODO: use the last page the user was in.
-    this._currentPage = 0;
-    this._switchToPage(0);
-
     // NOTE: we need to add the dropdown after the header so the shadow of the
     // dropdown is covered.
     this._$header.append(this._$modeLabel);
     this._$element.append(this._$modeDropdown, this._$header);
+
+    // TODO: use the last page the user was in.
+    this._currentPage = 0;
+    this._switchToPage(0);
   }
 
   GraphSettings.ANIMATION_DURATION = 150;
@@ -99,6 +99,10 @@
 
   GraphSettings.prototype._generateStandard = function() {
     var $element = $('<div></div>');
+    
+    var $lineGraph = $(BAR_GRAPH_IMAGE);
+    $element.append($lineGraph);
+    
     return $element;
   };
 
@@ -267,5 +271,44 @@
   };
 
   window.app.Graph = Graph;
+
+  var BAR_GRAPH_IMAGE = '<svg version="1.1" ' +
+    'xmlns="http://www.w3.org/2000/svg" ' +
+    'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
+    'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
+    'preserveAspectRatio="xMinYMin meet" xml:space="preserve">' +
+    '<g id="barGraphImage">' +
+    '<rect x="64.8" y="358.3" width="229.2" height="475"/>' +
+    '<rect x="369.3" y="101.4" width="229.2" height="731.9"/>' +
+    '<rect x="675.1" y="201" width="229.2" height="632.8"/>' +
+    '</g>' +
+    '</svg>';
+
+  var DOT_GRAPH_IMAGE = '<svg version="1.1" ' +
+    'xmlns="http://www.w3.org/2000/svg" ' +
+    'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
+    'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
+    'preserveAspectRatio="xMinYMin meet" xml:space="preserve">' +
+    '<g id="dotGraphImage">' +
+    '<g><g>' +
+    '<path fill-rule="evenodd" clip-rule="evenodd" '+
+    'd="M160.5,355.7c-46.9,0-84.9,38-84.9,84.9s38,84.9,84.9,84.9s84.9-38,' +
+    '84.9-84.9 S207.4,355.7,160.5,355.7z M432.1,304.8c-46.9,0-84.9,38-84.9,' +
+    '84.9s38,84.9,84.9,84.9s84.9-38,84.9-84.9S479,304.8,432.1,304.8z' +
+    'M601.8,525.5c-46.9,0-84.9,38-84.9,84.9s38,84.9,84.9,84.9s84.9-38,' +
+    '84.9-84.9S648.7,525.5,601.8,525.5z M839.5,440.6 c-46.9,0-84.9,38-84.9,' +
+    '84.9s38,84.9,84.9,84.9s84.9-38,84.9-84.9S886.3,440.6,839.5,440.6z"/>' +
+    '</g></g></g></svg>';
+
+  var LINE_GRAPH_IMAGE = '<svg version="1.1" ' +
+    'xmlns="http://www.w3.org/2000/svg" ' + 
+    'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
+    'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
+    'xml:space="preserve">' +
+    '<g id="Layer_1">' +
+    '<path fill-rule="evenodd" clip-rule="evenodd" fill="none" ' +
+    'stroke="#000000" stroke-width="22" stroke-miterlimit="10" d="' +
+    'M85.9,261c0,0,138.3,327.3,426.6,244.2S911,667.3,914.1,677.3"/>' +
+    '</g></svg>';
 
 })();
