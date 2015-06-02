@@ -132,12 +132,30 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
  * **scrambler** - string - the type of puzzle.js scrambler to use
  * **scrambleType** - string - the subtype of the scrambler to use
  * **lastUsed** - int - the UNIX time in milliseconds that the user last modified or switched to this puzzle
- * **timerInput** - int - an enum for the input method.
-   * 0 - INPUT_REGULAR - the timer is a normal.
-   * 1 - INPUT_INSPECTION - inspection time is used.
-   * 2 - INPUT_BLD - blindfolded (two-stage) mode.
-   * 3 - INPUT_STACKMAT - an external stackmat is used.
-   * 4 - INPUT_ENTRY - manual entry is used.
+ * **timerInput** - int - an enum for the input method
+   * 0 - INPUT_REGULAR - the timer is a normal
+   * 1 - INPUT_INSPECTION - inspection time is used
+   * 2 - INPUT_BLD - blindfolded (two-stage) mode
+   * 3 - INPUT_STACKMAT - an external stackmat is used
+   * 4 - INPUT_ENTRY - manual entry is used
+ * **graphMode** - int - an enum representing the type of graph the user wishes to see
+   * 0 - MODE_STANDARD - the graph is in standard mode and the "graphStandard*" settings are used
+   * 1 - MODE_MEAN - the graph is in mean mode and the "graphMean*" settings are used
+   * 2 - MODE_HISTOGRAM - the graph is in histogram mode and the "graphHistogram*" settings are used
+   * 3 - MODE_STREAK - the graph is in streak mode and the "graphStreak*" settings are used
+ * **graphStandardType** - int - an enum representing the graph sub-type.
+   * 0 - TYPE_LINE - a line graph
+   * 1 - TYPE_BAR - a bar graph
+   * 2 - TYPE_DOT - a dot graph
+ * **graphStandardScale** - int - the number of solves to show per page of the graph
+ * **graphStandardShowDNF** - bool - whether or not DNFs should be included in the standard graph
+ * **graphMeanScale** - int - the number of data points to show per page of the mean graph
+ * **graphMeanCount** - int - the number of solves to average into each data point
+ * **graphMeanShowDNF** - bool - whether or not DNFs should be used in the mean graph
+ * **graphStreakScale** - int - the number of days to show in one page of the streak graph
+ * **graphStreakUsePercent** - bool - if this is true, each bar in the streak represents the percent of solves below the upper bound. Otherwise, each bar represents the raw number of solves below the upper bound.
+ * **graphStreakUpperBound** - int - a time below which a solve must be in order to count towards the streak
+ * **graphStreakIncludeDNF** - bool - whether or not DNFs should be considered when computing the percent (if applicable)
  * **id** - string - the unique identifier of the puzzle. **This field will not be present if the puzzle has not been added to the store.**
 
 <a name="global-settings-object"></a>
