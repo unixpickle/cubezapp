@@ -104,6 +104,7 @@ The graph has this property:
 This view allows the user to control the configuration of the graph. It emits the following events:
 
  * **settingChanged**(settingName, newValue) - emitted when a setting (given by settingName) has been set to newValue. The setting should be updated on the current puzzle.
+ * **settingChanging**(settingName, newValue) - emitted when the user is in the middle of changing a setting. Usually, this is emitted for sliding a slider or some other operation where many modifications may occur in a very brief interval of time.
  * **modeChanged**(modeIndex) - emitted when the user attempts to switch the mode for the graph.
 
 <a name="timer-view-object"></a>

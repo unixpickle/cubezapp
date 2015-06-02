@@ -1,6 +1,6 @@
 (function() {
 
-  var MINIMUM_MEAN_SIZE = 2;
+  var MINIMUM_MEAN_SIZE = 3;
   var MAXIMUM_MEAN_SIZE = 50;
 
   var MINIMUM_SCALE = 5;
@@ -107,6 +107,7 @@
       MAXIMUM_MEAN_SIZE, 0));
     var meanOf = new ManagedSlider(this, meanOfSlider, 'Mean of',
       'graphMeanCount', formatInteger.bind(null, 'solves'));
+    $content.append(meanOf.element());
 
     $content.append(new ManagedCheckbox(this, 'Show DNF',
       'graphMeanShowDNF').element());
@@ -257,7 +258,8 @@
     });
     $(document.body).mouseup(function() {
       clicked = false;
-    });
+      this.emit('release');
+    }.bind(this));
     $(document.body).mousemove(function(e) {
       if (clicked) {
         update(e);
@@ -292,6 +294,7 @@
     this._toSliderValue = toSliderValue;
 
     slider.on('change', this.emit.bind(this, 'change'));
+    slider.on('release', this.emit.bind(this, 'release'));
   }
 
   ScaledSlider.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -334,6 +337,7 @@
     this._$element.append(this._slider.element());
 
     this._slider.on('change', this._sliderChanged.bind(this));
+    this._slider.on('release', this._sliderReleased.bind(this));
     this._updateFromModel();
     this._registerModelEvents();
   }
@@ -348,6 +352,12 @@
   };
 
   ManagedSlider.prototype._sliderChanged = function() {
+    this._emitter.emit('settingChanging', this._modelKey,
+      this._slider.getValue());
+    this._updateLabel();
+  };
+
+  ManagedSlider.prototype._sliderReleased = function() {
     this._emitter.emit('settingChanged', this._modelKey,
       this._slider.getValue());
   };
