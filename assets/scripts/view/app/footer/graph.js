@@ -1,5 +1,8 @@
 (function() {
 
+  var MINIMUM_SCALE = 5;
+  var MAXIMUM_SCALE = 100;
+
   function Graph() {
     this._$element = $('#graph');
     this._settings = new GraphSettings();
@@ -89,12 +92,11 @@
     var $element = $('<div></div>');
     var $content = $('<div class="page-content"></div>');
 
-    var slider = new Slider(1, 1000, 100);
-    var scale = new LabelSlider(slider, 'Scale', function(x) {
-      return Math.round(x) + ' Solves';
-    });
-    $content.append(scale.element());
+    var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
+    var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphMeanScale',
+      formatScale.bind(null, 'Solves'));
 
+    $content.append(scale.element());
     $element.append($content);
     return $element;
   };
@@ -235,49 +237,97 @@
     var fraction = (x - startX) / (endX - startX);
     fraction = Math.max(Math.min(fraction, 1), 0);
 
+    var oldValue = this.getValue();
     this.setValue(fraction*(this._maximumValue-this._minimumValue) +
       this._minimumValue);
 
-    this.emit('change');
+    if (oldValue !== this.getValue()) {
+      this.emit('change');
+    }
   };
 
-  function LabelSlider(slider, leftText, labelFunc) {
+  // A ScaledSlider uses two functions to scale or transform the value range of
+  // a slider.
+  function ScaledSlider(toModelValue, toSliderValue, slider) {
     window.app.EventEmitter.call(this);
 
     this._slider = slider;
-    this._labelFunc = labelFunc;
+    this._toModelValue = toModelValue;
+    this._toSliderValue = toSliderValue;
 
-    this._$element = $('<div></div>');
-
-    this._$right = $('<label></label>').addClass('right-label');
-    var $left = $('<label></label>').text(leftText).addClass('left-label');
-    var $twoSided = $('<div class="two-sided-label"></div>');
-
-    this._$element.append($twoSided.append($left, this._$right));
-    this._$element.append(this._slider.element());
-
-    this._slider.on('change', this._updateLabel.bind(this));
-    this._updateLabel();
+    slider.on('change', this.emit.bind(this, 'change'));
   }
 
-  LabelSlider.prototype = Object.create(window.app.EventEmitter.prototype);
+  ScaledSlider.prototype = Object.create(window.app.EventEmitter.prototype);
 
-  LabelSlider.prototype.element = function() {
+  ScaledSlider.prototype.element = function() {
+    return this._slider.element();
+  };
+
+  ScaledSlider.prototype.getValue = function() {
+    return this._toModelValue(this._slider.getValue());
+  };
+
+  ScaledSlider.prototype.setValue = function(v) {
+    return this._slider.setValue(this._toSliderValue(v));
+  };
+
+  // A ManagedSlider automatically keeps a slider in sync with the model and
+  // updates a label indicating its current value.
+  //
+  // A ManagedSlider is its own controller. It modifies the model itself.
+  function ManagedSlider(slider, name, modelKey, valueToLabel) {
+    this._slider = slider;
+    this._modelKey = modelKey;
+    this._valueToLabel = valueToLabel;
+
+    this._$element = $('<div></div>');
+    this._$valueLabel = $('<label></label>').addClass('value-label');
+    var $nameLabel = $('<label></label>').text(name).addClass('name-label');
+    var $labels = $('<div class="name-value-labels"></div>');
+
+    this._$element.append($labels.append($nameLabel, this._$valueLabel));
+    this._$element.append(this._slider.element());
+
+    this._slider.on('change', this._sliderChanged.bind(this));
+    this._updateFromModel();
+    this._registerModelEvents();
+  }
+
+  ManagedSlider.prototype.element = function() {
     return this._$element;
   };
 
-  LabelSlider.prototype.getValue = function() {
-    return this._slider.getValue();
+  ManagedSlider.prototype._registerModelEvents = function() {
+    window.app.observe.activePuzzle(this._modelKey,
+      this._updateFromModel.bind(this));
   };
 
-  LabelSlider.prototype.setValue = function(v) {
-    this._slider.setValue(v);
+  ManagedSlider.prototype._sliderChanged = function() {
+    var obj = {};
+    obj[this._modelKey] = this._slider.getValue();
+    window.app.store.modifyPuzzle(obj);
+  };
+
+  ManagedSlider.prototype._updateFromModel = function() {
+    var value = window.app.store.getActivePuzzle()[this._modelKey];
+
+    // If the slider's value is rounded, re-setting the value may cause it to
+    // jump a bit and that would be ugly.
+    if (value !== this._slider.getValue()) {
+      this._slider.setValue(value);
+    }
+
     this._updateLabel();
   };
 
-  LabelSlider.prototype._updateLabel = function() {
-    this._$right.text(this._labelFunc(this.getValue()));
+  ManagedSlider.prototype._updateLabel = function() {
+    this._$valueLabel.text(this._valueToLabel(this._slider.getValue()));
   };
+
+  function formatScale(unit, value) {
+    return Math.round(value) + ' ' + unit;
+  }
 
   window.app.Graph = Graph;
 

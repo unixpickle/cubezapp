@@ -46,7 +46,7 @@
   width: calc(100% - 20px);
 }
 
-#graph-settings .two-sided-label {
+#graph-settings .name-value-labels {
   margin-top: 10px;
   display: inline-block;
   width: 100%;
@@ -54,12 +54,12 @@
   font-size: 17px;
 }
 
-#graph-settings .left-label {
+#graph-settings .name-label {
   float: left;
   color: #777;
 }
 
-#graph-settings .right-label {
+#graph-settings .value-label {
   float: right;
   color: #777;
 }

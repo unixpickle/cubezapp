@@ -7,6 +7,24 @@
     theaterMode: true
   };
 
+  var DEFAULT_PUZZLE_SETTINGS = {
+    scrambler: 'None',
+    scrambleType: 'None',
+    lastUsed: new Date().getTime(),
+    timerInput: 0,
+    graphMode: 0,
+    graphStandardType: 0,
+    graphStandardScale: 20,
+    graphStandardShowDNF: true,
+    graphMeanScale: 20,
+    graphMeanCount: 10,
+    graphMeanShowDNF: false,
+    graphStreakScale: 20,
+    graphStreakUsePercent: true,
+    graphStreakUpperBound: 20,
+    graphStreakIncludeDNF: true
+  };
+
   function LocalStore() {
     window.app.EventEmitter.call(this);
 
@@ -32,11 +50,9 @@
 
   LocalStore.prototype.addPuzzle = function(puzzle) {
     puzzle.id = window.app.generateId();
-    if ('undefined' === typeof puzzle.solves) {
-      puzzle.solves = [];
-    }
     this._puzzles.unshift(puzzle);
     this._active = puzzle;
+    this._fillInMissingPuzzleFields();
     this._recomputeStatsFromScratch();
     this._save();
     this.emit('addedPuzzle', puzzle);
@@ -221,19 +237,15 @@
   // _fillInMissingPuzzleFields makes it easier to add new puzzle fields in the
   // future.
   LocalStore.prototype._fillInMissingPuzzleFields = function() {
-    var defaults = {
-      scrambler: 'None',
-      scrambleType: 'None',
-      lastUsed: new Date().getTime(),
-      timerInput: 0
-    };
-    var keys = Object.keys(defaults);
+    DEFAULT_PUZZLE_SETTINGS.lastUsed = new Date().getTime();
+
+    var keys = Object.keys(DEFAULT_PUZZLE_SETTINGS);
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       var puzzle = this._puzzles[i];
       for (var j = 0, len1 = keys.length; j < len1; ++j) {
         var key = keys[j]
         if (!puzzle.hasOwnProperty(key)) {
-          puzzle[key] = defaults[key];
+          puzzle[key] = DEFAULT_PUZZLE_SETTINGS[key];
         }
       }
       if (!puzzle.hasOwnProperty('solves')) {
