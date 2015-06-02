@@ -94,7 +94,7 @@
 
     var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
     var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphMeanScale',
-      formatScale.bind(null, 'Solves'));
+      formatScale.bind(null, 'Means'));
 
     $content.append(scale.element());
     $element.append($content);
@@ -114,11 +114,27 @@
     }
     $element.append($viewModes);
 
+    var $content = $('<div class="page-content"></div>');
+
+    var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
+    var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphStandardScale',
+      formatScale.bind(null, 'Solves'));
+    $content.append(scale.element());
+
+    $element.append($content);
     return $element;
   };
 
   GraphSettings.prototype._generateStreak = function() {
     var $element = $('<div></div>');
+    var $content = $('<div class="page-content"></div>');
+
+    var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
+    var scale = new ManagedSlider(scaleSlider, 'Scale', 'graphStreakScale',
+      formatScale.bind(null, 'Days'));
+    $content.append(scale.element());
+
+    $element.append($content);
     return $element;
   };
 
