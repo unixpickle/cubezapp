@@ -2,7 +2,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 170px;
+  width: 200px;
   height: 100%;
   background-color: #e6e6e6;
 }
@@ -99,7 +99,7 @@
 
 #graph-settings .slider {
   position: relative;
-  margin-top: 5px;
+  margin-top: 2px;
   height: 10px;
   width: 100%;
 }

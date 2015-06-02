@@ -87,9 +87,12 @@
 
   GraphSettings.prototype._generateMean = function() {
     var $element = $('<div></div>');
-    $element.append(generateTwoSidedLabel('Scale', 'Something'));
 
-    $element.append(new Slider(0, 1, 0.5).element());
+    var slider = new Slider(1, 1000, 100);
+    var scale = new LabelSlider(slider, 'Scale', function(x) {
+      return Math.round(x) + ' Solves';
+    });
+    $element.append(scale.element());
 
     return $element;
   };
@@ -132,6 +135,8 @@
   };
 
   function Slider(min, max, value, clip) {
+    window.app.EventEmitter.call(this);
+
     this._minimumValue = min;
     this._maximumValue = max;
     this._value = 0;
@@ -147,6 +152,8 @@
     this.setValue(value);
     this._registerUIEvents();
   }
+
+  Slider.prototype = Object.create(window.app.EventEmitter.prototype);
 
   Slider.prototype.element = function() {
     return this._$element;
@@ -188,16 +195,7 @@
 
   Slider.prototype._registerUIEvents = function() {
     var clicked = false;
-    var update = function(e) {
-      var x = e.pageX - this._$element.offset().left;
-      var startX = this._$bulb.width() / 2;
-      var endX = this._$element.width() - startX;
-      var fraction = (x - startX) / (endX - startX);
-      fraction = Math.max(Math.min(fraction, 1), 0);
-      this.setValue(fraction*(this._maximumValue-this._minimumValue) +
-        this._minimumValue);
-    }.bind(this);
-
+    var update = this._updateForMouseEvent.bind(this);
     this._$element.mousedown(function(e) {
       clicked = true;
       update(e);
@@ -216,11 +214,57 @@
     });
   };
 
-  function generateTwoSidedLabel(left, right) {
-    var $left = $('<label></label>').text(left).addClass('left-label');
-    var $right = $('<label></label>').text(right).addClass('right-label');
-    return $('<div class="two-sided-label"></div>').append($left, $right);
+  Slider.prototype._updateForMouseEvent = function(e) {
+    var x = e.pageX - this._$element.offset().left;
+    var startX = this._$bulb.width() / 2;
+    var endX = this._$element.width() - startX;
+
+    var fraction = (x - startX) / (endX - startX);
+    fraction = Math.max(Math.min(fraction, 1), 0);
+
+    this.setValue(fraction*(this._maximumValue-this._minimumValue) +
+      this._minimumValue);
+
+    this.emit('change');
+  };
+
+  function LabelSlider(slider, leftText, labelFunc) {
+    window.app.EventEmitter.call(this);
+
+    this._slider = slider;
+    this._labelFunc = labelFunc;
+
+    this._$element = $('<div></div>');
+
+    this._$right = $('<label></label>').addClass('right-label');
+    var $left = $('<label></label>').text(leftText).addClass('left-label');
+    var $twoSided = $('<div class="two-sided-label"></div>');
+
+    this._$element.append($twoSided.append($left, this._$right));
+    this._$element.append(this._slider.element());
+
+    this._slider.on('change', this._updateLabel.bind(this));
+    this._updateLabel();
   }
+
+  LabelSlider.prototype = Object.create(window.app.EventEmitter.prototype);
+
+  LabelSlider.prototype.element = function() {
+    return this._$element;
+  };
+
+  LabelSlider.prototype.getValue = function() {
+    return this._slider.getValue();
+  };
+
+  LabelSlider.prototype.setValue = function(v) {
+    this._slider.setValue(v);
+    this._updateLabel();
+  };
+
+  LabelSlider.prototype._updateLabel = function() {
+    this._$right.text(this._labelFunc(this.getValue()));
+  };
 
   window.app.Graph = Graph;
 
