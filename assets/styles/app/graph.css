@@ -38,7 +38,11 @@
 #graph-settings .page {
   position: absolute;
   top: 40px;
-  left: 10px;
+  width: 100%;
+}
+
+#graph-settings .page-content {
+  margin-left: 10px;
   width: calc(100% - 20px);
 }
 
@@ -132,4 +136,34 @@
   height: 2px;
   width: 100%;
   background-color: #cccccc;
+}
+
+#graph-settings .view-modes {
+  width: 100%;
+  height: 30px;
+  background-color: white;
+}
+
+#graph-settings .view-mode {
+  float: left;
+  height: 100%;
+}
+
+#graph-settings .view-mode svg {
+  width: 100%;
+  height: 100%;
+}
+
+#graph-settings .view-mode-0 {
+  width: 65px;
+  border-right: 1px solid #f0f0f0;
+}
+
+#graph-settings .view-mode-1 {
+  width: 66px;
+}
+
+#graph-settings .view-mode-2 {
+  width: 65px;
+  border-left: 1px solid #f0f0f0;
 }

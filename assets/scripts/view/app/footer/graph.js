@@ -87,22 +87,31 @@
 
   GraphSettings.prototype._generateMean = function() {
     var $element = $('<div></div>');
+    var $content = $('<div class="page-content"></div>');
 
     var slider = new Slider(1, 1000, 100);
     var scale = new LabelSlider(slider, 'Scale', function(x) {
       return Math.round(x) + ' Solves';
     });
-    $element.append(scale.element());
+    $content.append(scale.element());
 
+    $element.append($content);
     return $element;
   };
 
   GraphSettings.prototype._generateStandard = function() {
     var $element = $('<div></div>');
-    
-    var $lineGraph = $(BAR_GRAPH_IMAGE);
-    $element.append($lineGraph);
-    
+
+    var $viewModes = $('<div class="view-modes"></div>');
+    var images = [LINE_GRAPH_IMAGE, BAR_GRAPH_IMAGE, DOT_GRAPH_IMAGE];
+    for (var i = 0; i < 3; ++i) {
+      var $viewMode = $('<div class="view-mode"></div>');
+      $viewMode.addClass('view-mode-' + i);
+      $viewMode.append($(images[i]));
+      $viewModes.append($viewMode);
+    }
+    $element.append($viewModes);
+
     return $element;
   };
 
@@ -276,7 +285,7 @@
     'xmlns="http://www.w3.org/2000/svg" ' +
     'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
     'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
-    'preserveAspectRatio="xMinYMin meet" xml:space="preserve">' +
+    'preserveAspectRatio="xMidYMid meet" xml:space="preserve">' +
     '<g id="barGraphImage">' +
     '<rect x="64.8" y="358.3" width="229.2" height="475"/>' +
     '<rect x="369.3" y="101.4" width="229.2" height="731.9"/>' +
@@ -288,7 +297,7 @@
     'xmlns="http://www.w3.org/2000/svg" ' +
     'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
     'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
-    'preserveAspectRatio="xMinYMin meet" xml:space="preserve">' +
+    'preserveAspectRatio="xMidYMid meet" xml:space="preserve">' +
     '<g id="dotGraphImage">' +
     '<g><g>' +
     '<path fill-rule="evenodd" clip-rule="evenodd" '+
@@ -301,13 +310,13 @@
     '</g></g></g></svg>';
 
   var LINE_GRAPH_IMAGE = '<svg version="1.1" ' +
-    'xmlns="http://www.w3.org/2000/svg" ' + 
+    'xmlns="http://www.w3.org/2000/svg" ' +
     'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
     'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
-    'xml:space="preserve">' +
+    'preserveAspectRatio="xMidYMid meet" xml:space="preserve">' +
     '<g id="Layer_1">' +
     '<path fill-rule="evenodd" clip-rule="evenodd" fill="none" ' +
-    'stroke="#000000" stroke-width="22" stroke-miterlimit="10" d="' +
+    'stroke="#000000" stroke-width="70" stroke-miterlimit="10" d="' +
     'M85.9,261c0,0,138.3,327.3,426.6,244.2S911,667.3,914.1,677.3"/>' +
     '</g></svg>';
 
