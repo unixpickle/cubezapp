@@ -130,12 +130,12 @@
   };
 
   // makeCheckbox generates a checkbox that follows the theme color.
-  Flavors.prototype.makeCheckbox = function() {
+  Flavors.prototype.makeCheckbox = function(checked) {
     var rgbColor = [];
     for (var i = 0; i < 3; ++i) {
       rgbColor[i] = this._currentColorFlavor.color[i] / 0xff;
     }
-    var result = new window.checkboxjs.Checkbox(rgbColor);
+    var result = new window.checkboxjs.Checkbox(rgbColor, checked || false);
     result.setVisible(true);
     this._checkboxes.push(result);
     return result;

@@ -36,12 +36,9 @@
     this._showingDropdown = false;
     this._generateDropdownOptions();
 
-    this._pageElements = [];
-    var elements = [this._generateStandard(), this._generateMean(),
-      this._generateHistogram(), this._generateStreak()];
-    for (var i = 0, len = elements.length; i < len; ++i) {
-      this._pageElements.push(elements[i].addClass('page'));
-    }
+    this._pageElements = [this._generateStandardPage(),
+      this._generateMeanPage(), this._generateHistogramPage(),
+      this._generateStreakPage()];
 
     this._boundClickThru = this._clickThru.bind(this);
 
@@ -88,26 +85,29 @@
     }
   };
 
-  GraphSettings.prototype._generateHistogram = function() {
-    var $element = $('<div></div>');
+  GraphSettings.prototype._generateHistogramPage = function() {
+    var $element = $('<div class="page"></div>');
     return $element;
   };
 
-  GraphSettings.prototype._generateMean = function() {
-    var $element = $('<div></div>');
+  GraphSettings.prototype._generateMeanPage = function() {
+    var $element = $('<div class="page"></div>');
     var $content = $('<div class="page-content"></div>');
 
     var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
     var scale = new ManagedSlider(this, scaleSlider, 'Scale', 'graphMeanScale',
       formatScale.bind(null, 'means'));
-
     $content.append(scale.element());
+
+    $content.append(new ManagedCheckbox(this, 'Show DNF',
+      'graphMeanShowDNF').element());
+
     $element.append($content);
     return $element;
   };
 
-  GraphSettings.prototype._generateStandard = function() {
-    var $element = $('<div></div>');
+  GraphSettings.prototype._generateStandardPage = function() {
+    var $element = $('<div class="page"></div>');
 
     $element.append(new VisualModePicker(this).element());
 
@@ -118,18 +118,24 @@
       'graphStandardScale', formatScale.bind(null, 'solves'));
     $content.append(scale.element());
 
+    $content.append(new ManagedCheckbox(this, 'Show DNF',
+      'graphStandardShowDNF').element());
+
     $element.append($content);
     return $element;
   };
 
-  GraphSettings.prototype._generateStreak = function() {
-    var $element = $('<div></div>');
+  GraphSettings.prototype._generateStreakPage = function() {
+    var $element = $('<div class="page"></div>');
     var $content = $('<div class="page-content"></div>');
 
     var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
     var scale = new ManagedSlider(this, scaleSlider, 'Scale',
       'graphStreakScale', formatScale.bind(null, 'days'));
     $content.append(scale.element());
+
+    $content.append(new ManagedCheckbox(this, 'Include DNF',
+      'graphStreakIncludeDNF').element());
 
     $element.append($content);
     return $element;
@@ -408,13 +414,15 @@
   function ManagedCheckbox(emitter, name, modelKey) {
     this._emitter = emitter;
     this._modelKey = modelKey;
-    this._checkbox = window.app.flavors.makeCheckbox();
+    this._checkbox = window.app.flavors.makeCheckbox(
+      window.app.store.getActivePuzzle()[this._modelKey]
+    );
+    var $checkElement = $(this._checkbox.element()).addClass('checkbox');
     this._$element = $('<div class="labeled-checkbox"></div>');
-    this._$nameLabel = $('<label></label>');
-    this._$element.append(this._$nameLabel, this._checkbox.element());
+    this._$nameLabel = $('<label></label>').text(name);
+    this._$element.append(this._$nameLabel, $checkElement);
 
-    this._checkbox.onClick = this._handleChange.bind(this);
-    this._updateFromModel(first);
+    this._checkbox.onChange = this._handleChange.bind(this);
     this._registerModelEvents();
   }
 

@@ -106,6 +106,7 @@
   margin-top: 2px;
   height: 10px;
   width: 100%;
+  cursor: pointer;
 }
 
 #graph-settings .slider .bulb-container {
@@ -166,4 +167,19 @@
 
 #graph-settings .view-mode-2 {
   border-left: 1px solid #f0f0f0;
+}
+
+#graph-settings .labeled-checkbox {
+  margin-top: 10px;
+}
+
+#graph-settings .labeled-checkbox label {
+  float: left;
+  font-weight: lighter;
+  font-size: 17px;
+  color: #777;
+}
+
+#graph-settings .labeled-checkbox .checkbox {
+  float: right;
 }
