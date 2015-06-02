@@ -11,7 +11,6 @@
 
   Graph.prototype.layout = function(left, width) {
     this._$element.css({left: left, width: width});
-    this._settings.layout();
   };
 
   Graph.prototype.setVisible = function(flag) {
@@ -33,7 +32,6 @@
     this._generateDropdownOptions();
 
     this._pageElements = [];
-    this._sliders = [];
     var elements = [this._generateStandard(), this._generateMean(),
       this._generateHistogram(), this._generateStreak()];
     for (var i = 0, len = elements.length; i < len; ++i) {
@@ -63,12 +61,6 @@
     return this._$element;
   };
 
-  GraphSettings.prototype.layout = function() {
-    for (var i = 0, len = this._sliders.length; i < len; ++i) {
-      this._sliders[i].layout();
-    }
-  }
-
   GraphSettings.prototype._clickThru = function(e) {
     if (!e.inElement(this._$modeDropdown[0]) &&
         !e.inElement(this._$modeLabel[0])) {
@@ -97,9 +89,7 @@
     var $element = $('<div></div>');
     $element.append(generateTwoSidedLabel('Scale', 'Something'));
 
-    var slider = new Slider();
-    this._sliders.push(slider);
-    $element.append(slider.element());
+    $element.append(new Slider(0, 1, 0.5).element());
 
     return $element;
   };
@@ -139,50 +129,24 @@
     this._dropdownOptions[pageIdx].addClass('selected');
     this._$modeDropdown.before(this._pageElements[pageIdx]);
     this._$modeLabel.text(GraphSettings.MODE_NAMES[pageIdx]);
-    this.layout();
   };
 
-  function Slider() {
-    this._minimumValue = 0;
-    this._maximumValue = 1;
-    this._value = 0.5;
-    this._clipValues = null;
+  function Slider(min, max, value, clip) {
+    this._minimumValue = min;
+    this._maximumValue = max;
+    this._value = 0;
+    this._clipValues = clip || null;
 
-    this._$filledPart = $('<div></div>').css({
-      position: 'absolute',
-      top: (Slider.BULB_SIZE - Slider.THICKNESS) / 2,
-      left: 0,
-      width: 0,
-      height: Slider.THICKNESS
-    }).addClass('flavor-background');
-    this._$background = $('<div></div>').css({
-      position: 'absolute',
-      top: (Slider.BULB_SIZE - Slider.THICKNESS) / 2,
-      left: 0,
-      width: '100%',
-      height: Slider.THICKNESS,
-      backgroundColor: '#cccccc'
-    });
-    this._$bulb = $('<div></div>').css({
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: Slider.BULB_WIDTH,
-      height: Slider.BULB_SIZE,
-      backgroundColor: 'white'
-    });
-    this._$element = $('<div></div>').css({
-      position: 'relative',
-      height: Slider.BULB_SIZE,
-      marginTop: 5
-    }).append(this._$background, this._$filledPart, this._$bulb);
+    this._$element = $('<div class="slider"><div class="background"></div>' +
+      '<div class="bulb-container">' +
+      '<div class="before-bulb flavor-background"></div>' +
+      '<div class="bulb"></div></div>');
+    this._$beforeBulb = this._$element.find('.before-bulb');
+    this._$bulb = this._$element.find('.bulb');
 
+    this.setValue(value);
     this._registerUIEvents();
   }
-
-  Slider.BULB_SIZE = 10;
-  Slider.BULB_WIDTH = 4;
-  Slider.THICKNESS = 4;
 
   Slider.prototype.element = function() {
     return this._$element;
@@ -192,37 +156,14 @@
     return this._value;
   };
 
-  Slider.prototype.layout = function() {
-    var percent = (this.getValue() - this._minimumValue) / (this._maximumValue -
-      this._minimumValue);
-    var xValue = Math.round(Slider.BULB_WIDTH/2 +
-      percent*(this._$element.width()-Slider.BULB_WIDTH));
-
-    // If xValue is less than 0, the slider must be off-screen or is too narrow.
-    if (xValue < 0) {
-      return;
-    }
-
-    this._$filledPart.css({width: xValue});
-    this._$bulb.css({left: xValue - Slider.BULB_WIDTH/2});
-  };
-
-  Slider.prototype.setClipValues = function(values) {
-    this._clipValues = values;
-    this.setValue(this._value);
-  };
-
-  Slider.prototype.setMaximumValue = function(v) {
-    this._maximumValue = v;
-    this.setValue(this._value);
-  };
-
-  Slider.prototype.setMinimumValue = function(v) {
-    this._minimumValue = v;
-    this.setValue(this._value);
-  };
-
   Slider.prototype.setValue = function(v) {
+    this._value = this._closestAllowedValue(v);
+    var percent = this._percent();
+    this._$bulb.css({left: percent});
+    this._$beforeBulb.css({width: percent});
+  };
+
+  Slider.prototype._closestAllowedValue = function(v) {
     v = Math.max(Math.min(v, this._maximumValue), this._minimumValue);
     if (this._clipValues !== null) {
       var useValue = this._clipValues[0];
@@ -236,25 +177,33 @@
       }
       v = useValue;
     }
-    this._value = v;
-    this.layout();
+    return v;
+  };
+
+  Slider.prototype._percent = function() {
+    var fraction = (this._value - this._minimumValue) / (this._maximumValue -
+      this._minimumValue);
+    return (fraction * 100).toPrecision(5) + '%';
   };
 
   Slider.prototype._registerUIEvents = function() {
     var clicked = false;
     var update = function(e) {
       var x = e.pageX - this._$element.offset().left;
-      var startX = Slider.BULB_WIDTH / 2;
+      var startX = this._$bulb.width() / 2;
       var endX = this._$element.width() - startX;
-      var percent = (x - startX) / (endX - startX);
-      percent = Math.max(Math.min(percent, 1), 0);
-      this.setValue(percent*(this._maximumValue-this._minimumValue) +
+      var fraction = (x - startX) / (endX - startX);
+      fraction = Math.max(Math.min(fraction, 1), 0);
+      this.setValue(fraction*(this._maximumValue-this._minimumValue) +
         this._minimumValue);
     }.bind(this);
 
     this._$element.mousedown(function(e) {
       clicked = true;
       update(e);
+
+      // NOTE: this line prevents the cursor from changing in Safari on OS X. It
+      // may have the same effect on other platforms as well.
       e.preventDefault();
     });
     $(document.body).mouseup(function() {

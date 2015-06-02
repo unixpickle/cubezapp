@@ -96,3 +96,40 @@
 #graph-settings .mode-dropdown > li.selected {
   background-image: url('../../images/check.png');
 }
+
+#graph-settings .slider {
+  position: relative;
+  margin-top: 5px;
+  height: 10px;
+  width: 100%;
+}
+
+#graph-settings .slider .bulb-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 4px);
+}
+
+#graph-settings .slider .before-bulb {
+  position: absolute;
+  top: 4px;
+  height: 2px;
+  left: 0px;
+}
+
+#graph-settings .slider .bulb {
+  position: absolute;
+  top: 0;
+  height: 10px;
+  width: 4px;
+  background-color: white;
+}
+
+#graph-settings .slider .background {
+  position: absolute;
+  top: 4px;
+  height: 2px;
+  width: 100%;
+  background-color: #cccccc;
+}
