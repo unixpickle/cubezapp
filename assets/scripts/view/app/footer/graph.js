@@ -451,12 +451,18 @@
 
   window.app.Graph = Graph;
 
+  // The following are three SVG images which are used for the graph settings.
+  // Since the rest of the graph settings DOM is created programmatically, it
+  // seems to make sense to create these programmatically as well. I do not use
+  // external files for the SVGs because they are so small that it is much
+  // easier to load them synchronously and adjust their colors immediately.
+
   var BAR_GRAPH_IMAGE = '<svg version="1.1" ' +
     'xmlns="http://www.w3.org/2000/svg" ' +
     'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
     'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
     'preserveAspectRatio="xMidYMid meet" xml:space="preserve">' +
-    '<g id="barGraphImage" class="color-fill">' +
+    '<g class="color-fill">' +
     '<rect x="64.8" y="358.3" width="229.2" height="475"/>' +
     '<rect x="369.3" y="101.4" width="229.2" height="731.9"/>' +
     '<rect x="675.1" y="201" width="229.2" height="632.8"/>' +
@@ -468,8 +474,7 @@
     'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
     'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
     'preserveAspectRatio="xMidYMid meet" xml:space="preserve">' +
-    '<g id="dotGraphImage">' +
-    '<g><g>' +
+    '<g><g><g>' +
     '<path class="color-fill" fill-rule="evenodd" clip-rule="evenodd" '+
     'd="M160.5,355.7c-46.9,0-84.9,38-84.9,84.9s38,84.9,84.9,84.9s84.9-38,' +
     '84.9-84.9 S207.4,355.7,160.5,355.7z M432.1,304.8c-46.9,0-84.9,38-84.9,' +
@@ -484,7 +489,7 @@
     'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" ' +
     'viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" ' +
     'preserveAspectRatio="xMidYMid meet" xml:space="preserve">' +
-    '<g id="Layer_1">' +
+    '<g>' +
     '<path fill-rule="evenodd" clip-rule="evenodd" fill="none" ' +
     'class="color-stroke" stroke-width="70" stroke-miterlimit="10" d="' +
     'M85.9,261c0,0,138.3,327.3,426.6,244.2S911,667.3,914.1,677.3"/>' +
