@@ -1,5 +1,8 @@
 (function() {
 
+  var MINIMUM_MEAN_SIZE = 2;
+  var MAXIMUM_MEAN_SIZE = 50;
+
   var MINIMUM_SCALE = 5;
   var MAXIMUM_SCALE = 100;
 
@@ -94,10 +97,16 @@
     var $element = $('<div class="page"></div>');
     var $content = $('<div class="page-content"></div>');
 
-    var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
+    var scaleSlider = new IntegerSlider(new Slider(MINIMUM_SCALE,
+      MAXIMUM_SCALE, 0));
     var scale = new ManagedSlider(this, scaleSlider, 'Scale', 'graphMeanScale',
-      formatScale.bind(null, 'means'));
+      formatInteger.bind(null, 'means'));
     $content.append(scale.element());
+
+    var meanOfSlider = new IntegerSlider(new Slider(MINIMUM_MEAN_SIZE,
+      MAXIMUM_MEAN_SIZE, 0));
+    var meanOf = new ManagedSlider(this, meanOfSlider, 'Mean of',
+      'graphMeanCount', formatInteger.bind(null, 'solves'));
 
     $content.append(new ManagedCheckbox(this, 'Show DNF',
       'graphMeanShowDNF').element());
@@ -113,9 +122,10 @@
 
     var $content = $('<div class="page-content"></div>');
 
-    var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
+    var scaleSlider = new IntegerSlider(new Slider(MINIMUM_SCALE,
+      MAXIMUM_SCALE, 0));
     var scale = new ManagedSlider(this, scaleSlider, 'Scale',
-      'graphStandardScale', formatScale.bind(null, 'solves'));
+      'graphStandardScale', formatInteger.bind(null, 'solves'));
     $content.append(scale.element());
 
     $content.append(new ManagedCheckbox(this, 'Show DNF',
@@ -129,9 +139,10 @@
     var $element = $('<div class="page"></div>');
     var $content = $('<div class="page-content"></div>');
 
-    var scaleSlider = new Slider(MINIMUM_SCALE, MAXIMUM_SCALE, 0);
+    var scaleSlider = new IntegerSlider(new Slider(MINIMUM_SCALE,
+      MAXIMUM_SCALE, 0));
     var scale = new ManagedSlider(this, scaleSlider, 'Scale',
-      'graphStreakScale', formatScale.bind(null, 'days'));
+      'graphStreakScale', formatInteger.bind(null, 'days'));
     $content.append(scale.element());
 
     $content.append(new ManagedCheckbox(this, 'Include DNF',
@@ -297,6 +308,13 @@
     return this._slider.setValue(this._toSliderValue(v));
   };
 
+  // An IntegerSlider makes an integer only use whole values.
+  function IntegerSlider(slider) {
+    ScaledSlider.call(this, Math.round, Math.round, slider);
+  };
+
+  IntegerSlider.prototype = Object.create(ScaledSlider.prototype);
+
   // A ManagedSlider automatically keeps a slider in sync with the model and
   // updates a label indicating its current value.
   //
@@ -445,7 +463,7 @@
     this._checkbox.setChecked(flag);
   };
 
-  function formatScale(unit, value) {
+  function formatInteger(unit, value) {
     return Math.round(value) + ' ' + unit;
   }
 
