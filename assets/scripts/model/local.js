@@ -21,7 +21,7 @@
     graphMeanShowDNF: false,
     graphStreakScale: 20,
     graphStreakUsePercent: true,
-    graphStreakUpperBound: 20,
+    graphStreakUpperBound: 20000,
     graphStreakIncludeDNF: true
   };
 

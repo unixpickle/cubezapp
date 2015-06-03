@@ -145,7 +145,22 @@
     var scale = new ManagedSlider(this, scaleSlider, 'Scale',
       'graphStreakScale', formatInteger.bind(null, 'days'));
     $content.append(scale.element());
+    
+    var thresholdRawSlider = new Slider(0, 1, 0);
+    var thresholdSlider = new ScaledSlider(function(sliderValue) {
+      return Math.round(500 * Math.exp(6.397 * sliderValue));
+    }, function(modelValue) {
+      return Math.log(modelValue / 500) / 6.397;
+    }, thresholdRawSlider);
+    var threshold = new ManagedSlider(this, thresholdSlider, 'Threshold',
+      'graphStreakUpperBound', function(x) {
+        return 'sub ' + window.app.formatSeconds(x);
+      });
+    $content.append(threshold.element());
 
+    $content.append(new ManagedCheckbox(this, 'Use %',
+      'graphStreakUsePercent').element());
+    
     $content.append(new ManagedCheckbox(this, 'Include DNF',
       'graphStreakIncludeDNF').element());
 

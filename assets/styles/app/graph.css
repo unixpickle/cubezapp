@@ -166,9 +166,12 @@
 
 #graph-settings .labeled-checkbox {
   margin-top: 10px;
+  display: table;
+  width: 100%;
 }
 
 #graph-settings .labeled-checkbox label {
+  display: table-row;
   float: left;
   font-weight: lighter;
   font-size: 17px;

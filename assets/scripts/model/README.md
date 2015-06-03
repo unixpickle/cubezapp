@@ -154,7 +154,7 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
  * **graphMeanShowDNF** - bool - whether or not DNFs should be used in the mean graph
  * **graphStreakScale** - int - the number of days to show in one page of the streak graph
  * **graphStreakUsePercent** - bool - if this is true, each bar in the streak represents the percent of solves below the upper bound. Otherwise, each bar represents the raw number of solves below the upper bound.
- * **graphStreakUpperBound** - int - a time below which a solve must be in order to count towards the streak
+ * **graphStreakUpperBound** - int - a time below which a solve must be in order to count towards the streak. This is measured in milliseconds.
  * **graphStreakIncludeDNF** - bool - whether or not DNFs should be considered when computing the percent (if applicable)
  * **id** - string - the unique identifier of the puzzle. **This field will not be present if the puzzle has not been added to the store.**
 
