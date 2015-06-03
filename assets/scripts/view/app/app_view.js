@@ -8,7 +8,7 @@
 // In essence, the AppView is a magical genie in a bottle.
 (function() {
 
-  var MIN_FOOTER_SIZE = 250;
+  var MIN_FOOTER_SIZE = 264;
   var MAX_FOOTER_SIZE = 400;
 
   function AppView() {

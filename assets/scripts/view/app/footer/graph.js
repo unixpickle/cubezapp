@@ -90,6 +90,57 @@
 
   GraphSettings.prototype._generateHistogramPage = function() {
     var $element = $('<div class="page"></div>');
+    var $content = $('<div class="page-content"></div>');
+
+    var scaleSlider = new IntegerSlider(new Slider(MINIMUM_SCALE,
+      MAXIMUM_SCALE, 0));
+    var scale = new ManagedSlider(this, scaleSlider, 'Scale',
+      'graphHistogramScale', formatInteger.bind(null, 'bars'));
+    $content.append(scale.element());
+
+    var spanRawSlider = new Slider(0, 1, 0);
+    var spanSlider = new ScaledSlider(function(sliderValue) {
+      var value = Math.round(5 * Math.exp(6.908 * sliderValue));
+      return value === 5001 ? -1 : value;
+    }, function(modelValue) {
+      if (modelValue === -1) {
+        return 1;
+      }
+      return modelValue === -1 ? 1 : Math.log(modelValue / 5) / 6.908;
+    }, spanRawSlider);
+    var span = new ManagedSlider(this, spanSlider, 'Span',
+      'graphHistogramSpan', function(solveCount) {
+        if (solveCount === -1) {
+          return 'all solves';
+        } else {
+          return solveCount + ' solves';
+        }
+      });
+    $content.append(span.element());
+
+    var precisions = [250, 500];
+    for (var i = 1; i <= 20; ++i) {
+      precisions.push(i * 1000);
+    }
+    var precisionSlider = new Slider(250, 20000, 1, precisions);
+    var precision = new ManagedSlider(this, precisionSlider, 'Precision',
+      'graphHistogramPrecision', function(x) {
+        if (x === 250) {
+          return '1/4 second';
+        } else if (x === 500) {
+          return '1/2 second';
+        } else if (x === 1000) {
+          return '1 second';
+        } else {
+          return Math.round(x / 1000) + ' seconds';
+        }
+      });
+    $content.append(precision.element());
+
+    $content.append(new ManagedCheckbox(this, 'Include DNF',
+      'graphHistogramIncludeDNF').element());
+
+    $element.append($content);
     return $element;
   };
 
@@ -145,7 +196,7 @@
     var scale = new ManagedSlider(this, scaleSlider, 'Scale',
       'graphStreakScale', formatInteger.bind(null, 'days'));
     $content.append(scale.element());
-    
+
     var thresholdRawSlider = new Slider(0, 1, 0);
     var thresholdSlider = new ScaledSlider(function(sliderValue) {
       return Math.round(500 * Math.exp(6.397 * sliderValue));
@@ -160,7 +211,7 @@
 
     $content.append(new ManagedCheckbox(this, 'Use %',
       'graphStreakUsePercent').element());
-    
+
     $content.append(new ManagedCheckbox(this, 'Include DNF',
       'graphStreakIncludeDNF').element());
 
