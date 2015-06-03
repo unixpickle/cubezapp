@@ -201,6 +201,14 @@
     this._$beforeBulb = this._$element.find('.before-bulb');
     this._$bulb = this._$element.find('.bulb');
 
+    // This element is put in front of the entire page while the user drags the
+    // slider so that no hover events can be triggered on the rest of the page.
+    this._$shielding = $('<div></div>').css({
+      position: 'fixed',
+      width: '100%',
+      height: '100%'
+    });
+
     this.setValue(value);
     this._registerUIEvents();
   }
@@ -249,15 +257,18 @@
     var clicked = false;
     var update = this._updateForMouseEvent.bind(this);
     this._$element.mousedown(function(e) {
+      $(document.body).append(this._$shielding);
+
       clicked = true;
       update(e);
 
       // NOTE: this line prevents the cursor from changing in Safari on OS X. It
       // may have the same effect on other platforms as well.
       e.preventDefault();
-    });
+    }.bind(this));
     $(document.body).mouseup(function() {
       clicked = false;
+      this._$shielding.detach();
       this.emit('release');
     }.bind(this));
     $(document.body).mousemove(function(e) {
