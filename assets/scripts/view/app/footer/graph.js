@@ -398,6 +398,7 @@
     this._emitter = emitter;
     this._$element = $('<div class="view-modes"></div>');
     this._svgs = [];
+    this._hoveringIndex = -1;
     var images = [LINE_GRAPH_IMAGE, BAR_GRAPH_IMAGE, DOT_GRAPH_IMAGE];
     for (var i = 0; i < 3; ++i) {
       var $viewMode = $('<div class="view-mode"></div>');
@@ -407,6 +408,7 @@
       this._svgs.push($svg);
       this._$element.append($viewMode);
       $viewMode.click(this._handleClick.bind(this, i));
+      this._registerHoverEvents($viewMode, i);
     }
 
     this._updateFromModel();
@@ -439,13 +441,32 @@
     window.app.viewEvents.on('flavor.color', this._updateFromModel.bind(this));
   };
 
+  VisualModePicker.prototype._registerHoverEvents = function($viewMode, i) {
+    $viewMode.mouseenter(function() {
+      $viewMode.css({backgroundColor: '#e6e6e6', cursor: 'pointer'});
+      this._hoveringIndex = i;
+      this._updateFromModel();
+    }.bind(this));
+    $viewMode.mouseleave(function() {
+      $viewMode.css({backgroundColor: '', cursor: ''});
+      if (this._hoveringIndex === i) {
+        this._hoveringIndex = -1;
+        this._updateFromModel();
+      }
+    }.bind(this));
+  }
+
   VisualModePicker.prototype._updateFromModel = function() {
     var value = window.app.store.getActivePuzzle().graphStandardType;
     for (var i = 0; i < 3; ++i) {
       if (i === value) {
         this._colorSVG(i, window.app.flavors.getLastEmittedColor());
       } else {
-        this._colorSVG(i, '#d5d5d5');
+        if (this._hoveringIndex === i) {
+          this._colorSVG(i, '#999999');
+        } else {
+          this._colorSVG(i, '#d5d5d5');
+        }
       }
     }
   };
