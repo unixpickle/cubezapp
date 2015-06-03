@@ -152,7 +152,7 @@
 }
 
 #graph-settings .view-mode:hover {
-  background-color: #f0f0f0;
+  background-color: #e6e6e6;
   cursor: pointer;
 }
 
@@ -162,11 +162,11 @@
 }
 
 #graph-settings .view-mode-0 {
-  border-right: 1px solid #f0f0f0;
+  border-right: 1px solid #e6e6e6;
 }
 
 #graph-settings .view-mode-2 {
-  border-left: 1px solid #f0f0f0;
+  border-left: 1px solid #e6e6e6;
 }
 
 #graph-settings .labeled-checkbox {
