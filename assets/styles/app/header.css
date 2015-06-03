@@ -157,11 +157,6 @@
   background-size: 60% 60%;
   background-position: center;
   background-repeat: no-repeat;
-
-  transition: background-color 0.25s ease;
-  -webkit-transition: background-color 0.25s ease;
-  -moz-transition: background-color 0.25s ease;
-  -ms-transition: background-color 0.25s ease;
 }
 
 .header-button:hover {
