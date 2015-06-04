@@ -9,6 +9,8 @@
   // This is the number of pixels between each puzzle in the dropdown.
   var SPACING = 18;
 
+  var DELETE_BUTTON_FADE_TIME = 200;
+
   // These values represent different states of the header.
   var STATE_CLOSED = 0;
   var STATE_OPEN = 1;
@@ -208,7 +210,7 @@
   };
 
   Dropdown.prototype.hideDeleteButtons = function() {
-    this._$deleteButtons.stop(true, false).fadeOut();
+    this._$deleteButtons.stop(true, false).fadeOut(DELETE_BUTTON_FADE_TIME);
     this._isDeleting = false;
   };
 
@@ -223,7 +225,7 @@
   };
 
   Dropdown.prototype.showDeleteButtons = function() {
-    this._$deleteButtons.stop(true, false).fadeIn();
+    this._$deleteButtons.stop(true, false).fadeIn(DELETE_BUTTON_FADE_TIME);
     this._isDeleting = true;
   };
 
