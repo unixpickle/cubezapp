@@ -29,27 +29,17 @@
     this._$element = $('<div id="graph-settings"></div>');
     this._$header = $('<div class="title flavor-background"></div>');
 
-    this._$modeLabel = $('<label></label>');
-    this._$modeLabel.click(this._modeLabelClicked.bind(this));
-
-    this._$modeDropdown = $('<ul class="mode-dropdown"></ul>').css({
-      display: 'none'
-    });
-    this._dropdownOptions = [];
-    this._showingDropdown = false;
-    this._generateDropdownOptions();
-
+    var $modeLabel = $('<label></label>');
+    this._dropdown = new ModeDropdown(this, $modeLabel);
     this._pageElements = [this._generateStandardPage(),
       this._generateMeanPage(), this._generateHistogramPage(),
       this._generateStreakPage()];
 
-    this._boundClickThru = this._clickThru.bind(this);
-
     // NOTE: we need to add the dropdown before the header so the shadow of the
     // dropdown is covered by the header. I could just use z-index, but that's
     // always a bad idea.
-    this._$header.append(this._$modeLabel);
-    this._$element.append(this._$modeDropdown, this._$header);
+    this._$header.append($modeLabel);
+    this._$element.append(this._dropdown.element(), this._$header);
 
     this._currentPage = 0;
     this._registerModelEvents();
@@ -58,34 +48,8 @@
 
   GraphSettings.prototype = Object.create(window.app.EventEmitter.prototype);
 
-  GraphSettings.ANIMATION_DURATION = 150;
-  GraphSettings.MODE_NAMES = ['Standard', 'Mean', 'Histogram', 'Streak'];
-  GraphSettings.MODE_STANDARD = 0;
-  GraphSettings.MODE_MEAN = 1;
-  GraphSettings.MODE_HISTOGRAM = 2;
-  GraphSettings.MODE_STREAK = 3;
-
   GraphSettings.prototype.element = function() {
     return this._$element;
-  };
-
-  GraphSettings.prototype._clickThru = function(e) {
-    if (!e.inElement(this._$modeDropdown[0]) &&
-        !e.inElement(this._$modeLabel[0])) {
-      this._setShowingDropdown(false);
-    }
-  };
-
-  GraphSettings.prototype._generateDropdownOptions = function() {
-    for (var i = 0, len = GraphSettings.MODE_NAMES.length; i < len; ++i) {
-      var $option = $('<li></li>').text(GraphSettings.MODE_NAMES[i]);
-      this._$modeDropdown.append($option);
-      this._dropdownOptions.push($option);
-      $option.click(function(index) {
-        this.emit('modeChanged', index);
-        this._setShowingDropdown(false);
-      }.bind(this, i));
-    }
   };
 
   GraphSettings.prototype._generateHistogramPage = function() {
@@ -169,7 +133,6 @@
 
   GraphSettings.prototype._generateStandardPage = function() {
     var $element = $('<div class="page"></div>');
-
     $element.append(new VisualModePicker(this).element());
 
     var $content = $('<div class="page-content"></div>');
@@ -219,37 +182,97 @@
     return $element;
   };
 
-  GraphSettings.prototype._modeLabelClicked = function() {
-    this._setShowingDropdown(!this._showingDropdown);
-  };
-
   GraphSettings.prototype._registerModelEvents = function() {
     window.app.observe.activePuzzle('graphMode',
       this._updatePageFromModel.bind(this));
   };
 
-  GraphSettings.prototype._setShowingDropdown = function(x) {
-    if (x == this._showingDropdown) {
-      return;
-    }
-    this._showingDropdown = x;
-    if (x) {
-      this._$modeDropdown.stop(true, true).css({display: 'block', opacity: 1});
-      window.clickthru.addListener(this._boundClickThru);
-    } else {
-      this._$modeDropdown.fadeOut(GraphSettings.ANIMATION_DURATION);
-      window.clickthru.removeListener(this._boundClickThru);
-    }
-  }
-
   GraphSettings.prototype._updatePageFromModel = function() {
     var pageIdx = window.app.store.getActivePuzzle().graphMode;
-    this._dropdownOptions[this._currentPage].removeClass('selected');
     this._pageElements[this._currentPage].detach();
     this._currentPage = pageIdx;
-    this._dropdownOptions[pageIdx].addClass('selected');
-    this._$modeDropdown.before(this._pageElements[pageIdx]);
-    this._$modeLabel.text(GraphSettings.MODE_NAMES[pageIdx]);
+    this._dropdown.element().before(this._pageElements[pageIdx]);
+  };
+
+  function ModeDropdown(emitter, $modeLabel) {
+    this._$element = $('<ul class="mode-dropdown"></ul>').css({
+      display: 'none'
+    });
+    this._$modeLabel = $modeLabel;
+
+    this._showing = false;
+    this._currentPage = 0;
+    this._boundClickThru = this._clickThru.bind(this);
+
+    this._options = [];
+    for (var i = 0, len = ModeDropdown.MODE_NAMES.length; i < len; ++i) {
+      var $option = $('<li></li>').text(ModeDropdown.MODE_NAMES[i]);
+      this._$element.append($option);
+      this._options.push($option);
+      $option.click(function(index) {
+        emitter.emit('modeChanged', index);
+        this.hide();
+      }.bind(this, i));
+    }
+
+    this._registerModelEvents();
+    this._registerUIEvents();
+    this._updateFromModel();
+  }
+
+  ModeDropdown.ANIMATION_DURATION = 150;
+  ModeDropdown.MODE_NAMES = ['Standard', 'Mean', 'Histogram', 'Streak'];
+
+  ModeDropdown.prototype.element = function() {
+    return this._$element;
+  };
+
+  ModeDropdown.prototype.hide = function() {
+    if (!this._showing) {
+      return;
+    }
+    this._showing = false;
+    this._$element.fadeOut(ModeDropdown.ANIMATION_DURATION);
+    window.clickthru.removeListener(this._boundClickThru);
+  };
+
+  ModeDropdown.prototype.show = function() {
+    if (this._showing) {
+      return;
+    }
+    this._showing = true;
+    this._$element.css({display: 'block', opacity: 1});
+    window.clickthru.addListener(this._boundClickThru);
+  };
+
+  ModeDropdown.prototype._clickThru = function(e) {
+    if (!e.inElement(this._$element[0]) &&
+        !e.inElement(this._$modeLabel[0])) {
+      this.hide();
+    }
+  };
+
+  ModeDropdown.prototype._registerModelEvents = function() {
+    window.app.observe.activePuzzle('graphMode',
+      this._updateFromModel.bind(this));
+  };
+
+  ModeDropdown.prototype._registerUIEvents = function() {
+    this._$modeLabel.click(function() {
+      if (this._showing) {
+        this.hide();
+      } else {
+        this.show();
+      }
+    }.bind(this));
+  };
+
+  ModeDropdown.prototype._updateFromModel = function() {
+    var pageIdx = window.app.store.getActivePuzzle().graphMode;
+    this._options[this._currentPage].removeClass('selected');
+    this._currentPage = pageIdx;
+    this._options[pageIdx].addClass('selected');
+    this._$modeLabel.text(ModeDropdown.MODE_NAMES[pageIdx]);
   };
 
   function Slider(min, max, value, clip) {
