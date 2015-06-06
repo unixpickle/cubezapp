@@ -12,7 +12,9 @@
   HeaderController.prototype._addPuzzle = function() {
     var popup = new window.app.AddPopup();
     popup.on('create', function() {
-      var name = popup.getName().trim();
+      var viewModel = popup.viewModel();
+      
+      var name = viewModel.getField('name').trim();
       if (name === '' || puzzleNameExists(name)) {
         popup.shakeName();
         return;
@@ -21,15 +23,14 @@
       popup.close();
       this._view.close();
 
-      var input = popup.getBLD() ? window.app.Timer.INPUT_BLD :
-        window.app.Timer.INPUT_REGULAR;
       window.app.store.addPuzzle({
         name: name,
-        icon: popup.getIcon(),
-        scrambler: popup.getScrambler(),
-        scrambleType: popup.getScrambleType(),
+        icon: viewModel.getField('icon'),
+        scrambler: viewModel.getField('scrambler'),
+        scrambleType: viewModel.getField('scrambleType'),
         lastUsed: new Date().getTime(),
-        timerInput: input
+        timerInput: viewModel.getField('bld') ? window.app.Timer.INPUT_BLD :
+          window.app.Timer.INPUT_REGULAR
       });
     }.bind(this));
     popup.show();
