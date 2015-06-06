@@ -115,22 +115,22 @@
 
 .add-popup-name-field {
   /* (100% - 30px*4) / 5 */
-  top: calc(20% - 24px);
+  top: 16px;
 }
 
 .add-popup-icon-field {
   /* 2*((100% - 30px*4) / 5) + 30px */
-  top: calc(40% - 18px);
+  top: 62px;
 }
 
 .add-popup-scrambler-field {
   /* 3*((100% - 30px*4) / 5) + 60px */
-  top: calc(60% - 12px);
+  top: 108px;
 }
 
 .add-popup-scrambleType-field {
   /* 4*((100% - 30px*5) / 6) + 90px */
-  top: calc(66.667% - 10px);
+  top: 123px;
   opacity: 0;
   pointer-events: none;
 
@@ -140,27 +140,27 @@
 
 .add-popup-bld-field {
   /* 4*((100% - 30px*4) / 5) + 90px */
-  top: calc(80% - 6px);
+  top: 154px;
 }
 
 .add-popup-fields-all .add-popup-name-field {
   /* ((100% - 30px*5) / 6) */
-  top: calc(16.667% - 25px);
+  top: 8px;
 }
 
 .add-popup-fields-all .add-popup-icon-field {
   /* 2*((100% - 30px*5) / 6) + 30px */
-  top: calc(33.333% - 20px);
+  top: 47px;
 }
 
 .add-popup-fields-all .add-popup-scrambler-field {
   /* 3*((100% - 30px*5) / 6) + 60px */
-  top: calc(50% - 15px);
+  top: 85px;
 }
 
 .add-popup-fields-all .add-popup-bld-field {
   /* 5*((100% - 30px*5) / 6) + 120px */
-  top: calc(83.333% - 5px);
+  top: 162px;
 }
 
 .add-popup-fields-all .add-popup-scrambleType-field {
