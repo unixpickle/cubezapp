@@ -10,6 +10,7 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
  * Implement times list in footer
  * Implement graph in footer
  * Implement accounts system
+ * Fix CSS subpixel problems in add popup
 
 # License
 

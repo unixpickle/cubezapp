@@ -64,7 +64,7 @@
   AddPopup.prototype._addField = function(rawName, name, input) {
     var field = new Field(rawName, name, input);
     this._fields[rawName] = field.input();
-    
+
     // We use prepend to make sure the z order is correct.
     this._$fieldContainer.prepend(field.element());
   };
@@ -238,7 +238,51 @@
   };
 
   ViewModel.prototype._autocomplete = function() {
-    // TODO: this.
+    var predictedBLD = false;
+    var predictedName = '';
+    var predictedIcon = '';
+    var predictedScrambler = '';
+    if (!this._canAutocompleteField('bld') && this.getField('bld')) {
+      predictedIcon = 'BLD';
+    }
+    if (!this._canAutocompleteField('scrambler')) {
+      var scrambler = this.getField('scrambler');
+      predictedName = scrambler;
+      var iconIndex = window.app.iconNames.indexOf(scrambler);
+      if (iconIndex >= 0) {
+        predictedIcon = window.app.iconFiles[iconIndex];
+      }
+    }
+    if (!this._canAutocompleteField('icon')) {
+      var iconName = this.getField('icon');
+      if (iconName === 'BLD') {
+        predictedBLD = true;
+      }
+      predictedName = window.app.iconFilesToNames[iconName];
+      predictedScrambler = scramblerNameMatchingName(iconName);
+    }
+    if (!this._canAutocompleteField('name')) {
+      var name = this.getField('name');
+      var index = window.app.iconNames.indexOf(name);
+      predictedIcon = window.app.iconFiles[index];
+      predictedScrambler = scramblerNameMatchingName(name) ||
+        predictedScrambler;
+      if (name.toUpperCase().indexOf('BLD') >= 0) {
+        predictedBLD = true;
+      }
+    }
+    if (this._canAutocompleteField('bld')) {
+      this._updateAndEmit('bld', predictedBLD);
+    }
+    if (this._canAutocompleteField('name')) {
+      this._updateAndEmit('name', predictedName);
+    }
+    if (this._canAutocompleteField('icon')) {
+      this._updateAndEmit('icon', predictedIcon || '3x3x3');
+    }
+    if (this._canAutocompleteField('scrambler')) {
+      this._updateAndEmit('scrambler', predictedScrambler || 'None');
+    }
   };
 
   ViewModel.prototype._canAutocompleteField = function(name) {
@@ -279,6 +323,17 @@
     var names = window.puzzlejs.scrambler.allPuzzles();
     names.unshift('None');
     return names;
+  }
+
+  function scramblerNameMatchingName(name) {
+    var lowerName = name.toLowerCase();
+    var scramblers = window.puzzlejs.scrambler.allPuzzles();
+    for (var i = 0, len = scramblers.length; i < len; ++i) {
+      if (scramblers[i].toLowerCase() === lowerName) {
+        return scramblers[i];
+      }
+    }
+    return '';
   }
 
   window.app.AddPopup = AddPopup;

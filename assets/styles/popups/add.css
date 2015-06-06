@@ -8,7 +8,7 @@
   position: absolute;
   top: calc(50% - 80px);
   left: 0;
-  
+
   width: 180px;
   height: 160px;
   background-color: white;
@@ -33,7 +33,7 @@
   left: 0;
   height: 40px;
   width: 100%;
-  
+
   line-height: 40px;
   text-align: center;
   font-size: 20px;
@@ -60,7 +60,7 @@
   position: absolute;
   height: 30px;
   width: 100%;
-  
+
   -webkit-transition: top 0.3s ease-in-out;
   transition: top 0.3s ease-in-out;
 }
@@ -133,7 +133,7 @@
   top: calc(66.667% - 10px);
   opacity: 0;
   pointer-events: none;
-  
+
   -webkit-transition: opacity 0.3s linear;
   transition: opacity 0.3s linear;
 }

@@ -13,7 +13,7 @@
     var popup = new window.app.AddPopup();
     popup.on('create', function() {
       var viewModel = popup.viewModel();
-      
+
       var name = viewModel.getField('name').trim();
       if (name === '' || puzzleNameExists(name)) {
         popup.shakeName();
