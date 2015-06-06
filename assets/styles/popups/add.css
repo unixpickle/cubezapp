@@ -1,51 +1,46 @@
 .add-popup-content {
   width: 530px;
   height: 200px;
+  position: relative;
 }
 
-.add-popup-content > .puzzle {
+.add-popup-puzzle {
   position: absolute;
   top: calc(50% - 80px);
   left: 0;
-
+  
   width: 180px;
   height: 160px;
   background-color: white;
-  text-align: center;
 }
 
-.add-popup-content > .puzzle .icon {
-  display: inline-block;
-
+.add-popup-puzzle-icon {
+  position: absolute;
+  top: 6px;
+  left: 6px;
   width: calc(100% - 12px);
   height: 114px;
-  margin-top: 6px;
 
   background-size: 90% 90%;
   background-position: center;
   background-repeat: no-repeat;
-  background-image: url('../../images/puzzles/3x3x3.png');
-
-  text-align: center;
+  background-image: none;
 }
 
-.add-popup-content > .puzzle label {
+.add-popup-puzzle-label {
   position: absolute;
   bottom: 0;
   left: 0;
   height: 40px;
   width: 100%;
+  
   line-height: 40px;
   text-align: center;
   font-size: 20px;
   color: #999999;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.add-popup-content > .separator {
+.add-popup-separator {
   position: absolute;
   left: 220px;
   top: 0;
@@ -54,20 +49,23 @@
   background-color: #d5d5d5;
 }
 
-.add-popup-content > .fields {
+.add-popup-fields {
   position: absolute;
   left: 260px;
-  width: 270px;
+  width: calc(100% - 260px);
   height: 100%;
 }
 
-.add-popup-content > .fields > .field {
+.add-popup-field {
   position: absolute;
   height: 30px;
   width: 100%;
+  
+  -webkit-transition: top 0.3s ease-in-out;
+  transition: top 0.3s ease-in-out;
 }
 
-.add-popup-content > .fields > .field > label {
+.add-popup-label {
   display: inline-block;
 
   float: left;
@@ -80,38 +78,92 @@
   line-height: 30px;
 }
 
-.add-popup-content > .fields > .field > .content {
+.add-popup-input-container {
   float: right;
   width: 160px;
   height: 30px;
   text-align: right;
 }
 
-.add-popup-content > .fields > .field > .content > input {
+.add-popup-text-input {
   width: calc(100% - 10px);
   height: 30px;
 
-  padding: 0 5px 0 5px;
+  padding: 0 5px;
   margin: 0;
 
-  color: #999;
+  color: #999999;
   font-size: 18px;
   border: none;
 }
 
-.add-popup-content > .fields > .field > .content >
-  input::-webkit-input-placeholder {
-  color: #999;
+.add-popup-text-input::-webkit-input-placeholder {
+  color: #999999;
 }
 
-.add-popup-content.field > .content > input::-moz-placeholder {
-  color: #999;
+.add-popup-text-input::-moz-input-placeholder {
+  color: #999999;
 }
 
-.add-popup-content.field > .content > input:-ms-input-placeholder {
-  color: #999;
+.add-popup-text-input::-ms-input-placeholder {
+  color: #999999;
 }
 
-.add-popup-content.field > .content > input:-moz-placeholder {
-  color: #999;
+.add-popup-text-input:-moz-placeholder {
+  color: #999999;
+}
+
+.add-popup-name-field {
+  /* (100% - 30px*4) / 5 */
+  top: calc(20% - 24px);
+}
+
+.add-popup-icon-field {
+  /* 2*((100% - 30px*4) / 5) + 30px */
+  top: calc(40% - 18px);
+}
+
+.add-popup-scrambler-field {
+  /* 3*((100% - 30px*4) / 5) + 60px */
+  top: calc(60% - 12px);
+}
+
+.add-popup-scrambleType-field {
+  /* 4*((100% - 30px*5) / 6) + 90px */
+  top: calc(66.667% - 10px);
+  opacity: 0;
+  pointer-events: none;
+  
+  -webkit-transition: opacity 0.3s linear;
+  transition: opacity 0.3s linear;
+}
+
+.add-popup-bld-field {
+  /* 4*((100% - 30px*4) / 5) + 90px */
+  top: calc(80% - 6px);
+}
+
+.add-popup-fields-all .add-popup-name-field {
+  /* ((100% - 30px*5) / 6) */
+  top: calc(16.667% - 25px);
+}
+
+.add-popup-fields-all .add-popup-icon-field {
+  /* 2*((100% - 30px*5) / 6) + 30px */
+  top: calc(33.333% - 20px);
+}
+
+.add-popup-fields-all .add-popup-scrambler-field {
+  /* 3*((100% - 30px*5) / 6) + 60px */
+  top: calc(50% - 15px);
+}
+
+.add-popup-fields-all .add-popup-bld-field {
+  /* 5*((100% - 30px*5) / 6) + 120px */
+  top: calc(83.333% - 5px);
+}
+
+.add-popup-fields-all .add-popup-scrambleType-field {
+  opacity: 1;
+  pointer-events: auto;
 }
