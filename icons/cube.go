@@ -32,9 +32,9 @@ func runSetting(s ImageSetting) {
 		"\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">" +
 		"<svg xmlns=\"http://www.w3.org/2000/svg\" " +
 		"xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
-		"viewBox=\"0 0 1 1\">"
-	rectTemplate := "<rect x=\"%f\" y=\"%f\" width=\"%f\"" +
-		" height=\"%f\" fill=\"white\" />"
+		"viewBox=\"0 0 1 1\"><g class=\"puzzle-icon-fill\" fill=\"white\">"
+	rectTemplate := "<rect fill=\"inherit\" x=\"%f\" y=\"%f\" " +
+		"width=\"%f\" height=\"%f\" />"
 	for x := 0; x < s.Size; x++ {
 		for y := 0; y < s.Size; y++ {
 			rectX := (rectSize + s.Spacing) * float64(x)
@@ -43,7 +43,7 @@ func runSetting(s ImageSetting) {
 				rectSize)
 		}
 	}
-	svgData += "</svg>"
+	svgData += "</g></svg>"
 	fileName := strconv.Itoa(s.Size) + ".svg"
 	ioutil.WriteFile(fileName, []byte(svgData), 0777)
 }
