@@ -33,7 +33,7 @@ func main() {
 		"<svg xmlns=\"http://www.w3.org/2000/svg\" "+
 		"xmlns:xlink=\"http://www.w3.org/1999/xlink\" "+
 		"viewBox=\"0 0 %f %f\"><g class=\"puzzle-icon-fill\" "+
-		"fill=\"black\">", width, height)
+		"fill=\"white\">", width, height)
 
 	var edgeP1 [5]Point
 	var edgeP2 [5]Point
