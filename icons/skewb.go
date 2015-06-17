@@ -17,7 +17,7 @@ func main() {
 		"xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
 		"viewBox=\"0 0 1 1\">"
 
-	svgData += fmt.Sprintf("<path class=\"puzzle-icon-fill\" fill=\"black\" "+
+	svgData += fmt.Sprintf("<path class=\"puzzle-icon-fill\" fill=\"white\" "+
 		"d=\"M0.5,%fL%f,0.5L0.5,%fL%f,0.5zM0,0H%fL0,%fz"+
 		"M1,0h%fL1,%fzM0,1h%fL0,%fzM1,1h%fL1,%fz\" />",
 		SquareInset, 1-SquareInset, 1-SquareInset, SquareInset,
