@@ -380,7 +380,7 @@
     label.text(puzzle.name);
     var icon = $('<div class="icon flavor-background"></div>');
     icon.css({
-      'background-image': 'url(images/puzzles/' + puzzle.icon + '.png)'
+      'background-image': 'url(images/puzzles/' + puzzle.icon + '.svg)'
     });
     element.append(icon);
     element.append(label);

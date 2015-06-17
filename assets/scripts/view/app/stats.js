@@ -51,8 +51,7 @@
     var iconSize = Math.floor(PUZZLE_ICON_SIZE * viewHeight);
     this._$icon.css({
       top: padding,
-      height: iconSize,
-      backgroundSize: Math.floor(iconSize*746/505) + 'px ' + iconSize + 'px'
+      height: iconSize
     });
     var nameHeight = Math.floor(PUZZLE_LABEL_SIZE * viewHeight)
     this._$name.css({
@@ -114,7 +113,7 @@
   Stats.prototype._updatePuzzleInformation = function() {
     var puzzle = window.app.store.getActivePuzzle();
     this._$name.text(puzzle.name);
-    var iconPath = 'images/gray_puzzles/' + puzzle.icon + '.png';
+    var iconPath = 'images/gray_puzzles/' + puzzle.icon + '.svg';
     this._$icon.css({backgroundImage: 'url(' + iconPath + ')'});
   };
 

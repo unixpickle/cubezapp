@@ -138,7 +138,7 @@
       var iconName = window.app.iconFilesToNames[iconFile];
       this._getField('icon').setValue(iconName);
       this._$puzzleIcon.css({backgroundImage: 'url(images/puzzles/' +
-        iconFile + '.png)'});
+        iconFile + '.svg)'});
     }.bind(this));
 
     this._viewModel.on('bld', function(flag) {

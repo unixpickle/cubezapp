@@ -263,7 +263,7 @@
       window.app.iconFilesToNames[fileName]
     );
     this._$puzzleIcon.css({
-      backgroundImage: 'url(images/puzzles/' + fileName + '.png)'
+      backgroundImage: 'url(images/puzzles/' + fileName + '.svg)'
     });
   };
 
