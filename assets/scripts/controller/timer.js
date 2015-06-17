@@ -64,6 +64,9 @@
   };
 
   TimerController.prototype._controlCancel = function() {
+    if (window.app.timer.getState() === window.app.Timer.STATE_NOT_RUNNING) {
+      return;
+    }
     this._stopInterval();
     window.app.timer.reset();
     this._updateInputMode();
