@@ -1,4 +1,4 @@
-// dropdown.js version 4.0.0
+// dropdown.js version 4.0.1
 (function() {
 
   var DEFAULT_BG_COLOR = '#ffffff';
@@ -222,10 +222,10 @@
 
   Menu.prototype._layout = function() {
     this._down = this._shouldOpenDown();
-    this._relayout();
+    this._relayout(true);
   };
 
-  Menu.prototype._relayout = function() {
+  Menu.prototype._relayout = function(firstTime) {
     var state = this._changeTracker.getState();
 
     if (!state.elementVisible) {
@@ -253,6 +253,16 @@
       height = Math.min(contentHeight, this._dropdown.getHeight() +
         state.elementTop - PAGE_MARGIN);
       top = state.elementTop + this._dropdown.getHeight() - height;
+    }
+
+    // If the thing scrolls, make sure the last element is cutoff.
+    if (firstTime && height < contentHeight) {
+      var remaining = (height % this._dropdown.getHeight());
+      var midpoint = this._dropdown.getHeight()/2;
+      // If it's already cut near the middle, no need to cut it again.
+      if (remaining <= midpoint-3 || remaining >= midpoint+3) {
+        height -= remaining + this._dropdown.getHeight()/2;
+      }
     }
 
     this._container.css({
