@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	generateImage(3, 0.1, 3, 1.5, 1)
-	generateImage(5, 0.1, 3, 1.5, 1)
-	generateImage(7, 0.1, 3, 1.5, 0.8)
+	for i := 5; i <= 25; i++ {
+		generateImage(i, 0.5/float64(i), 3, 1.5, 1)
+	}
 }
 
 func generateImage(numBars int, spacing, width, height, xScale float64) {

@@ -26,9 +26,6 @@
     Peach: {
       color: [0xf1, 0x9e, 0x4d]
     },
-    Pineapple: {
-      color: [0xd9, 0xa9, 0x17]
-    },
     Banana: {
       color: [0xde, 0xc4, 0x32]
     },
@@ -50,7 +47,6 @@
     'Grape',
     'Strawberry',
     'Peach',
-    'Pineapple',
     'Banana',
     'Pear',
     'Oreo',

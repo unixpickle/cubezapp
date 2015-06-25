@@ -59,7 +59,7 @@
     var scaleSlider = new IntegerSlider(new Slider(MINIMUM_SCALE,
       MAXIMUM_SCALE, 0));
     var scale = new ManagedSlider(this, scaleSlider, 'Scale',
-      'graphHistogramScale', formatInteger.bind(null, 'bars'));
+      'graphHistogramScale', emptyStringFunc);
     $content.append(scale.element());
 
     var spanRawSlider = new Slider(0, 1, 0);
@@ -115,7 +115,7 @@
     var scaleSlider = new IntegerSlider(new Slider(MINIMUM_SCALE,
       MAXIMUM_SCALE, 0));
     var scale = new ManagedSlider(this, scaleSlider, 'Scale', 'graphMeanScale',
-      formatInteger.bind(null, 'means'));
+      emptyStringFunc);
     $content.append(scale.element());
 
     var meanOfSlider = new IntegerSlider(new Slider(MINIMUM_MEAN_SIZE,
@@ -140,7 +140,7 @@
     var scaleSlider = new IntegerSlider(new Slider(MINIMUM_SCALE,
       MAXIMUM_SCALE, 0));
     var scale = new ManagedSlider(this, scaleSlider, 'Scale',
-      'graphStandardScale', formatInteger.bind(null, 'solves'));
+      'graphStandardScale', emptyStringFunc);
     $content.append(scale.element());
 
     $content.append(new ManagedCheckbox(this, 'Show DNF',
@@ -157,7 +157,7 @@
     var scaleSlider = new IntegerSlider(new Slider(MINIMUM_SCALE,
       MAXIMUM_SCALE, 0));
     var scale = new ManagedSlider(this, scaleSlider, 'Scale',
-      'graphStreakScale', formatInteger.bind(null, 'days'));
+      'graphStreakScale', emptyStringFunc);
     $content.append(scale.element());
 
     var thresholdRawSlider = new Slider(0, 1, 0);
@@ -646,6 +646,10 @@
       node = node.parentNode;
     }
     return false;
+  }
+
+  function emptyStringFunc() {
+    return '';
   }
 
   function formatInteger(unit, value) {

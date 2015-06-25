@@ -147,16 +147,16 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
    * 0 - TYPE_LINE - a line graph
    * 1 - TYPE_BAR - a bar graph
    * 2 - TYPE_DOT - a dot graph
- * **graphStandardScale** - int - the number of solves to show per page of the graph
+ * **graphStandardScale** - int - the scale of the graph in view-defined units
  * **graphStandardShowDNF** - bool - whether or not DNFs should be included in the standard graph
- * **graphMeanScale** - int - the number of data points to show per page of the mean graph
+ * **graphMeanScale** - int - the scale of the graph in view-defined units
  * **graphMeanCount** - int - the number of solves to average into each data point
  * **graphMeanShowDNF** - bool - whether or not DNFs should be used in the mean graph
- * **graphHistogramScale** - int - the number of bars to show in one page of the histogram
+ * **graphHistogramScale** - int - the scale of the graph in view-defined units
  * **graphHistogramSpan** - int - the number of solves to include in the histogram. If this is -1, it is considered infinite.
  * **graphHistogramPrecision** - int - the number of milliseconds per "bucket" in the histogram
  * **graphHistogramIncludeDNF** - bool - whether or not the times of DNFs should be counted
- * **graphStreakScale** - int - the number of days to show in one page of the streak graph
+ * **graphStreakScale** - int - the scale of the graph in view-defined units
  * **graphStreakUsePercent** - bool - if this is true, each bar in the streak represents the percent of solves below the upper bound. Otherwise, each bar represents the raw number of solves below the upper bound.
  * **graphStreakUpperBound** - int - a time below which a solve must be in order to count towards the streak. This is measured in milliseconds.
  * **graphStreakIncludeDNF** - bool - whether or not DNFs should be considered when computing the percent (if applicable)
