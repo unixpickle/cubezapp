@@ -79,6 +79,7 @@ The **Solve** object stores all the information for a single recorded time. Here
  * **scrambleType** - string - the subtype of scrambler. For the "None" scrambler, the value of this field should be ignored.
  * **time** - int - the number of milliseconds that the solve physically took.
  * **lastPB** - int - the number of milliseconds for the most recent personal best before this solve. For all solves up to and including the first non-DNF solve, this is -1. This can be used to tell if a given solve is a PB, because all PBs will have times less than the last PB. **This field will not be present if the solve has not been added to the store. The store maintains this field automatically.**
+ * **lastPW** - int - the number of milliseconds for the most recent personal worst before this solve. See **lastPB** for more.
  * **id** - string - the unique identifier of the solve. **This field will not be present if the solve has not been added to the store.**
 
 The store also provides some helper functions for solves:
@@ -95,7 +96,8 @@ The **Stats** object stores averages, PBs, and other information about the user'
  * **count** - int - the total number of solves in the current puzzle.
  * **nonDNF** - int - the total number of solves which were not marked as DNF.
  * **mean** - int - the global mean of all non-DNF solve times in the current puzzle. If no mean is available, this is -1.
- * **best** - [Solve](#solve-object) - the user's best timed solve. If no solve times are available, this is -1.
+ * **best** - [Solve](#solve-object) - the user's best timed solve. If no solve times are available, this is null.
+ * **worst** - [Solve](#solve-object) - the user's worst timed solve. If no solve times are available, this is null.
  * **averages** - array - the averages table. Every element in this table will have the following fields:
    * **name** - string - usually, this is a numeric string like "5", but it may also be "mo3".
    * **count** - int - the number of these averages that have been taken. This will start as 0 and increase by 1 for every valid average that exists in the set of times. For instance, if this is the average of 5 and the user has 16 solves (and no DNFs), the count will be 12.

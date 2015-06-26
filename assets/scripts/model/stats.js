@@ -25,6 +25,8 @@
     this._timeSum = 0;
     this._bestSolve = null;
     this._bestTime = NaN;
+    this._worstSolve = null;
+    this._worstTime = NaN;
 
     for (var i = 0, len = SIZES.length; i < len; ++i) {
       var size = SIZES[i];
@@ -45,6 +47,10 @@
       if (this._bestSolve === null || this._bestTime > time) {
         this._bestSolve = solve;
         this._bestTime = time;
+      }
+      if (this._worstSolve === null || this._worstTime < time) {
+        this._worstSolve = solve;
+        this._worstTime = time;
       }
     }
     for (var i = 0, len = this._computers.length; i < len; ++i) {
@@ -72,6 +78,7 @@
       nonDNF: this._nonDNF,
       mean: this._timeSum / this._nonDNF,
       best: this._bestSolve,
+      worst: this._worstSolve,
       averages: averages
     };
   };

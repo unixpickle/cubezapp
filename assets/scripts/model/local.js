@@ -66,7 +66,7 @@
     solve.id = window.app.generateId();
     this._active.solves.push(solve);
 
-    recomputeLastPBs(this._active.solves, this._active.solves.length-1);
+    recomputeLastPBsAndPWs(this._active.solves, this._active.solves.length-1);
     if (this._averages) {
       this._averages.pushSolve(solve);
     }
@@ -96,7 +96,7 @@
     for (var i = solves.length-1; i >= 0; --i) {
       if (solves[i].id === id) {
         solves.splice(i, 1);
-        recomputeLastPBs(solves, i);
+        recomputeLastPBsAndPWs(solves, i);
         this._recomputeStatsFromScratch();
         this._save();
         this.emit('deletedSolve', id);
@@ -184,7 +184,7 @@
       var key = keys[i];
       solve[key] = attrs[key];
     }
-    recomputeLastPBs(solves, solveIndex+1);
+    recomputeLastPBsAndPWs(solves, solveIndex+1);
     this._recomputeStatsFromScratch();
     this._save();
     this.emit('modifiedSolve', id, attrs);
@@ -277,7 +277,7 @@
     for (var i = 0, len = puzzles.length; i < len; ++i) {
       var puzzle = puzzles[i];
       var solves = puzzle.solves;
-      recomputeLastPBs(solves, 0);
+      recomputeLastPBsAndPWs(solves, 0);
       for (var j = 0, len1 = solves.length; j < len1; ++j) {
         var solve = solves[j];
         if (!solve.scrambler) {
@@ -416,6 +416,11 @@
     } catch (e) {
     }
   };
+  
+  function recomputeLastPBsAndPWs(solves, startIndex) {
+    recomputeLastPBs(solves, startIndex);
+    recomputeLastPWs(solves, startIndex);
+  }
 
   function recomputeLastPBs(solves, startIndex) {
     if (startIndex >= solves.length) {
@@ -444,6 +449,38 @@
           lastPB = window.app.solveTime(solve);
         } else {
           lastPB = Math.min(lastPB, window.app.solveTime(solve));
+        }
+      }
+    }
+  };
+  
+  function recomputeLastPWs(solves, startIndex) {
+    if (startIndex >= solves.length) {
+      return;
+    }
+
+    var lastPW = -1;
+
+    if (startIndex > 0) {
+      var previousSolve = solves[startIndex - 1];
+      if (previousSolve.dnf) {
+        lastPW = previousSolve.lastPW;
+      } else if (previousSolve.lastPW === -1) {
+        lastPW = window.app.solveTime(previousSolve);
+      } else {
+        lastPW = Math.max(window.app.solveTime(previousSolve),
+          previousSolve.lastPW);
+      }
+    }
+
+    for (var i = startIndex, len = solves.length; i < len; ++i) {
+      var solve = solves[i];
+      solve.lastPW = lastPW;
+      if (!solve.dnf) {
+        if (lastPW < 0) {
+          lastPW = window.app.solveTime(solve);
+        } else {
+          lastPW = Math.max(lastPW, window.app.solveTime(solve));
         }
       }
     }
