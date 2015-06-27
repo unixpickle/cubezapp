@@ -13,7 +13,7 @@
 
   background-position: center;
   background-repeat: no-repeat;
-  background-image: url('arrow.png');
+  background-image: url('arrow.svg');
   background-size: 100% 100%;
 
   /* Allow clicks to hit contents and pass through arrow. */
@@ -41,7 +41,7 @@
 }
 
 .dropdownjs-preview:hover > .arrow {
-  background-image: url('arrow_hover.png');
+  background-image: url('arrow_hover.svg');
 }
 
 .dropdownjs-menu-container {
@@ -74,9 +74,10 @@ ul.dropdownjs-menu li {
 }
 
 ul.dropdownjs-menu li.checked {
-  background-image: url('check.png');
+  background-image: url('check.svg');
   background-repeat: no-repeat;
   background-position: left left;
+  background-size: 100% 100%;
 }
 
 ul.dropdownjs-menu li:hover {

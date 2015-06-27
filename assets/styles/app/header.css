@@ -36,18 +36,19 @@
 #header .puzzle-actions button {
   width: 26px;
   height: 26px;
+  background-size: 16px 16px;
   border-radius: 13px;
 
   position: absolute;
   top: 9px;
 }
 
-#header .puzzle-actions .add {
+.header-add-button {
   background-image: url('../../images/small_plus.svg');
   left: 6px;
 }
 
-#header .puzzle-actions .remove {
+.header-remove-button {
   background-image: url('../../images/small_minus.svg');
   left: 36px;
 }
@@ -117,14 +118,17 @@
   white-space: nowrap;
 }
 
-#puzzles .big-add {
+.header-big-add-button {
   position: absolute;
   left: calc(50% - 80px);
   top: 20px;
   width: 160px;
   height: 160px;
+  
   border-radius: 80px;
+  
   background-image: url('../../images/big_plus.svg');
+  background-size: 96px 96px;
 }
 
 #puzzles .delete {
@@ -154,7 +158,6 @@
   cursor: pointer;
 
   background-color: #d5d5d5;
-  background-size: 60% 60%;
   background-position: center;
   background-repeat: no-repeat;
 }

@@ -3,6 +3,5 @@
    xmlns="http://www.w3.org/2000/svg"
    viewBox="0 0 512 512"
    version="1.1">
-  <rect x="0" y="240" width="512" height="32" fill="white" />
-  <rect y="0" x="240" height="512" width="32" fill="white" />
+  <path fill="white" d="M0,240 h512 v32 h-512 z M240,0 h32 v512 h-32 z" />
 </svg>

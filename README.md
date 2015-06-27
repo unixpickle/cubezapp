@@ -7,7 +7,6 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 # TODO
 
  * Switch all images to SVG
- * Recode header CSS to have lower specificity and align images properly
  * Rewrite graph settings
    * For Histogram, use vague icons for Precision
    * For Streak, use PW and PB as bounds for Threshold

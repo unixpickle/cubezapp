@@ -159,8 +159,12 @@
       this.emit('deletePuzzle', id);
     }.bind(this);
     this._dropdown.onSwitch = this.emit.bind(this, 'switchPuzzle');
-    this._$puzzleActions.find('.add').click(this.emit.bind(this, 'addPuzzle'));
-    this._$puzzleActions.find('.remove').click(this._deleteClicked.bind(this));
+    this._$puzzleActions.find('.header-add-button').click(
+      this.emit.bind(this, 'addPuzzle')
+    );
+    this._$puzzleActions.find('.header-remove-button').click(
+      this._deleteClicked.bind(this)
+    );
   };
 
   Header.prototype._toggle = function() {
@@ -257,7 +261,8 @@
     this._empty = (puzzles.length === 0);
 
     if (this._empty) {
-      var button = $('<button class="header-button big-add">Add</button>');
+      var button = $('<button class="header-button header-big-add-button">' +
+        '+</button>');
       button.click(function() {
         this.onAdd();
       }.bind(this));
@@ -366,7 +371,8 @@
       $(this).remove();
     });
 
-    var button = $('<button class="header-button big-add">Add</button>');
+    var button = $('<button class="header-button header-big-add-button">' +
+      '+</button>');
     button.css({display: 'none'}).click(function() {
       this.onAdd();
     }.bind(this));

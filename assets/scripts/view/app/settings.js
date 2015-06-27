@@ -37,7 +37,6 @@
     this._addField('righty', new CheckField('Right Handed'));
     this._addField('theaterMode', new CheckField('Theater Mode'));
     this._addField('flavor', new DropdownField('Flavor'));
-    this._addField('configCube', new ButtonField('Configure Cube'));
     this._addField('changeName', new ButtonField('Change Name'));
 
     this._getField('scrambleType').element().css({display: 'none'});
