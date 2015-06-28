@@ -157,19 +157,21 @@
   };
 
   Times.prototype._rowClicked = function($row, solve) {
+    var style = {fontWeight: 'lighter'};
     this._scrollToRow($row, function() {
       var mainPage = new window.contextjs.Page([
-        new window.contextjs.TextRow('Delete Time'),
-        new window.contextjs.ExpandableRow('Add Penalty'),
-        new window.contextjs.TextRow('View Scramble'),
-        new window.contextjs.TextRow('Add Comment'),
-        new window.contextjs.ExpandableRow('Move To')
+        new window.contextjs.TextRow('Delete Time', style),
+        new window.contextjs.ExpandableRow('Add Penalty', style),
+        new window.contextjs.TextRow('View Scramble', style),
+        new window.contextjs.TextRow('Add Comment', style),
+        new window.contextjs.ExpandableRow('Move To', style)
       ]);
       var pentaltyPage = new window.contextjs.Page([
-        new window.contextjs.BackRow('Add Penalty'),
-        new window.contextjs.CheckRow((!solve.dnf && !solve.plus2), 'None'),
-        new window.contextjs.CheckRow(solve.plus2, '+2'),
-        new window.contextjs.CheckRow(solve.dnf, 'DNF')
+        new window.contextjs.BackRow('Add Penalty', style),
+        new window.contextjs.CheckRow((!solve.dnf && !solve.plus2), 'None',
+          style),
+        new window.contextjs.CheckRow(solve.plus2, '+2', style),
+        new window.contextjs.CheckRow(solve.dnf, 'DNF', style)
       ]);
 
       mainPage.onClick = function(itemIndex) {
