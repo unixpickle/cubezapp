@@ -48,7 +48,7 @@
       this._$element.fadeOut(FADE_OUT_DURATION);
       window.clickthru.removeListener(this._boundClickThru);
     } else {
-      this._$element.css({display: 'block', opacity: 1});
+      this._$element.stop(true, true).css({display: 'block', opacity: 1});
       window.clickthru.addListener(this._boundClickThru);
     }
     this._showing = !this._showing;
