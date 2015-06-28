@@ -1,0 +1,67 @@
+#graph-settings {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 100%;
+  background-color: #e6e6e6;
+}
+
+#graph-settings-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 40px;
+  width: 100%;
+}
+
+#current-graph-mode-label {
+  display: inline-block;
+
+  height: 40px;
+  line-height: 40px;
+
+  padding: 0 25px 0 10px;
+
+  background-image: url('../../images/down_arrow.svg');
+  background-size: 18px 18px;
+  background-position: right center;
+  background-repeat: no-repeat;
+
+  color: white;
+  font-size: 22px;
+  font-weight: lighter;
+
+  cursor: pointer;
+}
+
+.graph-settings-page {
+  position: absolute;
+  top: 40px;
+  width: 100%;
+}
+
+#graph-standard-view-modes {
+  width: 100%;
+  height: 30px;
+  background-color: white;
+}
+
+.graph-standard-view-mode {
+  float: left;
+  width: 66px;
+  height: 100%;
+}
+
+.graph-standard-view-mode svg {
+  width: 100%;
+  height: 100%;
+}
+
+#graph-standard-view-mode-0 {
+  border-right: 1px solid #e6e6e6;
+}
+
+#graph-standard-view-mode-2 {
+  border-left: 1px solid #e6e6e6;
+}

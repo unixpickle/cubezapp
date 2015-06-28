@@ -2,7 +2,6 @@
 
   function GraphController(view) {
     this._view = view;
-    this._registerSettingsEvents();
   }
 
   GraphController.prototype._registerSettingsEvents = function() {
