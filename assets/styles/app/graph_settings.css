@@ -51,6 +51,11 @@
   float: left;
   width: 66px;
   height: 100%;
+  cursor: pointer;
+}
+
+.graph-standard-view-mode:hover {
+  background-color: #f0f0f0;
 }
 
 .graph-standard-view-mode svg {

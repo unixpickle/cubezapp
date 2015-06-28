@@ -416,7 +416,7 @@
     } catch (e) {
     }
   };
-  
+
   function recomputeLastPBsAndPWs(solves, startIndex) {
     recomputeLastPBs(solves, startIndex);
     recomputeLastPWs(solves, startIndex);
@@ -453,7 +453,7 @@
       }
     }
   };
-  
+
   function recomputeLastPWs(solves, startIndex) {
     if (startIndex >= solves.length) {
       return;
