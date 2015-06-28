@@ -15,7 +15,7 @@
   width: 100%;
 }
 
-#current-graph-mode-label {
+#graph-mode-label {
   display: inline-block;
 
   height: 40px;
@@ -23,7 +23,7 @@
 
   padding: 0 25px 0 10px;
 
-  background-image: url('../../images/down_arrow.svg');
+  background-image: url('../../../images/down_arrow.svg');
   background-size: 18px 18px;
   background-position: right center;
   background-repeat: no-repeat;
@@ -40,35 +40,3 @@
   top: 40px;
   width: 100%;
 }
-
-#graph-standard-view-modes {
-  width: 100%;
-  height: 30px;
-  background-color: white;
-}
-
-.graph-standard-view-mode {
-  float: left;
-  width: 66px;
-  height: 100%;
-  cursor: pointer;
-}
-
-.graph-standard-view-mode:hover {
-  background-color: #f0f0f0;
-}
-
-.graph-standard-view-mode svg {
-  width: 100%;
-  height: 100%;
-}
-
-#graph-standard-view-mode-0 {
-  border-right: 1px solid #e6e6e6;
-}
-
-#graph-standard-view-mode-2 {
-  border-left: 1px solid #e6e6e6;
-}
-
-

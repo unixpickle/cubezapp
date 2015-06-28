@@ -18,7 +18,11 @@
     <!-- Stylesheets are magical things that make your site beautiful -->
     <link rel="stylesheet" type="text/css" href="styles/app/averages.css">
     <link rel="stylesheet" type="text/css" href="styles/app/footer.css">
-    <link rel="stylesheet" type="text/css" href="styles/app/graph_settings.css">
+    <link rel="stylesheet" type="text/css"
+          href="styles/app/graph/mode_dropdown.css">
+    <link rel="stylesheet" type="text/css" href="styles/app/graph/settings.css">
+    <link rel="stylesheet" type="text/css"
+          href="styles/app/graph/standard_view_mode.css">
     <link rel="stylesheet" type="text/css" href="styles/app/header.css">
     <link rel="stylesheet" type="text/css" href="styles/app/load.css">
     <link rel="stylesheet" type="text/css" href="styles/app/middle.css">
@@ -72,6 +76,7 @@
     <script src="scripts/view/app/averages.js"></script>
     <script src="scripts/view/app/footer.js"></script>
     <script src="scripts/view/app/graph/graph.js"></script>
+    <script src="scripts/view/app/graph/mode_dropdown.js"></script>
     <script src="scripts/view/app/graph/settings.js"></script>
     <script src="scripts/view/app/graph/standard_view_mode.js"></script>
     <script src="scripts/view/app/header.js"></script>
@@ -163,9 +168,6 @@
 
                 <!-- The graph settings are partially populated by JS. -->
                 <div id="graph-settings">
-                  <div id="graph-settings-title" class="flavor-background">
-                    <label id="current-graph-mode-label">Standard</label>
-                  </div>
                   <div id="graph-settings-standard" class="graph-settings-page">
                     <div id="graph-standard-view-modes">
                       <div class="graph-standard-view-mode"
@@ -211,6 +213,17 @@
                        class="graph-settings-page"></div>
 
                   <div id="graph-settings-streak" class="graph-settings-page">
+                  </div>
+
+                  <ul id="graph-mode-dropdown">
+                    <li class="graph-mode-dropdown-item">Standard</li>
+                    <li class="graph-mode-dropdown-item">Mean</li>
+                    <li class="graph-mode-dropdown-item">Histogram</li>
+                    <li class="graph-mode-dropdown-item">Streak</li>
+                  </ul>
+                  
+                  <div id="graph-settings-title" class="flavor-background">
+                    <label id="graph-mode-label">Standard</label>
                   </div>
                 </div>
 

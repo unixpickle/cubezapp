@@ -1,0 +1,29 @@
+#graph-standard-view-modes {
+  width: 100%;
+  height: 30px;
+  background-color: white;
+}
+
+.graph-standard-view-mode {
+  float: left;
+  width: 66px;
+  height: 100%;
+  cursor: pointer;
+}
+
+.graph-standard-view-mode:hover {
+  background-color: #f0f0f0;
+}
+
+.graph-standard-view-mode svg {
+  width: 100%;
+  height: 100%;
+}
+
+#graph-standard-view-mode-0 {
+  border-right: 1px solid #e6e6e6;
+}
+
+#graph-standard-view-mode-2 {
+  border-left: 1px solid #e6e6e6;
+}
