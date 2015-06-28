@@ -203,7 +203,7 @@
   Timer.prototype.setTime = function(time) {
     this._assertStates([Timer.STATE_TIMING, Timer.STATE_TIMING_DONE_MEMO,
       Timer.STATE_INSPECTION]);
-    this._time = time;
+    this._time = Math.max(Math.min(time, 35999999), 0);
     this.emit('time');
   };
 
