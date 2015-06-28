@@ -98,7 +98,7 @@
 }
 
 #graph-settings .mode-dropdown > li.selected {
-  background-image: url('../../images/check.png');
+  background-image: url('../../images/check.svg');
 }
 
 #graph-settings .slider {

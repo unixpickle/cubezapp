@@ -1,4 +1,4 @@
-// dropdown.js version 4.0.2
+// dropdown.js version 4.0.3
 (function() {
 
   var DEFAULT_BG_COLOR = '#ffffff';
