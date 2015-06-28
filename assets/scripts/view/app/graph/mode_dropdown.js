@@ -1,5 +1,5 @@
 (function() {
-  
+
   var FADE_IN_DURATION = 0;
   var FADE_OUT_DURATION = 200;
 
@@ -8,15 +8,15 @@
     this._$element = $('#graph-mode-dropdown');
     this._$items = $('.graph-mode-dropdown-item');
     this._$label = $('#graph-mode-label');
-    
+
     this._modeNames = [];
     for (var i = 0; i < this._$items.length; ++i) {
       this._modeNames[i] = this._$items.eq(i).text();
     }
-    
+
     this._showing = false;
     this._boundClickThru = this._clickThru.bind(this);
-    
+
     this._updateFromModel();
     this._registerEvents();
   }
