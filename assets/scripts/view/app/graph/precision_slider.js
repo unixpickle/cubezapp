@@ -50,7 +50,7 @@
   function generateImages() {
     var images = [];
     for (var i = 5; i <= 11; ++i) {
-      var spacing = Math.ceil(10 / i);
+      var spacing = 1;
       var barWidth = Math.floor((IMAGE_WIDTH - spacing*(i+1)) / i);
       images.push(generateHistogramImage(i, barWidth, spacing));
     }
