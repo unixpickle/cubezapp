@@ -75,7 +75,7 @@
     }
     return $(svgData + '</g></svg>');
   }
-  
+
   window.app.GraphPrecisionSlider = GraphPrecisionSlider;
 
 })();

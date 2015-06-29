@@ -15,7 +15,7 @@
       $('#graph-settings-histogram'),
       $('#graph-settings-streak')
     ];
-    
+
     this._populateHistogram();
     this._populateMean();
     this._populateStandard();
