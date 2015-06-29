@@ -27,6 +27,10 @@
 
   GraphSettings.prototype = Object.create(window.app.EventEmitter.prototype);
 
+  GraphSettings.prototype._createCheckbox = function(name, modelKey) {
+    return new window.app.GraphCheckbox(name, modelKey, this);
+  }
+
   GraphSettings.prototype._createSlider = function(min, max, name, modelKey) {
     var slider = new window.app.GraphSlider();
     slider.setMin(min);
@@ -37,9 +41,11 @@
 
   GraphSettings.prototype._populateHistogram = function() {
     var scale = this._createSlider(5, 100, 'Scale', 'graphHistogramScale');
+    var includeDNF = this._createCheckbox('Include DNF',
+      'graphHistogramIncludeDNF');
 
     var $fields = $('#graph-settings-histogram .graph-settings-page-fields');
-    $fields.append(scale.element());
+    $fields.append(scale.element(), includeDNF.element());
   };
 
   GraphSettings.prototype._populateMean = function() {
@@ -48,23 +54,28 @@
     meanSize.setLabelFunc(function(c) {
       return Math.round(c) + ' solves';
     });
+    var showDNF = this._createCheckbox('Show DNF', 'graphMeanShowDNF');
 
     var $fields = $('#graph-settings-mean .graph-settings-page-fields');
-    $fields.append(scale.element(), meanSize.element());
+    $fields.append(scale.element(), meanSize.element(), showDNF.element());
   };
 
   GraphSettings.prototype._populateStandard = function() {
     var scale = this._createSlider(5, 100, 'Scale', 'graphStandardScale');
+    var showDNF = this._createCheckbox('Show DNF', 'graphStandardShowDNF');
 
     var $fields = $('#graph-settings-standard .graph-settings-page-fields');
-    $fields.append(scale.element());
+    $fields.append(scale.element(), showDNF.element());
   };
 
   GraphSettings.prototype._populateStreak = function() {
     var scale = this._createSlider(5, 100, 'Scale', 'graphStreakScale');
+    var usePercent = this._createCheckbox('Use %', 'graphStreakUsePercent');
+    var includeDNF = this._createCheckbox('Include DNF',
+      'graphStreakIncludeDNF');
 
     var $fields = $('#graph-settings-streak .graph-settings-page-fields');
-    $fields.append(scale.element());
+    $fields.append(scale.element(), usePercent.element(), includeDNF.element());
   };
 
   GraphSettings.prototype._registerEvents = function() {

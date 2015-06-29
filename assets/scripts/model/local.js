@@ -19,7 +19,7 @@
     graphMeanScale: 20,
     graphMeanCount: 10,
     graphMeanShowDNF: false,
-    graphHistogramScale: 100,
+    graphHistogramScale: 20,
     graphHistogramSpan: 100,
     graphHistogramPrecision: 1000,
     graphHistogramIncludeDNF: false,

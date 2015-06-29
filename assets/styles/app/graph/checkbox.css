@@ -1,0 +1,16 @@
+.graph-settings-labeled-checkbox {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.graph-settings-labeled-checkbox::after {
+  content: " ";
+  display: block;
+  clear: both;
+  height: 0;
+  visibility: hidden;
+}
+
+.graph-settings-checkbox {
+  float: right;
+}

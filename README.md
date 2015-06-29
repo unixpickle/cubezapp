@@ -10,7 +10,6 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
    * For Histogram, use vague icons for Precision
    * For Streak, use PW and PB as bounds for Threshold
    * For Histogram, use the number of solves to bound the Span
-   * For Mean, use a range of 3 to 15 solves for the mean size.
  * Re-implement Dropdown with animations
  * Implement graph in footer
  * Implement accounts system

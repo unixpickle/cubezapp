@@ -41,9 +41,7 @@
 }
 
 .graph-settings-slider-labels {
-  font-size: 17px;
-  font-weight: lighter;
-  color: #777;
+  margin-bottom: 2px;
 }
 
 .graph-settings-slider-labels::after {
@@ -52,6 +50,12 @@
   clear: both;
   height: 0;
   visibility: hidden;
+}
+
+.graph-settings-name-label, .graph-settings-amount-label {
+  font-size: 17px;
+  font-weight: lighter;
+  color: #777;
 }
 
 .graph-settings-name-label {

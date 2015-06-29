@@ -2,7 +2,7 @@
 
   function GraphSlider() {
     window.app.EventEmitter.call(this);
-    
+
     this._$element = $('<div class="graph-settings-slider">' +
       '<div class="graph-settings-slider-background"></div>' +
       '<div class="graph-settings-slider-container">' +
@@ -26,7 +26,7 @@
     this._registerMouseEvents();
     this._updateUI();
   }
-  
+
   GraphSlider.prototype = Object.create(window.app.EventEmitter.prototype);
 
   GraphSlider.prototype.element = function() {
@@ -265,13 +265,21 @@
     return this._$element;
   };
 
+  LabeledGraphSlider.prototype.getManager = function() {
+    return this._manager;
+  };
+
+  LabeledGraphSlider.prototype.getSlider = function() {
+    return this._manager.getSlider();
+  };
+
   LabeledGraphSlider.prototype.setLabelFunc = function(f) {
     this._labelFunc = f;
     this._updateLabel();
   };
 
   LabeledGraphSlider.prototype._updateLabel = function() {
-    this._$amount.text(this._labelFunc(this._manager.getSlider().getValue()));
+    this._$amount.text(this._labelFunc(this.getSlider().getValue()));
   };
 
   window.app.GraphSlider = GraphSlider;
