@@ -40,7 +40,7 @@
   GraphSlider.prototype.setMax = function(max) {
     this._max = max;
     this.setValue(this._value);
-  }
+  };
 
   GraphSlider.prototype.setMin = function(min) {
     this._min = min;
@@ -97,12 +97,95 @@
   };
 
   GraphSlider.prototype._updateUI = function() {
+    if (this._min >= this._max) {
+      return;
+    }
     var fraction = (this._value - this._min) / (this._max - this._min);
     var percent = (fraction * 100).toFixed(1) + '%';
     this._$knob.css({left: percent});
     this._$highlight.css({width: percent});
   };
 
+  function DiscreteGraphSlider() {
+    GraphSlider.call(this);
+    this._allowedValues = [0, 0.5, 1];
+  }
+
+  DiscreteGraphSlider.prototype = Object.create(GraphSlider.prototype);
+
+  DiscreteGraphSlider.prototype.getAllowedValues = function() {
+    return this._allowedValues;
+  };
+
+  DiscreteGraphSlider.prototype.setAllowedValues = function(v) {
+    this._allowedValues = v;
+    this.setValue(this.getValue());
+  };
+
+  DiscreteGraphSlider.prototype.setValue = function(v) {
+    var closestAllowed = this._allowedValues[0];
+    var distance = Math.abs(closestAllowed - v);
+    for (var i = 1, len = this._allowedValues.length; i < len; ++i) {
+      var val = this._allowedValues[i];
+      var dist = Math.abs(val - v);
+      if (dist < distance) {
+        distance = dist;
+        closestAllowed = val;
+      }
+    }
+    GraphSlider.prototype.setValue.call(this, closestAllowed);
+  };
+
+  function TranslatedGraphSlider(slider) {
+    window.app.EventEmitter.call(this);
+    this._slider = slider;
+    this._sliderToExternal = function(x) {
+      return x;
+    }
+    this._externalToSlider = function(x) {
+      return x;
+    };
+    this.slider.on('change', this.emit.bind(this, 'change'));
+    this.slider.on('release', this.emit.bind(this, 'release'));
+  }
+
+  TranslatedGraphSlider.prototype =
+    Object.create(window.app.EventEmitter.prototype);
+
+  TranslatedGraphSlider.prototype.getMax = function() {
+    return this._sliderToExternal(this._slider.getMax());
+  };
+
+  TranslatedGraphSlider.prototype.getMin = function() {
+    return this._sliderToExternal(this._slider.getMin());
+  };
+
+  TranslatedGraphSlider.prototype.getValue = function() {
+    return this._sliderToExternal(this._slider.getValue());
+  };
+
+  TranslatedGraphSlider.prototype.setExternalToSlider = function(f) {
+    this._externalToSlider = f;
+  };
+
+  TranslatedGraphSlider.prototype.setMax = function(max) {
+    this._slider.setMax(this._externalToSlider(max));
+  };
+
+  TranslatedGraphSlider.prototype.setMin = function(min) {
+    this._slider.setMin(this._externalToSlider(min));
+  };
+
+  TranslatedGraphSlider.prototype.setSliderToExternal = function(f) {
+    this._sliderToExternal = f;
+  };
+
+  TranslatedGraphSlider.prototype.setValue = function(v) {
+    this._slider.setValue(this._externalToSlider(v));
+  };
+
   window.app.GraphSlider = GraphSlider;
+  window.app.DiscreteGraphSlider = DiscreteGraphSlider;
+  window.app.TranslatedGraphSlider = TranslatedGraphSlider;
 
 })();
