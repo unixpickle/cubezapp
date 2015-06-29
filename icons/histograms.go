@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	Width = 40
-	Height = 15
+	Width         = 40
+	Height        = 15
 	OutwardRadius = 2
 )
 
@@ -41,12 +41,12 @@ func generateImage(c Config) {
 		"viewBox=\"" + viewBox + "\" ><g fill=\"#777\">"
 	rectTemplate := "<rect fill=\"inherit\" x=\"%d\" y=\"%d\" " +
 		"width=\"%d\" height=\"%d\" />"
-	xSpacing := OutwardRadius*2.0 / float64(c.Count+1)
+	xSpacing := OutwardRadius * 2.0 / float64(c.Count+1)
 	for i := 0; i < c.Count; i++ {
 		xVal := -OutwardRadius + float64(i+1)*xSpacing
-		height := math.Floor(Height * math.Exp(-xVal * xVal / 2))
-		barXVal := xOffset + (c.Spacing + c.BarWidth) * i
-		svgData += fmt.Sprintf(rectTemplate, int(barXVal), int(Height - height), int(c.BarWidth),
+		height := math.Floor(Height * math.Exp(-xVal*xVal/2))
+		barXVal := xOffset + (c.Spacing+c.BarWidth)*i
+		svgData += fmt.Sprintf(rectTemplate, int(barXVal), int(Height-height), int(c.BarWidth),
 			int(height))
 	}
 	svgData += "</g></svg>"

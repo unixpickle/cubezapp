@@ -21,12 +21,12 @@
     graphMeanShowDNF: false,
     graphHistogramScale: 20,
     graphHistogramSpan: 100,
-    graphHistogramPrecision: 1000,
+    graphHistogramPrecision: 0.5,
     graphHistogramIncludeDNF: false,
     graphStreakScale: 20,
     graphStreakUsePercent: true,
     graphStreakUpperBound: 20000,
-    graphStreakIncludeDNF: true
+    graphStreakIncludeDNF: false
   };
 
   function LocalStore() {

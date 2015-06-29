@@ -7,7 +7,6 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 # TODO
 
  * Rewrite graph settings
-   * For Histogram, use vague icons for Precision
    * For Streak, use PW and PB as bounds for Threshold
    * For Histogram, use the number of solves to bound the Span
  * Re-implement Dropdown with animations

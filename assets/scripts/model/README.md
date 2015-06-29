@@ -156,7 +156,7 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
  * **graphMeanShowDNF** - bool - whether or not DNFs should be used in the mean graph
  * **graphHistogramScale** - int - the scale of the graph in view-defined units
  * **graphHistogramSpan** - int - the number of solves to include in the histogram. If this is -1, it is considered infinite.
- * **graphHistogramPrecision** - int - the number of milliseconds per "bucket" in the histogram
+ * **graphHistogramPrecision** - number - a number between 0 and 1 indicating approximately how many buckets should be used in the histogram.
  * **graphHistogramIncludeDNF** - bool - whether or not the times of DNFs should be counted
  * **graphStreakScale** - int - the scale of the graph in view-defined units
  * **graphStreakUsePercent** - bool - if this is true, each bar in the streak represents the percent of solves below the upper bound. Otherwise, each bar represents the raw number of solves below the upper bound.
