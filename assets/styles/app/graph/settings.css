@@ -40,3 +40,9 @@
   top: 40px;
   width: 100%;
 }
+
+.graph-settings-page-fields {
+  padding-left: 10px;
+  padding-right: 10px;
+  width: calc(100% - 20px);
+}

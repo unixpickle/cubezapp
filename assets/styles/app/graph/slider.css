@@ -18,6 +18,7 @@
   top: 0;
   left: 0;
   width: calc(100% - 4px);
+  height: 100%;
 }
 
 .graph-settings-slider-highlight {
@@ -35,9 +36,14 @@
   background-color: white;
 }
 
+.graph-settings-labeled-slider {
+  margin-top: 10px;
+}
+
 .graph-settings-slider-labels {
   font-size: 17px;
   font-weight: lighter;
+  color: #777;
 }
 
 .graph-settings-slider-labels::after {

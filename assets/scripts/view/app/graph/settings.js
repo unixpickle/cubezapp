@@ -15,12 +15,57 @@
       $('#graph-settings-histogram'),
       $('#graph-settings-streak')
     ];
+    
+    this._populateHistogram();
+    this._populateMean();
+    this._populateStandard();
+    this._populateStreak();
 
     this._updateFromModel();
     this._registerEvents();
   }
 
   GraphSettings.prototype = Object.create(window.app.EventEmitter.prototype);
+
+  GraphSettings.prototype._createSlider = function(min, max, name, modelKey) {
+    var slider = new window.app.GraphSlider();
+    slider.setMin(min);
+    slider.setMax(max);
+    var managed = new window.app.GraphSliderManager(slider, modelKey, this);
+    return new window.app.LabeledGraphSlider(managed, name);
+  };
+
+  GraphSettings.prototype._populateHistogram = function() {
+    var scale = this._createSlider(5, 100, 'Scale', 'graphHistogramScale');
+
+    var $fields = $('#graph-settings-histogram .graph-settings-page-fields');
+    $fields.append(scale.element());
+  };
+
+  GraphSettings.prototype._populateMean = function() {
+    var scale = this._createSlider(5, 100, 'Scale', 'graphMeanScale');
+    var meanSize = this._createSlider(3, 15, 'Mean of', 'graphMeanCount');
+    meanSize.setLabelFunc(function(c) {
+      return Math.round(c) + ' solves';
+    });
+
+    var $fields = $('#graph-settings-mean .graph-settings-page-fields');
+    $fields.append(scale.element(), meanSize.element());
+  };
+
+  GraphSettings.prototype._populateStandard = function() {
+    var scale = this._createSlider(5, 100, 'Scale', 'graphStandardScale');
+
+    var $fields = $('#graph-settings-standard .graph-settings-page-fields');
+    $fields.append(scale.element());
+  };
+
+  GraphSettings.prototype._populateStreak = function() {
+    var scale = this._createSlider(5, 100, 'Scale', 'graphStreakScale');
+
+    var $fields = $('#graph-settings-streak .graph-settings-page-fields');
+    $fields.append(scale.element());
+  };
 
   GraphSettings.prototype._registerEvents = function() {
     window.app.observe.activePuzzle('graphMode',

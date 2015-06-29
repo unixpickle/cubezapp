@@ -1,6 +1,8 @@
 (function() {
 
   function GraphSlider() {
+    window.app.EventEmitter.call(this);
+    
     this._$element = $('<div class="graph-settings-slider">' +
       '<div class="graph-settings-slider-background"></div>' +
       '<div class="graph-settings-slider-container">' +
@@ -24,6 +26,8 @@
     this._registerMouseEvents();
     this._updateUI();
   }
+  
+  GraphSlider.prototype = Object.create(window.app.EventEmitter.prototype);
 
   GraphSlider.prototype.element = function() {
     return this._$element;
@@ -145,7 +149,7 @@
     this._slider = slider;
     this._sliderToExternal = function(x) {
       return x;
-    }
+    };
     this._externalToSlider = function(x) {
       return x;
     };
@@ -207,6 +211,8 @@
     this._slider.on('change', this._handleChange.bind(this));
     this._slider.on('release', this._handleRelease.bind(this));
     this._registerModelEvents();
+
+    slider.setValue(window.app.store.getActivePuzzle()[this._modelKey]);
   }
 
   GraphSliderManager.prototype =
@@ -254,6 +260,10 @@
 
     manager.on('change', this._updateLabel.bind(this));
   }
+
+  LabeledGraphSlider.prototype.element = function() {
+    return this._$element;
+  };
 
   LabeledGraphSlider.prototype.setLabelFunc = function(f) {
     this._labelFunc = f;
