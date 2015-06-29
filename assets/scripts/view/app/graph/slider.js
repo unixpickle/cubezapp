@@ -25,6 +25,10 @@
     this._updateUI();
   }
 
+  GraphSlider.prototype.element = function() {
+    return this._$element;
+  };
+
   GraphSlider.prototype.getMax = function() {
     return this._max;
   };
@@ -152,6 +156,10 @@
   TranslatedGraphSlider.prototype =
     Object.create(window.app.EventEmitter.prototype);
 
+  TranslatedGraphSlider.prototype.element = function() {
+    return this._slider.element();
+  };
+
   TranslatedGraphSlider.prototype.getMax = function() {
     return this._sliderToExternal(this._slider.getMax());
   };
@@ -184,8 +192,82 @@
     this._slider.setValue(this._externalToSlider(v));
   };
 
+  // A GraphSliderManager makes sure a slider updates the controller with
+  // changes and updates the slider to reflect changes in the model.
+  //
+  // A GraphSliderManager will emit 'change' events whenever the value of the
+  // slider changes due to the model or the user dragging the slider.
+  function GraphSliderManager(slider, modelKey, changeEmitter) {
+    window.app.EventEmitter.call(this);
+
+    this._slider = slider;
+    this._modelKey = modelKey;
+    this._changeEmitter = changeEmitter;
+
+    this._slider.on('change', this._handleChange.bind(this));
+    this._slider.on('release', this._handleRelease.bind(this));
+    this._registerModelEvents();
+  }
+
+  GraphSliderManager.prototype =
+    Object.create(window.app.EventEmitter.prototype);
+
+  GraphSliderManager.prototype.getSlider = function() {
+    return this._slider;
+  };
+
+  GraphSliderManager.prototype._handleChange = function() {
+    this._changeEmitter.emit('settingChanging', this._modelKey,
+      this._slider.getValue());
+    this.emit('change');
+  };
+
+  GraphSliderManager.prototype._handleRelease = function() {
+    this._changeEmitter.emit('settingChanged', this._modelKey,
+      this._slider.getValue());
+  };
+
+  GraphSliderManager.prototype._registerModelEvents = function() {
+    window.app.observe.activePuzzle(this._modelKey, function() {
+      var newVal = window.app.store.getActivePuzzle()[this._modelKey];
+      if (this._slider.getValue() !== newVal) {
+        this._slider.setValue(newVal);
+        this.emit('change');
+      }
+    }.bind(this));
+  };
+
+  function LabeledGraphSlider(manager, name) {
+    this._manager = manager;
+    this._$element = $('<div class="graph-settings-labeled-slider"></div>');
+    this._$labels = $('<div class="graph-settings-slider-labels"></div>');
+    this._$name = $('<label class="graph-settings-name-label"></label>');
+    this._$amount = $('<label class="graph-settings-amount-label"></label>');
+
+    this._$name.text(name);
+    this._$labels.append(this._$name, this._$amount);
+    this._$element.append(this._$labels, manager.getSlider().element());
+
+    this._labelFunc = function() {
+      return '';
+    };
+
+    manager.on('change', this._updateLabel.bind(this));
+  }
+
+  LabeledGraphSlider.prototype.setLabelFunc = function(f) {
+    this._labelFunc = f;
+    this._updateLabel();
+  };
+
+  LabeledGraphSlider.prototype._updateLabel = function() {
+    this._$amount.text(this._labelFunc(this._manager.getSlider().getValue()));
+  };
+
   window.app.GraphSlider = GraphSlider;
   window.app.DiscreteGraphSlider = DiscreteGraphSlider;
   window.app.TranslatedGraphSlider = TranslatedGraphSlider;
+  window.app.GraphSliderManager = GraphSliderManager;
+  window.app.LabeledGraphSlider = LabeledGraphSlider;
 
 })();

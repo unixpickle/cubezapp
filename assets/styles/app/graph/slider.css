@@ -1,0 +1,57 @@
+.graph-settings-slider {
+  position: relative;
+  height: 12px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.graph-settings-slider-background {
+  position: absolute;
+  top: 5px;
+  height: 2px;
+  width: 100%;
+  background-color: #cccccc;
+}
+
+.graph-settings-slider-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 4px);
+}
+
+.graph-settings-slider-highlight {
+  position: absolute;
+  top: 5px;
+  height: 2px;
+  left: 0px;
+}
+
+.graph-settings-slider-knob {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: white;
+}
+
+.graph-settings-slider-labels {
+  font-size: 17px;
+  font-weight: lighter;
+}
+
+.graph-settings-slider-labels::after {
+  content: " ";
+  display: block;
+  clear: both;
+  height: 0;
+  visibility: hidden;
+}
+
+.graph-settings-name-label {
+  float: left;
+}
+
+.graph-settings-amount-label {
+  float: right;
+}
