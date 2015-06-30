@@ -1,6 +1,8 @@
 (function() {
 
   var MAX_TICK_COUNT = 500;
+  var MIN_TICK_COUNT = 10;
+  var TIME_QUANTUM = 1000;
 
   function GraphThresholdSlider(changeEmitter) {
     this._slider = new window.app.DiscreteGraphSlider();
@@ -46,7 +48,7 @@
   function minimumAndMaximumValues() {
     var solve = window.app.store.getLatestSolve();
     if (solve === null) {
-      return;
+      return {min: 15000, max: 15000 + MIN_TICK_COUNT*TIME_QUANTUM};
     }
 
     var worst = solve.lastPW;
@@ -61,20 +63,21 @@
       }
     }
 
-    best = best - (best % 1000);
-    if (worst%1000 !== 0) {
-      worst += 1000 - (worst % 1000);
+    best = best - (best % TIME_QUANTUM);
+    if (worst%TIME_QUANTUM !== 0) {
+      worst += TIME_QUANTUM - (worst % TIME_QUANTUM);
     }
 
     // NOTE: sub-0 makes no sense.
     if (best === 0) {
-      best = 1000;
+      best = TIME_QUANTUM;
     }
 
-    // Even if worst=best (i.e. they have one solve) we need a range so that the
-    // slider has somewhere to go.
-    if (worst <= best) {
-      worst = best + 1000;
+    while (worst-best < MIN_TICK_COUNT*TIME_QUANTUM) {
+      if (best > TIME_QUANTUM) {
+        best -= TIME_QUANTUM;
+      }
+      worst += TIME_QUANTUM;
     }
 
     return {min: best, max: worst};
@@ -82,8 +85,8 @@
 
   function ticksForRange(min, max) {
     var step = Math.floor((max - min) / MAX_TICK_COUNT);
-    if (step === 0 || step%1000 !== 0) {
-      step += 1000 - (step % 1000);
+    if (step === 0 || step%TIME_QUANTUM !== 0) {
+      step += TIME_QUANTUM - (step % TIME_QUANTUM);
     }
 
     var ticks = [];
