@@ -14,6 +14,7 @@
     this._$panes = $('#stats-panes');
 
     this._empty = (window.app.store.getSolveCount() === 0);
+    this._movingPaneTop = 0;
 
     this.averages = new window.app.Averages();
     this.graph = new window.app.Graph();
@@ -67,10 +68,16 @@
     if (this._empty) {
       top = -this._$panes.height();
     }
+    
+    if (top === this._movingPaneTop) {
+      return;
+    }
+    this._movingPaneTop = top;
+    
     if (animate) {
       this._$movingPane.animate({top: top}, 'fast');
     } else {
-      this._$movingPane.css({top: top});
+      this._$movingPane.stop(true, true).css({top: top});
     }
   };
 
