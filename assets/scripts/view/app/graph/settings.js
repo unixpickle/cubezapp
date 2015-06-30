@@ -73,12 +73,14 @@
 
   GraphSettings.prototype._populateStreak = function() {
     var scale = this._createSlider(5, 100, 'Scale', 'graphStreakScale');
+    var threshold = new window.app.GraphThresholdSlider(this);
     var usePercent = this._createCheckbox('Use %', 'graphStreakUsePercent');
     var includeDNF = this._createCheckbox('Include DNF',
       'graphStreakIncludeDNF');
 
     var $fields = $('#graph-settings-streak .graph-settings-page-fields');
-    $fields.append(scale.element(), usePercent.element(), includeDNF.element());
+    $fields.append(scale.element(), threshold.element(), usePercent.element(),
+      includeDNF.element());
   };
 
   GraphSettings.prototype._registerEvents = function() {
