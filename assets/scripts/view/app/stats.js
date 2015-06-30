@@ -68,12 +68,12 @@
     if (this._empty) {
       top = -this._$panes.height();
     }
-    
+
     if (top === this._movingPaneTop) {
       return;
     }
     this._movingPaneTop = top;
-    
+
     if (animate) {
       this._$movingPane.animate({top: top}, 'fast');
     } else {

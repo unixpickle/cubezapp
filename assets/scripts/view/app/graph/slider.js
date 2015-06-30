@@ -116,7 +116,7 @@
 
   function DiscreteGraphSlider() {
     GraphSlider.call(this);
-    this._allowedValues = [0, 0.5, 1];
+    this._allowedValues = null;
   }
 
   DiscreteGraphSlider.prototype = Object.create(GraphSlider.prototype);
@@ -131,6 +131,10 @@
   };
 
   DiscreteGraphSlider.prototype.setValue = function(v) {
+    if (this._allowedValues === null) {
+      GraphSlider.prototype.setValue.call(this, v);
+      return;
+    }
     var closestAllowed = this._allowedValues[0];
     var distance = Math.abs(closestAllowed - v);
     for (var i = 1, len = this._allowedValues.length; i < len; ++i) {
@@ -144,9 +148,9 @@
     GraphSlider.prototype.setValue.call(this, closestAllowed);
   };
 
-  function TranslatedGraphSlider() {
+  function TranslatedGraphSlider(slider) {
     window.app.EventEmitter.call(this);
-    this._slider = new GraphSlider();
+    this._slider = slider;
     this._sliderToExternal = function(x) {
       return x;
     };
@@ -164,12 +168,20 @@
     return this._slider.element();
   };
 
+  TranslatedGraphSlider.prototype.getExternalToSlider = function() {
+    return this._externalToSlider;
+  };
+
   TranslatedGraphSlider.prototype.getMax = function() {
     return this._sliderToExternal(this._slider.getMax());
   };
 
   TranslatedGraphSlider.prototype.getMin = function() {
     return this._sliderToExternal(this._slider.getMin());
+  };
+
+  TranslatedGraphSlider.prototype.getSliderToExternal = function() {
+    return this._sliderToExternal();
   };
 
   TranslatedGraphSlider.prototype.getValue = function() {
