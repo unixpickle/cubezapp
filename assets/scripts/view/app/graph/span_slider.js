@@ -1,7 +1,10 @@
 (function() {
+  
+  var MAXIMUM_UPPER_BOUND = 5001;
 
   function GraphSpanSlider(changeEmitter) {
-    this._maxValue = Math.max(window.app.store.getSolveCount()+1, 6);
+    this._maxValue = Math.min(Math.max(window.app.store.getSolveCount()+1, 6),
+      MAXIMUM_UPPER_BOUND);
 
     var slider = new window.app.TranslatedGraphSlider();
 
@@ -55,7 +58,8 @@
   };
 
   GraphSpanSlider.prototype._updateUpperBound = function() {
-    var newMaxValue = Math.max(window.app.store.getSolveCount()+1, 6);
+    var newMaxValue = Math.min(Math.max(window.app.store.getSolveCount()+1, 6),
+      MAXIMUM_UPPER_BOUND);
     if (newMaxValue === this._maxValue) {
       return;
     }
