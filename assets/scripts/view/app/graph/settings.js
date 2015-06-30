@@ -41,12 +41,14 @@
 
   GraphSettings.prototype._populateHistogram = function() {
     var scale = this._createSlider(5, 100, 'Scale', 'graphHistogramScale');
+    var span = new window.app.GraphSpanSlider(this);
     var precision = new window.app.GraphPrecisionSlider(this);
     var includeDNF = this._createCheckbox('Include DNF',
       'graphHistogramIncludeDNF');
 
     var $fields = $('#graph-settings-histogram .graph-settings-page-fields');
-    $fields.append(scale.element(), precision.element(), includeDNF.element());
+    $fields.append(scale.element(), span.element(), precision.element(),
+      includeDNF.element());
   };
 
   GraphSettings.prototype._populateMean = function() {

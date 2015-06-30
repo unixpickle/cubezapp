@@ -144,17 +144,17 @@
     GraphSlider.prototype.setValue.call(this, closestAllowed);
   };
 
-  function TranslatedGraphSlider(slider) {
+  function TranslatedGraphSlider() {
     window.app.EventEmitter.call(this);
-    this._slider = slider;
+    this._slider = new GraphSlider();
     this._sliderToExternal = function(x) {
       return x;
     };
     this._externalToSlider = function(x) {
       return x;
     };
-    this.slider.on('change', this.emit.bind(this, 'change'));
-    this.slider.on('release', this.emit.bind(this, 'release'));
+    this._slider.on('change', this.emit.bind(this, 'change'));
+    this._slider.on('release', this.emit.bind(this, 'release'));
   }
 
   TranslatedGraphSlider.prototype =
@@ -217,6 +217,12 @@
 
   GraphSliderManager.prototype =
     Object.create(window.app.EventEmitter.prototype);
+
+  GraphSliderManager.prototype.changedExternally = function() {
+    this._changeEmitter.emit('settingChanged', this._modelKey,
+      this._slider.getValue());
+    this.emit('change');
+  };
 
   GraphSliderManager.prototype.getSlider = function() {
     return this._slider;
