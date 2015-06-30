@@ -1,6 +1,6 @@
 (function() {
 
-  var IMAGE_WIDTH = 40;
+  var IMAGE_WIDTH = 43;
   var IMAGE_HEIGHT = 15;
   var OUTWARD_RADIUS = 2;
 
@@ -49,10 +49,12 @@
 
   function generateImages() {
     var images = [];
-    for (var i = 5; i <= 11; ++i) {
+    var maximumWidth = IMAGE_WIDTH;
+    for (var i = 11; i >= 5; --i) {
       var spacing = 1;
-      var barWidth = Math.floor((IMAGE_WIDTH - spacing*(i+1)) / i);
-      images.push(generateHistogramImage(i, barWidth, spacing));
+      var barWidth = Math.floor((maximumWidth - spacing*(i-1)) / i);
+      images.splice(0, 0, generateHistogramImage(i, barWidth, spacing));
+      maximumWidth = Math.min(i*barWidth + (i-1)*spacing, IMAGE_WIDTH);;
     }
     return images;
   }
