@@ -6,6 +6,7 @@
   var NUM0_KEY = 0x30;
   var NUM9_KEY = 0x39;
   var TOO_MUCH_INSPECTION = 17000;
+  var TEMP_DISABLE_TIMEOUT = 100;
 
   function TimerController() {
     this._stackmat = new window.app.Stackmat();
@@ -14,6 +15,7 @@
     this._interval = null;
     this._intervalStartTime = null;
     this._inputModeChanged = true;
+    this._temporarilyDisabled = false;
 
     this._updateInputMode();
     this._registerModelEvents();
@@ -73,6 +75,10 @@
   };
 
   TimerController.prototype._controlDown = function() {
+    if (this._temporarilyDisabled) {
+      return;
+    }
+
     switch (window.app.timer.getState()) {
     case window.app.Timer.STATE_NOT_RUNNING:
       if (this._inputMode === window.app.Timer.INPUT_INSPECTION) {
@@ -116,6 +122,10 @@
     case window.app.Timer.STATE_DONE:
       window.app.timer.saveTime();
       window.app.timer.reset();
+      this._temporarilyDisabled = true;
+      setTimeout(function() {
+        this._temporarilyDisabled = false;
+      }.bind(this), TEMP_DISABLE_TIMEOUT);
       break;
     case window.app.Timer.STATE_TIMING:
       // NOTE: this will occur if they just finished recording the memo time and
@@ -123,6 +133,10 @@
       // This may also occur if they press space or touch the screen while
       // inspection is running, then don't release until inspection goes over
       // and forces the timer to start.
+      break;
+    case window.app.Timer.STATE_NOT_RUNNING:
+      // NOTE: this may occur if this._temporarilyDisabled was set in
+      // this._controlDown.
       break;
     default:
       throw new Error('unexpected state: ' + window.app.timer.getState());
