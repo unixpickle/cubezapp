@@ -69,7 +69,7 @@
       sourceCode += '<rect fill="#f0f0f0" x="' + (xValue-1) + '" y="' +
         (height-X_LABELS_INSET+1) + '" width="2" height="7" />';
     }
-    
+
     // Generate the y-axis labels.
     for (var y = 0; y <= maximumCount; y += divisibilityRule) {
       var altitude = Math.round(barHeightOverCount * y);

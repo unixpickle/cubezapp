@@ -157,6 +157,9 @@
   };
 
   Times.prototype._rowClicked = function($row, solve) {
+    if (this.width() >= window.app.windowSize.width) {
+      return;
+    }
     var style = {fontWeight: 'lighter'};
     this._scrollToRow($row, function() {
       var mainPage = new window.contextjs.Page([
