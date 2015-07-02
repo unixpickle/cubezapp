@@ -8,6 +8,8 @@
     new window.app.GraphModeDropdown().on('change', function(mode) {
       this.emit('settingChanged', 'graphMode', mode);
     }.bind(this));
+    
+    this._$element = $('#graph-settings');
 
     this._views = [
       $('#graph-settings-standard'),
@@ -27,9 +29,13 @@
 
   GraphSettings.prototype = Object.create(window.app.EventEmitter.prototype);
 
+  GraphSettings.prototype.element = function() {
+    return this._$element;
+  };
+
   GraphSettings.prototype._createCheckbox = function(name, modelKey) {
     return new window.app.GraphCheckbox(name, modelKey, this);
-  }
+  };
 
   GraphSettings.prototype._createSlider = function(min, max, name, modelKey) {
     var slider = new window.app.GraphSlider();
