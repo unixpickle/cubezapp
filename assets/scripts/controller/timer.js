@@ -122,6 +122,7 @@
     case window.app.Timer.STATE_DONE:
       window.app.timer.saveTime();
       window.app.timer.reset();
+      this._updateInputMode();
       this._temporarilyDisabled = true;
       setTimeout(function() {
         this._temporarilyDisabled = false;
@@ -260,8 +261,8 @@
       this._stackmat.connect();
     }
 
-    if (this._inputMode === window.app.timer.INPUT_MANUAL ||
-        this._inputMode === window.app.timer.INPUT_STACKMAT) {
+    if (this._inputMode === window.app.Timer.INPUT_ENTRY ||
+        this._inputMode === window.app.Timer.INPUT_STACKMAT) {
       window.app.view.timer.controls.disable();
     } else {
       window.app.view.timer.controls.enable();
