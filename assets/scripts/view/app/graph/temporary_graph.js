@@ -1,9 +1,9 @@
 (function() {
 
   var Y_LABELS_INSET = 40;
-  var X_LABELS_INSET = 25;
+  var X_LABELS_INSET = 35;
   var RIGHT_SIDE_INSET = 20;
-  var TOP_INSET = 10;
+  var TOP_INSET = 20;
   var BAR_SPACING = 10;
   var MAX_BUCKET_COUNT = 20;
 
@@ -35,7 +35,7 @@
     }
 
     var sourceCode = '<svg viewBox="0 0 ' + width + ' ' + height + '" ' +
-      'class="flavor-text"><g fill="currentColor">';
+      'class="flavor-text">';
 
     var usableWidth = width - (Y_LABELS_INSET + RIGHT_SIDE_INSET);
     var usableHeight = height - (TOP_INSET + X_LABELS_INSET);
@@ -44,23 +44,51 @@
       maximumCount = Math.max(maximumCount, this._buckets[i].count);
     }
 
-    maximumCount += 1;
-    if (maximumCount > 10) {
-      maximumCount = 10 * Math.ceil(maximumCount / 10);
-    }
+    var divisibilityRule = Math.ceil(maximumCount / 5);
+    maximumCount = divisibilityRule * Math.ceil(maximumCount /
+      divisibilityRule);
 
     var barHeightOverCount = usableHeight / maximumCount;
-    var barWidth = (usableWidth-BAR_SPACING*(this._buckets.length-1)) /
+    var barWidth = (usableWidth-BAR_SPACING*(this._buckets.length)) /
       this._buckets.length;
 
     if (barWidth < 1) {
       barWidth = 1;
     }
 
+    // Generate the x-axis labels.
+    sourceCode += '<g fill="#999">'
+    var xLabelY = height - 5;
+    for (var i = 0, len = this._buckets.length; i < len; ++i) {
+      var time = window.app.formatSeconds(this._buckets[i].time);
+      var xValue = Math.round(Y_LABELS_INSET + i*(barWidth+BAR_SPACING) +
+        BAR_SPACING/2);
+      sourceCode += '<text x="' + xValue + '" y="' + xLabelY + '" ' +
+        'text-anchor="middle" font-size="17" font-weight="100">' + time +
+        '</text>';
+      sourceCode += '<rect fill="#f0f0f0" x="' + (xValue-1) + '" y="' +
+        (height-X_LABELS_INSET+1) + '" width="2" height="7" />';
+    }
+    
+    // Generate the y-axis labels.
+    for (var y = 0; y <= maximumCount; y += divisibilityRule) {
+      var altitude = Math.round(barHeightOverCount * y);
+      var yValue = Math.round(height - altitude - X_LABELS_INSET);
+      sourceCode += '<rect fill="#f0f0f0" x="' + Y_LABELS_INSET +
+        '" y="' + (yValue) + '" width="' +
+        (width-Y_LABELS_INSET) + '" height="2" />';
+      sourceCode += '<text x="' + (Y_LABELS_INSET/2) + '" y="' + (yValue+7) +
+        '" font-weight="100" ' + 'font-size="17" text-anchor="middle">' +
+        y + '</text>';
+    }
+    sourceCode += '</g>';
+
+    sourceCode += '<g fill="currentColor">';
     for (var i = 0, len = this._buckets.length; i < len; ++i) {
       var bucket = this._buckets[i];
       var barHeight = Math.round(barHeightOverCount * bucket.count);
-      var xVal = Math.round(Y_LABELS_INSET + (barWidth+BAR_SPACING)*i);
+      var xVal = Math.round(Y_LABELS_INSET + BAR_SPACING +
+        (barWidth+BAR_SPACING)*i)  ;
       var yVal = Math.round(height - (barHeight + X_LABELS_INSET));
       var rect = '<rect x="' + xVal + '" y="' + yVal + '" width="' +
         Math.round(barWidth) + '" height="' + barHeight + '" />';
