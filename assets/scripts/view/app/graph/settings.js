@@ -17,7 +17,7 @@
       width: '100%',
       height: '100%',
       position: 'absolute',
-      backgroundColor: 'rgba(0, 0, 0, 0.2)',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
       display: 'none'
     });
     this._$element.before(this._$shielding);
