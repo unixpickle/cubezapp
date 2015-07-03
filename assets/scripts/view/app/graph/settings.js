@@ -13,14 +13,8 @@
 
     this._showing = false;
     this._boundClickThru = this._clickThru.bind(this);
-    this._$shielding = $('<div></div>').css({
-      width: '100%',
-      height: '100%',
-      position: 'absolute',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'none'
-    });
-    this._$element.before(this._$shielding);
+    this._$container = $('#graph-container');
+    this._$showButton = $('#graph-settings-button');
 
     this._views = [
       $('#graph-settings-standard'),
@@ -68,8 +62,8 @@
     }
     this._showing = false;
     window.clickthru.removeListener(this._boundClickThru);
-    this._$element.stop(true, false).animate({right: -this._$element.width()});
-    this._$shielding.stop(true, false).fadeOut();
+    this._$container.stop(true, false).animate({left: 0});
+    this._$showButton.stop(true, false).animate({right: 5});
   };
 
   GraphSettings.prototype._populateHistogram = function() {
@@ -119,7 +113,8 @@
   GraphSettings.prototype._registerEvents = function() {
     window.app.observe.activePuzzle('graphMode',
       this._updateFromModel.bind(this));
-    $('#graph-settings-button').click(this._show.bind(this));
+    this._$showButton.click(this._show.bind(this));
+    $('#graph-settings-close-button').click(this._hide.bind(this));
   };
 
   GraphSettings.prototype._show = function() {
@@ -128,8 +123,8 @@
     }
     this._showing = true;
     window.clickthru.addListener(this._boundClickThru);
-    this._$element.stop(true, false).animate({right: 0});
-    this._$shielding.stop(true, false).fadeIn();
+    this._$container.stop(true, false).animate({left: -this._$element.width()});
+    this._$showButton.stop(true, false).animate({right: -195});
   };
 
   GraphSettings.prototype._updateFromModel = function() {

@@ -1,7 +1,7 @@
 #graph-settings {
   position: absolute;
   top: 0;
-  right: -200px;
+  left: 100%;
   width: 200px;
   height: 100%;
   background-color: #e6e6e6;
@@ -33,6 +33,23 @@
   font-weight: lighter;
 
   cursor: pointer;
+}
+
+#graph-settings-close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 40px;
+  width: 40px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  background-image: url('../../../images/graph_settings_x.svg');
+  background-size: 40px 40px;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .graph-settings-page {

@@ -172,87 +172,89 @@
             <div id="stats-panes">
               <div id="times" class="stats-pane"></div>
               <div id="graph" class="stats-pane">
+                <div id="graph-container">
+                  <div id="graph-viewport">
+                  </div>
 
-                <div id="graph-viewport">
-                </div>
+                  <div id="graph-settings-button">
+                    <svg viewBox="0 0 22 6" version="1.1" class="flavor-text">
+                      <g fill="currentColor">
+                        <circle r="3" cx="3" cy="3" />
+                        <circle r="3" cx="11" cy="3" />
+                        <circle r="3" cx="19" cy="3" />
+                      </g>
+                    </svg>
+                  </div>
 
-                <div id="graph-settings-button">
-                  <svg viewBox="0 0 22 12" version="1.1" class="flavor-text">
-                    <g fill="currentColor">
-                      <circle r="3" cx="3" cy="6" />
-                      <circle r="3" cx="11" cy="6" />
-                      <circle r="3" cx="19" cy="6" />
-                    </g>
-                  </svg>
-                </div>
+                  <!-- The graph settings are partially populated by JS. -->
+                  <div id="graph-settings">
+                    <div id="graph-settings-standard"
+                      class="graph-settings-page">
+                      <div id="graph-standard-view-modes">
+                        <div class="graph-standard-view-mode"
+                             id="graph-standard-view-mode-0">
+                          <svg version="1.1" viewBox="0 0 1000 1000">
+                            <path fill="none"
+                                  id="graph-standard-view-mode-color-0"
+                                  stroke-width="70" stroke="currentColor"
+                                  d="M85.9,261c0,0,138.3,327.3,426.6,244.2
+                                     S911,667.3,914.1,677.3" />
+                          </svg>
+                        </div>
+                        <div class="graph-standard-view-mode"
+                             id="graph-standard-view-mode-1">
+                          <svg version="1.1" viewBox="0 0 1000 1000">
+                            <g id="graph-standard-view-mode-color-1"
+                               fill="currentColor">
+                              <rect x="64" y="358" width="229" height="475" />
+                              <rect x="369" y="101" width="229" height="732" />
+                              <rect x="675" y="201" width="229" height="633" />
+                            </g>
+                          </svg>
+                        </div>
+                        <div class="graph-standard-view-mode"
+                             id="graph-standard-view-mode-2">
+                          <svg version="1.1" viewBox="0 0 1000 1000">
+                            <g id="graph-standard-view-mode-color-2"
+                               fill="currentColor">
+                              <circle cx="160" cy="440" r="85" />
+                              <circle cx="432" cy="389" r="85" />
+                              <circle cx="602" cy="611" r="85" />
+                              <circle cx="839" cy="526" r="85" />
+                            </g>
+                          </svg>
+                        </div>
+                      </div>
 
-                <!-- The graph settings are partially populated by JS. -->
-                <div id="graph-settings">
-                  <div id="graph-settings-standard" class="graph-settings-page">
-                    <div id="graph-standard-view-modes">
-                      <div class="graph-standard-view-mode"
-                           id="graph-standard-view-mode-0">
-                        <svg version="1.1" viewBox="0 0 1000 1000">
-                          <path fill="none"
-                                id="graph-standard-view-mode-color-0"
-                                stroke-width="70" stroke="currentColor"
-                                d="M85.9,261c0,0,138.3,327.3,426.6,244.2
-                                   S911,667.3,914.1,677.3" />
-                        </svg>
-                      </div>
-                      <div class="graph-standard-view-mode"
-                           id="graph-standard-view-mode-1">
-                        <svg version="1.1" viewBox="0 0 1000 1000">
-                          <g id="graph-standard-view-mode-color-1"
-                             fill="currentColor">
-                            <rect x="64" y="358" width="229" height="475" />
-                            <rect x="369" y="101" width="229" height="732" />
-                            <rect x="675" y="201" width="229" height="633" />
-                          </g>
-                        </svg>
-                      </div>
-                      <div class="graph-standard-view-mode"
-                           id="graph-standard-view-mode-2">
-                        <svg version="1.1" viewBox="0 0 1000 1000">
-                          <g id="graph-standard-view-mode-color-2"
-                             fill="currentColor">
-                            <circle cx="160" cy="440" r="85" />
-                            <circle cx="432" cy="389" r="85" />
-                            <circle cx="602" cy="611" r="85" />
-                            <circle cx="839" cy="526" r="85" />
-                          </g>
-                        </svg>
-                      </div>
+                      <div class="graph-settings-page-fields"></div>
                     </div>
 
-                    <div class="graph-settings-page-fields"></div>
-                  </div>
+                    <div id="graph-settings-mean" class="graph-settings-page">
+                      <div class="graph-settings-page-fields"></div>
+                    </div>
 
-                  <div id="graph-settings-mean" class="graph-settings-page">
-                    <div class="graph-settings-page-fields"></div>
-                  </div>
+                    <div id="graph-settings-histogram"
+                         class="graph-settings-page">
+                      <div class="graph-settings-page-fields"></div>
+                    </div>
 
-                  <div id="graph-settings-histogram"
-                       class="graph-settings-page">
-                    <div class="graph-settings-page-fields"></div>
-                  </div>
+                    <div id="graph-settings-streak" class="graph-settings-page">
+                      <div class="graph-settings-page-fields"></div>
+                    </div>
 
-                  <div id="graph-settings-streak" class="graph-settings-page">
-                    <div class="graph-settings-page-fields"></div>
-                  </div>
+                    <ul id="graph-mode-dropdown">
+                      <li class="graph-mode-dropdown-item">Standard</li>
+                      <li class="graph-mode-dropdown-item">Mean</li>
+                      <li class="graph-mode-dropdown-item">Histogram</li>
+                      <li class="graph-mode-dropdown-item">Streak</li>
+                    </ul>
 
-                  <ul id="graph-mode-dropdown">
-                    <li class="graph-mode-dropdown-item">Standard</li>
-                    <li class="graph-mode-dropdown-item">Mean</li>
-                    <li class="graph-mode-dropdown-item">Histogram</li>
-                    <li class="graph-mode-dropdown-item">Streak</li>
-                  </ul>
-
-                  <div id="graph-settings-title" class="flavor-background">
-                    <label id="graph-mode-label">Standard</label>
+                    <div id="graph-settings-title" class="flavor-background">
+                      <label id="graph-mode-label">Standard</label>
+                      <button id="graph-settings-close-button"></button>
+                    </div>
                   </div>
                 </div>
-
               </div>
               <div id="averages" class="stats-pane"></div>
             </div>
