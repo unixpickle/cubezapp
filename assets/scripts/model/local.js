@@ -413,6 +413,7 @@
       var jsonData = JSON.stringify(data);
       localStorage.localStoreData = jsonData;
       this._lastLocalStoreData = jsonData;
+      localStorage.saveNotification = new Date().getTime();
     } catch (e) {
     }
   };
