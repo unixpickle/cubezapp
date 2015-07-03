@@ -15,6 +15,7 @@ See [popups/README.md](popups/README.md) for information on the popup view subsy
 The `window.app.viewEvents` object is used to dispatch various events between views. This object is an [EventEmitter](../event_emitter.md) which may emit the following events:
 
  * **app.load**() - the application view has finished loading.
+ * **flavor.changeDone**() - the flavor has been changed and the transition was complete.
  * **flavor.color**(cssColor) - the flavor color has changed. This may be emitted many times during a flavor transition.
  * **footer.fullyVisible**() - the footer has changed to being fully visible. Internally, the footer considers itself hidden when the page loads. As a result, this event will be fired when the page loads if the footer is visible.
  * **footer.hidden**() - the footer has been completely hidden and is now invisible.

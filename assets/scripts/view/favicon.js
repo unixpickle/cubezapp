@@ -15,15 +15,8 @@
 
   Favicon.prototype._registerViewEvents = function() {
     var timeout = null;
-    window.app.viewEvents.on('flavor.color', function() {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      timeout = setTimeout(function() {
-        this._updateFavicon();
-        timeout = null;
-      }.bind(this), UPDATE_AFTER_TIME_NOT_ANIMATING);
-    }.bind(this));
+    window.app.viewEvents.on('flavor.changeDone',
+      this._updateFavicon.bind(this));
   };
 
   Favicon.prototype._updateFavicon = function() {

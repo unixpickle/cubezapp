@@ -237,6 +237,7 @@
       this._transition = null;
       this._updateCSS();
       this._emitColor();
+      window.app.viewEvents.emitFlavorChangeDone();
     }.bind(this);
 
     this._updateCheckboxColors();

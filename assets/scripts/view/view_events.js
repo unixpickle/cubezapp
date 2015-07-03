@@ -10,6 +10,10 @@
   ViewEvents.prototype.emitAppLoad = function() {
     this.emit('app.load');
   };
+  
+  ViewEvents.prototype.emitFlavorChangeDone = function() {
+    this.emit('flavor.changeDone');
+  };
 
   ViewEvents.prototype.emitFlavorColor = function(color) {
     this.emit('flavor.color', color);
