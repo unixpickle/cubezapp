@@ -74,6 +74,9 @@
       e.preventDefault();
     }.bind(this));
     $(document.body).mouseup(function() {
+      if (!clicked) {
+        return;
+      }
       clicked = false;
       this._$shielding.detach();
       this.emit('release');
