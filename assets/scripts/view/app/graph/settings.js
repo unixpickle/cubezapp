@@ -8,7 +8,7 @@
     new window.app.GraphModeDropdown().on('change', function(mode) {
       this.emit('settingChanged', 'graphMode', mode);
     }.bind(this));
-    
+
     this._$element = $('#graph-settings');
 
     this._views = [
