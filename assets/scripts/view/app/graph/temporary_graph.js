@@ -29,18 +29,19 @@
   TemporaryGraph.prototype._generateSVG = function() {
     var width = this._$element.width();
     var height = this._$element.height();
-    var buckets = this._narrowedDownBuckets();
 
     if (!width || !height || this._buckets.length === 0) {
       return;
     }
+
+    var buckets = this._narrowedDownBuckets();
 
     var sourceCode = '<svg viewBox="0 0 ' + width + ' ' + height + '" ' +
       'class="flavor-text">';
 
     var usableWidth = width - (Y_LABELS_INSET + RIGHT_SIDE_INSET);
     var usableHeight = height - (TOP_INSET + X_LABELS_INSET);
-    var maximumCount = 0;
+    var maximumCount = 1;
     for (var i = 0, len = buckets.length; i < len; ++i) {
       maximumCount = Math.max(maximumCount, buckets[i].count);
     }
@@ -129,7 +130,7 @@
 
     this._generateSVG();
   };
-  
+
   TemporaryGraph.prototype._narrowedDownBuckets = function() {
     var width = this._$element.width();
     var usableWidth = width - (Y_LABELS_INSET + RIGHT_SIDE_INSET);

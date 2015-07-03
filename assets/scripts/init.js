@@ -30,6 +30,7 @@
     window.app.fonts = new window.app.Fonts();
     window.app.flavors = new window.app.Flavors();
     window.app.view = new window.app.AppView();
+    window.app.favicon = new window.app.Favicon();
   }
 
   $(init);

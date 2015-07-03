@@ -1,0 +1,121 @@
+(function() {
+
+  var UPDATE_AFTER_TIME_NOT_ANIMATING = 250;
+
+  function Favicon() {
+    this._iconBytes = '';
+    for (var i = 0, len = BLUEBERRY_ICON_DATA.length; i < len; i += 2) {
+      var str = BLUEBERRY_ICON_DATA.substr(i, 2);
+      this._iconBytes += String.fromCharCode(parseInt(str, 16));
+    }
+
+    this._registerViewEvents();
+    this._updateFavicon();
+  }
+
+  Favicon.prototype._registerViewEvents = function() {
+    var timeout = null;
+    window.app.viewEvents.on('flavor.color', function() {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      timeout = setTimeout(function() {
+        this._updateFavicon();
+        timeout = null;
+      }.bind(this), UPDATE_AFTER_TIME_NOT_ANIMATING);
+    }.bind(this));
+  };
+
+  Favicon.prototype._updateFavicon = function() {
+    // TODO: use my own base64 encoder so this works in IE9
+    if ('function' !== typeof window.btoa) {
+      return;
+    }
+
+    var hexCode = window.app.flavors.getLastEmittedColor();
+    var color = colorForHex(hexCode);
+    var codeStr = '';
+    var redChar = String.fromCharCode(parseInt(hexCode.substr(1, 2), 16));
+    var greenChar = String.fromCharCode(parseInt(hexCode.substr(3, 2), 16));
+    var blueChar = String.fromCharCode(parseInt(hexCode.substr(5, 2), 16));
+    for (var i = 0, len = this._iconBytes.length; i < len; ++i) {
+      var str = this._iconBytes[i];
+      if (str === '\x65') {
+        codeStr += redChar;
+      } else if (str === '\xbc') {
+        codeStr += greenChar;
+      } else if (str === '\xd4') {
+        codeStr += blueChar;
+      } else {
+        codeStr += str;
+      }
+    }
+
+    var dataURI = 'data:image/x-icon;base64,' + window.btoa(codeStr);
+    $('#favicon-link').remove();
+    var $newLink = $('<link id="favicon-link" rel="shortcut icon" ' +
+      'type="image/x-icon"></link>');
+    $newLink.attr('href', dataURI);
+    $('head').append($newLink);
+  };
+
+  function colorForHex(hex) {
+    if (hex[0] !== '#' || hex.length != 7) {
+      throw new Error('invalid color');
+    }
+    var res = [];
+    for (var i = 0; i < 3; ++i) {
+      var val = parseInt(hex.substr(1 + 2*i, 2), 16);
+      if (isNaN(val)) {
+        throw new Error('invalid color');
+      }
+      res[i] = val;
+    }
+    return res;
+  }
+
+  window.app.Favicon = Favicon;
+
+  var BLUEBERRY_ICON_DATA =
+    '0000010001001010000000002000680400001600000028000000100000' +
+    '0020000000010020000000000040040000000000000000000000000000' +
+    '00000000FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FF' +
+    'FFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFF' +
+    'FF01FFFFFF01FFFFFF01FFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65' +
+    'FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FF' +
+    'D4BC65FFD4BC65FFD4BC65FFFFFFFF01FFFFFF01D4BC65FFD4BC65FFD4' +
+    'BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFF' +
+    'FF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01FFFFFF01D4BC65' +
+    'FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FF' +
+    'D4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01FF' +
+    'FFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC' +
+    '65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65' +
+    'FFFFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01' +
+    'FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FF' +
+    'FFFF01FFFFFF01FFFFFF01FFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC' +
+    '65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65' +
+    'FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01FFFFFF01D4BC65FFD4BC65FF' +
+    'D4BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFF' +
+    'FFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01FFFFFF01D4BC' +
+    '65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65' +
+    'FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01' +
+    'FFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FFD4' +
+    'BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC' +
+    '65FFFFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF' +
+    '01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01' +
+    'FFFFFF01FFFFFF01FFFFFF01FFFFFF01D4BC65FFD4BC65FFD4BC65FFD4' +
+    'BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC' +
+    '65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01FFFFFF01D4BC65FFD4BC65' +
+    'FFD4BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FF' +
+    'FFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01FFFFFF01D4' +
+    'BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC' +
+    '65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF' +
+    '01FFFFFF01D4BC65FFD4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FF' +
+    'D4BC65FFD4BC65FFD4BC65FFFFFFFF01D4BC65FFD4BC65FFD4BC65FFD4' +
+    'BC65FFFFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFF' +
+    'FF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF' +
+    '01FFFFFF01FFFFFF01FFFFFF010000FFFF0000FFFF0000FFFF0000FFFF' +
+    '0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF00' +
+    '00FFFF0000FFFF0000FFFF0000FFFF0000FFFF';
+
+})();
