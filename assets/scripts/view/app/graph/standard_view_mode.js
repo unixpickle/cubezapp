@@ -1,6 +1,6 @@
 (function() {
 
-  var UNSELECTED_COLOR = '#d5d5d5';
+  var UNSELECTED_COLOR = '#c1c1c1';
 
   function GraphStandardViewMode() {
     window.app.EventEmitter.call(this);
