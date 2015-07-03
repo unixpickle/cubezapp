@@ -10,7 +10,7 @@
 
   // TRANSITION_DURATION is the number of milliseconds to spend fading from one
   // color to another.
-  var TRANSITION_DURATION = 400;
+  var TRANSITION_DURATION = 10000;
 
   // COLOR_FLAVORS contains a key for every solid color flavor.
   var COLOR_FLAVORS = {

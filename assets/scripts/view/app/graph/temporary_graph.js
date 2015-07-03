@@ -12,11 +12,15 @@
       height: '100%'
     });
     $('#graph').prepend(this._$element);
+    this._$svg = $('<svg viewBox="0 0 0 0" class="flavor-text">');
+    this._$element.append(this._$svg);
+    
     this._buckets = [];
     for (var i = 15000; i <= 30000; i += 1000) {
       this._buckets.push({time: i, count: 0});
     }
     this._modelTicket = null;
+    
     this._updateFromModel();
     this._registerModelEvents();
   }
@@ -36,8 +40,8 @@
 
     var buckets = this._narrowedDownBuckets();
 
-    var sourceCode = '<svg viewBox="0 0 ' + width + ' ' + height + '" ' +
-      'class="flavor-text">';
+    this._$svg.empty();
+    this._$svg[0].setAttribute('viewBox', '0 0 ' + width + ' ' + height);
 
     var usableWidth = width - (Y_LABELS_INSET + RIGHT_SIDE_INSET);
     var usableHeight = height - (TOP_INSET + X_LABELS_INSET);
@@ -54,7 +58,7 @@
     var barWidth = (usableWidth-BAR_SPACING*(buckets.length)) / buckets.length;
 
     // Generate the x-axis labels.
-    sourceCode += '<g fill="#999">'
+    var sourceCode = '<svg version="1.1"><g fill="#999">';
     var xLabelY = height - 5;
     for (var i = 0, len = buckets.length; i < len; ++i) {
       var time = window.app.formatSeconds(buckets[i].time);
@@ -93,8 +97,7 @@
     }
     sourceCode += '</g></svg>';
 
-    this._$element.empty();
-    this._$element.html(sourceCode);
+    this._$svg.append($(sourceCode).find('g'));
   };
 
   TemporaryGraph.prototype._gotSolves = function(err, solves) {
