@@ -8,10 +8,7 @@
   var MIN_BAR_WIDTH = 23;
 
   function TemporaryGraph() {
-    this._$element = $('<div id="temporary-graph"></div>').css({
-      height: '100%'
-    });
-    $('#graph').prepend(this._$element);
+    this._$element = $('#graph-viewport');
     this._$svg = $('<svg viewBox="0 0 0 0" class="flavor-text">');
     this._$element.append(this._$svg);
 
@@ -26,7 +23,6 @@
   }
 
   TemporaryGraph.prototype.layout = function(width) {
-    this._$element.css({width: width});
     this._generateSVG();
   };
 
@@ -58,7 +54,12 @@
     var barWidth = (usableWidth-BAR_SPACING*(buckets.length)) / buckets.length;
 
     // Generate the x-axis labels.
-    var sourceCode = '<svg version="1.1"><g fill="#999">';
+    var sourceCode = '<svg version="1.1">';
+
+    sourceCode += '<g><rect fill="white" x="0" y="0" width="' + width +
+      '" height="' + height + '" /></g>';
+
+    sourceCode += '<g fill="#999">';
     var xLabelY = height - 5;
     for (var i = 0, len = buckets.length; i < len; ++i) {
       var time = window.app.formatSeconds(buckets[i].time);

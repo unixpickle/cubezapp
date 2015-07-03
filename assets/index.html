@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="styles/app/averages.css">
     <link rel="stylesheet" type="text/css" href="styles/app/footer.css">
     <link rel="stylesheet" type="text/css" href="styles/app/graph/checkbox.css">
+    <link rel="stylesheet" type="text/css" href="styles/app/graph/graph.css">
     <link rel="stylesheet" type="text/css"
           href="styles/app/graph/mode_dropdown.css">
     <link rel="stylesheet" type="text/css" href="styles/app/graph/settings.css">
@@ -171,6 +172,19 @@
             <div id="stats-panes">
               <div id="times" class="stats-pane"></div>
               <div id="graph" class="stats-pane">
+
+                <div id="graph-viewport">
+                </div>
+
+                <div id="graph-settings-button">
+                  <svg viewBox="0 0 22 12" version="1.1" class="flavor-text">
+                    <g fill="currentColor">
+                      <circle r="3" cx="3" cy="6" />
+                      <circle r="3" cx="11" cy="6" />
+                      <circle r="3" cx="19" cy="6" />
+                    </g>
+                  </svg>
+                </div>
 
                 <!-- The graph settings are partially populated by JS. -->
                 <div id="graph-settings">

@@ -25,6 +25,7 @@
     Object.create(window.app.EventEmitter.prototype);
 
   GraphModeDropdown.prototype._clickThru = function(e) {
+    e.stopClickThruPropagation();
     if (!e.inElement(this._$element[0]) &&
         !e.inElement(this._$label[0])) {
       this._toggle();

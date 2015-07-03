@@ -11,6 +11,17 @@
 
     this._$element = $('#graph-settings');
 
+    this._showing = false;
+    this._boundClickThru = this._clickThru.bind(this);
+    this._$shielding = $('<div></div>').css({
+      width: '100%',
+      height: '100%',
+      position: 'absolute',
+      backgroundColor: 'rgba(0, 0, 0, 0.2)',
+      display: 'none'
+    });
+    this._$element.before(this._$shielding);
+
     this._views = [
       $('#graph-settings-standard'),
       $('#graph-settings-mean'),
@@ -33,6 +44,12 @@
     return this._$element;
   };
 
+  GraphSettings.prototype._clickThru = function(e) {
+    if (!e.inElement(this._$element[0])) {
+      this._hide();
+    }
+  };
+
   GraphSettings.prototype._createCheckbox = function(name, modelKey) {
     return new window.app.GraphCheckbox(name, modelKey, this);
   };
@@ -43,6 +60,16 @@
     slider.setMax(max);
     var managed = new window.app.GraphSliderManager(slider, modelKey, this);
     return new window.app.LabeledGraphSlider(managed, name);
+  };
+
+  GraphSettings.prototype._hide = function() {
+    if (!this._showing) {
+      return;
+    }
+    this._showing = false;
+    window.clickthru.removeListener(this._boundClickThru);
+    this._$element.stop(true, false).animate({right: -this._$element.width()});
+    this._$shielding.stop(true, false).fadeOut();
   };
 
   GraphSettings.prototype._populateHistogram = function() {
@@ -92,6 +119,17 @@
   GraphSettings.prototype._registerEvents = function() {
     window.app.observe.activePuzzle('graphMode',
       this._updateFromModel.bind(this));
+    $('#graph-settings-button').click(this._show.bind(this));
+  };
+
+  GraphSettings.prototype._show = function() {
+    if (this._showing) {
+      return;
+    }
+    this._showing = true;
+    window.clickthru.addListener(this._boundClickThru);
+    this._$element.stop(true, false).animate({right: 0});
+    this._$shielding.stop(true, false).fadeIn();
   };
 
   GraphSettings.prototype._updateFromModel = function() {

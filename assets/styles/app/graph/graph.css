@@ -1,0 +1,25 @@
+#graph {
+  overflow: hidden;
+}
+
+#graph-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#graph-settings-button {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  width: 22px;
+  height: 20px;
+  cursor: pointer;
+}
+
+#graph-settings-button svg {
+  width: 100%;
+  height: 100%;
+}

@@ -1,4 +1,4 @@
-// clickthru.js version 0.0.1
+// clickthru.js version 0.0.2
 (function() {
 
   var listeners = [];
@@ -6,6 +6,7 @@
 
   function ClickThruEvent(event) {
     this.event = event;
+    this._stopPropagation = false;
   }
 
   ClickThruEvent.prototype.inElement = function(e) {
@@ -16,11 +17,18 @@
       y >= boundingRect.top && y <= boundingRect.bottom;
   };
 
+  ClickThruEvent.prototype.stopClickThruPropagation = function() {
+    this._stopPropagation = true;
+  };
+
   function callback(e) {
     var event = new ClickThruEvent(e);
     var theListeners = listeners.slice();
-    for (var i = 0, len = theListeners.length; i < len; ++i) {
+    for (var i = theListeners.length-1; i >= 0; --i) {
       theListeners[i](event);
+      if (event._stopPropagation) {
+        break;
+      }
     }
   }
 
