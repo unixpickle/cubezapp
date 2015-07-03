@@ -5,7 +5,7 @@
   var RIGHT_SIDE_INSET = 20;
   var TOP_INSET = 20;
   var BAR_SPACING = 10;
-  var MAX_BUCKET_COUNT = 20;
+  var MIN_BAR_WIDTH = 23;
 
   function TemporaryGraph() {
     this._$element = $('<div id="temporary-graph"></div>').css({
@@ -29,6 +29,7 @@
   TemporaryGraph.prototype._generateSVG = function() {
     var width = this._$element.width();
     var height = this._$element.height();
+    var buckets = this._narrowedDownBuckets();
 
     if (!width || !height || this._buckets.length === 0) {
       return;
@@ -40,8 +41,8 @@
     var usableWidth = width - (Y_LABELS_INSET + RIGHT_SIDE_INSET);
     var usableHeight = height - (TOP_INSET + X_LABELS_INSET);
     var maximumCount = 0;
-    for (var i = 0, len = this._buckets.length; i < len; ++i) {
-      maximumCount = Math.max(maximumCount, this._buckets[i].count);
+    for (var i = 0, len = buckets.length; i < len; ++i) {
+      maximumCount = Math.max(maximumCount, buckets[i].count);
     }
 
     var divisibilityRule = Math.ceil(maximumCount / 5);
@@ -49,18 +50,13 @@
       divisibilityRule);
 
     var barHeightOverCount = usableHeight / maximumCount;
-    var barWidth = (usableWidth-BAR_SPACING*(this._buckets.length)) /
-      this._buckets.length;
-
-    if (barWidth < 1) {
-      barWidth = 1;
-    }
+    var barWidth = (usableWidth-BAR_SPACING*(buckets.length)) / buckets.length;
 
     // Generate the x-axis labels.
     sourceCode += '<g fill="#999">'
     var xLabelY = height - 5;
-    for (var i = 0, len = this._buckets.length; i < len; ++i) {
-      var time = window.app.formatSeconds(this._buckets[i].time);
+    for (var i = 0, len = buckets.length; i < len; ++i) {
+      var time = window.app.formatSeconds(buckets[i].time);
       var xValue = Math.round(Y_LABELS_INSET + i*(barWidth+BAR_SPACING) +
         BAR_SPACING/2);
       sourceCode += '<text x="' + xValue + '" y="' + xLabelY + '" ' +
@@ -84,8 +80,8 @@
     sourceCode += '</g>';
 
     sourceCode += '<g fill="currentColor">';
-    for (var i = 0, len = this._buckets.length; i < len; ++i) {
-      var bucket = this._buckets[i];
+    for (var i = 0, len = buckets.length; i < len; ++i) {
+      var bucket = buckets[i];
       var barHeight = Math.round(barHeightOverCount * bucket.count);
       var xVal = Math.round(Y_LABELS_INSET + BAR_SPACING +
         (barWidth+BAR_SPACING)*i)  ;
@@ -131,20 +127,31 @@
       this._buckets.push({time: i, count: count});
     }
 
-    while (this._buckets.length > MAX_BUCKET_COUNT) {
+    this._generateSVG();
+  };
+  
+  TemporaryGraph.prototype._narrowedDownBuckets = function() {
+    var width = this._$element.width();
+    var usableWidth = width - (Y_LABELS_INSET + RIGHT_SIDE_INSET);
+    var buckets = this._buckets;
+    while (true) {
+      var barWidth = (usableWidth-BAR_SPACING*(buckets.length)) /
+        buckets.length;
+      if (barWidth >= MIN_BAR_WIDTH || buckets.length === 1) {
+        break;
+      }
       var newBuckets = [];
-      for (var i = 0; i < this._buckets.length; i += 2) {
-        var b1 = this._buckets[i];
+      for (var i = 0; i < buckets.length; i += 2) {
+        var b1 = buckets[i];
         var newBucket = {time: b1.time, count: b1.count};
-        if (i < this._buckets.length-1) {
-          newBucket.count += this._buckets[i+1].count;
+        if (i < buckets.length-1) {
+          newBucket.count += buckets[i+1].count;
         }
         newBuckets.push(newBucket);
       }
-      this._buckets = newBuckets;
+      buckets = newBuckets;
     }
-
-    this._generateSVG();
+    return buckets;
   };
 
   TemporaryGraph.prototype._registerModelEvents = function() {
