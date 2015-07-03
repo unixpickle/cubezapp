@@ -14,13 +14,13 @@
     $('#graph').prepend(this._$element);
     this._$svg = $('<svg viewBox="0 0 0 0" class="flavor-text">');
     this._$element.append(this._$svg);
-    
+
     this._buckets = [];
     for (var i = 15000; i <= 30000; i += 1000) {
       this._buckets.push({time: i, count: 0});
     }
     this._modelTicket = null;
-    
+
     this._updateFromModel();
     this._registerModelEvents();
   }

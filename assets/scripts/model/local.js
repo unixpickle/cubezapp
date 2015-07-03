@@ -410,9 +410,9 @@
     };
     // If they are in some kind of private browsing mode, this may fail.
     try {
-      var data = JSON.stringify(data);
-      localStorage.localStoreData = data;
-      this._lastLocalStoreData = data;
+      var jsonData = JSON.stringify(data);
+      localStorage.localStoreData = jsonData;
+      this._lastLocalStoreData = jsonData;
     } catch (e) {
     }
   };
