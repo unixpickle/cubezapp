@@ -1,5 +1,5 @@
 .add-popup-content {
-  width: 530px;
+  width: 490px;
   height: 200px;
   position: relative;
 }
@@ -42,7 +42,7 @@
 
 .add-popup-separator {
   position: absolute;
-  left: 220px;
+  left: 205px;
   top: 0;
   height: 100%;
   width: 2px;
@@ -51,8 +51,8 @@
 
 .add-popup-fields {
   position: absolute;
-  left: 260px;
-  width: calc(100% - 260px);
+  left: 230px;
+  width: calc(100% - 230px);
   height: 100%;
 }
 
