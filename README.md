@@ -6,8 +6,6 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 # TODO
 
- * On refresh, make sure Fruit Salad theme isn't the same
- * Create View Scramble popup
  * Re-implement Dropdown with animations
  * Implement graph in footer
  * Implement accounts system
