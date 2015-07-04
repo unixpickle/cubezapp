@@ -161,6 +161,7 @@
     this._alternationIndex = (this._alternationIndex + 1) %
       COLOR_FLAVOR_NAMES.length;
     this._transitionToColorFlavor(COLOR_FLAVOR_NAMES[this._alternationIndex]);
+    this._saveAlternationIndex();
   };
 
   Flavors.prototype._emitColor = function() {
@@ -180,6 +181,14 @@
     }
   };
 
+  Flavors.prototype._isSameAsLastAlternation = function() {
+    if (!('lastFlavorAlternation' in localStorage)) {
+      return false;
+    }
+    return parseInt(localStorage.lastFlavorAlternation) ===
+      this._alternationIndex;
+  };
+
   Flavors.prototype._modelFlavorChanged = function(name) {
     this._currentName = name;
     this._transitionToFlavor(name);
@@ -193,6 +202,13 @@
     }.bind(this));
   };
 
+  Flavors.prototype._saveAlternationIndex = function() {
+    try {
+      localStorage.lastFlavorAlternation = this._alternationIndex;
+    } catch (e) {
+    }
+  };
+
   Flavors.prototype._startAlternating = function(alternating) {
     if (this._alternationInterval !== null) {
       clearInterval(this._alternationInterval);
@@ -203,8 +219,18 @@
     this._alternationIndex = Math.floor(COLOR_FLAVOR_NAMES.length *
       Math.random());
 
+    if (this._currentColorFlavor === null) {
+      if (this._isSameAsLastAlternation()) {
+        this._alternationIndex = (this._alternationIndex + 1) %
+          COLOR_FLAVOR_NAMES.length;
+      }
+    }
+
     var newColorFlavorName = COLOR_FLAVOR_NAMES[this._alternationIndex];
     var newColorFlavor = COLOR_FLAVORS[newColorFlavorName];
+
+    this._saveAlternationIndex();
+
     if (newColorFlavor === this._currentColorFlavor) {
       this._alternate();
     } else if (this._currentColorFlavor === null) {
