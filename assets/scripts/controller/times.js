@@ -32,8 +32,11 @@
   };
 
   TimesController.prototype._viewScramble = function(solve) {
-    alert('Your scramble was: ' + solve.scramble + '. Sorry, I know this ' +
-      'popup is hideous and will give you nightmares.');
+    if (!solve.scramble) {
+      new window.app.MessagePopup('Scramble', 'No scramble.').show();
+    } else {
+      new window.app.MessagePopup('Scramble', solve.scramble).show();
+    }
   };
 
   window.app.TimesController = TimesController;
