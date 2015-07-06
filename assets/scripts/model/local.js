@@ -190,6 +190,32 @@
     this.emit('modifiedSolve', id, attrs);
   };
 
+  LocalStore.prototype.moveSolve = function(solveId, puzzleId) {
+    var puzzle = null;
+    for (var i = 1, len = this._puzzles.length; i < len; ++i) {
+      if (this._puzzles[i].id === puzzleId) {
+        puzzle = this._puzzles[i];
+        break;
+      }
+    }
+    if (puzzle === null) {
+      return;
+    }
+    var solves = this._active.solves;
+    for (var i = solves.length-1; i >= 0; --i) {
+      if (solves[i].id === solveId) {
+        insertSolveUsingTimestamp(solves[i], puzzle.solves);
+        solves.splice(i, 1);
+        recomputeLastPBsAndPWs(solves, i);
+        this._recomputeStatsFromScratch();
+        this._save();
+        this.emit('deletedSolve', solveId);
+        this.emit('movedSolve', solveId, puzzleId);
+        return;
+      }
+    }
+  };
+
   LocalStore.prototype.switchPuzzle = function(id, cb) {
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       var puzzle = this._puzzles[i];
@@ -417,6 +443,17 @@
     } catch (e) {
     }
   };
+
+  function insertSolveUsingTimestamp(solve, solves) {
+    // TODO: use a binary search here.
+    for (var i = solves.length-1; i >= 0; --i) {
+      if (solves[i].date <= solve.date) {
+        solves.splice(i+1, 0, solve);
+        return;
+      }
+    }
+    solves.unshift(solve);
+  }
 
   function recomputeLastPBsAndPWs(solves, startIndex) {
     recomputeLastPBs(solves, startIndex);

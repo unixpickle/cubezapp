@@ -191,8 +191,24 @@
         case 3:
           this.emit('addComment', solve);
           break;
-        case 5:
-          // TODO: this.
+        case 4:
+          var items = [new window.contextjs.BackRow('Move To', style)];
+          var puzzles = window.app.store.getPuzzles();
+          for (var i = 1, len = puzzles.length; i < len; ++i) {
+            var puzzle = puzzles[i];
+            items.push(new window.contextjs.TextRow(puzzle.name, style));
+          }
+          var page = new window.contextjs.Page(items);
+          page.onClick = function(itemIndex) {
+            if (itemIndex === 0) {
+              this._currentContextMenu.popPage();
+            } else {
+              var puzzleId = puzzles[itemIndex].id;
+              window.app.store.moveSolve(solve.id, puzzleId);
+              this._hideContextMenu();
+            }
+          }.bind(this);
+          this._currentContextMenu.pushPage(page);
           return;
         }
         this._hideContextMenu();
