@@ -1,0 +1,22 @@
+.comment-popup-content {
+  width: 500px;
+  height: 300px;
+}
+
+.comment-popup-textarea {
+  margin-left: 10px;
+  margin-top: 10px;
+  width: 480px;
+  height: 280px;
+  
+  resize: none;
+  border: none;
+  
+  font-family: Roboto;
+  font-size: 17px;
+  color: #999;
+}
+
+.comment-popup-textarea:focus {
+  outline: none;
+}

@@ -11,8 +11,11 @@
   }
 
   TimesController.prototype._addComment = function(solve) {
-    // TODO: this.
-    alert('i am very lazy.');
+    var popup = new window.app.CommentPopup(solve);
+    popup.on('save', function(msg) {
+      window.app.store.modifySolve(solve.id, {notes: msg});
+    }.bind(this));
+    popup.show();
   };
 
   TimesController.prototype._delete = function(solve) {
