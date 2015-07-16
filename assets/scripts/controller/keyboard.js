@@ -31,7 +31,7 @@
       this._down[e.which] = true;
     }
 
-    if (isActiveElementTextEntry() && isTypedText(e)) {
+    if (shouldIgnoreKeyEvent(e)) {
       return;
     }
 
@@ -51,7 +51,7 @@
   };
 
   Keyboard.prototype._keypress = function(e) {
-    if (isActiveElementTextEntry() && isTypedText(e)) {
+    if (shouldIgnoreKeyEvent(e)) {
       return;
     }
 
@@ -73,7 +73,7 @@
   Keyboard.prototype._keyup = function(e) {
     this._down[e.which] = false;
 
-    if (isActiveElementTextEntry() && isTypedText(e)) {
+    if (shouldIgnoreKeyEvent(e)) {
       return;
     }
 
@@ -91,15 +91,14 @@
       }
     }
   };
-
-  function isActiveElementTextEntry() {
-    return $(document.activeElement).is('input') ||
-      $(document.activeElement).is('textarea');
-  }
-
-  function isTypedText(e) {
-    // The enter key and the escape key don't count as text.
-    return e.which !== 13 & e.which !== 27;
+  
+  function shouldIgnoreKeyEvent(e) {
+    var $activeElement = $(document.activeElement);
+    if ($activeElement.is('input')) {
+      return e.which !== 13 && e.which !== 27;
+    } else if ($activeElement.is('textarea')) {
+      return e.which !== 27;
+    }
   }
 
   window.app.keyboard = new Keyboard();
