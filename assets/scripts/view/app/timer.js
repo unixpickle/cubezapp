@@ -96,9 +96,10 @@
   };
 
   TimerView.prototype._handleTimerReady = function() {
-    if (this._accuracy === TimerView.ACCURACY_NONE) {
+    var accuracy = window.app.store.getGlobalSettings().timerAccuracy;
+    if (accuracy === TimerView.ACCURACY_NONE) {
       window.app.view.setTime('Ready');
-    } else if (this._accuracy === TimerView.ACCURACY_SECONDS) {
+    } else if (accuracy === TimerView.ACCURACY_SECONDS) {
       window.app.view.setTime('0');
     } else {
       window.app.view.setTime('0.00');
