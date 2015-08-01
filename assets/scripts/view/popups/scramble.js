@@ -18,12 +18,6 @@
     this._dialog.show();
   };
 
-  ScramblePopup.prototype._setupMessage = function(content) {
-    var content = $('<div class="message-popup-content"></div>').text(content);
-    this._dialog = new window.app.Dialog('Scramble', content, ['OK']);
-    this._dialog.on('action', this._dialog.close.bind(this._dialog));
-  }
-
   ScramblePopup.prototype._setup3x3Scramble = function(scramble) {
     var moves = window.puzzlejs.bigcube.parseWCAMoves(scramble);
     var cube = new window.puzzlejs.bigcube.StickerCube(3);
@@ -60,7 +54,13 @@
     $content.append($object);
     this._dialog = new window.app.Dialog('Scramble', $content, ['OK']);
     this._dialog.on('action', this._dialog.close.bind(this._dialog));
-  }
+  };
+
+  ScramblePopup.prototype._setupMessage = function(content) {
+    var content = $('<div class="message-popup-content"></div>').text(content);
+    this._dialog = new window.app.Dialog('Scramble', content, ['OK']);
+    this._dialog.on('action', this._dialog.close.bind(this._dialog));
+  };
 
   window.app.ScramblePopup = ScramblePopup;
 

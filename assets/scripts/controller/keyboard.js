@@ -91,7 +91,7 @@
       }
     }
   };
-  
+
   function shouldIgnoreKeyEvent(e) {
     var $activeElement = $(document.activeElement);
     if ($activeElement.is('input')) {

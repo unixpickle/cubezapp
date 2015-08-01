@@ -33,7 +33,7 @@
     window.app.view = new window.app.AppView();
     window.app.favicon = new window.app.Favicon();
   }
-  
+
   function showDisclaimerPopup() {
     if (localStorage.dontShowDisclaimer !== 'true') {
       setTimeout(function() {
