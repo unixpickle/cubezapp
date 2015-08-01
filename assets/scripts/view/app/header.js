@@ -151,7 +151,7 @@
   };
 
   Header.prototype._registerUIEvents = function() {
-    this._$puzzleName.click(this._toggle.bind(this));
+    $('#header-puzzle-name-container').click(this._toggle.bind(this));
     this._dropdown.onAdd = this.emit.bind(this, 'addPuzzle');
     this._dropdown.onDelete = function(id) {
       this._dropdown.hideDeleteButtons();

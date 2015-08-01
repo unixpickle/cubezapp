@@ -14,13 +14,26 @@
   overflow-y: hidden;
 }
 
+#header-puzzle-name-container {
+  float: left;
+  height: 44px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
 #header .name {
   float: left;
   height: 44px;
   line-height: 44px;
   font-size: 25px;
-  margin-left: 10px;
-  cursor: pointer;
+  pointer-events: none;
+}
+
+#header-puzzle-name-arrow {
+  float: left;
+  height: 44px;
+  width: 17px;
+  margin-left: 4px;
 }
 
 #header .puzzle-actions {
@@ -29,6 +42,7 @@
   overflow: hidden;
   height: 44px;
   width: 90px;
+  margin-left: 7px;
 
   display: none;
 }
