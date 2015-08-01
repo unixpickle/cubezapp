@@ -41,30 +41,28 @@
   float: left;
   overflow: hidden;
   height: 44px;
-  width: 90px;
+  width: 56px;
   margin-left: 7px;
 
   display: none;
 }
 
 #header .puzzle-actions button {
+  margin-top: 9px;
   width: 26px;
   height: 26px;
   background-size: 16px 16px;
   border-radius: 13px;
-
-  position: absolute;
-  top: 9px;
 }
 
 .header-add-button {
   background-image: url('../../images/small_plus.svg');
-  left: 6px;
+  float: left;
 }
 
 .header-remove-button {
   background-image: url('../../images/small_minus.svg');
-  left: 36px;
+  float: right;
 }
 
 #puzzles {
