@@ -153,6 +153,7 @@
       throw new Error('checkbox not found');
     }
     this._checkboxes.splice(idx, 1);
+    box.setVisible(false);
   };
 
   // _alternate is called periodically when using ALTERNATION_FLAVOR to change

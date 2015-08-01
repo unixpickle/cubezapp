@@ -1,0 +1,28 @@
+.disclaimer-popup-content {
+  width: 520px;
+  color: #999;
+  font-size: 18px;
+}
+
+.disclaimer-popup-checkbox-container {
+  margin-top: 10px;
+  position: relative;
+}
+
+.disclaimer-popup-checkbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.disclaimer-popup-checkbox-label {
+  display: inline-block;
+  height: 22px;
+  line-height: 22px;
+  
+  position: absolute;
+  left: 27px;
+  top: 0;
+  
+  cursor: pointer;
+}
