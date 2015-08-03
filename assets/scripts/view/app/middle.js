@@ -6,9 +6,9 @@
   var MIN_TIME_SIZE = 50;
   var PB_SIZE_RATIO = 0.2;
   var SCRAMBLE_PADDING = 10;
-  
+
   var REFRESH_BUTTON_MARGIN_LEFT = 10;
-  var REFRESH_BUTTON_SIZE = 22;
+  var REFRESH_BUTTON_SIZE = 26;
 
   function Middle() {
     this._$memoTime = $('#memo-time');
