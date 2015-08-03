@@ -5,6 +5,8 @@
 
   // The TimerView is responsible for presenting the timer to the user.
   function TimerView(appView) {
+    window.app.EventEmitter.call(this);
+
     this.controls = new Controls();
     window.app.viewEvents.on('app.load', this._appLoaded.bind(this));
 
@@ -17,8 +19,11 @@
   TimerView.ACCURACY_NONE = 2;
   TimerView.ACCURACY_NAMES = ['Centiseconds', 'Seconds', 'None'];
 
+  TimerView.prototype = Object.create(window.app.EventEmitter.prototype);
+
   TimerView.prototype._appLoaded = function() {
     this._registerModelEvents();
+    this._registerUIEvents();
 
     window.app.timer.getScrambleStream().resume();
     this._showPBLabel();
@@ -168,6 +173,11 @@
       }
       window.app.timer.on(event, this[handlerName].bind(this));
     }
+  };
+
+  TimerView.prototype._registerUIEvents = function() {
+    $('#refresh-scramble-button').click(this.emit.bind(this,
+      'refreshScramble'));
   };
 
   TimerView.prototype._showLatestSolve = function() {

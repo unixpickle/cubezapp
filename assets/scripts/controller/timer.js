@@ -190,6 +190,11 @@
     window.app.view.timer.controls.on('up', this._controlUp.bind(this));
     window.app.view.timer.controls.on('down', this._controlDown.bind(this));
     window.app.view.timer.controls.on('cancel', this._controlCancel.bind(this));
+    window.app.view.timer.on('refreshScramble', function() {
+      var stream = window.app.timer.getScrambleStream();
+      stream.pause();
+      stream.resume();
+    });
   };
 
   TimerController.prototype._stackmatCancel = function() {

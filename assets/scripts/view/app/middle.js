@@ -6,11 +6,15 @@
   var MIN_TIME_SIZE = 50;
   var PB_SIZE_RATIO = 0.2;
   var SCRAMBLE_PADDING = 10;
+  
+  var REFRESH_BUTTON_MARGIN_LEFT = 10;
+  var REFRESH_BUTTON_SIZE = 22;
 
   function Middle() {
     this._$memoTime = $('#memo-time');
     this._$pbStatus = $('#pb-status');
     this._$scramble = $('#scramble');
+    this._$refreshButton = $('#refresh-scramble-button');
     this._time = new window.app.Time();
   }
 
@@ -150,10 +154,18 @@
     // not be possible to measure the scramble while it's invisible.
     if (attrs.scrambleOpacity === 0) {
       this._$scramble.css({visibility: 'hidden'});
+      this._$refreshButton.css({display: 'none'});
     } else {
       this._$scramble.css({
         opacity: attrs.scrambleOpacity,
         visibility: 'visible'
+      });
+      var rect = this._$scramble[0].getBoundingClientRect();
+      this._$refreshButton.css({
+        display: 'block',
+        opacity: attrs.scrambleOpacity,
+        left: Math.round(rect.left + rect.width + REFRESH_BUTTON_MARGIN_LEFT),
+        top: Math.round(rect.top + (rect.height-REFRESH_BUTTON_SIZE)/2)
       });
     }
 

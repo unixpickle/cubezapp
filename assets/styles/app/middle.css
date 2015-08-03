@@ -26,6 +26,31 @@
   border: 3px solid white;
 }
 
+#refresh-scramble-button {
+  /* Invisible until code loads it. */
+  display: none;
+
+  position: absolute;
+
+  width: 22px;
+  height: 22px;
+  border: none;
+  background-color: transparent;
+  background-size: 100% 100%;
+  background-image: url('../../images/refresh.svg');
+
+  color: transparent;
+  cursor: pointer;
+}
+
+#refresh-scramble-button:hover {
+  /*opacity: 0.5 !important;*/
+}
+
+#refresh-scramble:focus {
+  outline: none;
+}
+
 #time {
   /* Invisible until code loads it. */
   display: none;
