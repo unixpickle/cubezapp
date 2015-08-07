@@ -4971,6 +4971,8 @@
   var pocketcube = includeAPI('pocketcube');
   var bigcube = includeAPI('bigcube');
   var pocketHeuristic = null;
+  var MIN_POCKET_CUBE_LENGTH = 4;
+  var REGULAR_POCKET_CUBE_LENGTH = 8;
 
   function pocketMoves(count) {
     var moves = pocketcube.scrambleMoves(count);
@@ -4981,18 +4983,29 @@
     if (pocketHeuristic === null) {
       pocketHeuristic = new pocketcube.FullHeuristic(5);
     }
-    var state = pocketcube.randomState();
-    var solution = pocketcube.solve(state, pocketHeuristic);
-    return pocketcube.movesToString(solution);
+    while (true) {
+      var state = pocketcube.randomState();
+      var solution = pocketcube.solve(state, pocketHeuristic);
+      if (solution.length >= MIN_POCKET_CUBE_LENGTH) {
+        return pocketcube.movesToString(solution);
+      }
+    }
   }
 
   function pocketState() {
     if (pocketHeuristic === null) {
       pocketHeuristic = new pocketcube.FullHeuristic(5);
     }
-    var state = pocketcube.randomState();
-    var solution = pocketcube.solve(state, pocketHeuristic, 8);
-    return pocketcube.movesToString(solution);
+    while (true) {
+      var state = pocketcube.randomState();
+      var solution = pocketcube.solve(state, pocketHeuristic);
+      if (solution.length >= MIN_POCKET_CUBE_LENGTH) {
+        if (solution.length < REGULAR_POCKET_CUBE_LENGTH) {
+          solution = pocketcube.solve(state, pocketHeuristic, 8);
+        }
+        return pocketcube.movesToString(solution);
+      }
+    }
   }
   var rubikTables = null;
   var rubikTimeouts = null;
@@ -5217,11 +5230,12 @@
   exports.generateScramble = generateScramble;
   exports.scramblersForPuzzle = scramblersForPuzzle;
   var skewbHeuristic = null;
+  var MIN_SCRAMBLE_LENGTH = 7;
 
   function skewbCenters() {
     var state = new skewb.Skewb();
     state.centers = skewb.randomCenters();
-    return solveSkewbState(state);
+    return solveSkewbState(state, 0);
   }
 
   function skewbMoves(count) {
@@ -5230,14 +5244,22 @@
   }
 
   function skewbState() {
-    return solveSkewbState(skewb.randomState());
+    while (true) {
+      var solution = solveSkewbState(skewb.randomState(), MIN_SCRAMBLE_LENGTH);
+      if (solution !== null) {
+        return solution;
+      }
+    }
   }
 
-  function solveSkewbState(state) {
+  function solveSkewbState(state, minLength) {
     if (skewbHeuristic === null) {
       skewbHeuristic = new skewb.Heuristic();
     }
     var solution = skewb.solve(state, skewbHeuristic);
+    if (solution.length < minLength) {
+      return null;
+    }
     return skewb.movesToString(solution);
   }
 
