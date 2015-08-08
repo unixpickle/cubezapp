@@ -321,15 +321,22 @@
     return false;
   };
 
+  Controls.prototype._ignoreTouchEvent = function(e) {
+    var t = e.target;
+    if (t === document.body || t.id === 'memo-time' ||
+        t.id === 'pb-status' || t.id === 'time') {
+      return false;
+    } else if (t.id === 'scramble' || t.id === 'scramble-container') {
+      return $('#scramble').css(['visibility']).visibility !== 'hidden';
+    } else {
+      return true;
+    }
+  };
+
   Controls.prototype._touchDown = function(e) {
     if (!this._enabled) {
       return;
-    }
-
-    // Only accept touch events from the middle part of the page.
-    var t = e.target;
-    if (t !== document.body && t.id !== 'memo-time' &&
-        t.id !== 'pb-status' && t.id !== 'time') {
+    } else if (this._ignoreTouchEvent(e)) {
       return;
     }
 
