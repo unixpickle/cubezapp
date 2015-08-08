@@ -53,9 +53,7 @@
     });
 
     if (this._showingBlinker) {
-      this._$blinker.css({
-        left: this._$label.offset().left + this._$label.outerWidth()
-      });
+      this._$blinker.css({left: this._blinkerLeft()});
     }
   };
 
@@ -94,6 +92,11 @@
     this._$label.css({fontSize: this._usableFontSize() + 'px'});
     this._setBlinkerVisible(this._showingBlinker);
   };
+  
+  Time.prototype._blinkerLeft = function() {
+    var boundingRect = this._$label[0].getBoundingClientRect();
+    return boundingRect.left + boundingRect.width;
+  };
 
   Time.prototype._setBlinkerVisible = function(flag) {
     if (!flag) {
@@ -101,7 +104,7 @@
     } else {
       this._$blinker.css({
         display: 'block',
-        left: this._$label.offset().left + this._$label.outerWidth()
+        left: this._blinkerLeft()
       });
     }
   };

@@ -228,10 +228,8 @@
 
   FooterTop.prototype.layout = function() {
     // Move the tab indicator under the current tab.
-    var left = this._$currentTab.offset().left;
-    var width = this._$currentTab.outerWidth();
     this._$bar.stop(true, true);
-    this._$bar.css({left: left, width: width});
+    this._$bar.css(this._barPositionStyle());
   };
 
   FooterTop.prototype.setClosedness = function(closedness) {
@@ -258,6 +256,13 @@
       this.layout();
     }
   };
+  
+  FooterTop.prototype._barPositionStyle = function() {
+    return {
+      left: this._$currentTab[0].getBoundingClientRect().left,
+      width: this._$currentTab.outerWidth()
+    };
+  };
 
   FooterTop.prototype._switchTab = function(tab) {
     // Make sure we don't switch to the current tab.
@@ -267,10 +272,8 @@
     this._$currentTab = tab;
 
     // Animate the current tab indicator to the right place.
-    var left = this._$currentTab.offset().left;
-    var width = this._$currentTab.outerWidth();
     this._$bar.stop(true, false);
-    this._$bar.animate({left: left, width: width});
+    this._$bar.animate(this._barPositionStyle());
 
     // Run the tab callback.
     if ('function' === typeof this.onSwitch) {
