@@ -35,6 +35,9 @@
   font-size: 20px;
   line-height: 40px;
 
+  padding: 0 6px;
+  margin: 0;
+
   cursor: pointer;
 }
 

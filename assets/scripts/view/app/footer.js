@@ -256,7 +256,7 @@
       this.layout();
     }
   };
-  
+
   FooterTop.prototype._barPositionStyle = function() {
     return {
       left: this._$currentTab[0].getBoundingClientRect().left,

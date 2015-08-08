@@ -92,7 +92,7 @@
     this._$label.css({fontSize: this._usableFontSize() + 'px'});
     this._setBlinkerVisible(this._showingBlinker);
   };
-  
+
   Time.prototype._blinkerLeft = function() {
     var boundingRect = this._$label[0].getBoundingClientRect();
     return boundingRect.left + boundingRect.width;

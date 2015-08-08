@@ -2,7 +2,8 @@
 
   window.app.iconFiles = [
     '2x2x2', '3x3x3', '4x4x4', '5x5x5', '6x6x6', '7x7x7', 'BLD', 'clock',
-    'feet', 'megaminx', 'OH', 'pyraminx', 'skewb', 'square1', 'mirror', 'generic', 'egg'
+    'feet', 'megaminx', 'OH', 'pyraminx', 'skewb', 'square1', 'mirror',
+    'generic', 'egg'
   ];
 
   window.app.iconNames = [
