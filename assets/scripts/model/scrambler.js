@@ -10,7 +10,8 @@
     '4x4x4  WCA Moves': 40,
     '5x5x5  WCA Moves': 60,
     '6x6x6  WCA Moves': 80,
-    '7x7x7  WCA Moves': 100
+    '7x7x7  WCA Moves': 100,
+    'Megaminx  Moves': 77
   };
 
   // A ScrambleStream generates scrambles for the current puzzle. It emits these

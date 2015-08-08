@@ -199,7 +199,17 @@
 
   // setScramble sets the scramble's text contents.
   Middle.prototype.setScramble = function(text) {
-    this._$scramble.text(text || '');
+    // NOTE: without span.no-word-wrap, moves like "R--" and "D--" get cut.
+    var comps = (text || '').split(' ');
+    var $elements = $('<span></span>');
+    for (var i = 0; i < comps.length; ++i) {
+      $elements.append($('<span class="no-word-break"></span>').text(comps[i]));
+      if (i < comps.length-1) {
+        $elements.append(' ');
+      }
+    }
+    this._$scramble.empty();
+    this._$scramble.append($elements);
   };
 
   // setTime sets the time's text contents.

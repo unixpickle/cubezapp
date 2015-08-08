@@ -109,3 +109,7 @@
 
   color: white;
 }
+
+.no-word-break {
+  white-space: nowrap;
+}

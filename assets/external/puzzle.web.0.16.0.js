@@ -1,4 +1,4 @@
-// puzzlejs.perms version 0.15.1
+// puzzlejs.perms version 0.16.0
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -394,7 +394,7 @@
 
 
 })();
-// puzzlejs.symmetry version 0.15.1
+// puzzlejs.symmetry version 0.16.0
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -521,7 +521,7 @@
 
 
 })();
-// puzzlejs.pocketcube version 0.15.1
+// puzzlejs.pocketcube version 0.16.0
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -1220,7 +1220,7 @@
 
 
 })();
-// puzzlejs.rubik version 0.15.1
+// puzzlejs.rubik version 0.16.0
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -4057,7 +4057,7 @@
 
 
 })();
-// puzzlejs.skewb version 0.15.1
+// puzzlejs.skewb version 0.16.0
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -4747,7 +4747,7 @@
 
 
 })();
-// puzzlejs.bigcube version 0.15.1
+// puzzlejs.bigcube version 0.16.0
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5114,7 +5114,7 @@
 
 
 })();
-// puzzlejs.pyraminx version 0.15.1
+// puzzlejs.pyraminx version 0.16.0
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5574,7 +5574,86 @@
 
 
 })();
-// puzzlejs.scrambler version 0.15.1
+// puzzlejs.megaminx version 0.16.0
+//
+// Copyright (c) 2015, Alex Nichol.
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+// 1. Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer. 
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+// ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+(function() {
+
+  var exports;
+  if ('undefined' !== typeof self) {
+    if (!self.puzzlejs) {
+      self.puzzlejs = {};
+    }
+    if (!self.puzzlejs.megaminx) {
+      self.puzzlejs.megaminx = {};
+    }
+    exports = self.puzzlejs.megaminx;
+  } else if ('undefined' !== typeof window) {
+    if (!window.puzzlejs) {
+      window.puzzlejs = {};
+    }
+    if (!window.puzzlejs.megaminx) {
+      window.puzzlejs.megaminx = {};
+    }
+    exports = window.puzzlejs.megaminx;
+  } else if ('undefined' !== typeof module) {
+    exports = module.exports;
+  }
+
+  function includeAPI(name) {
+    if ('undefined' !== typeof self) {
+      return self.puzzlejs[name];
+    } else if ('undefined' !== typeof window) {
+      return window.puzzlejs[name];
+    } else if ('function' === typeof require) {
+      return require('./' + name + '.js');
+    }
+    throw new Error('cannot include packages');
+  }
+
+  function pochmannScramble(length) {
+    var lines = [];
+    for (var i = 0; i < Math.ceil(length / 11); ++i) {
+      var moves = [];
+      var offset = Math.floor(Math.random() * 2);
+      for (var j = offset; j < 10+offset; ++j) {
+        var face = (j & 1) === 0 ? 'R' : 'D';
+        var direction = Math.random() < 0.5 ? '--' : '++';
+        moves.push(face + direction);
+      }
+      moves.push('U' + (Math.random() < 0.5 ? "'" : ''));
+      lines.push('(' + moves.join(' ') + ')');
+    }
+    return lines.join(' ');
+  }
+
+  exports.pochmannScramble = pochmannScramble;
+
+
+
+})();
+// puzzlejs.scrambler version 0.16.0
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5799,6 +5878,16 @@
         ]
       },
       {
+        name: "Megaminx",
+        scramblers: [
+          {
+            f: megaminx.pochmannScramble,
+            moves: true,
+            name: "Moves"
+          }
+        ]
+      },
+      {
         name: "Pyraminx",
         scramblers: [
           {
@@ -5971,6 +6060,7 @@
   var pocketcube = includeAPI('pocketcube');
   var bigcube = includeAPI('bigcube');
   var pyraminx = includeAPI('pyraminx');
+  var megaminx = includeAPI('megaminx');
 
 
   function wcaMoves4x4(count) {
