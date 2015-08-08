@@ -16,6 +16,7 @@
     window.app.graphController =
       new window.app.GraphController(window.app.view.footer.stats.graph);
     window.app.viewEvents.on('app.load', function() {
+      new window.app.AppleDeviceBugFixer();
       window.app.timerController = new window.app.TimerController();
       showDisclaimerPopup();
     });

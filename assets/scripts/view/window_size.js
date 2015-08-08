@@ -6,6 +6,7 @@
     this.width = $(window).width();
     this.height = $(window).height();
     this._listeners = [];
+
     $(window).resize(this._handler.bind(this));
   }
 
