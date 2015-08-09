@@ -1,4 +1,4 @@
-// puzzlejs.perms version 0.16.0
+// puzzlejs.perms version 0.16.1
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -394,7 +394,7 @@
 
 
 })();
-// puzzlejs.symmetry version 0.16.0
+// puzzlejs.symmetry version 0.16.1
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -521,7 +521,7 @@
 
 
 })();
-// puzzlejs.pocketcube version 0.16.0
+// puzzlejs.pocketcube version 0.16.1
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -1220,7 +1220,7 @@
 
 
 })();
-// puzzlejs.rubik version 0.16.0
+// puzzlejs.rubik version 0.16.1
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -4057,7 +4057,7 @@
 
 
 })();
-// puzzlejs.skewb version 0.16.0
+// puzzlejs.skewb version 0.16.1
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -4747,7 +4747,7 @@
 
 
 })();
-// puzzlejs.bigcube version 0.16.0
+// puzzlejs.bigcube version 0.16.1
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5114,7 +5114,7 @@
 
 
 })();
-// puzzlejs.pyraminx version 0.16.0
+// puzzlejs.pyraminx version 0.16.1
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5574,7 +5574,7 @@
 
 
 })();
-// puzzlejs.megaminx version 0.16.0
+// puzzlejs.megaminx version 0.16.1
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5636,8 +5636,7 @@
     var lines = [];
     for (var i = 0; i < Math.ceil(length / 11); ++i) {
       var moves = [];
-      var offset = Math.floor(Math.random() * 2);
-      for (var j = offset; j < 10+offset; ++j) {
+      for (var j = 0; j < 10; ++j) {
         var face = (j & 1) === 0 ? 'R' : 'D';
         var direction = Math.random() < 0.5 ? '--' : '++';
         moves.push(face + direction);
@@ -5653,7 +5652,7 @@
 
 
 })();
-// puzzlejs.scrambler version 0.16.0
+// puzzlejs.scrambler version 0.16.1
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.

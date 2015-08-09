@@ -13,6 +13,10 @@
     '7x7x7  WCA Moves': 100,
     'Megaminx  Moves': 77
   };
+  
+  var DONT_QUEUE_SCRAMBLERS = [
+    'Megaminx  Moves'
+  ];
 
   // A ScrambleStream generates scrambles for the current puzzle. It emits these
   // scrambles in a stream-like fashion, making it easy to get new scrambles as
@@ -145,6 +149,7 @@
   function ScrambleQueue() {
     this._queue = {};
     this._load();
+    this._removeDontQueueScramblers();
     this._registerStorageEvents();
   }
 
@@ -194,6 +199,22 @@
       window.addEventListener('storage', handler, false);
     } else {
       window.attachEvent('onstorage', handler);
+    }
+  };
+  
+  ScrambleQueue.prototype._removeDontQueueScramblers = function() {
+    // NOTE: this is only to fix broken scrambles from the past.
+    // TODO: remove this routine by version 1.
+    var changed = false;
+    for (var i = 0, len = DONT_QUEUE_SCRAMBLERS.length; i < len; ++i) {
+      var name = DONT_QUEUE_SCRAMBLERS[i];
+      if (this._queue[name]) {
+        this._queue[name] = [];
+        changed = true;
+      }
+    }
+    if (changed) {
+      this._save();
     }
   };
 
