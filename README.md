@@ -7,7 +7,6 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 # TODO
 
  * On mobile, it is possible to touch hidden elements while timing yourself.
- * Implement View Scramble
  * Re-implement Dropdown with animations
  * Implement graph in footer
  * Implement accounts system

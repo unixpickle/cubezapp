@@ -12,6 +12,7 @@
 
     var $content = $(code);
     this._$input = $content.find('input');
+    this._$input.attr('placeholder', window.app.store.getActivePuzzle().name);
 
     this._dialog = new window.app.Dialog('Change Name', $content,
       ['Cancel', 'Rename']);
