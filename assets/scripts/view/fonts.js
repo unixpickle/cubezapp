@@ -38,7 +38,7 @@
     // https://gist.github.com/smnh/1bc5aaead6ce52c39e9e#file-onfontsload-js
 
     var $container = $('<div></div>').css({
-      position: 'absolute',
+      position: 'fixed',
       left: -FAR_OFFSCREEN,
       top: -FAR_OFFSCREEN,
       fontFamily: REFERENCE_FONT,
@@ -47,7 +47,7 @@
     $(document.body).append($container);
 
     var $referenceDiv = $('<div>' + TEST_TEXT + '</div>').css({
-      position: 'fixed',
+      position: 'absolute',
       whiteSpace: 'nowrap'
     });
     $container.append($referenceDiv);
