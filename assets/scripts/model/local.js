@@ -121,6 +121,18 @@
   LocalStore.prototype.getGlobalSettings = function() {
     return this._globalSettings;
   };
+  
+  LocalStore.prototype.getInactivePuzzles = function() {
+    var res = [];
+    var puzzles = this._puzzles;
+    for (var i = 0, len = puzzles.length; i < len; ++i) {
+      var puzzle = puzzles[i];
+      if (puzzle.id !== this._active.id) {
+        res.push(puzzle);
+      }
+    }
+    return res;
+  }
 
   LocalStore.prototype.getLatestSolve = function() {
     if (this._active.solves.length === 0) {

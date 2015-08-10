@@ -257,7 +257,7 @@
     this._$deleteButtons = $();
     this._$contents.empty();
 
-    var puzzles = window.app.store.getPuzzles().slice(1);
+    var puzzles = window.app.store.getInactivePuzzles();
     this._empty = (puzzles.length === 0);
 
     if (this._empty) {

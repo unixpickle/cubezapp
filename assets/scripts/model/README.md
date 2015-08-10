@@ -55,6 +55,7 @@ Here are the methods which the store provides:
  * **deleteSolve**(id) - delete a solve from the current puzzle. While this is a synchronous operation, it may still fail. If the delete operation fails, it will be as if the puzzle was deleted (upon the `deleteSolve` call) and then re-added externally (once the request failed).
  * **getActivePuzzle**() - get the current [Puzzle](#puzzle-object).
  * **getGlobalSettings**() - get the current [Global Settings](#global-settings-object).
+ * **getInactivePuzzles**() - get the ordered list of [Puzzle](#puzzle-object) objects, excluding the active puzzle.
  * **getLatestSolve**() - get the latest solve for the current puzzle. This returns `null` if no solves have been completed for the current puzzle. Notice that this is synchronous whereas *getSolves(0, 1, cb)* would be asynchronous.
  * **getPuzzles**() - get the ordered list of [Puzzle](#puzzle-object) objects.
  * **getSolveCount**() - get the number of [Solve](#solve-object) objects for the current puzzle.

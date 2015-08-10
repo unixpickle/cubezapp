@@ -193,8 +193,8 @@
           break;
         case 4:
           var items = [new window.contextjs.BackRow('Move To', style)];
-          var puzzles = window.app.store.getPuzzles();
-          for (var i = 1, len = puzzles.length; i < len; ++i) {
+          var puzzles = window.app.store.getInactivePuzzles();
+          for (var i = 0, len = puzzles.length; i < len; ++i) {
             var puzzle = puzzles[i];
             items.push(new window.contextjs.TextRow(puzzle.name, style));
           }
