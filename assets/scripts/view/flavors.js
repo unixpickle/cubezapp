@@ -279,9 +279,8 @@
   Flavors.prototype._updateCSS = function() {
     var color = this._currentColorFlavor.color;
     var hex = hexForColor(color);
-    var pressed = [color[0]*0.8, color[1]*0.8, color[2]*0.8];
-    var pressedHex = hexForColor(pressed);
-    setFlavorStyle(hex, pressedHex);
+    var hoverHex = hexForColor(hoverColor(color));
+    setFlavorStyle(hex, hoverHex);
   };
 
   Flavors.prototype._updateCheckboxColors = function() {
@@ -400,6 +399,19 @@
       hexCode += hexNum;
     }
     return hexCode;
+  }
+  
+  function hoverColor(color) {
+    var sum = color[0] + color[1] + color[2];
+    if (sum > 84) {
+      // Overlay black with 20% opacity over the color.
+      return [color[0]*0.8, color[1]*0.8, color[2]*0.8];
+    } else {
+      // Overlay white with 20% opacity over the color.
+      // (background * (1 - foregroundAlpha)) + (foreground * foregroundAlpha)
+      return [Math.min(color[0]*0.8+51, 255), Math.min(color[0]*0.8+51, 255),
+        Math.min(color[0]*0.8+51, 255)];
+    }
   }
 
   function setFlavorStyle(color, hover) {
