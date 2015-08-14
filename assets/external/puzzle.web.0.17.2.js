@@ -1,4 +1,4 @@
-// puzzlejs.perms version 0.16.1
+// puzzlejs.perms version 0.17.2
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -394,7 +394,7 @@
 
 
 })();
-// puzzlejs.symmetry version 0.16.1
+// puzzlejs.symmetry version 0.17.2
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -521,7 +521,7 @@
 
 
 })();
-// puzzlejs.pocketcube version 0.16.1
+// puzzlejs.pocketcube version 0.17.2
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -1220,7 +1220,7 @@
 
 
 })();
-// puzzlejs.rubik version 0.16.1
+// puzzlejs.rubik version 0.17.2
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -1463,6 +1463,7 @@
 
   function randomZBLL() {
     var result = new Cube();
+
     result.corners = pocketcube.randomLastLayer();
 
     var cornerPerm = [];
@@ -3680,38 +3681,56 @@
   };
 
 
-  // cancelMoves performs move cancellation on a sequence of moves. The result is
-  // returned and the original array is not modified.
+  // combinedMovesOnSameFace takes two moves which affect the same face and returns a move that
+  // represents their product.
+  // If the moves were inverses, this returns null.
+  function combinedMovesOnSameFace(m1, m2) {
+    var turns = m1.turns() + m2.turns();
+    var face = m1.face();
+    if (m2.face() !== m1.face()) {
+      throw new Error('combineMovesOnSameFace only works for moves on the same face');
+    }
+    if (turns === 1) {
+      return new Move(face - 1);
+    } else if (turns === 2 || turns === -2) {
+      return new Move(face + 11);
+    } else if (turns === -1 || turns === 3) {
+      return new Move(face + 5);
+    } else {
+      return null;
+    }
+  }
+
+  // cancelMoves performs move cancellation on a sequence of moves. The result is returned and the
+  // original array is not modified.
   function cancelMoves(moves) {
     var res = moves.slice();
 
-    // TODO: remove redundancy like L R L'.
-
-    // Loop through each move and make sure it has a different face than the move
-    // before it.
-    var lastFace = 0;
     for (var i = 0; i < res.length; ++i) {
-      var face = res[i].face();
-      if (face === lastFace) {
-        // Figure out the new move (or delete the move altogether).
-        var turns = res[i-1].turns() + res[i].turns();
-        res.splice(i, 1);
-        --i;
-        if (turns === 1) {
-          res[i] = new Move(face - 1);
-        } else if (turns === 2 || turns === -2) {
-          res[i] = new Move(face + 11);
-        } else if (turns === -1 || turns === 3) {
-          res[i] = new Move(face + 5);
+      var move = res[i];
+      if (i > 0 && move.face() === res[i-1].face()) {
+        var newMove = combinedMovesOnSameFace(move, res[i-1]);
+        if (newMove === null) {
+          res.splice(i-1, 2);
+          i -= 2;
         } else {
-          // The moves directly cancelled each other out.
+          res[i-1] = newMove;
           res.splice(i, 1);
           --i;
-          lastFace = (i === -1 ? 0 : res[i].face());
-          continue;
         }
+      } else if (i > 1 && move.axis() === res[i-1].axis() && move.axis() === res[i-2].axis()) {
+        // NOTE: this deals with cases like "L R L2" or "U D U'".
+        var newMove = combinedMovesOnSameFace(move, res[i-2]);
+        if (newMove === null) {
+          res.splice(i, 1);
+          res.splice(i-2, 1);
+        } else {
+          res.splice(i, 1);
+          res[i-2] = newMove;
+        }
+        // TODO: see if this could be i -= 2. I think it could be, but I am too lazy to prove it.
+        i -= 3;
       }
-      lastFace = face;
     }
 
     return res;
@@ -4057,7 +4076,7 @@
 
 
 })();
-// puzzlejs.skewb version 0.16.1
+// puzzlejs.skewb version 0.17.2
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -4747,7 +4766,7 @@
 
 
 })();
-// puzzlejs.bigcube version 0.16.1
+// puzzlejs.bigcube version 0.17.2
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5114,7 +5133,7 @@
 
 
 })();
-// puzzlejs.pyraminx version 0.16.1
+// puzzlejs.pyraminx version 0.17.2
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5171,6 +5190,215 @@
     }
     throw new Error('cannot include packages');
   }
+
+  // Stickers represents the stickers on the Pyraminx and facilitates the rendering of a 3D pyraminx
+  // based on its stickers.
+  //
+  // Colors are represented by the numbers 0 through 3 (inclusive). 0 is green, 1 yellow, 2 blue, and
+  // 3 red.
+  //
+  // Stickers are indexed from 0 through 35 (inclusive). The start from the green face, going left to
+  // right from the tip down. Next is the yellow face, going left to right from the base to the tip.
+  // Next is the blue face, read like the green face, and finally the red face, also read like the
+  // green face.
+  function Stickers() {
+    this._stickers = [];
+    for (var sticker = 0; sticker < 4; ++sticker) {
+      for (var i = 0; i < 9; ++i) {
+        this._stickers.push(sticker);
+      }
+    }
+  }
+
+  // colorAt gets the color of the sticker at a given physical slot (index).
+  Stickers.prototype.colorAt = function(index) {
+    if (index < 0 || index >= 36) {
+      throw new Error('sticker index out of bounds: ' + index);
+    }
+    return this._stickers[index];
+  };
+
+  // move applies a StickerMove to the stickers.
+  Stickers.prototype.move = function(stickerMove) {
+    this._applyMoveToTip(stickerMove);
+    if (!stickerMove.tip) {
+      this._applyMoveToNonTip(stickerMove);
+    }
+  };
+
+  Stickers.prototype._applyMoveToNonTip = function(stickerMove) {
+    var front = 0;
+    var bottom = 9;
+    var right = 18;
+    var left = 27;
+
+    if (stickerMove.clockwise) {
+      switch (stickerMove.corner) {
+      case 0: // R
+        this._threeCycle(front+7, right+5, bottom+3);
+        this._threeCycle(front+6, right+1, bottom+7);
+        this._threeCycle(bottom+2, front+3, right+6);
+        break;
+      case 1: // L
+        this._threeCycle(front+5, bottom+1, left+7);
+        this._threeCycle(front+1, bottom+2, left+6);
+        this._threeCycle(front+6, bottom+5, left+3);
+        break;
+      case 2: // U
+        this._threeCycle(front+2, left+2, right+2);
+        this._threeCycle(front+1, left+1, right+1);
+        this._threeCycle(front+3, left+3, right+3);
+        break;
+      case 3: // B
+        this._threeCycle(left+5, bottom+6, right+7);
+        this._threeCycle(left+1, bottom+5, right+6);
+        this._threeCycle(right+3, left+6, bottom+7);
+        break;
+      default:
+        throw new Error('invalid corner: ' + stickerMove.corner);
+      }
+    } else {
+      switch (stickerMove.corner) {
+      case 0: // R'
+        this._reverseThreeCycle(front+7, right+5, bottom+3);
+        this._reverseThreeCycle(front+6, right+1, bottom+7);
+        this._reverseThreeCycle(bottom+2, front+3, right+6);
+        break;
+      case 1: // L'
+        this._reverseThreeCycle(front+5, bottom+1, left+7);
+        this._reverseThreeCycle(front+1, bottom+2, left+6);
+        this._reverseThreeCycle(front+6, bottom+5, left+3);
+        break;
+      case 2: // U'
+        this._reverseThreeCycle(front+2, left+2, right+2);
+        this._reverseThreeCycle(front+1, left+1, right+1);
+        this._reverseThreeCycle(front+3, left+3, right+3);
+        break;
+      case 3: // B'
+        this._reverseThreeCycle(left+5, bottom+6, right+7);
+        this._reverseThreeCycle(left+1, bottom+5, right+6);
+        this._reverseThreeCycle(right+3, left+6, bottom+7);
+        break;
+      default:
+        throw new Error('invalid corner: ' + stickerMove.corner);
+      }
+    }
+  };
+
+  Stickers.prototype._applyMoveToTip = function(stickerMove) {
+    var front = 0;
+    var bottom = 9;
+    var right = 18;
+    var left = 27;
+
+    if (stickerMove.clockwise) {
+      switch (stickerMove.corner) {
+      case 0: // r
+        this._threeCycle(front+8, right+4, bottom+4);
+        break;
+      case 1: // l
+        this._threeCycle(front+4, bottom, left+8);
+        break;
+      case 2: // u
+        this._threeCycle(front, left, right);
+        break;
+      case 3: // b
+        this._threeCycle(left+4, bottom+8, right+8);
+        break;
+      default:
+        throw new Error('invalid corner: ' + stickerMove.corner);
+      }
+    } else {
+      switch (stickerMove.corner) {
+      case 0: // r'
+        this._reverseThreeCycle(front+8, right+4, bottom+4);
+        break;
+      case 1: // l'
+        this._reverseThreeCycle(front+4, bottom, left+8);
+        break;
+      case 2: // u'
+        this._reverseThreeCycle(front, left, right);
+        break;
+      case 3: // b'
+        this._reverseThreeCycle(left+4, bottom+8, right+8);
+        break;
+      default:
+        throw new Error('invalid corner: ' + stickerMove.corner);
+      }
+    }
+  };
+
+  Stickers.prototype._threeCycle = function(idx1, idx2, idx3) {
+    var temp = this._stickers[idx3];
+    this._stickers[idx3] = this._stickers[idx2];
+    this._stickers[idx2] = this._stickers[idx1];
+    this._stickers[idx1] = temp;
+  };
+
+  Stickers.prototype._reverseThreeCycle = function(idx1, idx2, idx3) {
+    this._threeCycle(idx1, idx2, idx3);
+    this._threeCycle(idx1, idx2, idx3);
+  };
+
+  exports.Stickers = Stickers;
+
+
+  // A StickerMove represents a face turn or a tip twist on the Pyraminx.
+  //
+  // The corner of a move is a number between 0 and 3 (inclusive), corresponding to the R, L, U and B
+  // corners respectively.
+  //
+  // The tip should be true if this move should only be performed on the outer tip.
+  function StickerMove(corner, clockwise, tip) {
+    this.corner = corner;
+    this.clockwise = clockwise;
+    this.tip = tip;
+  }
+
+  // toString returns the move, represented in WCA notation.
+  StickerMove.prototype.toString = function() {
+    var cornerName = ['R', 'L', 'U', 'B'][this.corner];
+    if (this.tip) {
+      cornerName = cornerName.toLowerCase();
+    }
+    return cornerName + (this.clockwise ? '' : "'");
+  };
+
+  // stickerMovesToString converts an array of StickerMoves to a string.
+  function stickerMovesToString(moves) {
+    return moves.join(' ');
+  }
+
+  // parseStickerMove parses a WCA move string and returns the given move.
+  // If the move is invalid, this will throw an exception.
+  function parseStickerMove(str) {
+    try {
+      var regularMove = parseMove(str.toUpperCase());
+    } catch (e) {
+      // We catch the error and re-throw it because the move string in the exception from parseMove()
+      // will be converted to upper-case.
+      throw new Error('invalid move: ' + str);
+    }
+    var tip = (str !== str.toUpperCase());
+    return new StickerMove(regularMove.corner, regularMove.clockwise, tip);
+  }
+
+  // parseStickerMoves parses a space-separated string of sticker moves.
+  // If any move is invalid, this will throw an exception.
+  function parseStickerMoves(str) {
+    var comps = str.split(' ');
+    var moves = [];
+    for (var i = 0, len = comps.length; i < len; ++i) {
+      moves.push(parseStickerMove(comps[i]));
+    }
+    return moves;
+  }
+
+  exports.StickerMove = StickerMove;
+  exports.stickerMovesToString = stickerMovesToString;
+  exports.parseStickerMove = parseStickerMove;
+  exports.parseStickerMoves = parseStickerMoves;
+
 
   var MAX_MOVE_COUNT = 11;
 
@@ -5318,18 +5546,18 @@
       var corners = ['R', 'L', 'U', 'B'];
       var corner = corners.indexOf(str);
       if (corner < 0) {
-        throw new Error('Invalid move: ' + str);
+        throw new Error('invalid move: ' + str);
       }
       return new Move(corner, true);
     } else if (str.length === 2) {
       if (str[1] !== "'") {
-        throw new Error('Invalid move: ' + str);
+        throw new Error('invalid move: ' + str);
       }
       var res = parseMove(str[0]);
       res.clockwise = false;
       return res;
     } else {
-      throw new Error('Invalid move: ' + str);
+      throw new Error('invalid move: ' + str);
     }
   }
 
@@ -5574,7 +5802,7 @@
 
 
 })();
-// puzzlejs.megaminx version 0.16.1
+// puzzlejs.megaminx version 0.17.2
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5652,7 +5880,7 @@
 
 
 })();
-// puzzlejs.scrambler version 0.16.1
+// puzzlejs.scrambler version 0.17.2
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5715,7 +5943,9 @@
 
   function skewbCenters() {
     var state = new skewb.Skewb();
-    state.centers = skewb.randomCenters();
+    while (state.solved()) {
+      state.centers = skewb.randomCenters();
+    }
     return solveSkewbState(state, 0);
   }
 
@@ -5951,15 +6181,15 @@
   var rubikTimeouts = null;
 
   function rubikCorners() {
-    return solveRubikState(rubik.randomCorners());
+    return solveRubikState(rubik.randomCorners);
   }
 
   function rubikEdges() {
-    return solveRubikState(rubik.randomEdges());
+    return solveRubikState(rubik.randomEdges);
   }
 
   function rubikLastLayer() {
-    return solveRubikState(rubik.randomLastLayer());
+    return solveRubikState(rubik.randomLastLayer);
   }
 
   function rubikMoves(count) {
@@ -5968,14 +6198,19 @@
   }
 
   function rubikState() {
-    return solveRubikState(rubik.randomState());
+    return solveRubikState(rubik.randomState);
   }
 
   function rubikZBLL() {
-    return solveRubikState(rubik.randomZBLL());
+    return solveRubikState(rubik.randomZBLL);
   }
 
-  function solveRubikState(state) {
+  function solveRubikState(stateGen) {
+    var state = stateGen();
+    while (state.solved()) {
+      state = stateGen();
+    }
+
     // Make sure the needed global variables are there.
     if (rubikTables === null || rubikTimeouts === null) {
       rubikTables = new rubik.SolveTables();
