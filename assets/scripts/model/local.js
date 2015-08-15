@@ -38,6 +38,8 @@
     this._stats = null;
     this._averages = null;
 
+    this._cursors = [];
+
     this._lastLocalStoreData = null;
     this._changeListener = this._dataChanged.bind(this);
     if (window.addEventListener) {
@@ -57,6 +59,7 @@
     this._puzzles.unshift(puzzle);
     this._active = puzzle;
     this._fillInMissingPuzzleFields();
+    this._invalidateAllCursors();
     this._recomputeStatsFromScratch();
     this._save();
     this.emit('addedPuzzle', puzzle);
@@ -66,12 +69,19 @@
     solve.id = window.app.generateId();
     this._active.solves.push(solve);
 
+    // All the cursors at the end of the data get the extra solve.
+    for (var i = 0, len = this._cursors.length; i < len; ++i) {
+      var cursor = this._cursors[i];
+      if (cursor._startIndex+cursor._length === this._active.solves.length-1) {
+        ++cursor._length;
+      }
+    }
+
     recomputeLastPBsAndPWs(this._active.solves, this._active.solves.length-1);
     if (this._averages) {
       this._averages.pushSolve(solve);
     }
     this._recomputeStats();
-
     this._save();
     this.emit('addedSolve', solve);
   };
@@ -89,21 +99,6 @@
       }
     }
     throw new Error('puzzle not found: ' + id);
-  };
-
-  LocalStore.prototype.deleteSolve = function(id) {
-    var solves = this._active.solves;
-    for (var i = solves.length-1; i >= 0; --i) {
-      if (solves[i].id === id) {
-        solves.splice(i, 1);
-        recomputeLastPBsAndPWs(solves, i);
-        this._recomputeStatsFromScratch();
-        this._save();
-        this.emit('deletedSolve', id);
-        return;
-      }
-    }
-    throw new Error('solve not found: ' + id);
   };
 
   LocalStore.prototype.detach = function() {
@@ -150,8 +145,10 @@
   };
 
   LocalStore.prototype.getSolves = function(start, count, cb) {
-    var list = this._active.solves.slice(start, start+count);
-    return new window.app.DataTicket(cb, list);
+    if (start < 0 || start+count >= this._active.solves.length) {
+      return new window.app.ErrorTicket(cb, new Error('out of bounds'));
+    }
+    return new CursorTicket(cb, this, start, count);
   };
 
   LocalStore.prototype.getStats = function() {
@@ -191,56 +188,6 @@
     this.emit('modifiedPuzzle', attrs);
   };
 
-  LocalStore.prototype.modifySolve = function(id, attrs) {
-    var solve = null;
-    var solveIndex;
-    var solves = this._active.solves;
-    for (solveIndex = solves.length-1; solveIndex >= 0; --solveIndex) {
-      if (solves[solveIndex].id === id) {
-        solve = solves[solveIndex];
-        break;
-      }
-    }
-    if (solve === null) {
-      throw new Error('solve not found: ' + id);
-    }
-    var keys = Object.keys(attrs);
-    for (var i = 0, len = keys.length; i < len; ++i) {
-      var key = keys[i];
-      solve[key] = attrs[key];
-    }
-    recomputeLastPBsAndPWs(solves, solveIndex+1);
-    this._recomputeStatsFromScratch();
-    this._save();
-    this.emit('modifiedSolve', id, attrs);
-  };
-
-  LocalStore.prototype.moveSolve = function(solveId, puzzleId) {
-    var puzzle = null;
-    for (var i = 1, len = this._puzzles.length; i < len; ++i) {
-      if (this._puzzles[i].id === puzzleId) {
-        puzzle = this._puzzles[i];
-        break;
-      }
-    }
-    if (puzzle === null) {
-      return;
-    }
-    var solves = this._active.solves;
-    for (var i = solves.length-1; i >= 0; --i) {
-      if (solves[i].id === solveId) {
-        insertSolveUsingTimestamp(solves[i], puzzle.solves);
-        solves.splice(i, 1);
-        recomputeLastPBsAndPWs(solves, i);
-        this._recomputeStatsFromScratch();
-        this._save();
-        this.emit('deletedSolve', solveId);
-        this.emit('movedSolve', solveId, puzzleId);
-        return;
-      }
-    }
-  };
-
   LocalStore.prototype.switchPuzzle = function(id, cb) {
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
       var puzzle = this._puzzles[i];
@@ -248,6 +195,7 @@
         this._active = puzzle;
         this._puzzles.splice(i, 1);
         this._puzzles.unshift(this._active);
+        this._invalidateAllCursors();
         this._recomputeStatsFromScratch();
         this._save();
         this.emit('switchedPuzzle');
@@ -285,8 +233,29 @@
       }
     }
 
+    this._invalidateAllCursors();
     this.emit('remoteChange');
     this._recomputeStatsFromScratch();
+  };
+
+  LocalStore.prototype._deleteSolveAtIndex = function(index) {
+    var solves = this._active.solves;
+    var id = solves[index].id;
+    solves.splice(index, 1);
+
+    for (var i = 0, len = this._cursors.length; i < len; ++i) {
+      var cursor = this._cursors[i];
+      if (index < cursor._startIndex) {
+        --cursor._startIndex;
+      } else if (index < cursor._startIndex+cursor._length) {
+        --cursor._length;
+      }
+    }
+
+    recomputeLastPBsAndPWs(solves, index);
+    this._recomputeStatsFromScratch();
+    this._save();
+    this.emit('deletedSolve', id, index);
   };
 
   // _fillInMissingPuzzleFields makes it easier to add new puzzle fields in the
@@ -368,6 +337,14 @@
     this._save();
   };
 
+  LocalStore.prototype._invalidateAllCursors = function() {
+    var cursors = this._cursors;
+    this._cursors = [];
+    for (var i = 0, len = cursors.length; i < len; ++i) {
+      cursors[i]._invalidate();
+    }
+  };
+
   LocalStore.prototype._loadData = function() {
     if ('undefined' === typeof localStorage.localStoreData) {
       // Load the legacy local data if available, or create new data otherwise.
@@ -437,6 +414,36 @@
     this._save();
   };
 
+  LocalStore.prototype._modifySolveAtIndex = function(index, attrs) {
+    var solve = this._active.solves[index];
+    var keys = Object.keys(attrs);
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
+      solve[key] = attrs[key];
+    }
+    recomputeLastPBsAndPWs(solves, index+1);
+    this._recomputeStatsFromScratch();
+    this._save();
+    this.emit('modifiedSolve', id, attrs, index);
+  };
+
+  LocalStore.prototype._moveSolveAtIndex = function(index, puzzleId) {
+    var puzzle = null;
+    for (var i = 1, len = this._puzzles.length; i < len; ++i) {
+      if (this._puzzles[i].id === puzzleId) {
+        puzzle = this._puzzles[i];
+        break;
+      }
+    }
+    if (puzzle === null) {
+      return;
+    }
+    var solve = this._active.solves[index];
+    insertSolveUsingTimestamp(solve, puzzle.solves);
+    this._deleteSolveAtIndex(index);
+    this.emit('movedSolve', solve.id, puzzleId);
+  };
+
   LocalStore.prototype._recomputeStats = function() {
     this._stats = null;
     this.emit('loadingStats');
@@ -460,6 +467,13 @@
     this._recomputeStats();
   };
 
+  LocalStore.prototype._removeCursor = function(cursor) {
+    var index = this._cursors.indexOf(cursor);
+    if (index >= 0) {
+      this._cursors.splice(index, 1);
+    }
+  };
+
   LocalStore.prototype._save = function() {
     this._active.lastUsed = new Date().getTime();
     var data = {
@@ -476,6 +490,114 @@
     } catch (e) {
     }
   };
+
+  // A Cursor is used to supply solves asynchronously to callbacks which want
+  // them.
+  function Cursor(store, startIndex, length) {
+    window.app.EventEmitter.call(this);
+    this._valid = true;
+    this._store = store;
+    this._startIndex = startIndex;
+    this._length = length;
+  }
+
+  Cursor.prototype = Object.create(window.app.EventEmitter.prototype);
+
+  // close invalidates this cursor and tells the store that it can stop caching
+  // the values covered by this cursor.
+  Cursor.prototype.close = function() {
+    this._store._removeCursor(this);
+  };
+
+  // deleteSolve deletes the solve at a given index, relative to the cursor's
+  // start index.
+  Cursor.prototype.deleteSolve = function(index) {
+    this._assertValid();
+    this._assertInRange(index);
+    this._store._deleteSolveAtIndex(index + this._startIndex);
+  };
+
+  // findSolveById takes a solve ID and returns the index (relative to this
+  // cursor) of the corresponding solve. If the solve ID does not exist in this
+  // cursor, this returns -1.
+  Cursor.prototype.findSolveById = function(id) {
+    this._assertValid();
+    for (var i = 0, len = this.getLength(); i < len; ++i) {
+      if (this.getSolve(i).id === id) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
+  // getLength returns the number of solves included in this cursor.
+  Cursor.prototype.getLength = function() {
+    this._assertValid();
+    return this._length;
+  };
+
+  // getSolve gets a solve within this cursor. The supplied index is relative to
+  // the cursor's start index.
+  Cursor.prototype.getSolve = function(index) {
+    this._assertValid();
+    this._assertInRange(index);
+    return this._store._active.solves[index + this._startIndex];
+  };
+
+  // getStartIndex returns the index of the first solve included in this cursor.
+  Cursor.prototype.getStartIndex = function() {
+    this._assertValid();
+    return this._startIndex;
+  };
+
+  // modifySolve modifies the solve at a given index. The first argument is the
+  // solve index (relative to the cursor). The second is a dictionary of
+  // attributes to change.
+  Cursor.prototype.modifySolve = function(index, attrs) {
+    this._assertValid();
+    this._assertInRange(index);
+    this._store._modifySolveAtIndex(index+this._startIndex, attrs);
+  };
+
+  // moveSolve moves the solve at a given index (relative to this cursor) to a
+  // different puzzle in the store.
+  Cursor.prototype.moveSolve = function(index, puzzleId) {
+    this._assertValid();
+    this._assertInRange(index);
+    this._store._moveSolveAtIndex(index+this._startIndex, puzzleId);
+  };
+
+  // _assertInRange makes sure a specified index is within this cursor.
+  Cursor.prototype._assertInRange = function(index) {
+    if (index < 0 || index >= this._length) {
+      throw new Error('index out of bounds: ' + index);
+    }
+  };
+  
+  // _assertValid makes sure that this Cursor is valid.
+  Cursor.prototype._assertValid = function() {
+    if (!this._valid) {
+      throw new Error('this Cursor is invalid.');
+    }
+  };
+
+  // _invalidate emits an invalidate event and renders this Cursor unusable.
+  Cursor.prototype._invalidate = function() {
+    this._valid = false;
+    this.emit('invalidate');
+  };
+
+  // A CursorTicket is used to return a Cursor to a callback. This must be used
+  // instead of a regular DataTicket so that a Cursor does not leak if the
+  // ticket is cancelled.
+  function CursorTicket(store, start, count) {
+    window.app.Ticket.call(this, callback);
+    setTimeout(function() {
+      this.finish(new Cursor(store, start, count));
+    }.bind(this), 10);
+  }
+  
+  CursorTicket.prototype = Object.create(Ticket.prototype);
 
   function insertSolveUsingTimestamp(solve, solves) {
     // TODO: use a binary search here.

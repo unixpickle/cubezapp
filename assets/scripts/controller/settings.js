@@ -94,6 +94,10 @@
 
   SettingsController.prototype._updateChanged = function() {
     var accuracy = this._view.getUpdate();
+    if (accuracy === window.app.store.getActivePuzzle().timerAccuracy) {
+      return;
+    }
+
     var popup = new window.app.ChangeAllUpdatePopup();
 
     popup.on('no', function() {
