@@ -13,7 +13,7 @@
     '7x7x7  WCA Moves': 100,
     'Megaminx  Moves': 77
   };
-  
+
   var DONT_QUEUE_SCRAMBLERS = [
     'Megaminx  Moves'
   ];
@@ -201,7 +201,7 @@
       window.attachEvent('onstorage', handler);
     }
   };
-  
+
   ScrambleQueue.prototype._removeDontQueueScramblers = function() {
     // NOTE: this is only to fix broken scrambles from the past.
     // TODO: remove this routine by version 1.

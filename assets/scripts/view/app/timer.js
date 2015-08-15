@@ -101,7 +101,7 @@
   };
 
   TimerView.prototype._handleTimerReady = function() {
-    var accuracy = window.app.store.getGlobalSettings().timerAccuracy;
+    var accuracy = window.app.store.getActivePuzzle().timerAccuracy;
     if (accuracy === TimerView.ACCURACY_NONE) {
       window.app.view.setTime('Ready');
     } else if (accuracy === TimerView.ACCURACY_SECONDS) {
@@ -122,7 +122,7 @@
   };
 
   TimerView.prototype._handleTimerTime = function() {
-    var accuracy = window.app.store.getGlobalSettings().timerAccuracy;
+    var accuracy = window.app.store.getActivePuzzle().timerAccuracy;
 
     if (accuracy === TimerView.ACCURACY_NONE) {
       window.app.view.setTime('Timing');

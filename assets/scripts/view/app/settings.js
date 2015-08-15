@@ -110,6 +110,10 @@
     this._layoutFields(false);
   };
 
+  Settings.prototype.updateNotChanged = function() {
+    this._updateUpdate();
+  };
+
   Settings.prototype._addField = function(name, field) {
     this._fields.push(field);
     this._fieldMap[name] = field;
@@ -195,7 +199,6 @@
 
     var globalEvents = {
       'flavor': this._updateFlavor,
-      'timerAccuracy': this._updateUpdate,
       'theaterMode': this._updateTheaterMode,
       'righty': this._updateRighty
     };
@@ -213,6 +216,7 @@
         this._updateScrambleTypes(true);
       },
       'scrambleType': this._updateScrambleType,
+      'timerAccuracy': this._updateUpdate,
       'timerInput': function() {
         this._updateBLD();
         this._updateInspection(true);
@@ -371,7 +375,7 @@
 
   Settings.prototype._updateUpdate = function() {
     this._getField('update').dropdown().setSelected(
-      window.app.store.getGlobalSettings().timerAccuracy
+      window.app.store.getActivePuzzle().timerAccuracy
     );
   };
 

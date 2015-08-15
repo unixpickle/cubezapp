@@ -121,7 +121,7 @@
   LocalStore.prototype.getGlobalSettings = function() {
     return this._globalSettings;
   };
-  
+
   LocalStore.prototype.getInactivePuzzles = function() {
     var res = [];
     var puzzles = this._puzzles;
@@ -132,7 +132,7 @@
       }
     }
     return res;
-  }
+  };
 
   LocalStore.prototype.getLatestSolve = function() {
     if (this._active.solves.length === 0) {
@@ -156,6 +156,19 @@
 
   LocalStore.prototype.getStats = function() {
     return this._stats;
+  };
+
+  LocalStore.prototype.modifyAllPuzzles = function(attrs) {
+    var keys = Object.keys(attrs);
+    for (var i = 0, len = this._puzzles.length; i < len; ++i) {
+      var puzzle = this._puzzles[i];
+      for (var j = 0, len1 = keys.length; j < len1; ++j) {
+        var key = keys[j];
+        puzzle[key] = attrs[key];
+      }
+    }
+    this._save();
+    this.emit('modifiedPuzzle', attrs);
   };
 
   LocalStore.prototype.modifyGlobalSettings = function(attrs) {
@@ -280,6 +293,7 @@
   // future.
   LocalStore.prototype._fillInMissingPuzzleFields = function() {
     DEFAULT_PUZZLE_SETTINGS.lastUsed = new Date().getTime();
+    DEFAULT_PUZZLE_SETTINGS.timerAccuracy = this._globalSettings.timerAccuracy;
 
     var keys = Object.keys(DEFAULT_PUZZLE_SETTINGS);
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
@@ -345,6 +359,7 @@
         icon: icons[i],
         scrambler: scrambler[0],
         scrambleType: scrambler[1],
+        timerAccuracy: 0,
         timerInput: 0,
         lastUsed: new Date().getTime()
       });
@@ -368,11 +383,15 @@
     var data = JSON.parse(localStorage.localStoreData);
 
     this._puzzles = data.puzzles;
-    this._fillInMissingPuzzleFields();
-    this._fillInMissingSolveFields();
 
+    // NOTE: we must get the global settings before the puzzle settings because
+    // some global settings may act as defaults for corresponding puzzle
+    // settings.
     this._globalSettings = (data.globalSettings || {});
     this._fillInMissingSettings();
+
+    this._fillInMissingPuzzleFields();
+    this._fillInMissingSolveFields();
 
     // Find the active puzzle.
     for (var i = 0, len = this._puzzles.length; i < len; ++i) {
@@ -395,11 +414,13 @@
       this._puzzles[i].solves = revSolves;
     }
 
-    this._fillInMissingPuzzleFields();
-    this._fillInMissingSolveFields();
-
+    // NOTE: we must do this before filling in puzzle fields. See _loadData for
+    // more.
     this._globalSettings = {};
     this._fillInMissingSettings();
+
+    this._fillInMissingPuzzleFields();
+    this._fillInMissingSolveFields();
 
     var active = localStorage.activePuzzle;
     var puzzles = this._puzzles;

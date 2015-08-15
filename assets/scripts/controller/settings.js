@@ -93,9 +93,27 @@
   };
 
   SettingsController.prototype._updateChanged = function() {
-    window.app.store.modifyGlobalSettings({
-      timerAccuracy: this._view.getUpdate()
+    var accuracy = this._view.getUpdate();
+    var popup = new window.app.ChangeAllUpdatePopup();
+
+    popup.on('no', function() {
+      window.app.store.modifyPuzzle({
+        timerAccuracy: accuracy
+      });
     });
+    popup.on('yes', function() {
+      window.app.store.modifyGlobalSettings({
+        timerAccuracy: accuracy
+      });
+      window.app.store.modifyAllPuzzles({
+        timerAccuracy: accuracy
+      });
+    });
+    popup.on('cancel', function() {
+      this._view.updateNotChanged();
+    }.bind(this));
+
+    popup.show();
   };
 
   function isNameValid(name) {

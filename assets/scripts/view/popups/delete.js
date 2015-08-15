@@ -4,7 +4,7 @@
     var msg = 'Are you sure you would like to delete "' + name +
       '"? This action cannot be undone.';
     var content = $('<div class="delete-popup-content"></div>').text(msg);
-    this._dialog = new window.app.Dialog('Are you sure?', content,
+    this._dialog = new window.app.Dialog('Are You Sure?', content,
       ['Cancel', 'Delete']);
     this._dialog.on('action', this._action.bind(this));
     this._callback = cb;

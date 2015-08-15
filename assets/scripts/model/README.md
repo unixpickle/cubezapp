@@ -61,6 +61,7 @@ Here are the methods which the store provides:
  * **getSolveCount**() - get the number of [Solve](#solve-object) objects for the current puzzle.
  * **getSolves**(start, count, cb) - get a list of [Solve](#solve-object) objects asynchronously.
  * **getStats**() - get the current [Stats](#stats-object) object. This returns null if the stats are currently being recomputed.
+ * **modifyAllPuzzles**(attrs) - modify attributes of the current puzzle and all other puzzles. Provide a dictionary of attributes to set on the puzzles.
  * **modifyGlobalSettings**(attrs) - modify attributes of the global settings.
  * **modifyPuzzle**(attrs) - modify attributes of the current puzzle. Provide a dictionary of attributes to set on the current puzzle.
  * **modifySolve**(id, attrs) - modify attributes of a solve in the current puzzle. Provide a solve id and an object containing attributes to set.
@@ -137,6 +138,7 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
  * **scrambler** - string - the type of puzzle.js scrambler to use
  * **scrambleType** - string - the subtype of the scrambler to use
  * **lastUsed** - int - the UNIX time in milliseconds that the user last modified or switched to this puzzle
+ * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller. **Default:** 0
  * **timerInput** - int - an enum for the input method
    * 0 - INPUT_REGULAR - the timer is a normal
    * 1 - INPUT_INSPECTION - inspection time is used
@@ -174,7 +176,7 @@ The **Global Settings** object stores the user's global settings. Here are the f
 
  * **flavor** - string - a hex color identifier (e.g. #f0d5a9) which indicates the color of the current flavor. If the flavor is the alternation flavor, this is simply "#" with no hex after it. The flavor view must give unrecognized values meaning for legacy purposes. **Default:** "" (empty string)
  * **righty** - bool - true if the user is right handed. **Default:** true
- * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller. **Default:** 0
+ * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller. This is now only used as a default value when creating new puzzles. Puzzles have their own timerAccuracy setting. **Default:** 0
  * **theaterMode** - bool - enter theater mode while timing. **Default:** true
 
 <a name="observe-section"></a>

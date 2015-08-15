@@ -400,7 +400,7 @@
     }
     return hexCode;
   }
-  
+
   function hoverColor(color) {
     var sum = color[0] + color[1] + color[2];
     if (sum > 84) {
