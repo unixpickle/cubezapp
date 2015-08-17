@@ -77,6 +77,11 @@
   LocalSolves.prototype.getSolves = function() {
     return this._puzzles.getActivePuzzle().solves;
   };
+  
+  // getStats returns the current stats or null if no stats are cached.
+  LocalSolves.prototype.getStats = function() {
+    return this._stats;
+  };
 
   // modifySolve changes the attributes of a given solve.
   LocalSolves.prototype.modifySolve = function(index, attrs) {
