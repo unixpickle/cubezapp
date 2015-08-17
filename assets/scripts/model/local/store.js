@@ -84,7 +84,7 @@
   };
 
   LocalStore.prototype.getStats = function() {
-    return this._stats;
+    return this._solves.getStats();
   };
 
   LocalStore.prototype.modifyAllPuzzles = function(attrs) {

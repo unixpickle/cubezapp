@@ -19,7 +19,7 @@
     this._averages = null;
     this._cursors = [];
     this._fillInMissingFields();
-    this._resetStats();
+    this._computeStats();
   }
 
   LocalSolves.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -137,6 +137,18 @@
     }
     this._resetStats();
   };
+  
+  // _computeStats generates this._stats.
+  LocalSolves.prototype._computeStats = function() {
+    if (this._averages === null) {
+      this._averages = new window.app.OfflineAverages();
+      var solves = this.getSolves();
+      for (var i = 0, len = solves.length; i < len; ++i) {
+        this._averages.pushSolve(solves[i]);
+      }
+    }
+    this._stats = this._averages.stats();
+  };
 
   // _emitStats uses this._averages to emit new stats asynchronously.
   // It will create this._averages if it is null.
@@ -145,14 +157,7 @@
     this.emit('loadingStats');
     setTimeout(function() {
       if (this._stats === null) {
-        if (this._averages === null) {
-          this._averages = new window.app.OfflineAverages();
-          var solves = this.getSolves();
-          for (var i = 0, len = solves.length; i < len; ++i) {
-            this._averages.pushSolve(solves[i]);
-          }
-        }
-        this._stats = this._averages.stats();
+        this._computeStats();
         this.emit('computedStats', this._stats);
       }
     }.bind(this), 1);
