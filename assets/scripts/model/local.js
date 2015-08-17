@@ -482,10 +482,12 @@
     for (var i = solves.length-1; i >= 0; --i) {
       if (solves[i].date <= solve.date) {
         solves.splice(i+1, 0, solve);
+        recomputeLastPBsAndPWs(solves, i+1);
         return;
       }
     }
     solves.unshift(solve);
+    recomputeLastPBsAndPWs(solves, 0);
   }
 
   function recomputeLastPBsAndPWs(solves, startIndex) {
