@@ -175,6 +175,15 @@
         puzzle[key] = DEFAULT_PUZZLE_SETTINGS[key];
       }
     }
+
+    // NOTE: solves is not part of DEFAULT_PUZZLE_SETTINGS because it shoudl be
+    // a different empty array every time. Using the same default empty array
+    // for every puzzle could result in puzzles having duplicate solve lists.
+    if (!puzzle.hasOwnProperty('solves')) {
+      puzzle.solves = [];
+    }
   };
+
+  window.app.LocalPuzzles = LocalPuzzles;
 
 })();
