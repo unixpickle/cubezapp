@@ -67,7 +67,7 @@
   // A LocalCursorTicket is used to return a LocalCursor to a callback.
   // LocalSolves must use this instead of a regular DataTicket so that a
   // LocalCursor does not leak if the ticket is cancelled.
-  function LocalCursorTicket(solves, start, count) {
+  function LocalCursorTicket(callback, solves, start, count) {
     window.app.Ticket.call(this, callback);
     setTimeout(function() {
       if (start + count > solves.getSolves().length) {

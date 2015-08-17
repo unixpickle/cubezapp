@@ -19,6 +19,7 @@
     this._averages = null;
     this._cursors = [];
     this._fillInMissingFields();
+    this._resetStats();
   }
 
   LocalSolves.prototype = Object.create(window.app.EventEmitter.prototype);
@@ -44,6 +45,11 @@
     this._emitStats();
   };
 
+  // createCursor generates a ticket for getting a LocalCursor.
+  LocalSolves.prototype.createCursor = function(start, length, cb) {
+    return new window.app.LocalCursorTicket(cb, this, start, length);
+  };
+
   // cursorClosed is called by a LocalCursor when it is closed by a consumer.
   LocalSolves.prototype.cursorClosed = function(cursor) {
     var idx = this._cursors.indexOf(cursor);
@@ -51,6 +57,12 @@
       throw new Error('cursor was not registered');
     }
     this._cursors.splice(idx, 1);
+  };
+
+  // cursorCreated is called by each cursor to register itself with the
+  // LocalSolves.
+  LocalSolves.prototype.cursorCreated = function(cursor) {
+    this._cursors.push(cursor);
   };
 
   // deleteSolve deletes a solve at a given index.
@@ -73,11 +85,20 @@
     this.emit('delete', id, index);
   };
 
+  // getLatestSolve returns the latest solve or null if no solves exist.
+  LocalSolves.prototype.getLatestSolve = function() {
+    var solves = this.getSolves();
+    if (solves.length === 0) {
+      return null;
+    }
+    return solves[solves.length - 1];
+  };
+
   // getSolves returns the current array of solves.
   LocalSolves.prototype.getSolves = function() {
     return this._puzzles.getActivePuzzle().solves;
   };
-  
+
   // getStats returns the current stats or null if no stats are cached.
   LocalSolves.prototype.getStats = function() {
     return this._stats;
@@ -109,8 +130,11 @@
   };
 
   // reset should be called whenever the solves were changed in a way that
-  // cannot be broken down into deletions, additions and modifications.
+  // cannot be easily broken down into deletions, additions and modifications.
   LocalSolves.prototype.reset = function() {
+    while (this._cursors.length > 0) {
+      this._cursors[this._cursors.length-1].close();
+    }
     this._resetStats();
   };
 

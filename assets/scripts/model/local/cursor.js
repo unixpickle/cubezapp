@@ -7,6 +7,7 @@
     this._solves = localSolves;
     this._start = start;
     this._length = length;
+    localSolves.cursorCreated(this);
   }
 
   LocalCursor.prototype = Object.create(window.app.EventEmitter.prototype);

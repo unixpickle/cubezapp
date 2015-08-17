@@ -35,8 +35,15 @@
 
   // addPuzzle adds a puzzle with the specified attributes. Missing attributes
   // will be filled in. The puzzle will be made the active puzzle.
+  //
+  // You may use addPuzzle even if you have not called loadPuzzles. Doing so
+  // will initialize this instance with one puzzle.
   LocalPuzzles.prototype.addPuzzle = function(puzzle) {
     puzzle.id = window.app.generateId();
+    if (this._puzzles === null) {
+      this._puzzles = [];
+      this._active = null;
+    }
     this._puzzles.unshift(puzzle);
     this._active = puzzle;
     this._fillInMissingFieldsForPuzzle(puzzle);
