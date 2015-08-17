@@ -203,7 +203,7 @@
             if (itemIndex === 0) {
               this._currentContextMenu.popPage();
             } else {
-              var puzzleId = puzzles[itemIndex].id;
+              var puzzleId = puzzles[itemIndex-1].id;
               window.app.store.moveSolve(solve.id, puzzleId);
               this._hideContextMenu();
             }
