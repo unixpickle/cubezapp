@@ -73,7 +73,7 @@
       if (start + count > solves.getSolves().length) {
         this.fail(new Error('bounds out of range: ' + start + ', ' + count));
       } else {
-        this.finish(new LocalCursor(solves, start, count));
+        this.finish(new window.app.LocalCursor(solves, start, count));
       }
     }.bind(this), 10);
   }

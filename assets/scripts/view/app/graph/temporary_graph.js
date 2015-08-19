@@ -101,7 +101,7 @@
     this._$svg.append($(sourceCode).find('g'));
   };
 
-  TemporaryGraph.prototype._gotSolves = function(err, solves) {
+  TemporaryGraph.prototype._gotSolves = function(err, cursor) {
     if (err) {
       this._$element.empty();
       this._$element.text('Could not load solves.');
@@ -111,8 +111,8 @@
     var lowestBucket = Infinity;
     var highestBucket = -Infinity;
     var times = {};
-    for (var i = 0, len = solves.length; i < len; ++i) {
-      var solve = solves[i];
+    for (var i = 0, len = cursor.getLength(); i < len; ++i) {
+      var solve = cursor.getSolve(i);
       if (!solve.dnf) {
         var time = window.app.solveTime(solve);
         var bucket = 1000 * Math.floor(time / 1000);
