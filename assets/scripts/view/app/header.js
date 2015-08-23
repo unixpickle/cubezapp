@@ -307,6 +307,14 @@
   };
 
   Dropdown.prototype._puzzleDeleted = function(puzzleId) {
+    if (!this._isOpen) {
+      // NOTE: this will happen if a test or some other code removes a puzzle
+      // while the header is closed. In this case, we may not have an element
+      // for the puzzle in the first place.
+      this._updateOnOpen = true;
+      return;
+    }
+    
     if (this._puzzleElements.length === 1) {
       this._transitionToEmpty();
       return;

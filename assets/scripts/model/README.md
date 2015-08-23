@@ -155,7 +155,7 @@ The **Puzzle** object stores the general information about a puzzle. Here are th
  * **scrambler** - string - the type of puzzle.js scrambler to use
  * **scrambleType** - string - the subtype of the scrambler to use
  * **lastUsed** - int - the UNIX time in milliseconds that the user last modified or switched to this puzzle
- * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller. **Default:** 0
+ * **timerAccuracy** - int - an enum for the accuracy to show in the timer. The values of this setting are given meaning by the view and controller. The default value for this field is determined by the global settings.
  * **timerInput** - int - an enum for the input method
    * 0 - INPUT_REGULAR - the timer is a normal
    * 1 - INPUT_INSPECTION - inspection time is used
