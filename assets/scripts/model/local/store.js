@@ -114,6 +114,7 @@
 
   LocalStore.prototype.switchPuzzle = function(id, cb) {
     this._puzzles.switchPuzzle(id);
+    this._solves.reset();
     this._save();
     this.emit('switchedPuzzle');
     return new window.app.DataTicket(cb, null);

@@ -52,20 +52,17 @@ Here are the methods which the store provides:
  * **addPuzzle**(puzzle) - create a new [Puzzle](#puzzle-object) in the store. This will automatically switch to the added puzzle.
  * **addSolve**(solve) - add a [Solve](#solve-object) to the current puzzle.
  * **deletePuzzle**(id) - delete a puzzle (besides the current puzzle) given its identifier.
- * **deleteSolve**(id) - delete a solve from the current puzzle. While this is a synchronous operation, it may still fail. If the delete operation fails, it will be as if the puzzle was deleted (upon the `deleteSolve` call) and then re-added externally (once the request failed).
  * **getActivePuzzle**() - get the current [Puzzle](#puzzle-object).
  * **getGlobalSettings**() - get the current [Global Settings](#global-settings-object).
  * **getInactivePuzzles**() - get the ordered list of [Puzzle](#puzzle-object) objects, excluding the active puzzle.
- * **getLatestSolve**() - get the latest solve for the current puzzle. This returns `null` if no solves have been completed for the current puzzle. Notice that this is synchronous whereas *getSolves(0, 1, cb)* would be asynchronous.
+ * **getLatestSolve**() - get the latest solve for the current puzzle. This returns `null` if no solves have been completed for the current puzzle. Notice that this is synchronous and cannot fail.
  * **getPuzzles**() - get the ordered list of [Puzzle](#puzzle-object) objects.
  * **getSolveCount**() - get the number of [Solve](#solve-object) objects for the current puzzle.
- * **getSolves**(start, count, cb) - get a list of [Solve](#solve-object) objects asynchronously.
+ * **getSolves**(start, count, cb) - get a [Cursor](#cursor-object) for a range of solves asynchronously.
  * **getStats**() - get the current [Stats](#stats-object) object. This returns null if the stats are currently being recomputed.
  * **modifyAllPuzzles**(attrs) - modify attributes of the current puzzle and all other puzzles. Provide a dictionary of attributes to set on the puzzles.
  * **modifyGlobalSettings**(attrs) - modify attributes of the global settings.
  * **modifyPuzzle**(attrs) - modify attributes of the current puzzle. Provide a dictionary of attributes to set on the current puzzle.
- * **modifySolve**(id, attrs) - modify attributes of a solve in the current puzzle. Provide a solve id and an object containing attributes to set.
- * **moveSolve**(solveId, puzzleId)
  * **switchPuzzle**(id, cb) - switch to a new puzzle. If this fails, the active puzzle is not changed.
 
 <a name="solve-object"></a>
@@ -91,6 +88,26 @@ The store also provides some helper functions for solves:
  * window.app.copySolve(solve) - get a copy of a solve object.
  * window.app.solveIsPB(solve) - get a boolean indicating whether a solve is a PB. This does not look at milliseconds; it complies with the WCA regulations.
  * window.app.solveTime(solve) - get the time of a solve, counting penalties.
+
+<a name="cursor-object"></a>
+## Cursor
+
+A Cursor allows you to read and manipulate a sub-range of solves within the store. Cursors make it possible to address solves by index. Cursors are automatically updated whenever the store's solves are manipulated. Whenever you are done using a cursor, you should be sure to close it.
+
+A cursor implements the following methods:
+
+ * **close**() - invalidate this cursor and tell the store that it does not need to update the cursor anymore.
+ * **deleteSolve**(index) - delete the solve at a given index (relative to the beginning of the cursor).
+ * **findSolveById**(id) - get the index (relative to the beginning of the cursor) of the solve with a given ID. If the solve is not found, this returns -1.
+ * **getLength**() - get the number of solves in the cursor. This may change if the store is manipulated in some way.
+ * **getStartIndex**() - get the start index of this cursor within the store. This may change (for instance, if solves before the store are deleted.)
+ * **modifySolve**(index, attrs) - set the given attributes on the solve at the given index (relative to the beginning of the cursor).
+ * **moveSolve**(index, puzzleId) - move the solve at a given index (relative to the beginning of the cursor) to a new puzzle. This will effectively delete the solve from the cursor.
+ * **valid**() - get a boolean indicating whether or not this cursor is still valid. Cursors are invalidated whenever a puzzle switch or remote change occurs.
+
+When you get a Cursor, there are several times when it may change. If a solve is deleted, moved, or added, all valid cursors will be updated accordingly. In addition, all cursors are invalidated when there is a remote change or a puzzle switch.
+
+Cursors at the end of the store's list will be expanded whenever a new solve is added.
 
 <a name="stats-object"></a>
 ## Stats
