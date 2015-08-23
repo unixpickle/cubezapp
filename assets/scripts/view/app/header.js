@@ -314,7 +314,7 @@
       this._updateOnOpen = true;
       return;
     }
-    
+
     if (this._puzzleElements.length === 1) {
       this._transitionToEmpty();
       return;
