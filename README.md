@@ -7,8 +7,8 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 # TODO
 
  * On mobile, it is possible to touch hidden elements while timing yourself.
- * Use light hover color for Oreo theme
- * Make it possible to delete icons
+ * Fix word wrap in View Scramble popup for megaminx.
+ * Make it possible for developers to delete icons
  * Re-implement Dropdown with animations
  * Implement graph in footer
  * Implement accounts system

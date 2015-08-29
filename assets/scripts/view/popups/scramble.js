@@ -3,16 +3,16 @@
   function ScramblePopup(solve) {
     this._useful = false;
     if (!solve.scramble) {
-      this._setupMessage('No scramble.');
+      this._setupMessage('No scramble.', false);
     } else if (solve.scrambler === '3x3x3') {
       try {
         this._setup3x3Scramble(solve.scramble);
         this._useful = true;
       } catch (e) {
-        this._setupMessage(solve.scramble);
+        this._setupMessage(solve.scramble, true);
       }
     } else {
-      this._setupMessage(solve.scramble);
+      this._setupMessage(solve.scramble, true);
     }
   }
 
@@ -40,7 +40,7 @@
     var topIDs = ['rect1390', 'rect1394', 'rect1402', 'rect1388', 'rect1392',
       'rect1400', 'rect1386', 'rect1384', 'rect1398'];
     var $content = $('<div class="message-popup-content"></div>');
-    $content.text(scramble);
+    $content.append($('<span class="selectable"></span>').text(scramble));
     var $object;
     window.app.cubePreviewLoad = function() {
       for (var i = 0; i < 9; ++i) {
@@ -64,9 +64,12 @@
     this._dialog.on('action', this._dialog.close.bind(this._dialog));
   };
 
-  ScramblePopup.prototype._setupMessage = function(content) {
-    var content = $('<div class="message-popup-content"></div>').text(content);
-    this._dialog = new window.app.Dialog('Scramble', content, ['OK']);
+  ScramblePopup.prototype._setupMessage = function(content, selectable) {
+    var $content = $('<div class="message-popup-content"></div>').text(content);
+    if (selectable) {
+      $content.addClass('selectable');
+    }
+    this._dialog = new window.app.Dialog('Scramble', $content, ['OK']);
     this._dialog.on('action', this._dialog.close.bind(this._dialog));
   };
 

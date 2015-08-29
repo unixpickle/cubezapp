@@ -8,7 +8,7 @@ body, html, #header, #footer, #time, #pb-status, #memo-time, #puzzles,
   user-select: none;
 }
 
-#scramble {
+.selectable {
   -webkit-touch-callout: text;
   -webkit-user-select: text;
   -khtml-user-select: text;
