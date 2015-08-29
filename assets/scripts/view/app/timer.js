@@ -7,6 +7,8 @@
   function TimerView(appView) {
     window.app.EventEmitter.call(this);
 
+    this._$scramble = $('#scramble');
+
     this.controls = new Controls();
     window.app.viewEvents.on('app.load', this._appLoaded.bind(this));
 
@@ -50,6 +52,21 @@
     if (window.app.timer.getState() === window.app.Timer.STATE_DONE ||
         window.app.timer.getState() === window.app.Timer.STATE_NOT_RUNNING) {
       this._showLatestSolve();
+    }
+  };
+
+  TimerView.prototype._handleScrambleClicked = function() {
+    if (this._$scramble.css(['visibility']).visibility === 'hidden') {
+      return;
+    }
+    var stream = window.app.timer.getScrambleStream();
+    var popup = new window.app.ScramblePopup({
+      scramble: stream.getLastScramble(),
+      scrambleType: stream.getLastScrambleType(),
+      scrambler: stream.getLastScrambler()
+    });
+    if (popup.hasUsefulInformation()) {
+      popup.show();
     }
   };
 
@@ -178,6 +195,7 @@
   TimerView.prototype._registerUIEvents = function() {
     $('#refresh-scramble-button').click(this.emit.bind(this,
       'refreshScramble'));
+    this._$scramble.click(this._handleScrambleClicked.bind(this));
   };
 
   TimerView.prototype._showLatestSolve = function() {
