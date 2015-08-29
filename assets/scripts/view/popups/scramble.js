@@ -1,11 +1,13 @@
 (function() {
 
   function ScramblePopup(solve) {
+    this._useful = false;
     if (!solve.scramble) {
       this._setupMessage('No scramble.');
     } else if (solve.scrambler === '3x3x3') {
       try {
         this._setup3x3Scramble(solve.scramble);
+        this._useful = true;
       } catch (e) {
         this._setupMessage(solve.scramble);
       }
@@ -13,6 +15,12 @@
       this._setupMessage(solve.scramble);
     }
   }
+
+  // hasUsefulInformation returns true if the popup has some information
+  // besides the scramble itself.
+  ScramblePopup.prototype.hasUsefulInformation = function() {
+    return this._useful;
+  };
 
   ScramblePopup.prototype.show = function() {
     this._dialog.show();

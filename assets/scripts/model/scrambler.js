@@ -40,6 +40,18 @@
 
   ScrambleStream.prototype = Object.create(window.app.EventEmitter.prototype);
 
+  ScrambleStream.prototype.getLastScramble = function() {
+    return this._lastEmittedScramble;
+  };
+
+  ScrambleStream.prototype.getLastScrambleType = function() {
+    return this._lastEmittedScrambleType;
+  };
+
+  ScrambleStream.prototype.getLastScrambler = function() {
+    return this._lastEmittedScrambler;
+  };
+
   ScrambleStream.prototype.pause = function() {
     this._paused = true;
     this._needScramble = false;
