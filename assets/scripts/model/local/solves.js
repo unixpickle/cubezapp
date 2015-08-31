@@ -137,7 +137,7 @@
     }
     this._resetStats();
   };
-  
+
   // _computeStats generates this._stats.
   LocalSolves.prototype._computeStats = function() {
     if (this._averages === null) {

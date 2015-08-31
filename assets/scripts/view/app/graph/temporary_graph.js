@@ -126,6 +126,8 @@
       }
     }
 
+    cursor.close();
+
     this._buckets = [];
     for (var i = lowestBucket; i <= highestBucket; i += 1000) {
       var count = times[i] || 0;

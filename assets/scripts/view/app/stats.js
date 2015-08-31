@@ -18,7 +18,7 @@
 
     this.averages = new window.app.Averages();
     this.graph = new window.app.Graph();
-    this.times = new window.app.Times();
+    this.timesList = new window.app.TimesList();
 
     this._registerModelEvents();
     this._registerUIEvents();
@@ -87,15 +87,15 @@
     this.averages.setVisible(true);
 
     this.averages.layout();
-    this.times.layout();
+    this.timesList.layout();
 
     var averagesWidth = this.averages.width();
-    var timesWidth = this.times.width();
+    var timesWidth = this.timesList.width();
 
     if (averagesWidth + timesWidth + PANE_SPACING > totalWidth) {
       this.averages.setVisible(false);
       this.graph.setVisible(false);
-      this.times.layout(totalWidth);
+      this.timesList.layout(totalWidth);
     } else if (averagesWidth + timesWidth + MIN_GRAPH_WIDTH > totalWidth) {
       this.graph.setVisible(false);
       this.averages.layout(totalWidth - timesWidth - PANE_SPACING);
@@ -114,7 +114,7 @@
 
   Stats.prototype._registerUIEvents = function() {
     this.averages.on('needsLayout', this.layout.bind(this));
-    this.times.on('needsLayout', this.layout.bind(this));
+    this.timesList.on('needsLayout', this.layout.bind(this));
   };
 
   Stats.prototype._updatePuzzleInformation = function() {

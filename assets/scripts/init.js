@@ -7,14 +7,18 @@
   }
 
   function initializeController() {
-    window.app.settingsController =
-      new window.app.SettingsController(window.app.view.footer.settings);
-    window.app.timesController =
-      new window.app.TimesController(window.app.view.footer.stats.times);
-    window.app.headerController =
-      new window.app.HeaderController(window.app.view.header);
-    window.app.graphController =
-      new window.app.GraphController(window.app.view.footer.stats.graph);
+    window.app.settingsController = new window.app.SettingsController(
+      window.app.view.footer.settings
+    );
+    window.app.timesListController = new window.app.TimesListController(
+      window.app.view.footer.stats.timesList
+    );
+    window.app.headerController = new window.app.HeaderController(
+      window.app.view.header
+    );
+    window.app.graphController = new window.app.GraphController(
+      window.app.view.footer.stats.graph
+    );
     window.app.viewEvents.on('app.load', function() {
       window.app.timerController = new window.app.TimerController();
       showDisclaimerPopup();

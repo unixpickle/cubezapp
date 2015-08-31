@@ -6,6 +6,7 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 # TODO
 
+ * Use [jsbuild](https://github.com/unixpickle/jsbuild) for everything.
  * On mobile, it is possible to touch hidden elements while timing yourself.
  * Fix word wrap in View Scramble popup for megaminx.
  * Make it possible for developers to delete icons

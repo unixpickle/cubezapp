@@ -1,6 +1,6 @@
 (function() {
 
-  function TimesController(view) {
+  function TimesListController(view) {
     this._view = view;
     var events = ['delete', 'viewScramble', 'addComment', 'removePenalty',
       'plus2', 'dnf'];
@@ -10,7 +10,7 @@
     }
   }
 
-  TimesController.prototype._addComment = function(solve) {
+  TimesListController.prototype._addComment = function(solve) {
     var popup = new window.app.CommentPopup(solve);
     popup.on('save', function(msg) {
       window.app.store.modifySolve(solve.id, {notes: msg});
@@ -18,26 +18,26 @@
     popup.show();
   };
 
-  TimesController.prototype._delete = function(solve) {
+  TimesListController.prototype._delete = function(solve) {
     window.app.store.deleteSolve(solve.id);
   };
 
-  TimesController.prototype._dnf = function(solve) {
+  TimesListController.prototype._dnf = function(solve) {
     window.app.store.modifySolve(solve.id, {plus2: false, dnf: true});
   };
 
-  TimesController.prototype._plus2 = function(solve) {
+  TimesListController.prototype._plus2 = function(solve) {
     window.app.store.modifySolve(solve.id, {plus2: true, dnf: false});
   };
 
-  TimesController.prototype._removePenalty = function(solve) {
+  TimesListController.prototype._removePenalty = function(solve) {
     window.app.store.modifySolve(solve.id, {plus2: false, dnf: false});
   };
 
-  TimesController.prototype._viewScramble = function(solve) {
+  TimesListController.prototype._viewScramble = function(solve) {
     new window.app.ScramblePopup(solve).show();
   };
 
-  window.app.TimesController = TimesController;
+  window.app.TimesListController = TimesListController;
 
 })();
