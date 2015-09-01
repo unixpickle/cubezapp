@@ -35,11 +35,11 @@ The store emits a number of events. These events are listed to look like functio
  * **addedSolve**(solve) - the user saved a new solve. Not triggered by remote changes.
  * **computedStats**(stats) - the statistics for the current puzzle were re-computed. The stats argument is a [Stats](#stats-object) object.
  * **deletedPuzzle**(id) - the user deleted a puzzle. Not triggered by remote changes.
- * **deletedSolve**(id) - the user deleted a solve. Not triggered by remote changes. This may also be triggered when a solve is moved from the current puzzle to a different puzzle.
+ * **deletedSolve**(id, index) - the user deleted a solve. Not triggered by remote changes. This may also be triggered when a solve is moved from the current puzzle to a different puzzle. The given index is the index where the solve used to be.
  * **loadingStats**() - the current statistics are invalid because the statistics are being recomputed.
  * **modifiedGlobalSettings**(attrs) - the user modified the global settings. Not triggered by remote changes.
  * **modifiedPuzzle**(attrs) - the user modified the current puzzle. Not triggered by remote changes.
- * **modifiedSolve**(id, attrs) - the user modified a solve in the current puzzle. Not triggered by remote changes.
+ * **modifiedSolve**(id, attrs, index) - the user modified a solve in the current puzzle. Not triggered by remote changes. The index argument is the index of the solve in the store.
  * **movedSolve**(solveId, puzzleId) - a solve was moved to a different puzzle. This is emitted after **deletedSolve** is triggered for the solve.
  * **remoteChange**() - the user changed *something* on a remote device.
  * **switchPuzzleError**(err) - the puzzle could not be switched because of an error.
