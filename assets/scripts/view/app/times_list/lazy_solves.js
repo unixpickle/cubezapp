@@ -111,9 +111,16 @@
       return;
     }
 
-    // TODO: figure out how to emit the 'delete' event here. We will need
-    // this._lastLength to aid in our calculation.
+    var lastLength = this._lastLength;
     this._updateLastLength();
+    var lastStoreCount = window.app.store.getSolveCount()+1;
+    var lastStartIndex = lastStoreCount - lastLength;
+    if (index < lastStartIndex) {
+      return;
+    }
+
+    var oldIndex = lastStoreCount - (index+1);
+    this.emit('delete', oldIndex);
   };
 
   LazySolves.prototype._handleModifiedSolve = function(id, attrs, index) {
