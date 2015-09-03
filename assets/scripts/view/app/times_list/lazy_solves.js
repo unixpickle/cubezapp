@@ -29,7 +29,7 @@
     this._registerModelEvents();
   }
 
-  LazySolves.prototype = Object.create(window.app.EventEmitter);
+  LazySolves.prototype = Object.create(window.app.EventEmitter.prototype);
 
   // canLoadMore returns true if the store has some solves which are not loaded.
   LazySolves.prototype.canLoadMore = function() {
@@ -160,6 +160,6 @@
 
   LazySolves.prototype._updateLastLength = function() {
     this._lastLength = this.getLength();
-  }
+  };
 
 })();
