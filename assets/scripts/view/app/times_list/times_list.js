@@ -1,5 +1,7 @@
 (function() {
 
+  var DEFAULT_WIDTH = 150;
+
   function TimesList() {
     window.app.EventEmitter.call(this);
 
