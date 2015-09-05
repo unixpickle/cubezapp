@@ -1,17 +1,10 @@
 (function() {
 
-  var ROW_HEIGHT = 30;
-
   function TimesList() {
     window.app.EventEmitter.call(this);
 
     this._$element = $('#times-list');
   }
-
-  // These values are necessary for TimesTextMetrics to perform its calculations.
-  TimesList.FONT_SIZE = 18;
-  TimesList.FONT_FAMILY = 'Roboto, sans-serif';
-  TimesList.FONT_WEIGHT = '300';
 
   TimesList.prototype = Object.create(window.app.EventEmitter.prototype);
 

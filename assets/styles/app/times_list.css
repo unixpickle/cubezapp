@@ -2,3 +2,32 @@
   overflow-y: scroll;
   overflow-x: hidden;
 }
+
+.times-list-row {
+  width: 100%;
+  font-size: 18px;
+  font-family: Roboto, sans-serif;
+  font-weight: 300;
+  height: 30px;
+}
+
+.times-list-row:hover {
+  background-color: #f0f0f0;
+}
+
+.times-list-row-not-pb {
+  color: #999;
+}
+
+.times-list-row-time {
+  height: 30px;
+  line-height: 30px;
+  float: right;
+}
+
+.times-list-row-plus2 {
+  height: 30px;
+  line-height: 30px;
+  float: right;
+  visibility: hidden;
+}

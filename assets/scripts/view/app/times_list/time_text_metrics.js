@@ -30,10 +30,8 @@
   };
 
   TimeTextMetrics.prototype._initializeWidths = function() {
-    var $label = $('<label></label>').css({
-      fontSize: window.app.TimesList.FONT_SIZE,
-      fontFamily: window.app.TimesList.FONT_FAMILY,
-      fontWeight: window.app.TimesList.FONT_WEIGHT,
+    var $label = $('<label class="times-list-row"></label>').css({
+      width: 'auto',
       position: 'absolute',
       visibility: 'hidden'
     });
