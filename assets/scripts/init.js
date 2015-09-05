@@ -36,6 +36,7 @@
     window.app.flavors = new window.app.Flavors();
     window.app.view = new window.app.AppView();
     window.app.favicon = new window.app.Favicon();
+    window.app.title = new window.app.Title();
   }
 
   function showDisclaimerPopup() {

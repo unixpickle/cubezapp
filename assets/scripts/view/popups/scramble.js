@@ -32,7 +32,10 @@
     for (var i = 0, len = moves.length; i < len; ++i) {
       cube = cube.move(moves[i]);
     }
-    var colors = ['white', 'yellow', 'green', 'blue', 'red', 'orange'];
+
+    var colors = ['white', '#ffff00', '#38d838', '#3b6de0', '#e9364b',
+      'orange'];
+
     var rightIDs = ['rect1350', 'rect1352', 'rect1354', 'rect1356',
       'rect1358', 'rect1360', 'rect1362', 'rect1364', 'rect1366'];
     var frontIDs = ['rect1396', 'rect1370', 'rect1372', 'rect1374',
