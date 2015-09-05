@@ -15,7 +15,9 @@
   };
 
   var DONT_QUEUE_SCRAMBLERS = [
-    'Megaminx  Moves'
+    'Megaminx  Moves',
+    '4x4x4  WCA Moves',
+    '6x6x6  WCA Moves'
   ];
 
   // A ScrambleStream generates scrambles for the current puzzle. It emits these
