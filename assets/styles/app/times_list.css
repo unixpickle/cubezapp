@@ -4,6 +4,7 @@
 }
 
 .times-list-row {
+  text-align: center;
   width: 100%;
   font-size: 18px;
   font-family: Roboto, sans-serif;
@@ -19,15 +20,15 @@
   color: #999;
 }
 
-.times-list-row-time {
+.times-list-row-content {
+  display: inline-block;
   height: 30px;
-  line-height: 30px;
-  float: right;
+  display: table;
 }
 
-.times-list-row-plus2 {
+.times-list-row-label {
+  display: table-row;
+  float: left;
   height: 30px;
   line-height: 30px;
-  float: right;
-  visibility: hidden;
 }

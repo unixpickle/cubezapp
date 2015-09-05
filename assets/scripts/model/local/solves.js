@@ -107,11 +107,21 @@
   // modifySolve changes the attributes of a given solve.
   LocalSolves.prototype.modifySolve = function(index, attrs) {
     var solve = this.getSolves()[index];
+
+    var newSolve = {};
+    var allKeys = Object.keys(solve);
+    for (var i = 0, len = allKeys; i < len; ++i) {
+      var key = allKeys[i];
+      newSolve[key] = solve[key];
+    }
+    this.getSolves()[index] = newSolve;
+
     var keys = Object.keys(attrs);
     for (var i = 0, len = keys.length; i < len; ++i) {
       var key = keys[i];
-      solve[key] = attrs[key];
+      newSolve[key] = attrs[key];
     }
+
     recomputeLastPBsAndPWs(this.getSolves(), index+1);
     this._resetStats();
     this.emit('modify', id, attrs, index);
