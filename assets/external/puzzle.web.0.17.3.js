@@ -1,4 +1,4 @@
-// puzzlejs.perms version 0.17.2
+// puzzlejs.perms version 0.17.3
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -394,7 +394,7 @@
 
 
 })();
-// puzzlejs.symmetry version 0.17.2
+// puzzlejs.symmetry version 0.17.3
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -521,7 +521,7 @@
 
 
 })();
-// puzzlejs.pocketcube version 0.17.2
+// puzzlejs.pocketcube version 0.17.3
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -1220,7 +1220,7 @@
 
 
 })();
-// puzzlejs.rubik version 0.17.2
+// puzzlejs.rubik version 0.17.3
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -1463,7 +1463,6 @@
 
   function randomZBLL() {
     var result = new Cube();
-
     result.corners = pocketcube.randomLastLayer();
 
     var cornerPerm = [];
@@ -4076,7 +4075,7 @@
 
 
 })();
-// puzzlejs.skewb version 0.17.2
+// puzzlejs.skewb version 0.17.3
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -4766,7 +4765,7 @@
 
 
 })();
-// puzzlejs.bigcube version 0.17.2
+// puzzlejs.bigcube version 0.17.3
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -4922,7 +4921,7 @@
       for (var turns = 1; turns <= 3; ++turns) {
         for (var axis = 0; axis < 3; ++axis) {
           basis.push(new WCAMove(primaryFacesForAxes[axis], width, turns));
-          if (!threeGen) {
+          if (!threeGen || width < maxWidth) {
             basis.push(new WCAMove(secondaryFacesForAxes[axis], width, turns));
           }
         }
@@ -5133,7 +5132,7 @@
 
 
 })();
-// puzzlejs.pyraminx version 0.17.2
+// puzzlejs.pyraminx version 0.17.3
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5802,7 +5801,7 @@
 
 
 })();
-// puzzlejs.megaminx version 0.17.2
+// puzzlejs.megaminx version 0.17.3
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5880,7 +5879,7 @@
 
 
 })();
-// puzzlejs.scrambler version 0.17.2
+// puzzlejs.scrambler version 0.17.3
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
