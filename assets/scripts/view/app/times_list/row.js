@@ -15,6 +15,10 @@
     this._metrics = metrics;
   }
 
+  TimesListRow.prototype.element = function() {
+    return this._$element;
+  };
+
   TimesListRow.prototype.getSolve = function() {
     return this._solve;
   };
