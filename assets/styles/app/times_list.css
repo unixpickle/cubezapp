@@ -36,3 +36,18 @@
 .times-list-spacer {
   visibility: hidden;
 }
+
+.times-list-loader {
+  position: relative;
+  height: 44px;
+  width: 100%;
+}
+
+.times-list-reload, .times-list-spinner {
+  width: 30px;
+  height: 30px;
+
+  position: absolute;
+  left: calc(50% - 15px);
+  top: 7px;
+}
