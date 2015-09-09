@@ -8,6 +8,8 @@
   function TimesListRowRange() {
     window.app.EventEmitter.call(this);
 
+    this._viewCache = [];
+
     this._start = 0;
     this._length = 0;
     this._totalLength = 0;
@@ -37,12 +39,17 @@
   };
 
   TimesListRowRange.prototype.setParameters = function(total, start, rows) {
-    this._$rows.remove();
-    this._$rows.empty();
+    this._$rows.remove().empty();
     for (var i = 0, len = rows.length; i < len; ++i) {
-      var $row = rows[i].element();
+      if (i > this._viewCache.length) {
+        this._viewCache[i] = new window.app.TimesListRowView();
+      }
+
+      var view = this._viewCache[i];
+      view.updateWithSolve(rows[i].getSolve());
+      var $row = view.element();
       this._$rows.append($row);
-      $row.click(this.emit.bind(this, 'rowClick', i));
+      $row.click(this.emit.bind(this, 'rowClick', i+start));
     }
     this._$beforeSpacer.after(this._$rows);
 
