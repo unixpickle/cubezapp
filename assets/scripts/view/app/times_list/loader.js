@@ -8,7 +8,14 @@
 
   var cancelAnimationFrame = window.cancelAnimationFrame || clearTimeout;
 
+  // TimesListLoader presents the user with a loading animation at the end of
+  // their times list. It also presents a reload button if the load fails.
+  //
+  // This emits the following events:
+  // - reload: the user wants to try loading more solves again.
   function TimesListLoader() {
+    window.app.EventEmitter.call(this);
+
     this._$element = $('<div class="times-list-loader"></div>').css({
       display: 'none'
     });
@@ -16,10 +23,14 @@
     this._$spinner = $(SPINNER_SVG).addClass('times-list-spinner')
     this._$element.append(this._$reloadButton, this._$spinner);
 
+    this._$reloadButton.click(this.emit.bind(this, 'reload'));
+
     this._startTime = null;
     this._state = TimesListLoader.STATE_HIDDEN;
     this._frameRequest = null;
   }
+
+  TimesListLoader.prototype = Object.create(window.app.EventEmitter.prototype);
 
   TimesListLoader.STATE_HIDDEN = 0;
   TimesListLoader.STATE_LOADING = 1;

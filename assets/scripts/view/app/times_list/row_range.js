@@ -4,7 +4,7 @@
   // scrollable space above and below them with blank content.
   //
   // TimesListRowRange implements the EventEmitter interface.
-  // - rowClick(index) - a row at the given index was clicked.
+  // - rowClick(index): a row at the given index was clicked.
   function TimesListRowRange() {
     window.app.EventEmitter.call(this);
 
