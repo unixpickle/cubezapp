@@ -48,12 +48,21 @@
   // getSolve gets a solve at the given index. The indexes start from newest
   // solve to oldest, unlike the indexes in the store.
   LazySolves.prototype.getSolve = function(inverseIndex) {
+    var info = this.getSolveAddress();
+    return info.cursor.getSolve(info.index);
+  };
+
+  // getSolveAddress returns an object with enough information to access and
+  // edit solve within the store. The object has a 'cursor' property and an
+  // 'index' property. The 'index' property is the index of this solve within
+  // the given cursor.
+  LazySolves.prototype.getSolveAddress = function(inverseIndex) {
     var index = window.app.store.getSolveCount() - (inverseIndex + 1);
     for (var i = 0, len = this._cursors.length; i < len; ++i) {
       var cursor = this._cursors[i];
       if (index >= cursor.getStartIndex() &&
           index < cursor.getStartIndex()+cursor.getLength) {
-        return cursor.getSolve(index - cursor.getStartIndex());
+        return {cursor: cursor, index: index - cursor.getStartIndex()};
       }
     }
     throw new Error('solve index out of bounds: ' + inverseIndex);
