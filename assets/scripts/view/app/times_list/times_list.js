@@ -36,6 +36,7 @@
     this._contextMenu = null;
 
     this._registerModelEvents();
+    this._registerViewEvents();
     this._loadMore();
   }
 
@@ -44,6 +45,8 @@
   TimesList.prototype.layout = function(width) {
     this._$element.css({width: (this._maxRowWidth || DEFAULT_WIDTH) +
       scrollbarWidth()});
+    this._loadMoreIfNecessary();
+    this._updateRowRange();
   };
 
   TimesList.prototype.width = function() {
@@ -236,7 +239,7 @@
     var visibleBottom = visibleTop + this._$element.height();
 
     var firstVisibleIndex = Math.floor(visibleTop / this._rowHeight);
-    var lastVisibleIndex = Math.ceil(visibleBottom / this._rowHeight);
+    var lastVisibleIndex = Math.floor(visibleBottom / this._rowHeight);
 
     firstVisibleIndex = Math.min(firstVisibleIndex, this._rows.length-1);
     lastVisibleIndex = Math.min(lastVisibleIndex, this._rows.length-1);
