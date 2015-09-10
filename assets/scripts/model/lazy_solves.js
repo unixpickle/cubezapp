@@ -48,7 +48,7 @@
   // getSolve gets a solve at the given index. The indexes start from newest
   // solve to oldest, unlike the indexes in the store.
   LazySolves.prototype.getSolve = function(inverseIndex) {
-    var info = this.getSolveAddress();
+    var info = this.getSolveAddress(inverseIndex);
     return info.cursor.getSolve(info.index);
   };
 
@@ -61,7 +61,7 @@
     for (var i = 0, len = this._cursors.length; i < len; ++i) {
       var cursor = this._cursors[i];
       if (index >= cursor.getStartIndex() &&
-          index < cursor.getStartIndex()+cursor.getLength) {
+          index < cursor.getStartIndex()+cursor.getLength()) {
         return {cursor: cursor, index: index - cursor.getStartIndex()};
       }
     }
@@ -114,8 +114,8 @@
 
   LazySolves.prototype._handleDeletedSolve = function(id, index) {
     if (this._cursors.length === 0) {
-      // NOTE: if the initial data was still loading, it could have been asking
-      // for indices that are now invalid.
+      // NOTE: if we were loading the initial data, the indices we were
+      // requesting are probably invalid now.
       this._invalidate();
       return;
     }
@@ -170,5 +170,7 @@
   LazySolves.prototype._updateLastLength = function() {
     this._lastLength = this.getLength();
   };
+
+  window.app.LazySolves = LazySolves;
 
 })();

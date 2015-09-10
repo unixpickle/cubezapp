@@ -41,7 +41,7 @@
   TimesListRowRange.prototype.setParameters = function(total, start, rows) {
     this._$rows.remove().empty();
     for (var i = 0, len = rows.length; i < len; ++i) {
-      if (i > this._viewCache.length) {
+      if (i >= this._viewCache.length) {
         this._viewCache[i] = new window.app.TimesListRowView();
       }
 

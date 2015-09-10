@@ -34,7 +34,7 @@
 
   TimesListLoader.STATE_HIDDEN = 0;
   TimesListLoader.STATE_LOADING = 1;
-  TimesListLoader.STATE_FAILED = 2;
+  TimesListLoader.STATE_MANUAL_RELOAD = 2;
 
   TimesListLoader.prototype.element = function() {
     return this._$element;
@@ -60,12 +60,14 @@
       this._$spinner.css({display: 'block'});
       this._startSpinning();
       break;
-    case TimesListLoader.STATE_FAILED:
+    case TimesListLoader.STATE_MANUAL_RELOAD:
       this._$element.css({display: 'block'});
       this._$reloadButton.css({display: 'block'});
       this._$spinner.css({display: 'none'});
       break;
     }
+    
+    this._state = newState;
   };
 
   TimesListLoader.prototype._animationFrame = function(time) {
@@ -75,7 +77,7 @@
     }
     var angle = (time - this._startTime) / 3;
     this._setSpinnerAngle(angle % 360);
-    this._frameRequest = requestAnimationFrame(this._animateFrame.bind(this));
+    this._frameRequest = requestAnimationFrame(this._animationFrame.bind(this));
   };
 
   TimesListLoader.prototype._setSpinnerAngle = function(angle) {
@@ -94,13 +96,14 @@
   };
 
   var RELOAD_BUTTON_SVG = '<svg viewBox="12 12 26 26" version="1.1" ' +
-    'class="flavor-text">' +
+    'class="flavor-text times-list-reload">' +
     '<path d="M33.660254038,30 a10,10 0 1 1 0,-10'
     'm-7.372666366,0 l7.372666366,0 l0,-7.372666366" ' +
     'stroke="currentColor" fill="none" stroke-width="2" />' +
     '</svg>';
 
-  var SPINNER_SVG = '<svg viewBox="0 0 1 1" class="flavor-text">' +
+  var SPINNER_SVG = '<svg viewBox="0 0 1 1" version="1.1" '+
+    'class="flavor-text times-list-spinner">' +
     '<g fill="currentColor"><rect fill="inherit" x="0.000000" y="0.000000" ' +
     'width="0.306931" height="0.306931" /><rect fill="inherit" x="0.000000" ' +
     'y="0.346535" width="0.306931" height="0.306931" /><rect fill="inherit" ' +
@@ -114,6 +117,6 @@
     'height="0.306931" /><rect fill="inherit" x="0.693069" y="0.693069" ' +
     'width="0.306931" height="0.306931" /></g></svg>';
 
-  window.TimesListLoader = TimesListLoader;
+  window.app.TimesListLoader = TimesListLoader;
 
 })();

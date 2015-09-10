@@ -23,11 +23,9 @@
 .times-list-row-content {
   display: inline-block;
   height: 30px;
-  display: table;
 }
 
 .times-list-row-label {
-  display: table-row;
   float: left;
   height: 30px;
   line-height: 30px;

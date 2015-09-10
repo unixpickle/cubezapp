@@ -4,6 +4,10 @@
   // the LazySolves will take effect.
   var CLEAR_DELAY = 500;
 
+  // When the user is scrolled within LOAD_MORE_THRESHOLD pixels of the bottom
+  // of the content, more content will automatically be loaded.
+  var LOAD_MORE_THRESHOLD = 200;
+
   var DEFAULT_WIDTH = 150;
 
   // TimesList shows the users their times in a linear fashion.
@@ -14,6 +18,7 @@
     window.app.EventEmitter.call(this);
     this._$element = $('#times-list');
 
+    this._rowHeight = computeRowHeight();
     this._textMetrics = new window.app.TimeTextMetrics();
     this._rowRange = new window.app.TimesListRowRange();
     this._loader = new window.app.TimesListLoader();
@@ -90,7 +95,7 @@
 
   TimesList.prototype._handleError = function() {
     this._clearIfNecessary();
-    this._loader.switchState(window.app.TimesListLoader.STATE_FAILED);
+    this._loader.switchState(window.app.TimesListLoader.STATE_MANUAL_REFRESH);
   };
 
   TimesList.prototype._handleModify = function(index) {
@@ -112,7 +117,12 @@
 
   TimesList.prototype._handleMore = function() {
     this._clearIfNecessary();
-    this._loader.switchState(window.app.TimesListLoader.STATE_HIDDEN);
+
+    if (this._lazySolves.canLoadMore()) {
+      this._loader.switchState(window.app.TimesListLoader.STATE_MANUAL_REFRESH);
+    } else {
+      this._loader.switchState(window.app.TimesListLoader.STATE_HIDDEN);
+    }
 
     var len = this._lazySolves.getLength();
     var oldMaxWidth = this._maxRowWidth;
@@ -140,7 +150,15 @@
   };
 
   TimesList.prototype._loadMoreIfNecessary = function() {
-    // TODO: check if they are scrolled down enough, and if so load more.
+    if (!this._lazySolves.canLoadMore()) {
+      return;
+    }
+
+    var contentHeight = this._rows.length * this._rowHeight;
+    var scrollBottom = this._$element.scrollTop() + this._$element.height();
+    if (scrollBottom+LOAD_MORE_THRESHOLD > contentHeight) {
+      this._loadMore();
+    }
   };
 
   // _recomputeUpperBoundedMaxRowWidth recomputes this._maxRowWidth assuming it
@@ -170,23 +188,85 @@
   };
 
   TimesList.prototype._registerViewEvents = function() {
-    // TODO: handle scroll events here.
-    // TODO: handle refresh events here.
-    // TODO: handle row clicks here.
+    this._$element.on('scroll', function() {
+      this._clearIfNecessary();
+      this._loadMoreIfNecessary();
+      this._updateRowRange();
+    }.bind(this));
+    this._loader.on('reload', this._loadMore.bind(this));
+    this._rowRange.on('rowClick', this._showMenuForRow.bind(this));
+  };
+
+  TimesList.prototype._scrollToShowRow = function(rowIndex, callback) {
+    var rowTop = rowIndex * this._rowHeight;
+    var rowBottom = (rowIndex + 1) * this._rowHeight;
+
+    var visibleTop = this._$element.scrollTop();
+    var visibleHeight = this._$element.height();
+    var visibleBottom = visibleTop + visibleHeight;
+
+    var newScrollTop = null;
+    if (rowTop < visibleTop) {
+      newScrollTop = rowTop;
+    } else if (rowBottom > visibleBottom) {
+      newScrollTop = rowBottom - visibleHeight
+    }
+
+    if (newScrollTop === null) {
+      callback();
+    } else {
+      this._$element.one('scroll', callback);
+      this._$element.scrollTop(newScrollTop);
+    }
+  };
+
+  TimesList.prototype._showMenuForRow = function(rowIndex) {
+    this._scrollToShowRow(rowIndex, function() {
+      if (rowIndex >= this._rows.length) {
+        // NOTE: this may happen in some edge cases. For example, if the data
+        // changes while the view is being scrolled.
+        return;
+      }
+      // TODO: show a menu here.
+    }.bind(this));
   };
 
   TimesList.prototype._updateRowRange = function() {
-    // TODO: update this._rowRange to show the rows that the user is currently
-    // scrolled to.
+    var visibleTop = this._$element.scrollTop();
+    var visibleBottom = visibleTop + this._$element.height();
+
+    var firstVisibleIndex = Math.floor(visibleTop / this._rowHeight);
+    var lastVisibleIndex = Math.ceil(visibleBottom / this._rowHeight);
+
+    firstVisibleIndex = Math.min(firstVisibleIndex, this._rows.length-1);
+    lastVisibleIndex = Math.min(lastVisibleIndex, this._rows.length-1);
+
+    if (this._rowRange.getLength() !== 1+lastVisibleIndex-firstVisibleIndex ||
+        this._rowRange.getStart() !== firstVisibleIndex ||
+        this._rowRange.getTotalLength() !== this._rows.length) {
+      this._rowRange.setParameters(this._rows.length, firstVisibleIndex,
+        this._rows.slice(firstVisibleIndex, lastVisibleIndex+1));
+    }
   };
 
   TimesList.prototype._widthChanged = function() {
     this.emit('layout');
   };
 
+  function computeRowHeight() {
+    var $element = $('<div class="times-list-row"></div>').css({
+      position: 'fixed',
+      visibility: 'hidden'
+    });
+    $(document.body).append($element);
+    var height = $element.height();
+    $element.remove();
+    return height;
+  }
+
   function scrollbarWidth() {
     // Generate a small scrolling element.
-    var element = $('<div></div>').css({
+    var $element = $('<div></div>').css({
       width: 200,
       height: 100,
       overflowY: 'scroll',
@@ -195,13 +275,13 @@
     });
 
     // Generate a tall element to put inside the small one.
-    var content = $('<div></div>').css({height: 300, width: '100%'});
-    element.append(content);
+    var $content = $('<div></div>').css({height: 300, width: '100%'});
+    $element.append($content);
 
     // Append the small element to the body and measure stuff.
-    $(document.body).append(element);
-    var result = element.width() - content.width();
-    element.remove();
+    $(document.body).append($element);
+    var result = $element.width() - $content.width();
+    $element.remove();
 
     return result;
   }

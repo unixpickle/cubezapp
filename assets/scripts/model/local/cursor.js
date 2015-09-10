@@ -2,15 +2,12 @@
 
   // A LocalCursor implements the cursor interface for LocalSolves.
   function LocalCursor(localSolves, start, length) {
-    window.app.EventEmitter.call(this);
     this._valid = true;
     this._solves = localSolves;
     this._start = start;
     this._length = length;
     localSolves.cursorCreated(this);
   }
-
-  LocalCursor.prototype = Object.create(window.app.EventEmitter.prototype);
 
   // close invalidates this cursor and allows the store to delete any caches
   // associated with it.

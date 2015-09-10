@@ -3,7 +3,7 @@
   function TimesListRowView() {
     this._$element = $('<div class="times-list-row"></div>');
     this._$content = $('<div class="times-list-row-content"></div>');
-    this._$time = $('<label class="times-list-row-label></label>"');
+    this._$time = $('<label class="times-list-row-label"></label>');
     this._$plus2 = $('<label class="times-list-row-label">+</label>');
     this._$content.append(this._$time, this._$plus2);
     this._$element.append(this._$content);
@@ -13,7 +13,7 @@
     return this._$element;
   };
 
-  TimesListRowView.prototype.updateWithSolve = function(s) {
+  TimesListRowView.prototype.updateWithSolve = function(solve) {
     var solveTime = window.app.solveTime(solve);
 
     this._$time.text(window.app.formatTime(solveTime));
