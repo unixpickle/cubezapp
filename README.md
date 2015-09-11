@@ -6,6 +6,8 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 # TODO
 
+ * On creating a puzzle, hovering over an icon name could change the preview.
+ * Make it possible to search your list of puzzles.
  * Rename this repository to "cubezapp"
  * Use [jsbuild](https://github.com/unixpickle/jsbuild) for everything.
  * On mobile, it is possible to touch hidden elements while timing yourself.
