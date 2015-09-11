@@ -12,6 +12,7 @@
 
     this._start = 0;
     this._length = 0;
+    this._maxWidth = 0;
     this._totalLength = 0;
 
     this._rowHeight = computeRowHeight();
@@ -30,6 +31,14 @@
     return this._length;
   };
 
+  TimesListRowRange.prototype.getMaxWidth = function() {
+    return this._maxWidth;
+  };
+
+  TimesListRowRange.prototype.getRowHeight = function() {
+    return this._rowHeight;
+  };
+
   TimesListRowRange.prototype.getStart = function() {
     return this._start;
   };
@@ -38,7 +47,12 @@
     return this._totalLength;
   };
 
-  TimesListRowRange.prototype.setParameters = function(total, start, rows) {
+  TimesListRowRange.prototype.setParameters = function(total, maxWidth, start,
+                                                       rows) {
+    // TODO: sometimes, scrolling while hovering over a row causes the row to
+    // flicker because the row changes views. Figure out how to fix this if
+    // possible.
+
     this._$rows.remove().empty();
     for (var i = 0, len = rows.length; i < len; ++i) {
       if (i >= this._viewCache.length) {
@@ -46,7 +60,7 @@
       }
 
       var view = this._viewCache[i];
-      view.updateWithSolve(rows[i].getSolve());
+      view.update(rows[i].getSolve(), maxWidth);
       var $row = view.element();
       this._$rows.append($row);
       $row.click(this.emit.bind(this, 'rowClick', i+start));
@@ -56,6 +70,11 @@
     this._$beforeSpacer.css({height: start * this._rowHeight});
     this._$afterSpacer.css({height: (total-start-rows.length) *
       this._rowHeight});
+
+    this._length = rows.length;
+    this._maxWidth = maxWidth;
+    this._start = start;
+    this._totalLength = total;
   };
 
   function computeRowHeight() {

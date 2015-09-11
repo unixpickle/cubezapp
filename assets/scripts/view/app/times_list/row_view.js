@@ -1,6 +1,6 @@
 (function() {
 
-  function TimesListRowView() {
+  function TimesListRowView(metrics) {
     this._$element = $('<div class="times-list-row"></div>');
     this._$content = $('<div class="times-list-row-content"></div>');
     this._$time = $('<label class="times-list-row-label"></label>');
@@ -13,11 +13,13 @@
     return this._$element;
   };
 
-  TimesListRowView.prototype.updateWithSolve = function(solve) {
+  TimesListRowView.prototype.update = function(solve, contentWidth) {
     var solveTime = window.app.solveTime(solve);
 
     this._$time.text(window.app.formatTime(solveTime));
     this._$plus2.css({visibility: solve.plus2 ? 'visible' : 'hidden'});
+    this._$content.css({width: contentWidth -
+      window.app.TimesListRow.TOTAL_PADDING});
 
     if (window.app.solveIsPB(solve)) {
       this._$element.addClass('flavor-text');

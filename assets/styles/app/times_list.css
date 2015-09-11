@@ -10,6 +10,7 @@
   font-family: Roboto, sans-serif;
   font-weight: 300;
   height: 30px;
+  cursor: pointer;
 }
 
 .times-list-row:hover {
@@ -21,12 +22,13 @@
 }
 
 .times-list-row-content {
+  text-align: right;
   display: inline-block;
   height: 30px;
+  pointer-events: none;
 }
 
 .times-list-row-label {
-  float: left;
   height: 30px;
   line-height: 30px;
 }
