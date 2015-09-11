@@ -51,3 +51,7 @@
   left: calc(50% - 15px);
   top: 7px;
 }
+
+.times-list-reload {
+  cursor: pointer;
+}

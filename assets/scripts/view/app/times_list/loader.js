@@ -97,7 +97,7 @@
 
   var RELOAD_BUTTON_SVG = '<svg viewBox="12 12 26 26" version="1.1" ' +
     'class="flavor-text times-list-reload">' +
-    '<path d="M33.660254038,30 a10,10 0 1 1 0,-10'
+    '<path d="M33.660254038,30 a10,10 0 1 1 0,-10' +
     'm-7.372666366,0 l7.372666366,0 l0,-7.372666366" ' +
     'stroke="currentColor" fill="none" stroke-width="2" />' +
     '</svg>';

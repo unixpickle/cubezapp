@@ -96,7 +96,7 @@
 
   TimesList.prototype._handleError = function() {
     this._clearIfNecessary();
-    this._loader.switchState(window.app.TimesListLoader.STATE_MANUAL_REFRESH);
+    this._loader.switchState(window.app.TimesListLoader.STATE_MANUAL_RELOAD);
   };
 
   TimesList.prototype._handleModify = function(index) {
@@ -119,12 +119,6 @@
   TimesList.prototype._handleMore = function() {
     this._clearIfNecessary();
 
-    if (this._lazySolves.canLoadMore()) {
-      this._loader.switchState(window.app.TimesListLoader.STATE_MANUAL_REFRESH);
-    } else {
-      this._loader.switchState(window.app.TimesListLoader.STATE_HIDDEN);
-    }
-
     var len = this._lazySolves.getLength();
     var oldMaxWidth = this._maxRowWidth;
     for (var i = this._rows.length; i < len; ++i) {
@@ -138,6 +132,13 @@
     }
 
     this._updateRowRange();
+    
+    if (this._lazySolves.canLoadMore()) {
+      this._loader.switchState(window.app.TimesListLoader.STATE_MANUAL_RELOAD);
+    } else {
+      this._loader.switchState(window.app.TimesListLoader.STATE_HIDDEN);
+    }
+    
     this._loadMoreIfNecessary();
   };
 
