@@ -32,6 +32,7 @@
     this._lazySolves = new window.app.LazySolves();
     this._rows = [];
     this._maxRowWidth = 0;
+    this._lastMaxRowWidth = DEFAULT_WIDTH;
     this._contextMenu = null;
 
     this._registerModelEvents();
@@ -42,8 +43,10 @@
   TimesList.prototype = Object.create(window.app.EventEmitter.prototype);
 
   TimesList.prototype.layout = function(width) {
-    this._$element.css({width: (this._maxRowWidth || DEFAULT_WIDTH) +
-      scrollbarWidth()});
+    this._$element.css({
+      width: (width || this._maxRowWidth || this._lastMaxRowWidth) +
+        scrollbarWidth()
+    });
     this._loadMoreIfNecessary();
     this._updateRowRange();
   };
@@ -58,7 +61,7 @@
       this._clearEventTimeout = null;
       this._rows = [];
       this._maxRowWidth = 0;
-      this._rowRange.setParameters(0, 0, []);
+      this._rowRange.setParameters(0, 0, 0, []);
       this._hideContextMenu();
     }
   };
@@ -287,7 +290,8 @@
   };
 
   TimesList.prototype._widthChanged = function() {
-    this.emit('layout');
+    this._lastMaxRowWidth = this._maxRowWidth || this._lastMaxRowWidth;
+    this.emit('needsLayout');
   };
 
   function scrollbarWidth() {
