@@ -16,7 +16,9 @@
   TimesListRowView.prototype.update = function(solve, contentWidth) {
     var solveTime = window.app.solveTime(solve);
 
-    this._$time.text(window.app.formatTime(solveTime));
+    this._$time.text(window.app.formatTime(solveTime)).css({
+      textDecoration: solve.dnf ? 'line-through' : 'none'
+    });
     this._$plus2.css({visibility: solve.plus2 ? 'visible' : 'hidden'});
     this._$content.css({width: contentWidth -
       window.app.TimesListRow.TOTAL_PADDING});

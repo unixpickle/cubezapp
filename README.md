@@ -6,6 +6,9 @@ Cubezapp will be the best cube timer in existence. It will support scramble gene
 
 # TODO
 
+ * Create mechanism for testing times list:
+   * Simple routine to create a bunch of solves.
+   * Flags to emulate bad internet connectivity.
  * On creating a puzzle, hovering over an icon name could change the preview.
  * Make it possible to search your list of puzzles.
  * Rename this repository to "cubezapp"
