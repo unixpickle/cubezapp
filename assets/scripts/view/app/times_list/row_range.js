@@ -46,6 +46,13 @@
   TimesListRowRange.prototype.getTotalLength = function() {
     return this._totalLength;
   };
+  
+  TimesListRowRange.prototype.rowViewForIndex = function(index) {
+    if (index < this._start || index >= this._start + this._length) {
+      return null;
+    }
+    return this._viewCache[index - this._start];
+  };
 
   TimesListRowRange.prototype.setParameters = function(total, maxWidth, start,
                                                        rows) {

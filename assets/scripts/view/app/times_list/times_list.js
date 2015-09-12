@@ -59,10 +59,12 @@
       this._rows = [];
       this._maxRowWidth = 0;
       this._rowRange.setParameters(0, 0, []);
+      this._hideContextMenu();
     }
   };
 
   TimesList.prototype._handleAdd = function() {
+    this._hideContextMenu();
     this._clearIfNecessary();
 
     var solve = this._lazySolves.getSolve(0);
@@ -85,6 +87,7 @@
   };
 
   TimesList.prototype._handleDelete = function(index) {
+    this._hideContextMenu();
     this._clearIfNecessary();
 
     this._rows.splice(index, 1);
@@ -100,6 +103,7 @@
   };
 
   TimesList.prototype._handleModify = function(index) {
+    this._hideContextMenu();
     this._clearIfNecessary();
 
     var solve = this._lazySolves.getSolve(index);
@@ -132,14 +136,21 @@
     }
 
     this._updateRowRange();
-    
+
     if (this._lazySolves.canLoadMore()) {
       this._loader.switchState(window.app.TimesListLoader.STATE_MANUAL_RELOAD);
     } else {
       this._loader.switchState(window.app.TimesListLoader.STATE_HIDDEN);
     }
-    
+
     this._loadMoreIfNecessary();
+  };
+
+  TimesList.prototype._hideContextMenu = function() {
+    if (this._contextMenu !== null) {
+      this._contextMenu.hide();
+      this._contextMenu = null;
+    }
   };
 
   TimesList.prototype._loadMore = function() {
@@ -187,10 +198,13 @@
     this._lazySolves.on('add', this._handleAdd.bind(this));
     this._lazySolves.on('delete', this._handleDelete.bind(this));
     this._lazySolves.on('modify', this._handleModify.bind(this));
+
+    window.app.timer.on('active', this._hideContextMenu.bind(this));
   };
 
   TimesList.prototype._registerViewEvents = function() {
     this._$element.on('scroll', function() {
+      this._hideContextMenu();
       this._clearIfNecessary();
       this._loadMoreIfNecessary();
       this._updateRowRange();
@@ -223,13 +237,16 @@
   };
 
   TimesList.prototype._showMenuForRow = function(rowIndex) {
+    this._hideContextMenu();
     this._scrollToShowRow(rowIndex, function() {
-      if (rowIndex >= this._rows.length) {
-        // NOTE: this may happen in some edge cases. For example, if the data
-        // changes while the view is being scrolled.
+      var view = this._rowRange.rowViewForIndex(rowIndex);
+      if (view === null) {
+        // NOTE: this may happen if the data changed while scrolling.
         return;
       }
-      // TODO: show a menu here.
+      var solve = this._rows[rowIndex].getSolve();
+      this._contextMenu = new window.app.TimesListContextMenu(solve,
+        view.element());
     }.bind(this));
   };
 
