@@ -29,7 +29,7 @@
       new window.contextjs.TextRow('Add Comment', MENU_STYLE),
       new window.contextjs.ExpandableRow('Move To', MENU_STYLE)
     ]);
-    mainPage.onClick = this._mainPageClick.bind(this)
+    mainPage.onClick = this._mainPageClick.bind(this);
 
     var context = new window.contextjs.Context($rowElement, $('#footer'));
     this._menu = new window.contextjs.Menu(context, mainPage);
