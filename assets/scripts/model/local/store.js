@@ -260,6 +260,7 @@
     for (var i = 0, len = events.length; i < len; ++i) {
       var event = events[i];
       this._solves.on(event, this.emit.bind(this, eventMapping[event]));
+      this._solves.on(event, this._save.bind(this));
     }
   };
 

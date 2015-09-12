@@ -48,7 +48,7 @@
         scrollbarWidth()
     });
     this._loadMoreIfNecessary();
-    this._updateRowRange();
+    this._updateRowRange(false);
   };
 
   TimesList.prototype.width = function() {
@@ -80,7 +80,7 @@
       this._widthChanged();
     }
 
-    this._updateRowRange();
+    this._updateRowRange(false);
   };
 
   TimesList.prototype._handleClear = function() {
@@ -95,7 +95,7 @@
     this._clearIfNecessary();
 
     this._rows.splice(index, 1);
-    this._updateRowRange();
+    this._updateRowRange(false);
     this._loadMoreIfNecessary();
 
     this._recomputeUpperBoundedMaxRowWidth();
@@ -121,7 +121,7 @@
       this._recomputeUpperBoundedMaxRowWidth();
     }
 
-    this._updateRowRange();
+    this._updateRowRange(true);
   };
 
   TimesList.prototype._handleMore = function() {
@@ -139,7 +139,7 @@
       this._widthChanged();
     }
 
-    this._updateRowRange();
+    this._updateRowRange(false);
 
     if (this._lazySolves.canLoadMore()) {
       this._loader.switchState(window.app.TimesListLoader.STATE_MANUAL_RELOAD);
@@ -210,7 +210,7 @@
     this._$element.on('scroll', function() {
       this._clearIfNecessary();
       this._loadMoreIfNecessary();
-      this._updateRowRange();
+      this._updateRowRange(false);
     }.bind(this));
     this._loader.on('reload', this._loadMore.bind(this));
     this._rowRange.on('rowClick', this._showMenuForRow.bind(this));
@@ -268,7 +268,7 @@
     }.bind(this));
   };
 
-  TimesList.prototype._updateRowRange = function() {
+  TimesList.prototype._updateRowRange = function(forceUpdate) {
     var visibleTop = this._$element.scrollTop();
     var visibleBottom = visibleTop + this._$element.height();
 
@@ -280,7 +280,8 @@
     firstVisibleIndex = Math.min(firstVisibleIndex, this._rows.length-1);
     lastVisibleIndex = Math.min(lastVisibleIndex, this._rows.length-1);
 
-    if (this._rowRange.getLength() !== 1+lastVisibleIndex-firstVisibleIndex ||
+    if (forceUpdate ||
+        this._rowRange.getLength() !== 1+lastVisibleIndex-firstVisibleIndex ||
         this._rowRange.getStart() !== firstVisibleIndex ||
         this._rowRange.getTotalLength() !== this._rows.length ||
         this._rowRange.getMaxWidth() !== this._maxRowWidth) {
