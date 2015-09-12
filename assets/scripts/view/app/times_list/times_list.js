@@ -63,6 +63,7 @@
       this._maxRowWidth = 0;
       this._rowRange.setParameters(0, 0, 0, []);
       this._hideContextMenu();
+      this._loader.switchState(window.app.TimesListLoader.STATE_LOADING);
     }
   };
 
@@ -166,7 +167,7 @@
   };
 
   TimesList.prototype._loadMoreIfNecessary = function() {
-    if (!this._lazySolves.canLoadMore()) {
+    if (!this._lazySolves.canLoadMore() || this._clearEventTimeout !== null) {
       return;
     }
 

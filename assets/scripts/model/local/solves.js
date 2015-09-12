@@ -108,7 +108,7 @@
   // modifySolve changes the attributes of a given solve.
   LocalSolves.prototype.modifySolve = function(index, attrs) {
     this._modifySolveNoEmit(index, attrs);
-    this.emit('modify', id, attrs, index);
+    this.emit('modify', this.getSolves()[index].id, attrs, index);
   };
 
   // modifySolveById changes the attributes of a solve by looking up its ID.
