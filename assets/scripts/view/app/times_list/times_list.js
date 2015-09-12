@@ -204,7 +204,6 @@
 
   TimesList.prototype._registerViewEvents = function() {
     this._$element.on('scroll', function() {
-      this._hideContextMenu();
       this._clearIfNecessary();
       this._loadMoreIfNecessary();
       this._updateRowRange();
@@ -239,6 +238,8 @@
   TimesList.prototype._showMenuForRow = function(rowIndex) {
     this._hideContextMenu();
     this._scrollToShowRow(rowIndex, function() {
+      this._clearIfNecessary();
+
       var view = this._rowRange.rowViewForIndex(rowIndex);
       if (view === null) {
         // NOTE: this may happen if the data changed while scrolling.
@@ -247,6 +248,19 @@
       var solve = this._rows[rowIndex].getSolve();
       this._contextMenu = new window.app.TimesListContextMenu(solve,
         view.element());
+
+      var address = this._lazySolves.getSolveAddress(rowIndex);
+      var events = ['delete', 'viewScramble', 'addComment', 'removePenalty',
+        'plus2', 'dnf', 'moveTo'];
+      for (var i = 0, len = events.length; i < len; ++i) {
+        var event = events[i];
+        this._contextMenu.on(event, function(eventName, extraArgument) {
+          if (address.index < address.cursor.getLength() &&
+              address.cursor.valid()) {
+            this.emit(eventName, address, extraArgument);
+          }
+        }.bind(this, event));
+      }
     }.bind(this));
   };
 

@@ -9,6 +9,7 @@
   // This is an EventEmitter which will emit the following events:
   // - delete: either the deleteSolve or the moveSolve method was used.
   // - modify: the modifySolve method was used.
+  // - modifyUnindexed: modifySolveById was used and the ID was not in a cursor.
   // - move: the moveSolve method was used.
   // - loadingStats
   // - computedStats
@@ -106,25 +107,41 @@
 
   // modifySolve changes the attributes of a given solve.
   LocalSolves.prototype.modifySolve = function(index, attrs) {
-    var solve = this.getSolves()[index];
-
-    var newSolve = {};
-    var allKeys = Object.keys(solve);
-    for (var i = 0, len = allKeys; i < len; ++i) {
-      var key = allKeys[i];
-      newSolve[key] = solve[key];
-    }
-    this.getSolves()[index] = newSolve;
-
-    var keys = Object.keys(attrs);
-    for (var i = 0, len = keys.length; i < len; ++i) {
-      var key = keys[i];
-      newSolve[key] = attrs[key];
-    }
-
-    recomputeLastPBsAndPWs(this.getSolves(), index+1);
-    this._resetStats();
+    this._modifySolveNoEmit(index, attrs);
     this.emit('modify', id, attrs, index);
+  };
+
+  // modifySolveById changes the attributes of a solve by looking up its ID.
+  // This will emit 'modifyUnindexed' instead of 'modify' if the solve is not
+  // within any cursor.
+  LocalSolves.prototype.modifySolveById = function(id, attrs) {
+    var index = -1;
+    var solves = this.getSolves();
+    for (var i = 0, len = solves.length; i < len; ++i) {
+      if (solves[i].id === id) {
+        index = i;
+        break;
+      }
+    }
+    if (index < 0) {
+      return;
+    }
+    this._modifySolveNoEmit(index, attrs);
+
+    var containedByCursor = false;
+    for (var i = 0, len = this._cursors.length; i < len; ++i) {
+      var cursor = this._cursors[i];
+      if (index < cursor._start+cursor._length && index >= cursor._start) {
+        containedByCursor = true;
+        break;
+      }
+    }
+
+    if (containedByCursor) {
+      this.emit('modify', id, attrs, index);
+    } else {
+      this.emit('modifyUnindexed', id, attrs);
+    }
   };
 
   // moveSolve moves a solve to a different puzzle.
@@ -189,6 +206,30 @@
         }
       }
     }
+  };
+
+  // _modifySolveNoEmit modifies a solve without emitting a modify event.
+  LocalSolves.prototype._modifySolveNoEmit = function(index, attrs) {
+    var solve = this.getSolves()[index];
+
+    var newSolve = {};
+    var allKeys = Object.keys(solve);
+    for (var i = 0, len = allKeys; i < len; ++i) {
+      var key = allKeys[i];
+      newSolve[key] = solve[key];
+    }
+    this.getSolves()[index] = newSolve;
+
+    var keys = Object.keys(attrs);
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
+      newSolve[key] = attrs[key];
+    }
+
+    // TODO: do not recompute this stuff if neither the time nor the penalties
+    // were modified.
+    recomputeLastPBsAndPWs(this.getSolves(), index+1);
+    this._resetStats();
   };
 
   // _resetStats deletes all pre-existing knowledge about the stats and

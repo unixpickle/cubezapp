@@ -46,7 +46,7 @@
   TimesListRowRange.prototype.getTotalLength = function() {
     return this._totalLength;
   };
-  
+
   TimesListRowRange.prototype.rowViewForIndex = function(index) {
     if (index < this._start || index >= this._start + this._length) {
       return null;

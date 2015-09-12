@@ -112,6 +112,10 @@
     this.emit('modifiedPuzzle', attrs);
   };
 
+  LocalStore.prototype.modifySolveById = function(id, attrs) {
+    this._solves.modifySolveById(id, attrs);
+  };
+
   LocalStore.prototype.switchPuzzle = function(id, cb) {
     this._puzzles.switchPuzzle(id);
     this._solves.reset();
@@ -247,6 +251,7 @@
     var eventMapping = {
       'delete': 'deletedSolve',
       'modify': 'modifiedSolve',
+      'modifyUnindexed': 'modifiedUnindexedSolve',
       'move': 'movedSolve',
       'loadingStats': 'loadingStats',
       'computedStats': 'computedStats'

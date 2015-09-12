@@ -66,7 +66,7 @@
       this._$spinner.css({display: 'none'});
       break;
     }
-    
+
     this._state = newState;
   };
 

@@ -40,6 +40,7 @@ The store emits a number of events. These events are listed to look like functio
  * **modifiedGlobalSettings**(attrs) - the user modified the global settings. Not triggered by remote changes.
  * **modifiedPuzzle**(attrs) - the user modified the current puzzle. Not triggered by remote changes.
  * **modifiedSolve**(id, attrs, index) - the user modified a solve in the current puzzle. Not triggered by remote changes. The index argument is the index of the solve in the store.
+ * **modifiedUnindexedSolve**(id, attrs) - the user modified a solve which was not within any cursor. This can occur if a remote change occurs while a popup is open.
  * **movedSolve**(solveId, puzzleId) - a solve was moved to a different puzzle. This is emitted after **deletedSolve** is triggered for the solve.
  * **remoteChange**() - the user changed *something* on a remote device.
  * **switchPuzzleError**(err) - the puzzle could not be switched because of an error.
@@ -63,6 +64,7 @@ Here are the methods which the store provides:
  * **modifyAllPuzzles**(attrs) - modify attributes of the current puzzle and all other puzzles. Provide a dictionary of attributes to set on the puzzles.
  * **modifyGlobalSettings**(attrs) - modify attributes of the global settings.
  * **modifyPuzzle**(attrs) - modify attributes of the current puzzle. Provide a dictionary of attributes to set on the current puzzle.
+ * **modifySolveById**(id, attrs) - modify a solve by looking up its ID. If the solve is not loaded in any cursor, this will emit a **modifiedUnindexedSolve** event instead of a **modifiedSolve** event.
  * **switchPuzzle**(id, cb) - switch to a new puzzle. If this fails, the active puzzle is not changed.
 
 <a name="solve-object"></a>
