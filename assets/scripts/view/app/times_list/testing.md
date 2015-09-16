@@ -56,4 +56,15 @@ Note adding:
  * Perform the above 4 steps again, but instead of deleting the solve, add a penalty to it.
  * Make sure that the comment was added correctly to the solve.
 
+# Testing lazy loading
 
+The times list (actually, it's backing LazySolves) loads a fixed number of solves at a time. It is important to make sure that these chunks of solves are loaded properly. In particular, it is important to be sure that the chunks do not overlap and that there are no gaps in between them. It is also important to make sure the chunks respond properly when solves within them are modified, deleted, or added.
+
+Before testing this, it would be nice to setup the data to be something systematic and easy to navigate. See [Creating many solves](#creating-many-solves) for more info on how to do this.
+
+# Creating many solves
+
+For many tests, it will be nice to have a bunch of solves which are ordered in a systematic way. Here is a procedure by which to create such solves:
+
+ * First, create a new puzzle and go to it.
+ * In the javascript console, enter the following code: `for (var i = 0; i < 1000; ++i) {window.app.store.addSolve({date: new Date().getTime(), dnf: false, memo: 0, notes: '', plus2: false, time: i*10, scramble: null, scrambler: 'None', scrambleType: null});}`
