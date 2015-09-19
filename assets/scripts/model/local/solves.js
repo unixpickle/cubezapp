@@ -215,7 +215,7 @@
       throw new Error('no solve at index: ' + index);
     }
 
-    var newSolve = copySolve(solve);
+    var newSolve = window.app.copySolve(solve);
     this.getSolves()[index] = newSolve;
 
     var keys = Object.keys(attrs);
@@ -236,16 +236,6 @@
     this._averages = null;
     this._emitStats();
   };
-
-  function copySolve(solve) {
-    var newObject = {};
-    var keys = Object.keys(solve);
-    for (var i = 0, len = keys.length; i < len; ++i) {
-      var key = keys[i];
-      newObject[key] = solve[key];
-    }
-    return newObject;
-  }
 
   function insertSolveUsingTimestamp(solve, solves) {
     // TODO: use a binary search here.
