@@ -1,5 +1,7 @@
 (function() {
 
+  var MAX_TIME = 35997999;
+
   function Timer() {
     window.app.EventEmitter.call(this);
 
@@ -203,7 +205,7 @@
   Timer.prototype.setTime = function(time) {
     this._assertStates([Timer.STATE_TIMING, Timer.STATE_TIMING_DONE_MEMO,
       Timer.STATE_INSPECTION]);
-    this._time = Math.max(Math.min(time, 35999999), 0);
+    this._time = Math.max(Math.min(time, MAX_TIME), 0);
     this.emit('time');
   };
 
@@ -254,7 +256,7 @@
 
     // Generate milliseconds and cap it at 9:59:59.99
     var millis = centisecond*10 + second*1000 + minute*60000 + hour*3600000;
-    return Math.min(millis, 35999990);
+    return Math.min(millis, MAX_TIME);
   }
 
   window.app.Timer = Timer;
