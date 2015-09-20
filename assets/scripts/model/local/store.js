@@ -185,8 +185,6 @@
   // _loadData loads or reloads all of the user's data from localStorage. If the
   // data is not present in localStorage, reasonable defaults are generated.
   LocalStore.prototype._loadData = function() {
-    console.log('load data!');
-
     if ('undefined' === typeof localStorage.localStoreData) {
       if ('undefined' !== typeof localStorage.puzzles) {
         this._loadLegacy();

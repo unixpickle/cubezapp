@@ -73,6 +73,8 @@ Adding:
  * Scroll all the way down in the list to make sure all of the times are loaded.
  * Do another solve.
  * Scroll through the list again, doing the same steps as in "Loading and modification".
+ * Refresh the page.
+ * Do a few solves, then do the same steps as in "Loading modification".
 
 Deleting:
  * Delete the 99th solve and make sure nothing else is missing.
@@ -117,6 +119,16 @@ You can reverse the above code like this:
 window.app.store.getSolves = window.getSolvesBackup;
 window.app.ErrorTicket.SHORT_TIMEOUT = 10;
 ```
+
+# Tests for specific bugs
+
+These tests are designed to help you identify bugs that existed in the past but were fixed.
+
+LocalCursorTicket leaking cursors when cancelled:
+ * Create a new puzzle with 0 solves.
+ * Run the code in [Creating many solves](#creating-many-solves). 
+ * [Make sure](#checking-number-of-open-cursors) there are only a few open cursors.
+ * If the bug exists, there will be roughly 2 cursors per solve created.
 
 # Creating many solves
 

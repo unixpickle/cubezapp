@@ -74,6 +74,9 @@
   function LocalCursorTicket(callback, solves, start, count) {
     window.app.Ticket.call(this, callback);
     setTimeout(function() {
+      if (this._cancelled) {
+        return;
+      }
       if (start + count > solves.getSolves().length) {
         this.fail(new Error('bounds out of range: ' + start + ', ' + count));
       } else {
