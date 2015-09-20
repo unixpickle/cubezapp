@@ -56,11 +56,34 @@ Note adding:
  * Perform the above 4 steps again, but instead of deleting the solve, add a penalty to it.
  * Make sure that the comment was added correctly to the solve.
 
-# Testing lazy loading
+# Testing offline lazy loading
 
 The times list (actually, it's backing LazySolves) loads a fixed number of solves at a time. It is important to make sure that these chunks of solves are loaded properly. In particular, it is important to be sure that the chunks do not overlap and that there are no gaps in between them. It is also important to make sure the chunks respond properly when solves within them are modified, deleted, or added.
 
 Before testing this, it would be nice to setup the data to be something systematic and easy to navigate. See [Creating many solves](#creating-many-solves) for more info on how to do this.
+
+Loading and modification:
+ * Slowly scroll down the list of solves.
+ * Make sure that whenever you get near the bottom, the scrollbar gets larger
+ * Each time you pass 100 solves, make sure that there are no missing or repeated ones.
+ * Add +2 to the last, middle, and first time and make sure it shows up.
+ * Do the above step, but with DNF.
+
+Adding:
+ * Scroll all the way down in the list to make sure all of the times are loaded.
+ * Do another solve.
+ * Scroll through the list again, doing the same steps as in "Loading and modification".
+
+Deleting:
+ * Delete the 99th solve and make sure nothing else is missing.
+ * Reset your data
+ * Delete the 101st solve and make sure nothing else is missing.
+ * Reset your data
+ * Delete the last solve and make sure nothing else is missing.
+
+When you first load the site, [check the number of cursors](checking-number-of-cursors). Now, scroll to the bottom of the times list and make sure there are more cursors open. Now, switch to a different puzzle and switch back. Verify that the number of cursors now is the same as it was when you loaded the page.
+
+If you have between 900 and 1000 solves, the times list should use 10 cursors when it is fully loaded.
 
 # Creating many solves
 
@@ -84,3 +107,11 @@ for (var i = 0; i < 1000; ++i) {
 ```
 
 **NOTE:** To address [a bug in Safari 8.0.8](https://bugs.webkit.org/show_bug.cgi?id=149372), you may have to open the JS console, then refresh the page, then paste this code.
+
+# Checking number of open cursors
+
+To see the number of open cursors on the LocalStore, run this in the console:
+
+```js
+window.app.store._solves._cursors.length
+```
