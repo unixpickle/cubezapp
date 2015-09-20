@@ -85,6 +85,39 @@ When you first load the site, [check the number of cursors](checking-number-of-c
 
 If you have between 900 and 1000 solves, the times list should use 10 cursors when it is fully loaded.
 
+# Testing "online" lazy loading
+
+Since no server is currently implemented, all we have to work with is LocalStore. To make the best of this situation, we can manipulate LocalStore to emulate bad network connectivity.
+
+**Testing the loading animation:**
+
+Run this code to make loading take 5 seconds:
+```js
+window.app.LocalCursorTicket.SHORT_TIMEOUT = 3000
+```
+
+Now, make sure the loader is visible whenever you scroll to the bottom of the content (except the last time).
+
+**Testing loading failures:**
+
+Run this code to make loading fail after 3 seconds:
+```js
+window.getSolvesBackup = window.app.store.getSolves;
+window.app.store.getSolves = function(a, b, cb) {
+  return new window.app.ErrorTicket(cb, new Error('intentionally broken'));
+};
+window.app.ErrorTicket.SHORT_TIMEOUT = 3000;
+```
+
+Scrolling down should cause a spinner to show for 3 seconds, then a reload button.
+
+You can reverse the above code like this:
+
+```js
+window.app.store.getSolves = window.getSolvesBackup;
+window.app.ErrorTicket.SHORT_TIMEOUT = 10;
+```
+
 # Creating many solves
 
 For many tests, it will be nice to have a bunch of solves which are ordered in a systematic way. Here is a procedure by which to create such solves:

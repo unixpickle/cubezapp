@@ -47,8 +47,10 @@
     Ticket.call(this, callback);
     setTimeout(function() {
       this.finish(data);
-    }.bind(this), 10);
+    }.bind(this), DataTicket.SHORT_TIMEOUT);
   }
+  
+  DataTicket.SHORT_TIMEOUT = 10;
 
   DataTicket.prototype = Object.create(Ticket.prototype);
 
@@ -59,8 +61,10 @@
     Ticket.call(this, callback);
     setTimeout(function() {
       this.fail(error);
-    }.bind(this), 10);
+    }.bind(this), ErrorTicket.SHORT_TIMEOUT);
   }
+  
+  ErrorTicket.SHORT_TIMEOUT = 10;
 
   ErrorTicket.prototype = Object.create(Ticket.prototype);
 
@@ -75,8 +79,10 @@
       } else {
         this.finish(new window.app.LocalCursor(solves, start, count));
       }
-    }.bind(this), 10);
+    }.bind(this), LocalCursorTicket.SHORT_TIMEOUT);
   }
+
+  LocalCursorTicket.SHORT_TIMEOUT = 10;
 
   LocalCursorTicket.prototype = Object.create(Ticket.prototype);
 
