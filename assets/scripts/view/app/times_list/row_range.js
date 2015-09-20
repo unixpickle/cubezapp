@@ -59,7 +59,6 @@
     // TODO: sometimes, scrolling while hovering over a row causes the row to
     // flicker because the row changes views. Figure out how to fix this if
     // possible.
-
     this._$rows.remove().empty();
     for (var i = 0, len = rows.length; i < len; ++i) {
       if (i >= this._viewCache.length) {

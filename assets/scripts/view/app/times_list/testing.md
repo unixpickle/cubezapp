@@ -95,7 +95,7 @@ Since no server is currently implemented, all we have to work with is LocalStore
 
 Run this code to make loading take 5 seconds:
 ```js
-window.app.LocalCursorTicket.SHORT_TIMEOUT = 3000
+window.app.LocalCursorTicket.SHORT_TIMEOUT = 3000;
 ```
 
 Now, make sure the loader is visible whenever you scroll to the bottom of the content (except the last time).
