@@ -66,5 +66,21 @@ Before testing this, it would be nice to setup the data to be something systemat
 
 For many tests, it will be nice to have a bunch of solves which are ordered in a systematic way. Here is a procedure by which to create such solves:
 
- * First, create a new puzzle and go to it.
- * In the javascript console, enter the following code: `for (var i = 0; i < 1000; ++i) {window.app.store.addSolve({date: new Date().getTime(), dnf: false, memo: 0, notes: '', plus2: false, time: i*10, scramble: null, scrambler: 'None', scrambleType: null});}`
+First, create a new puzzle and go to it. Now, in the javascript console, enter the following code:
+```js
+for (var i = 0; i < 1000; ++i) {
+    window.app.store.addSolve({
+        date: new Date().getTime(),
+        dnf: false,
+        memo: 0,
+        notes: '',
+        plus2: false,
+        time: i*10,
+        scramble: null,
+        scrambler: 'None',
+        scrambleType: null
+    });
+}
+```
+
+**NOTE:** To address [a bug in Safari 8.0.8](https://bugs.webkit.org/show_bug.cgi?id=149372), you may have to open the JS console, then refresh the page, then paste this code.
