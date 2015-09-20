@@ -49,7 +49,7 @@
       this.finish(data);
     }.bind(this), DataTicket.SHORT_TIMEOUT);
   }
-  
+
   DataTicket.SHORT_TIMEOUT = 10;
 
   DataTicket.prototype = Object.create(Ticket.prototype);
@@ -63,7 +63,7 @@
       this.fail(error);
     }.bind(this), ErrorTicket.SHORT_TIMEOUT);
   }
-  
+
   ErrorTicket.SHORT_TIMEOUT = 10;
 
   ErrorTicket.prototype = Object.create(Ticket.prototype);

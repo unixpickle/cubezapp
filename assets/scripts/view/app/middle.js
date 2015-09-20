@@ -65,8 +65,6 @@
     }
 
     if ('number' !== typeof usableHeight || isNaN(usableHeight)) {
-      console.log('usableHeight is', usableHeight, 'math is', height-SCRAMBLE_PADDING*2);
-      console.log('height is', height, 'scramble', scramble);
       throw new Error('invalid usableHeight: ' + usableHeight);
     } else if ('number' !== typeof usableY || isNaN(usableY)) {
       throw new Error('invalid usableY: ' + usableY);
