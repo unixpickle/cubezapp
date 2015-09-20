@@ -71,13 +71,15 @@
   };
 
   TimesListLoader.prototype._animationFrame = function(time) {
+    this._frameRequest = requestAnimationFrame(this._animationFrame.bind(this));
+
     if (this._startTime === null) {
       this._startTime = time;
       return;
     }
+
     var angle = (time - this._startTime) / 3;
     this._setSpinnerAngle(angle % 360);
-    this._frameRequest = requestAnimationFrame(this._animationFrame.bind(this));
   };
 
   TimesListLoader.prototype._setSpinnerAngle = function(angle) {
@@ -92,6 +94,7 @@
 
   TimesListLoader.prototype._startSpinning = function() {
     this._setSpinnerAngle(0);
+    this._startTime = null;
     this._frameRequest = requestAnimationFrame(this._animationFrame.bind(this));
   };
 
