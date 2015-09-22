@@ -6,6 +6,14 @@
   display: table;
 }
 
+.puzzle-matcher-cell {
+  display: table;
+}
+
+.puzzle-matcher-importing-cell {
+  width: 100%;
+}
+
 .puzzle-matcher-cell-linker {
   width: 14px;
   height: 20px;
@@ -40,6 +48,10 @@
 }
 
 .puzzle-matcher-cell-linker:hover {
+  background-image: url('../images/filled-linker.svg');
+}
+
+.puzzle-matcher-connecting-cell .puzzle-matcher-cell-linker {
   background-image: url('../images/filled-linker.svg');
 }
 

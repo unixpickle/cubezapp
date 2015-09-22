@@ -1,6 +1,8 @@
 (function() {
 
+  var LINKER_CLASS = 'puzzle-matcher-cell-linker';
   var CONNECTED_CELL_CLASS = 'puzzle-matcher-connected-cell';
+  var CONNECTING_CELL_CLASS = 'puzzle-matcher-connecting-cell';
 
   function PuzzleMatcher() {
     this._importingNames = [];
@@ -36,14 +38,34 @@
     this._makeDefaultConnections();
   }
 
+  PuzzleMatcher.prototype._findCellAtPoint = function(x, y) {
+    for (var imp = 0; imp < 2; ++imp) {
+      var importing = (imp === 0);
+      var container = [this._importingPuzzles, this._existingPuzzles][imp];
+      var count = container.childNodes.length;
+      for (var nodeIndex = 0, len = container.childNodes.length; nodeIndex < len; ++nodeIndex) {
+        var puzzle = container.childNodes[nodeIndex];
+        var cell = puzzle.getElementsByClassName(LINKER_CLASS)[0];
+        var boundingBox = cell.getBoundingClientRect();
+        var width = cell.offsetWidth;
+        var height = cell.offsetHeight;
+        if (x >= boundingBox.left && y >= boundingBox.top && x <= boundingBox.left + width &&
+            y <= boundingBox.top + height) {
+          return {importing: importing, index: nodeIndex};
+        }
+      }
+    }
+    return null;
+  };
+
   PuzzleMatcher.prototype._generateCell = function(name, importing) {
     var kindLabel = (importing ? 'importing' : 'existing');
 
     var element = document.createElement('div');
-    element.className = 'puzzle-matcher-cell';
+    element.className = 'puzzle-matcher-cell puzzle-matcher-' + kindLabel + '-cell';
 
     var linker = document.createElement('div');
-    linker.className = 'puzzle-matcher-cell-linker puzzle-matcher-' + kindLabel + '-cell-linker';
+    linker.className = LINKER_CLASS + ' puzzle-matcher-' + kindLabel + '-cell-linker';
     element.appendChild(linker);
 
     var index;
@@ -52,7 +74,7 @@
     } else {
       index = this._existingNames.indexOf(name);
     }
-    linker.addEventListener('click', this._linkClicked.bind(this, index, importing));
+    linker.addEventListener('mousedown', this._linkMouseDown.bind(this, index, importing));
 
     var label = document.createElement('label');
     label.className = 'puzzle-matcher-cell-label puzzle-matcher-' + kindLabel + '-cell-label';
@@ -62,22 +84,58 @@
     return element;
   };
 
-  PuzzleMatcher.prototype._linkClicked = function(index, importing) {
+  PuzzleMatcher.prototype._linkMouseDown = function(index, importing) {
     var container = (importing ? this._importingPuzzles : this._existingPuzzles);
     var cell = container.childNodes[index];
-    
+
     if (hasClass(cell, CONNECTED_CELL_CLASS)) {
       this._removeConnectionForIndex(index, importing);
-      return;
     }
+
+    var linker = cell.getElementsByClassName(LINKER_CLASS)[0];
+    var tempLine = window.lineDrawer.createLine(linker, linker);
+
+    var onMove;
+    var onDrop;
+
+    var lastX = 0;
+    var lastY = 0;
+    onMove = function(e) {
+      var x = e.clientX;
+      var y = e.clientY;
+      window.lineDrawer.updateLineEnd(tempLine, [x, y]);
+    }.bind(this);
+
+    onDrop = function(e) {
+      removeClass(cell, CONNECTING_CELL_CLASS);
+      window.lineDrawer.deleteLine(tempLine);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onDrop);
+
+      var x = e.clientX;
+      var y = e.clientY;
+      var newCell = this._findCellAtPoint(x, y);
+      if (newCell === null || newCell.importing === importing) {
+        return;
+      }
+      if (importing) {
+        this._makeConnection(index, newCell.index);
+      } else {
+        this._makeConnection(newCell.index, index);
+      }
+    }.bind(this);
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onDrop);
+    addClass(cell, CONNECTING_CELL_CLASS);
   };
 
   PuzzleMatcher.prototype._makeConnection = function(startIndex, endIndex) {
     var puzzle1 = this._importingPuzzles.childNodes[startIndex];
     var puzzle2 = this._existingPuzzles.childNodes[endIndex];
 
-    var linker1 = puzzle1.getElementsByClassName('puzzle-matcher-cell-linker')[0];
-    var linker2 = puzzle2.getElementsByClassName('puzzle-matcher-cell-linker')[0];
+    var linker1 = puzzle1.getElementsByClassName(LINKER_CLASS)[0];
+    var linker2 = puzzle2.getElementsByClassName(LINKER_CLASS)[0];
 
     var line = window.lineDrawer.createLine(linker1, linker2);
     this._connections.push(new Connection(startIndex, endIndex, line));
@@ -108,7 +166,7 @@
     removeClass(this._existingPuzzles.childNodes[connection.endIndex],
       CONNECTED_CELL_CLASS);
   };
-  
+
   PuzzleMatcher.prototype._removeConnectionForIndex = function(index, importing) {
     for (var i = 0, len = this._connections.length; i < len; ++i) {
       var connection = this._connections[i];
