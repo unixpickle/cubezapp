@@ -1,0 +1,4 @@
+#content {
+  /* NOTE: this prevents the fixed SVG from covering the content */
+  position: relative;
+}
