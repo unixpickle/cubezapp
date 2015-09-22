@@ -1,7 +1,7 @@
 (function() {
 
   var SVG_NAMESPACE = "http://www.w3.org/2000/svg";
-  var STROKE_COLOR = 'blue';
+  var STROKE_COLOR = '#65bcd4';
   var STROKE_WIDTH = '3';
 
   function LineDrawer() {
@@ -34,7 +34,7 @@
     this._lines.splice(index, 1);
     this._svg.removeChild(line._svgLine);
   };
-  
+
   LineDrawer.prototype.updateLineEnd = function(line, newEnd) {
     line._p2 = newEnd;
     line.update();
@@ -77,7 +77,7 @@
     var height = element.offsetHeight;
     return [rect.left + width/2, rect.top + height/2];
   }
-  
+
   window.lineDrawer = new LineDrawer();
 
 })();

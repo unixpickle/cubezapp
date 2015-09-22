@@ -1,0 +1,52 @@
+#puzzle-matcher {
+  display: none;
+}
+
+#puzzle-matcher.showing {
+  display: table;
+}
+
+.puzzle-matcher-cell-linker {
+  width: 14px;
+  height: 20px;
+  background-image: url('../images/empty-linker.svg');
+  background-position: center center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.puzzle-matcher-cell-label {
+  height: 20px;
+  line-height: 20px;
+}
+
+.puzzle-matcher-importing-cell-label {
+  float: right;
+  margin-right: 5px;
+}
+
+.puzzle-matcher-importing-cell-linker {
+  float: right;
+  margin-right: 10px;
+}
+
+.puzzle-matcher-existing-cell-label {
+  float: right;
+  margin-left: 5px;
+}
+
+.puzzle-matcher-existing-cell-linker {
+  float: left;
+}
+
+.puzzle-matcher-cell-linker:hover {
+  background-image: url('../images/filled-linker.svg');
+}
+
+.puzzle-matcher-connected-cell .puzzle-matcher-cell-linker {
+  background-image: url('../images/filled-linker.svg');
+}
+
+.puzzle-matcher-connected-cell .puzzle-matcher-cell-linker:hover {
+  background-image: url('../images/delete-linker.svg');
+}
