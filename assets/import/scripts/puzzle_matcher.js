@@ -36,7 +36,7 @@
 
     this._element.className = 'showing';
 
-    this._connections = [];
+    this._removeAllConnections();
     this._importingPuzzles.innerHTML = '';
     this._existingPuzzles.innerHTML = '';
 
@@ -165,6 +165,12 @@
       if (index >= 0) {
         this._makeConnection(i, index);
       }
+    }
+  };
+
+  PuzzleMatcher.prototype._removeAllConnections = function() {
+    while (this._connections.length > 0) {
+      this._removeConnection(this._connections[0]);
     }
   };
 
