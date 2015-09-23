@@ -16,6 +16,20 @@
     }.bind(this));
   }
 
+  PuzzleMatcher.prototype.getExistingForImporting = function(importingIndex) {
+    var connection = null;
+    for (var i = 0, len = this._connections.length; i < len; ++i) {
+      if (this._connections[i].startIndex === importingIndex) {
+        connection = this._connections[i];
+        break;
+      }
+    }
+    if (connection === null) {
+      return null;
+    }
+    return this._existingNames[connection.endIndex];
+  };
+
   PuzzleMatcher.prototype.showMatcher = function(importingNames, existingNames) {
     this._importingNames = importingNames;
     this._existingNames = existingNames;
