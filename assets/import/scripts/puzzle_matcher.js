@@ -145,6 +145,10 @@
   };
 
   PuzzleMatcher.prototype._makeConnection = function(startIndex, endIndex) {
+    if (this.getExistingForImporting(startIndex) !== null) {
+      return;
+    }
+    
     var puzzle1 = this._importingPuzzles.childNodes[startIndex];
     var puzzle2 = this._existingPuzzles.childNodes[endIndex];
 
