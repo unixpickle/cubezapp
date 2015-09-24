@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Import Times</title>
+
+    <link rel="stylesheet" type="text/css" href="styles/style.css">
+    <link rel="stylesheet" type="text/css" href="styles/puzzle_matcher.css">
+
+    <script src="scripts/file_picker.js"></script>
+    <script src="scripts/line_drawer.js"></script>
+    <script src="scripts/puzzle_matcher.js"></script>
+    <script src="scripts/main.js"></script>
+  </head>
+
+  <body>
+    <div id="content">
+      <p>Upload data to import.</p>
+      <input type="file" id="file">
+      <table id="puzzle-matcher">
+        <tr>
+          <th>Importing</th>
+          <th>Existing</th>
+        </tr>
+        <tr>
+          <td id="importing-puzzles"></td>
+          <td id="existing-puzzles"></td>
+        </tr>
+      </table>
+      <div id="import-fields">
+        <input type="checkbox" id="import-settings"> Use settings from imported data.
+        <br>
+        <button id="import-button">Import</button>
+      </div>
+    </div>
+  </body>
+
+</html>

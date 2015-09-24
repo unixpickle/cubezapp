@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>Export Times</title>
+    <script src="export.js"></script>
+  </head>
+  <body onload="loadHandler()">
+    <p>The link below should download your Cubezapp data.</p>
+    <a id="download-link" download="export.txt">Download</a>
+    <p>On some browsers, that won't work and you'll have to manually copy+paste the data.</p>
+    <button onclick="copyAndPasteMode()">Copy &amp; Paste Mode</button>
+  </body>
+</html>
