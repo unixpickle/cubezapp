@@ -11,6 +11,7 @@
     <script src="scripts/file_picker.js"></script>
     <script src="scripts/line_drawer.js"></script>
     <script src="scripts/puzzle_matcher.js"></script>
+    <script src="scripts/main.js"></script>
   </head>
 
   <body>
@@ -27,7 +28,11 @@
           <td id="existing-puzzles"></td>
         </tr>
       </table>
-      <button id="import-button">Import</button>
+      <div id="import-fields">
+        <input type="checkbox" id="import-settings"> Use settings from imported data.
+        <br>
+        <button id="import-button">Import</button>
+      </div>
     </div>
   </body>
 

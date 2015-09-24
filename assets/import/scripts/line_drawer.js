@@ -7,7 +7,7 @@
   function LineDrawer() {
     this._lines = [];
     this._svg = document.createElementNS(SVG_NAMESPACE, 'svg');
-    this._svg.setAttribute('style', 'position: fixed; top: 0; left: 0; width: 100%; height: 100%');
+    this._svg.setAttribute('style', 'position: absolute;top: 0;left: 0;width: 100%;height: 100%');
 
     window.addEventListener('load', function() {
       document.body.insertBefore(this._svg, document.body.childNodes[0]);

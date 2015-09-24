@@ -25,9 +25,9 @@
       }
     }
     if (connection === null) {
-      return null;
+      return -1;
     }
-    return this._existingNames[connection.endIndex];
+    return connection.endIndex;
   };
 
   PuzzleMatcher.prototype.showMatcher = function(importingNames, existingNames) {
@@ -145,7 +145,7 @@
   };
 
   PuzzleMatcher.prototype._makeConnection = function(startIndex, endIndex) {
-    if (this.getExistingForImporting(startIndex) !== null) {
+    if (this.getExistingForImporting(startIndex) >= 0) {
       return;
     }
     
