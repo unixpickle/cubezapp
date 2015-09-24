@@ -67,6 +67,12 @@
     existing.solves.sort(function(a, b) {
       return a.date - b.date;
     });
+    for (var i = 1; i < existing.solves.length; ++i) {
+      if (existing.solves[i].id === existing.solves[i-1].id) {
+        existing.solves.splice(i, 1);
+        --i;
+      }
+    }
   }
 
   function addPuzzle(importing, existing) {
