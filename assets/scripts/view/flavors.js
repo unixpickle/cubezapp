@@ -26,7 +26,7 @@
     Peach: {
       color: [0xf1, 0x9e, 0x4d]
     },
-    Pear: {
+    Kiwi: {
       color: [0x33, 0xbe, 0x6e]
     },
     Oreo: {
@@ -44,7 +44,7 @@
     'Grape',
     'Strawberry',
     'Peach',
-    'Pear',
+    'Kiwi',
     'Oreo',
     'Chocolate'
   ];
