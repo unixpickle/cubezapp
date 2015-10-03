@@ -27,6 +27,8 @@
   };
 
   TemporaryGraph.prototype._generateSVG = function() {
+    this._$svg.empty();
+
     var width = this._$element.width();
     var height = this._$element.height();
 
@@ -35,8 +37,6 @@
     }
 
     var buckets = this._narrowedDownBuckets();
-
-    this._$svg.empty();
     this._$svg[0].setAttribute('viewBox', '0 0 ' + width + ' ' + height);
 
     var usableWidth = width - (Y_LABELS_INSET + RIGHT_SIDE_INSET);

@@ -148,7 +148,7 @@
     if (this.getExistingForImporting(startIndex) >= 0) {
       return;
     }
-    
+
     var puzzle1 = this._importingPuzzles.childNodes[startIndex];
     var puzzle2 = this._existingPuzzles.childNodes[endIndex];
 
