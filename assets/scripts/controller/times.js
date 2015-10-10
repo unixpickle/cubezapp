@@ -2,21 +2,12 @@
 
   function TimesController(view) {
     this._view = view;
-    var events = ['delete', 'viewScramble', 'addComment', 'removePenalty',
-      'plus2', 'dnf'];
+    var events = ['delete', 'viewScramble', 'removePenalty', 'plus2', 'dnf'];
     for (var i = 0, len = events.length; i < len; ++i) {
       var event = events[i];
       view.on(event, this['_' + event]);
     }
   }
-
-  TimesController.prototype._addComment = function(solve) {
-    var popup = new window.app.CommentPopup(solve);
-    popup.on('save', function(msg) {
-      window.app.store.modifySolve(solve.id, {notes: msg});
-    }.bind(this));
-    popup.show();
-  };
 
   TimesController.prototype._delete = function(solve) {
     window.app.store.deleteSolve(solve.id);

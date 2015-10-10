@@ -166,7 +166,6 @@
         new window.contextjs.TextRow('Delete Time', style),
         new window.contextjs.ExpandableRow('Add Penalty', style),
         new window.contextjs.TextRow('View Scramble', style),
-        new window.contextjs.TextRow('Add Comment', style),
         new window.contextjs.ExpandableRow('Move To', style)
       ]);
       var pentaltyPage = new window.contextjs.Page([
@@ -189,9 +188,6 @@
           this.emit('viewScramble', solve);
           break;
         case 3:
-          this.emit('addComment', solve);
-          break;
-        case 4:
           var items = [new window.contextjs.BackRow('Move To', style)];
           var puzzles = window.app.store.getInactivePuzzles();
           for (var i = 0, len = puzzles.length; i < len; ++i) {
