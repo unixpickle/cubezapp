@@ -1,5 +1,7 @@
 (function() {
 
+  var SPIN_RATE = 0.3;
+
   var requestAnimationFrame = window.requestAnimationFrame || function(cb) {
     return setTimeout(function() {
       cb(new Date().getTime());
@@ -78,7 +80,7 @@
       return;
     }
 
-    var angle = (time - this._startTime) / 3;
+    var angle = (time - this._startTime) * SPIN_RATE;
     this._setSpinnerAngle(angle % 360);
   };
 

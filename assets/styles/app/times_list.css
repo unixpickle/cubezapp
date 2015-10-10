@@ -39,17 +39,26 @@
 
 .times-list-loader {
   position: relative;
-  height: 44px;
+  height: 34px;
   width: 100%;
 }
 
-.times-list-reload, .times-list-spinner {
-  width: 30px;
-  height: 30px;
+.times-list-reload {
+  width: 24px;
+  height: 24px;
 
   position: absolute;
-  left: calc(50% - 15px);
-  top: 7px;
+  left: calc(50% - 12px);
+  top: 3px;
+}
+
+.times-list-spinner {
+  width: 20px;
+  height: 20px;
+
+  position: absolute;
+  left: calc(50% - 10px);
+  top: 5px;
 }
 
 .times-list-reload {
