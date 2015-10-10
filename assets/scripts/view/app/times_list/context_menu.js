@@ -8,7 +8,6 @@
   // This is an EventEmitter which emits the following events:
   // - delete
   // - viewScramble
-  // - addComment
   // - moveTo(puzzleId)
   // - removePenalty
   // - plus2
@@ -26,7 +25,6 @@
       new window.contextjs.TextRow('Delete Time', MENU_STYLE),
       new window.contextjs.ExpandableRow(this._penaltyTitle, MENU_STYLE),
       new window.contextjs.TextRow('View Scramble', MENU_STYLE),
-      new window.contextjs.TextRow('Add Comment', MENU_STYLE),
       new window.contextjs.ExpandableRow('Move To', MENU_STYLE)
     ]);
     mainPage.onClick = this._mainPageClick.bind(this);
@@ -55,9 +53,6 @@
       this.emit('viewScramble');
       break;
     case 3:
-      this.emit('addComment');
-      break;
-    case 4:
       this._showMoveToPage();
       return;
     }

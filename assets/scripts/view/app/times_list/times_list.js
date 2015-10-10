@@ -254,7 +254,7 @@
         view.element());
 
       var address = this._lazySolves.getSolveAddress(rowIndex);
-      var events = ['delete', 'viewScramble', 'addComment', 'removePenalty',
+      var events = ['delete', 'viewScramble', 'removePenalty',
         'plus2', 'dnf', 'moveTo'];
       for (var i = 0, len = events.length; i < len; ++i) {
         var event = events[i];
