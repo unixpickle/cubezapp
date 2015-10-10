@@ -56,7 +56,7 @@
       var keys = Object.keys(importing);
       for (var i = 0, len = keys.length; i < len; ++i) {
         var key = keys[i];
-        if (key === 'solves') {
+        if (key === 'solves' || key == 'id') {
           continue;
         }
         existing[key] = importing[key];
