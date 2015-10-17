@@ -157,6 +157,11 @@
       shiftedVersion._removeOldestValue();
     }
 
+    if (shiftedVersion._posInfCount > this._numRemove ||
+        shiftedVersion._negInfCount > this._numRemove) {
+      return NaN;
+    }
+
     var average = shiftedVersion._average.average();
     var middleCount = this._size - this._numRemove*2;
 
@@ -166,11 +171,6 @@
         return NaN;
       }
       return (requested - average) * middleCount;
-    }
-
-    if (shiftedVersion._posInfCount > this._numRemove ||
-        shiftedVersion._negInfCount > this._numRemove) {
-      return NaN;
     }
 
     var highestMiddle = shiftedVersion._sortedValues.get(this._size -
@@ -334,16 +334,16 @@
     return idx;
   };
 
-  // count returns the number of items in the list.
-  SortedArray.prototype.count = function() {
-    return this._list.count();
-  };
-
   // copy duplicates the sorted array and returns the duplicate.
   SortedArray.prototype.copy = function() {
     var res = new SortedArray();
     res._list = this._list.copy();
     return res;
+  };
+
+  // count returns the number of items in the list.
+  SortedArray.prototype.count = function() {
+    return this._list.count();
   };
 
   // get returns the number at a given index.
