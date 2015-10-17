@@ -277,8 +277,10 @@
     var lastVisibleIndex = Math.floor(visibleBottom /
       this._rowRange.getRowHeight());
 
-    firstVisibleIndex = Math.max(Math.min(firstVisibleIndex, this._rows.length-1), 0);
-    lastVisibleIndex = Math.max(Math.min(lastVisibleIndex, this._rows.length-1), 0);
+    firstVisibleIndex = Math.max(Math.min(firstVisibleIndex,
+      this._rows.length-1), 0);
+    lastVisibleIndex = Math.max(Math.min(lastVisibleIndex,
+      this._rows.length-1), 0);
 
     if (forceUpdate ||
         this._rowRange.getLength() !== 1+lastVisibleIndex-firstVisibleIndex ||

@@ -18,6 +18,10 @@
     address.cursor.modifySolve(address.index, {plus2: false, dnf: true});
   };
 
+  TimesListController.prototype._moveTo = function(address, puzzleId) {
+    address.cursor.moveSolve(address.index, puzzleId);
+  };
+
   TimesListController.prototype._plus2 = function(address) {
     address.cursor.modifySolve(address.index, {plus2: true, dnf: false});
   };
