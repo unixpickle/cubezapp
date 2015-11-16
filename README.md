@@ -2,7 +2,7 @@
 
 Cubezapp will be the best cube timer in existence. It will support scramble generation and 3D rendering (with WebGL), online cloud storage for times, graphs, statistical analysis, and more.
 
-**CURRENT STATUS**: I have just begun rewriting this webapp to implement the full design and feature list.
+**CURRENT STATUS**: I am currently developing [graphalicious](https://github.com/unixpickle/graphalicious.git) for the graphing system.
 
 # TODO
 
