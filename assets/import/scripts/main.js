@@ -6,6 +6,10 @@
 
   window.filePicker.onData = function(data) {
     var existingData, importingData;
+    if (!localStorage.localStoreData) {
+      console.log('you must have some existing Cubezapp data first');
+      return;
+    }
     try {
       existingData = JSON.parse(localStorage.localStoreData);
       importingData = JSON.parse(data);
