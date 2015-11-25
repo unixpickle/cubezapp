@@ -1,4 +1,4 @@
-// average.js version 1.0.1
+// average.js version 1.1.0
 //
 // Copyright (c) 2015, Alexander Nichol.
 // All rights reserved.
@@ -87,6 +87,68 @@
     res._chronologicalValues = this._chronologicalValues.copy();
     res._sortedValues = this._sortedValues.copy();
     return res;
+  };
+
+  // integralValueForAverageBelow computes the highest positive integer value
+  // which could be passed to pushValue() while keeping the total average below a
+  // certain value.
+  // If no such integer exists, this returns NaN.
+  // If any integer value yields a satisfactory average, this returns Infinity.
+  CenterAverage.prototype.integralValueForAverageBelow = function(target) {
+    // TODO: optimize this.
+
+    if (this._sortedValues.count() < this._size-1) {
+      return NaN;
+    }
+
+    var low = 0;
+    var high = 1;
+
+    // Verify that the lower bound even *works*.
+    var tempCenter = this.copy();
+    tempCenter.pushValue(low);
+    var tempAvg = tempCenter.average();
+    if (isNaN(tempAvg) || tempAvg >= target) {
+      return NaN;
+    }
+
+    // Compute the upper bound.
+    var i;
+    for (i = 0; i < 51; ++i) {
+      var newAverage = this.copy();
+      newAverage.pushValue(high);
+      var avg = newAverage.average();
+      if (isNaN(avg)) {
+        return NaN;
+      } else if (avg >= target) {
+        break;
+      }
+      high *= 2;
+    }
+    if (i === 51) {
+      return Infinity;
+    }
+
+    while (low+1 < high) {
+      var mid = Math.round((low + high) / 2);
+      var newAverage = this.copy();
+      newAverage.pushValue(mid);
+      var avg = newAverage.average();
+      if (isNaN(avg)) {
+        throw new Error('impossible NaN result');
+      }
+      if (avg < target) {
+        low = mid;
+      } else if (avg >= target) {
+        high = mid;
+      }
+    }
+
+    if (high <= low) {
+      throw new Error('impossible result from binary search');
+    }
+
+    return low;
   };
 
   // pushValue adds the next value to the rolling average and removes the very

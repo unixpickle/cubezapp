@@ -42,7 +42,7 @@
     ++this._count;
     if (!solve.dnf) {
       ++this._nonDNF;
-      var time = window.app.solveTime(solve);
+      var time = canonicalSolveTime(solve);
       this._timeSum += time;
       if (this._bestSolve === null || this._bestTime > time) {
         this._bestSolve = solve;
@@ -144,7 +144,7 @@
     if (this._filter && solve.dnf) {
       return;
     }
-    var time = solve.dnf ? Infinity : window.app.solveTime(solve);
+    var time = solve.dnf ? Infinity : canonicalSolveTime(solve);
     this._center.pushValue(time);
     this._solves.push(solve);
     if (this._solves.count() > this._size) {
@@ -171,7 +171,7 @@
       } else if (b.solve.dnf) {
         return -1;
       }
-      return window.app.solveTime(a.solve) - window.app.solveTime(b.solve);
+      return canonicalSolveTime(a.solve) - canonicalSolveTime(b.solve);
     });
 
     for (var i = 0; i < this._numRemove; ++i) {
@@ -186,16 +186,10 @@
   };
 
   AverageComputer.prototype.timeToBeat = function(average) {
-    // Find the first average that would *appear* lower than the current
-    // average. For instance, If we have 1111 milliseconds, we want to get 1109 
-    // milliseconds or lower 1109.
-    var beat = average - (average%10) - 1;
-    if (beat < 0) {
-      return NaN;
-    }
-
-    var time = this._center.valueNeededForAverage(beat);
-    if (isNaN(time) || time < 0) {
+    average = Math.floor(average);
+    var beat = average - (average%10);
+    var time = this._center.integralValueForAverageBelow(beat);
+    if (isNaN(time) || !isFinite(time)) {
       return NaN;
     } else {
       return Math.floor(time);
@@ -260,6 +254,11 @@
 
   function averageBeatsAverage(newAverage, oldAverage) {
     return Math.floor(newAverage / 10) < Math.floor(oldAverage / 10);
+  }
+
+  function canonicalSolveTime(solve) {
+    var time = window.app.solveTime(solve);
+    return time - (time % 10);
   }
 
   window.app.OfflineAverages = OfflineAverages;
