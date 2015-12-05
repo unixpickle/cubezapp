@@ -21,7 +21,7 @@ function importTime() {
       memo: Math.floor(memo * 1000),
       notes: '',
       plus2: false,
-      scramble: scramble,
+      scramble: scramble || null,
       scrambler: scrambler,
       scrambleType: scrambleType,
       time: Math.floor(time * 1000),
