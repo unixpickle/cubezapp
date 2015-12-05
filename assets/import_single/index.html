@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Import Single</title>
+    <script src="../external/puzzle.web.0.17.3.js"></script>
+    <script src="main.js"></script>
+  </head>
+  <body>
+    <p>
+      Puzzle: <select id="puzzle"></select><br>
+      Time in seconds: <input id="time"><br>
+      Memo time in seconds: <input id="memo" value="-1"><br>
+      Scramble: <input id="scramble"><br>
+      Scrambler: <select id="scrambler"></select><br>
+      Scramble type: <select id="scramble-type"></select>
+    </p>
+
+    <p>
+      Month (1-12): <input id="month"><br>
+      Day (1-31): <input id="day"><br>
+      Year (e.g. 2015): <input id="year"><br>
+      Hour (0-23): <input id="hour"><br>
+      Minute (0-59): <input id="minute"><br>
+      Second (0-59): <input id="second" value="0"><br>
+    </p>
+
+    <button onclick="importTime()">Import!</button>
+  </body>
+</html>
