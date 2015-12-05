@@ -204,6 +204,8 @@
     this._lazySolves.on('modify', this._handleModify.bind(this));
 
     window.app.timer.on('active', this._hideContextMenu.bind(this));
+    window.app.viewEvents.on('footer.partlyVisible', this._hideContextMenu.bind(this));
+    window.app.viewEvents.on('footer.hidden', this._hideContextMenu.bind(this));
   };
 
   TimesList.prototype._registerViewEvents = function() {
