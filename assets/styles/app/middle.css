@@ -69,6 +69,7 @@
   pointer-events: none;
 
   font-family: 'Roboto', sans-serif;
+  font-weight: 100;
 }
 
 #time .blinker {
