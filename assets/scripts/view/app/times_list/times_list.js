@@ -227,9 +227,13 @@
     var visibleBottom = visibleTop + visibleHeight;
 
     var newScrollTop = null;
-    if (rowTop < visibleTop) {
+
+    // NOTE: on Chrome on windows, being scrolled to the bottom has some weird
+    // quirks, so we must use a fudge factor of 1 pixel.
+    // Example: rowBottom=330, visibleBottom=329.18
+    if (rowTop < visibleTop-1) {
       newScrollTop = rowTop;
-    } else if (rowBottom > visibleBottom) {
+    } else if (rowBottom > visibleBottom+1) {
       newScrollTop = rowBottom - visibleHeight
     }
 
