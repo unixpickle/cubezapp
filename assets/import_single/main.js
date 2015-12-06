@@ -18,7 +18,7 @@ function importTime() {
     var solve = {
       date: timestamp,
       dnf: false,
-      memo: Math.floor(memo * 1000),
+      memo: (memo === -1 ? -1 : Math.floor(memo * 1000)),
       notes: '',
       plus2: false,
       scramble: scramble || null,
