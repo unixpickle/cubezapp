@@ -8,7 +8,7 @@
 
   // FILTER_DNF_CUTOFF is the first average size for which DNFs should be
   // completely ignored.
-  var FILTER_DNF_CUTOFF = 50;
+  var FILTER_DNF_CUTOFF = Infinity;
 
   var NUM_REMOVE = [0, 1, 1, 3, 5, 50];
   var SIZES = [3, 5, 12, 50, 100, 1000];
