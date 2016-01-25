@@ -1,4 +1,4 @@
-// puzzlejs.perms version 0.17.3
+// puzzlejs.perms version 0.17.4
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -394,7 +394,7 @@
 
 
 })();
-// puzzlejs.symmetry version 0.17.3
+// puzzlejs.symmetry version 0.17.4
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -521,7 +521,7 @@
 
 
 })();
-// puzzlejs.pocketcube version 0.17.3
+// puzzlejs.pocketcube version 0.17.4
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -1220,7 +1220,7 @@
 
 
 })();
-// puzzlejs.rubik version 0.17.3
+// puzzlejs.rubik version 0.17.4
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -1480,11 +1480,36 @@
     return result;
   }
 
+  function random2GLL() {
+    var result = new Cube();
+    result.corners = pocketcube.randomLastLayer();
+
+    var numCornerTurns = Math.floor(Math.random() * 4);
+    var topCorners = [6, 2, 3, 7];
+    for (var i = 0; i < 4; ++i) {
+      var piece = topCorners[(i+numCornerTurns)%4];
+      var slot = topCorners[i];
+      var corner = result.corners.corners[slot];
+      corner.piece = piece;
+      corner.orientation = Math.floor(Math.random() * 3);
+    }
+    var cornerParity = (numCornerTurns%2 === 0);
+
+    var edgePerm = perms.randomPermParity(4, cornerParity);
+    var topEdges = [0, 4, 5, 6];
+    for (var i = 0; i < 4; ++i) {
+      result.edges.edges[topEdges[i]].piece = topEdges[edgePerm[i]];
+    }
+
+    return result;
+  }
+
   exports.randomCorners = randomCorners;
   exports.randomEdges = randomEdges;
   exports.randomLastLayer = randomLastLayer;
   exports.randomState = randomState;
   exports.randomZBLL = randomZBLL;
+  exports.random2GLL = random2GLL;
 
 
   // moveSymInvConjugates[m][s] gives s*m*s'.
@@ -4075,7 +4100,7 @@
 
 
 })();
-// puzzlejs.skewb version 0.17.3
+// puzzlejs.skewb version 0.17.4
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -4765,7 +4790,7 @@
 
 
 })();
-// puzzlejs.bigcube version 0.17.3
+// puzzlejs.bigcube version 0.17.4
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5132,7 +5157,7 @@
 
 
 })();
-// puzzlejs.pyraminx version 0.17.3
+// puzzlejs.pyraminx version 0.17.4
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5801,7 +5826,7 @@
 
 
 })();
-// puzzlejs.megaminx version 0.17.3
+// puzzlejs.megaminx version 0.17.4
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -5879,7 +5904,7 @@
 
 
 })();
-// puzzlejs.scrambler version 0.17.3
+// puzzlejs.scrambler version 0.17.4
 //
 // Copyright (c) 2015, Alex Nichol.
 // All rights reserved.
@@ -6042,7 +6067,12 @@
             f: rubikEdges,
             moves: false,
             name: "Edges"
-          }
+          },
+          {
+            f: rubik2GLL,
+            moves: false,
+            name: "2-Gen LL"
+          },
         ]
       },
       {
@@ -6202,6 +6232,10 @@
 
   function rubikZBLL() {
     return solveRubikState(rubik.randomZBLL);
+  }
+
+  function rubik2GLL() {
+    return solveRubikState(rubik.random2GLL);
   }
 
   function solveRubikState(stateGen) {
