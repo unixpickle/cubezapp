@@ -72,7 +72,7 @@ I trust that, as you implement animations, you will test them on slower devices.
 
 # License
 
-**cubezapp2** is licensed under the BSD 2-clause license. See [LICENSE](LICENSE).
+**cubezapp2** is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License](http://creativecommons.org/licenses/by-nc-nd/4.0/legalcode). See [LICENSE.md](LICENSE.md).
 
 ```
 Copyright (c) 2015, Alexander Nichol and Jonathan Loeb.
